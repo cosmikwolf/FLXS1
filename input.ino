@@ -20,7 +20,7 @@
 #define SW_14    14
 #define SW_15    15
 #define SW_PLAY  16
-#define SW_REC 17
+#define SW_REC   17
 #define SW_STOP  18
 #define SW_M0    19
 #define SW_M1    20
@@ -30,7 +30,6 @@
 #define SW_PGUP  24
 #define SW_MENU  25
 #define SW_ALT   26
-
 
 #define ENCODER1LEFTPIN 17
 #define ENCODER1RIGHTPIN 16
@@ -90,18 +89,136 @@ void buttonSetup() {
 
 void buttonLoop(){
   max7301.update();
-
-  unsigned long loopTimer = micros();
   encoderLoop();
-    encoderLoopTime = ((micros() - loopTimer) + 9*encoderLoopTime)/10;
-    loopTimer = micros();
-  smallButtonLoop();
-    smallButtonLoopTime = ((micros() - loopTimer) + 9*smallButtonLoopTime)/10;
-    loopTimer = micros();
-  matrixButtonLoop();
-    matrixButtonTime = ((micros() - loopTimer) + 9*matrixButtonTime)/ 10;
-    loopTimer = micros();
+  snapDomeLoop();
 }
+
+void snapDomeLoop(){
+  // for matrix buttons
+  for (int i=0; i < 16; i++){
+    if (max7301.fell(i)){
+      switch (settingMode) {
+        case 0:
+          stepModeMatrixHandler(i);
+          break; 
+        case 1:
+      //    sequencerMenuButtonHandler(i);
+          break;
+        case 2:
+     //     globalMenuButtonHandler(i);
+          break;
+        default:
+       //   menuItemButtonHandler(settingMode, i);
+          break;
+      }
+    }
+  }
+  // for all other buttons
+  for (int i=16; i <27; i++){
+    if (max7301.fell(i) ){
+      switch (i){
+        // left row bottom up
+        case SW_M0:
+          if (settingMode == PATTERN_SELECT){
+            stepMode = 0;
+            settingMode = STEP_DISPLAY;
+          } else {
+            stepMode = 4; 
+            settingMode = PATTERN_SELECT;
+          }
+          break;
+
+        case SW_M1:
+          stepMode = 3;
+          break;
+
+        case SW_PGDN:
+     //     stepMode = 4;
+    //      settingMode = TEMPO_SET;
+          colorWipe(pixels.Color(255, 0, 0), 50); // Red
+
+          break;
+
+        case SW_M3:
+          settingMode = positive_modulo(settingMode + 1, 3);
+          break;
+
+        case SW_STOP:
+          if (!playing){ //if the sequence is already paused, stop kills all internal sound.
+            for(int s = 0; s < sequenceCount; s++){
+              sam2695.allNotesOff(s);
+            }
+          }
+          playing = false;
+          for(int s = 0; s < sequenceCount; s++){
+            sequence[s].activeStep = 0;
+           // sam2695.allNotesOff(s);
+          }
+          break;
+
+        // right two, bottom up
+        case SW_PLAY:
+          playing = !playing;
+          break;
+
+        case SW_M2:
+            if (settingMode == SEQUENCE_SELECT){
+              stepMode = 0;
+              settingMode = 0;
+            } else {
+              stepMode = 4; 
+              settingMode = SEQUENCE_SELECT;
+            }  
+          break;
+      }
+    }
+  }
+}
+
+
+void stepModeMatrixHandler(uint8_t i){
+//  need2save = true;
+//  saveTimer = 0;
+  if(selectedStep == i && stepMode == 0){
+    stepMode = 1; // change the step length
+    knob1.write(0);
+    stepModeBuffer = sequence[selectedSequence].stepData[i].gateLength;
+  } else if (selectedStep == i && stepMode != 0){
+    stepMode = positive_modulo(stepMode + 1, 3); // change the step length
+    knob1.write(0);
+    stepModeBuffer = sequence[selectedSequence].stepData[i].gateType;
+  } else {
+    stepMode = 0;
+    selectedStep = i;
+    // since the selected step changed, we need to reset the knob2 value to 0
+    knob1.write(0);
+    knob1previousValue = 0;
+    stepModeBuffer = sequence[selectedSequence].getStepPitch(selectedStep);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void encoderLoop(){
   knob1Buffer = knob1.read()/-4;
@@ -112,7 +229,7 @@ void encoderLoop(){
     knob1previousValue = knob1Buffer;
     switch (settingMode) {
       case 0: // step mode
-      /*  switch (stepMode) {
+        switch (stepMode) {
           case 0:
           // just change the note
             if (knob1Buffer + sequence[selectedSequence].getStepPitch(selectedStep) < 0){
@@ -150,7 +267,7 @@ void encoderLoop(){
             break;
         }
         break;
-*/
+
       case SEQUENCE_SPED: // speed setting
         switch(menuSelection){
           case 0:
@@ -183,6 +300,7 @@ void encoderLoop(){
 
 }
 
+/*
 void matrixButtonLoop(){
   for (int i=0; i < numSteps; i++){
     if (max7301.fell(i)){
@@ -203,7 +321,7 @@ void matrixButtonLoop(){
     }
     
   }
-}
+}*/
 
 // adding a menu item requires an entry here, in the menuItemButtonHandler, as well as a 
 // menuItem case in the display.ino file. all cases should be referenced by a #define that 
@@ -401,27 +519,6 @@ void globalMenuButtonHandler(uint8_t buttonId){
       default:
         settingMode = 0;
         break;
-  }
-}
-
-void stepModeButtonHandler(uint8_t i){
-  need2save = true;
-  saveTimer = 0;
-  if(selectedStep == i && stepMode == 0){
-    stepMode = 1; // change the step length
-    knob1.write(0);
-    stepModeBuffer = sequence[selectedSequence].stepData[i].gateLength;
-  } else if (selectedStep == i && stepMode != 0){
-    stepMode = positive_modulo(stepMode + 1, 3); // change the step length
-    knob1.write(0);
-    stepModeBuffer = sequence[selectedSequence].stepData[i].gateType;
-  } else {
-    stepMode = 0;
-    selectedStep = i;
-    // since the selected step changed, we need to reset the knob2 value to 0
-    knob1.write(0);
-    knob1previousValue = 0;
-    stepModeBuffer = sequence[selectedSequence].getStepPitch(selectedStep);
   }
 }
 

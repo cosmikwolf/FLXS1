@@ -13,8 +13,7 @@
 #include "NoteDatum.h"
 
 //STATE DEFINITIONS:
-
-#define STEP_MODE				0
+#define STEP_DISPLAY		0
 #define	SEQUENCE_SELECT	1
 #define SEQUENCE_NAME   65
 #define SEQUENCE_SPED   66
@@ -38,6 +37,29 @@
 #define PATTERN_SELECT  96
 #define SEQUENCE_SELECT 97
 
+float midiFreq[128] = { 8.17, 8.66, 9.17, 9.72, 10.30, 10.91, 11.56, 12.24, 12.97, 13.75, 14.56, 15.43, 16.35, 17.32, 18.35,
+ 19.44, 20.60, 21.82, 23.12, 24.49, 25.95, 27.50, 29.13, 30.86, 32.70, 34.64, 36.70, 38.89, 41.20, 43.65, 46.24, 48.99, 51.91,
+ 55.00, 58.27, 61.73, 65.40, 69.29, 73.41, 77.78, 82.40, 87.30, 92.49, 97.99, 103.82, 110.00, 116.54, 123.47, 130.81, 138.59,
+ 146.83, 155.56, 164.81, 174.61, 184.99, 195.99, 207.65, 220.00, 233.08, 246.94, 261.62, 277.18, 293.66, 311.12, 329.62, 349.22,
+ 369.99, 391.99, 415.30, 440.00, 466.16, 493.88, 523.25, 554.36, 587.32, 622.25, 659.25, 698.45, 739.98, 783.99, 830.60, 880.00,
+ 932.32, 987.76, 1046.50, 1108.73, 1174.65, 1244.50, 1318.51, 1396.91, 1479.97, 1567.98, 1661.21, 1760.00, 1864.65, 1975.53,
+ 2093.00, 2217.46, 2349.31, 2489.01, 2637.02, 2793.82, 2959.95, 3135.96, 3322.43, 3520.00, 3729.31, 3951.06, 4186.00, 4434.92,
+ 4698.63, 4978.03, 5274.04, 5587.65, 5919.91, 6271.92, 6644.87, 7040.00, 7458.62, 7902.13, 8372.01, 8869.84, 9397.27, 9956.06,
+ 10548.08, 11175.30, 11839.82, 12543.85 };
+
+const char* midiNotes[] = {
+ "C -2","C#-2","D -2","D#-2","E -2","F -2","F#-2","G -2","G#-2","A -2","A#-2","B -2",
+ "C -1","C#-1","D -1","D#-1","E -1","F -1","F#-1","G -1","G#-1","A -1","A#-1","B -1",
+ "C  0","C# 0","D  0","D# 0","E  0","F  0","F# 0","G  0","G# 0","A  0","A# 0","B  0",
+ "C  1","C# 1","D  1","D# 1","E  1","F  1","F# 1","G  1","G# 1","A  1","A# 1","B  1",
+ "C  2","C# 2","D  2","D# 2","E  2","F  2","F# 2","G  2","G# 2","A  2","A# 2","B  2",
+ "C  3","C# 3","D  3","D# 3","E  3","F  3","F# 3","G  3","G# 3","A  3","A# 3","B  3",
+ "C  4","C# 4","D  4","D# 4","E  4","F  4","F# 4","G  4","G# 4","A  4","A# 4","B  4",
+ "C  5","C# 5","D  5","D# 5","E  5","F  5","F# 5","G  5","G# 5","A  5","A# 5","B  5",
+ "C  6","C# 6","D  6","D# 6","E  6","F  6","F# 6","G  6","G# 6","A  6","A# 6","B  6",
+ "C  7","C# 7","D  7","D# 7","E  7","F  7","F# 7","G  7","G# 7","A  7","A# 7","B  7",
+ "C  8","C# 8","D  8","D# 8","E  8","F  8","F# 8","G  8" }; 
+
 int tempVar = 0;
 
 
@@ -50,8 +72,8 @@ uint8_t numSteps = 16;
 
 uint8_t	currentState = 0;
 
-uint8_t stepMode; 
-uint8_t settingMode;
+uint8_t stepMode = 0; 
+uint8_t settingMode = 0;
 uint8_t selectedStep = 0;
 uint8_t menuSelection = 127;
 
@@ -64,7 +86,7 @@ boolean playing = false;
 boolean wasPlaying = false;
 boolean tempoBlip = false;
 boolean firstRun = false;
-boolean  extClock = false;
+boolean extClock = false;
 boolean need2save = false;
 
 unsigned long beatLength = 60000000/tempo;
@@ -97,17 +119,19 @@ elapsedMicros pixelTimer;
 elapsedMicros displayTimer;
 
 IntervalTimer masterClock;
-Sequencer sequence[4];
-NoteDatum noteData[4];
-Zetaohm_SAM2695 sam2695;
+Sequencer sequence[1];
+NoteDatum noteData[1];
 File saveData;
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(20, 0, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(20, 0, NEO_GRB + NEO_KHZ800);
+Zetaohm_SAM2695 sam2695;
 
 
 //end afx-01a
 
 coord_t height, width;
-font_t font;
+font_t fontSm;
+font_t fontMd;
+font_t fontLg;
 
 void setup() {
 	Serial.begin(115200);
@@ -117,21 +141,36 @@ void setup() {
 	SPI.setMOSI(11);
 	SPI.setSCK(13);
 
-	Serial.println("Initializing Neopixels");
-	pixels.begin();
-	pixels.setBrightness(25);
+	Serial.println("Initializing Sequence Objects");
+	sequence[0].initialize(0, 16, 4, tempo);
+	sequence[1].initialize(1, 16, 4, tempo);
+	sequence[2].initialize(2, 16, 4, tempo);
+	sequence[3].initialize(3, 16, 4, tempo);
+  Serial.println("Initializing SAM2695");
 
+  sam2695.programChange(0, 0, 29);       // give our two channels different voices
+  sam2695.programChange(0, 1, 30);
+  sam2695.programChange(0, 2, 128);       // give our two channels different voices
+  sam2695.programChange(0, 3, 29);
+
+  sam2695.begin();
+
+	Serial.println("Initializing Neopixels");
+	ledSetup();
+	
 	Serial.println("Initializing Display");
 	displayStartup();
 
 	Serial.println("Initializing Button Array");
 	buttonSetup();
 
-	Serial.println("Initializing Sequence Objects");
-	sequence[0].initialize(0, 16, 4, tempo);
-	sequence[1].initialize(1, 16, 4, tempo);
-	sequence[2].initialize(2, 16, 4, tempo);
-	sequence[3].initialize(3, 16, 4, tempo);
+  Serial.println("Initializing MIDI");
+  MIDI.begin(MIDI_CHANNEL_OMNI);
+//  midiSetup();
+
+
+
+
 
 	Serial.println("Beginning Master Clock");
 	masterClock.begin(masterClockFunc,masterClockInterval);
@@ -149,7 +188,7 @@ void loop() {
 //	gdispClear(Black);
 	displayLoop();
 	ledLoop();
-buttonLoop();
+	buttonLoop();
 }
 
 inline int positive_modulo(int i, int n) {

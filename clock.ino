@@ -9,13 +9,13 @@ void changeTempo(uint16_t newTempo){
 void masterClockFunc(){ 
   elapsedMicros loopTimer = 0;
 
-  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
-  timerAvg = (lastTimer + 9*timerAvg) /10;
-  lastMicros = micros();
-
-  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
-  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
-  lastAvgInterval = avgInterval;
+//  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
+//  timerAvg = (lastTimer + 9*timerAvg) /10;
+//  lastMicros = micros();
+//
+//  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
+//  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
+//  lastAvgInterval = avgInterval;
 
   if(playing){
     if( extClock == false ){ 
@@ -38,8 +38,8 @@ void internalClockTick(){
   if (wasPlaying == false){
     Serial.println("TestTimer: " + String(testTimer));
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
-    MIDI.send(Start, 0, 0, 1);
-    MIDI.sendSongPosition(0);
+   // MIDI.send(Start, 0, 0, 1);
+   // MIDI.sendSongPosition(0);
     masterTempoTimer = 0;
     masterPulseCount = 0;
     internalClockTimer = 0;
@@ -110,12 +110,12 @@ void noteOnSwitch(){
         sam2695.noteOn(noteData[i].channel, noteData[i].noteOnArray[n], 127);
         MIDI.sendNoteOn(noteData[i].noteOnArray[n], noteData[i].noteVelArray[n], noteData[i].channel);
 
-        Serial.println( "noteOn: " + String(noteData[i].noteOnArray[n]) 
-         + "\tbt: " + String(sequence[selectedSequence].beatTracker) 
-         + "\tch: " + String(noteData[i].channel)
-         + "\tseq: " + String(noteData[i].sequenceTime)
-         + "\toff: " + String(noteData[i].offset)
-         + "\tstartTime: " + String(startTime));
+        //Serial.println( "noteOn: " + String(noteData[i].noteOnArray[n]) 
+        // + "\tbt: " + String(sequence[selectedSequence].beatTracker) 
+        // + "\tch: " + String(noteData[i].channel)
+        // + "\tseq: " + String(noteData[i].sequenceTime)
+        // + "\toff: " + String(noteData[i].offset)
+        // + "\tstartTime: " + String(startTime));
       }
     }
   }

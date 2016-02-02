@@ -1,45 +1,37 @@
 uint8_t ledMapping[] = {3,2,1,0,8,7,6,5,13,12,11,10,18,17,16,15,4,9,14,19};
 
+void ledSetup(){
+  pinMode(0, OUTPUT);
+  digitalWrite(0, LOW);
+  pixels.begin();
+  pixels.setBrightness(35);
+}
+
 void ledLoop(){
-/*  for(int i = 0; i < 20; i++){
-    if (tempVar == i){
-      pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255)); 
-    } else {
-      pixels.setPixelColor(ledMapping[i], Wheel( millis()/2 ) );
-    }
-  }
-  pixels.show();
-  if (  pixelTimer > 200000 ){
-    tempVar++;
-      pixelTimer = 0;
-
-  }
-  if (tempVar > 15){
-    tempVar = 0;
-  }
-  */
-
-
   if (pixelTimer > 20000){
-    if (settingMode == 0){
-      for (int i=0; i < 16; i++){
-        if (i == sequence[selectedSequence].activeStep ){
-          pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );      
-        } else if ( i == selectedStep) {
-           pixels.setPixelColor(ledMapping[selectedStep], Wheel(int(millis()/3)%255) );      
-        } else {
-          if(sequence[selectedSequence].stepData[ledMapping[i]].gateType == 0){
-            pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
+    switch (settingMode ){
+      case STEP_DISPLAY:
+        for (int i=0; i < 16; i++){
+          if (i == sequence[selectedSequence].activeStep ){
+            pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );      
+          } else if ( i == selectedStep) {
+            pixels.setPixelColor(ledMapping[selectedStep], Wheel(int(millis()/3)%255) );      
           } else {
-            pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedSequence].getStepPitch(i) ) );
+            if(sequence[selectedSequence].stepData[i].gateType == 0){
+              pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
+            } else {
+              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedSequence].getStepPitch(i) ) );
+            }
           }
         }
-      }
-      pixels.show();
+      break;
+      case PATTERN_SELECT:
+        nonBlockingRainbow(10);
+      break;
     }
-  pixelTimer = 0;
+    pixels.show();
+    pixelTimer = 0;
   }
-
 }
 
 

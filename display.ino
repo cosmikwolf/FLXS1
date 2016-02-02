@@ -18,7 +18,9 @@ void displayStartup(){
   //surface = gdispPixmapGetBits(pixmap);
 
 
-  font = gdispOpenFont("UI1");
+  fontSm = gdispOpenFont("DejaVuSans10");
+  fontMd = gdispOpenFont("DejaVuSans20");
+  fontLg = gdispOpenFont("DejaVuSans32");
   gdispClear(Black);
 
  // gdispGDrawStringBox(pixmap, 0, 0, width, 50, "ZETAOHM", font, White, justifyCenter);
@@ -36,17 +38,16 @@ void displayStartup(){
   delay(100);
   nonBlockingRainbow(2);
   delay(100);
-  changeState(STEP_MODE);
+  changeState(STEP_DISPLAY);
   //gdispBlitArea(0, 0, PIXMAP_WIDTH, PIXMAP_HEIGHT, surface);
 
 
 }
 
 void displayLoop() {
-  //Serial.println(F("displayStart"));
-  if (displayTimer > 1000) {
+  if (displayTimer > 50000) {
    // runState(STEP_MODE);
-stepDisplay();
+  stepDisplay();
  //  if (settingMode == 0){
  //    stepDisplay();
  //  } else if (settingMode == 1){
@@ -63,35 +64,59 @@ stepDisplay();
 }
 
 void menuItem(uint8_t menuItem){ 
-  nonBlockingRainbow(2);
-  gdispDrawStringBox(0, 0, width, 50, "ZETAOHM", font, White, justifyCenter);
-  gdispDrawStringBox(0, height/2, width, 30, "MENU MODE", font, White, justifyCenter);
- 
+  //nonBlockingRainbow(2);
+  gdispDrawStringBox(0, 0, 32, 64, "ZETAOHM", fontSm, White, justifyCenter);
+  gdispDrawStringBox(0, height/2, width, 30, "MENU MODE", fontSm, White, justifyCenter);
 }
 
 void sequenceMenuDisplay(){
-  nonBlockingRainbow(2);
-  gdispFillStringBox(0, 0, width, 10, "ZETAOHM", font , Red, Green, justifyCenter);
-  gdispFillStringBox(0, height/2, width, 15,  "SEQUENCE", font, Blue, White, justifyCenter);
-  gdispFillStringBox(0, height/3, width, 15,  "MEMU", font, White, Black, justifyCenter);
+ // nonBlockingRainbow(2);
+  gdispFillStringBox(0, 0, width, 10, "ZETAOHM", fontSm , Red, Green, justifyCenter);
+  gdispFillStringBox(0, height/2, width, 15,  "SEQUENCE", fontSm, Blue, White, justifyCenter);
+  gdispFillStringBox(0, height/3, width, 15,  "MEMU", fontSm, White, Black, justifyCenter);
  }
 
 void globalMenuDisplay(){
-  nonBlockingRainbow(5);
-  gdispFillStringBox(0, 0, width, 10, "ZETAOHM", font , Red, Green, justifyCenter);
-  gdispFillStringBox(0, height/2, width, 15,  "GLOBAL", font, Blue, White, justifyCenter);
-  gdispFillStringBox(0, height/3, width, 15,  "MENU", font, White, Black, justifyCenter);
-
+  //nonBlockingRainbow(5);
+  gdispFillStringBox(0, 0, width, 10, "ZETAOHM", fontSm , Red, Green, justifyCenter);
+  gdispFillStringBox(0, height/2, width, 15,  "GLOBAL", fontSm, Blue, White, justifyCenter);
+  gdispFillStringBox(0, height/3, width, 15,  "MENU", fontSm, White, Black, justifyCenter);
 }
 
 void stepDisplay(){ 
   elapsedMicros timer1 = 0;
-  //colorWipe(pixels.Color(255, 0, 0), 50); 
-  gdispFillStringBox( 0, 0, width, 10, "ZETAOHM", font , Red, Green, justifyCenter);
-  gdispFillStringBox( 0, 20, width, 10,  "STEPMODE", font, Blue, White, justifyCenter);
-  gdispFillStringBox( 0, 30, width, 20,  "OMG", font, White, Black, justifyCenter);
 
-  //String(selectedSequence) + "|" + String(currentPattern)
+  const char* element;
+  
+  gdispFillStringBox( 64,  0, 64 , 10, "pitch", fontSm , White, Blue, justifyCenter);
+
+  element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
+  gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
+
+
+  element =  String("trak: " + String(selectedSequence)).c_str();
+  gdispFillStringBox( 64, 54, 32 , 10, element, fontSm, Green, White, justifyCenter);
+
+  element = String(selectedSequence).c_str();
+  gdispFillStringBox( 64, 64, 32 , 16, element, fontMd, Blue, White, justifyCenter);
+
+  element = String(currentPattern).c_str();
+  gdispFillStringBox( 96, 64, 32 , 16, element, fontSm, White, Magenta, justifyCenter);
+
+  element =  String("Stpmd: " + String(stepMode)).c_str();
+  gdispFillStringBox( 0, 0, 64 , 10, element, fontSm, Green, White, justifyCenter);
+  
+  element =  String("step: " + String(sequence[selectedSequence].activeStep)).c_str();
+  gdispFillStringBox( 0, 10, 64 , 10, element, fontSm, Green, White, justifyCenter);
+
+  element =  String("stng: " + String(settingMode)).c_str();
+  gdispFillStringBox( 0, 20, 64 , 10, element, fontSm, Green, White, justifyCenter);
+  
+  element =  String("sqnc: " + String(selectedSequence)).c_str();
+  gdispFillStringBox( 0, 30, 64 , 10, element, fontSm, Green, White, justifyCenter);
+
+
+  // + "|" + String(currentPattern)
 }
 
 
@@ -105,9 +130,9 @@ void menuItem(uint8_t menuItem){
 
   switch (menuItem){
     case GLOBAL_MIDI:
-      nonBlockingRainbow(5, globalSkip, 15 );
+      nonBlockingRainbow(5, globalSkip, 15 );;
 
-      display.setTextColor(WHITE);
+      display.setTextColor(WHITE)
       display.setCursor(9,1);
       display.setTextSize(2);
       display.println("MIDI MENU" );
@@ -116,8 +141,8 @@ void menuItem(uint8_t menuItem){
       display.setTextSize(1);
       display.print(" Midi Clock: " );
       if (extClock == true){
-        display.println("External");
-      } else {
+         display.println("External");
+     } else {
         display.println("Internal");
       };
       break;
