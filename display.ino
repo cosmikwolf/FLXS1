@@ -4,27 +4,29 @@
 
 #define PIXMAP_WIDTH  120
 #define PIXMAP_HEIGHT 80
+    coord_t   i, j;
 
 int color = 0;
 
 void displayStartup(){
+ 
   gfxInit();
-  gdispSetOrientation(GDISP_ROTATE_0);
+  //gdispSetOrientation(GDISP_ROTATE_0);
 
   width = gdispGetWidth();
   height = gdispGetHeight();
 
  // pixmap = gdispPixmapCreate(PIXMAP_WIDTH, PIXMAP_HEIGHT);
-  //surface = gdispPixmapGetBits(pixmap);
+ // surface = gdispPixmapGetBits(pixmap);
 
-
+  fontTny = gdispOpenFont("fixed_5x8");
   fontSm = gdispOpenFont("DejaVuSans10");
   fontMd = gdispOpenFont("DejaVuSans20");
   fontLg = gdispOpenFont("DejaVuSans32");
   gdispClear(Black);
 
- // gdispGDrawStringBox(pixmap, 0, 0, width, 50, "ZETAOHM", font, White, justifyCenter);
- // gdispGDrawStringBox(pixmap, 0, height/2, width, 30, "FLXS1 SEQUENCER", font, White, justifyCenter);
+ // gdispGDrawStringBox(pixmap, 0, 0, width, 50, "ZETAOHM", fontSm, White, justifyCenter);
+ // gdispGDrawStringBox(pixmap, 0, height/2, width, 30, "FLXS1 SEQUENCER", fontSm, White, justifyCenter);
 
   nonBlockingRainbow(2);
   delay(100);
@@ -39,24 +41,53 @@ void displayStartup(){
   nonBlockingRainbow(2);
   delay(100);
   changeState(STEP_DISPLAY);
-  //gdispBlitArea(0, 0, PIXMAP_WIDTH, PIXMAP_HEIGHT, surface);
 
-
+  gdispFillStringBox( 64,  0, 64 , 10, "TESTING", fontSm , White, Blue, justifyCenter);
+/*
+  i = j = 0;
+    while(TRUE) {
+      // Clear the old position
+      Serial.println("loop!" + String(millis()));
+      gdispFillArea(i, j, PIXMAP_WIDTH, PIXMAP_HEIGHT, Black);
+ 
+      // Change the position
+      i += PIXMAP_WIDTH/2;
+      if (i >= width - PIXMAP_WIDTH/2) {
+        i %= width - PIXMAP_WIDTH/2;
+        j = (j + PIXMAP_HEIGHT/2) % (height - PIXMAP_HEIGHT/2);
+      }
+ 
+      // Blit the pixmap to the real display at the new position
+      gdispBlitArea(i, j, PIXMAP_WIDTH, PIXMAP_HEIGHT, surface);
+      
+      // Wait
+      gfxSleepMilliseconds(100);
+    }
+ 
+    // Clean up
+    gdispPixmapDelete(pixmap);
+*/
 }
 
 void displayLoop() {
   if (displayTimer > 50000) {
    // runState(STEP_MODE);
-  stepDisplay();
- //  if (settingMode == 0){
- //    stepDisplay();
- //  } else if (settingMode == 1){
- //    sequenceMenuDisplay();
- //  } else if (settingMode == 2){
- //    globalMenuDisplay();
- //  } else {
- //    menuItem(settingMode);
- //  }
+    switch(currentState) {
+      case SEQUENCE_SELECT:
+        sequenceMenuDisplay();
+      break;
+      case STEP_DISPLAY:
+        stepDisplay();
+      break;
+    }
+    //    stepDisplay();
+    //  } else if (settingMode == 1){
+    //    sequenceMenuDisplay();
+    //  } else if (settingMode == 2){
+    //    globalMenuDisplay();
+    //  } else {
+    //    menuItem(settingMode);
+    //  }
    displayTimer = 0;
   }
 
@@ -85,25 +116,27 @@ void globalMenuDisplay(){
 
 void stepDisplay(){ 
   elapsedMicros timer1 = 0;
-
   const char* element;
   
+  // Pitch Display
   gdispFillStringBox( 64,  0, 64 , 10, "pitch", fontSm , White, Blue, justifyCenter);
-
   element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
   gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
 
+  // Instrument selection
+  element = String(instrumentNames[sequence[selectedSequence].instrument]).c_str();
+  gdispFillStringBox( 64, 34, 64 , 10, element, fontTny ,White , Blue, justifyCenter);
 
+  // Selected Sequence Number
   element =  String("trak: " + String(selectedSequence)).c_str();
   gdispFillStringBox( 64, 54, 32 , 10, element, fontSm, Green, White, justifyCenter);
-
   element = String(selectedSequence).c_str();
   gdispFillStringBox( 64, 64, 32 , 16, element, fontMd, Blue, White, justifyCenter);
 
   element = String(currentPattern).c_str();
   gdispFillStringBox( 96, 64, 32 , 16, element, fontSm, White, Magenta, justifyCenter);
 
-  element =  String("Stpmd: " + String(stepMode)).c_str();
+  element =  String("state: " + String(currentState)).c_str();
   gdispFillStringBox( 0, 0, 64 , 10, element, fontSm, Green, White, justifyCenter);
   
   element =  String("step: " + String(sequence[selectedSequence].activeStep)).c_str();
@@ -114,9 +147,6 @@ void stepDisplay(){
   
   element =  String("sqnc: " + String(selectedSequence)).c_str();
   gdispFillStringBox( 0, 30, 64 , 10, element, fontSm, Green, White, justifyCenter);
-
-
-  // + "|" + String(currentPattern)
 }
 
 

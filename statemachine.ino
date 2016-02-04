@@ -1,8 +1,9 @@
 // this subroutine initializes the new state. 
 void changeState(uint8_t state){
+	currentState = state;
 	switch(state){
 		case STEP_DISPLAY:
-			initializeStepMode();
+//			initializeStepMode();
 		break;
 	}
 }
@@ -20,8 +21,7 @@ void runState(uint8_t state){
 
 
 void initializeStepMode(){
-  gdispClear(Black);
-
+  //gdispClear(Black);
 }
 
 void runStepMode(){

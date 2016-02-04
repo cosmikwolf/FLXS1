@@ -4,7 +4,7 @@ void ledSetup(){
   pinMode(0, OUTPUT);
   digitalWrite(0, LOW);
   pixels.begin();
-  pixels.setBrightness(35);
+  pixels.setBrightness(10);
 }
 
 void ledLoop(){

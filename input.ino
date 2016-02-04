@@ -52,7 +52,6 @@ unsigned long encoderButtonTime;
 unsigned long matrixButtonTime;
 
 void buttonSetup() {
-
   Serial.println("button setup start");  delay(1);
   max7301.begin(0);                      delay(1);
   max7301.gpioPinMode(INPUT_PULLUP);     delay(1);
@@ -84,7 +83,6 @@ void buttonSetup() {
   max7301.init(25, 24);  // SW_MENU 
   max7301.init(26, 23);  // SW_ALT  
   Serial.println("button setup end");
-
 }
 
 void buttonLoop(){
@@ -139,8 +137,12 @@ void snapDomeLoop(){
 
           break;
 
-        case SW_M3:
-          settingMode = positive_modulo(settingMode + 1, 3);
+        case SW_M3: //switch M3 toggles the sequence menu
+          if(currentState == SEQUENCE_MENU){
+            changeState(STEP_DISPLAY);
+          } else {
+            changeState(SEQUENCE_MENU);
+          }
           break;
 
         case SW_STOP:
