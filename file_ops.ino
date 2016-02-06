@@ -15,11 +15,11 @@ void changePattern(uint8_t pattern, boolean saveFirst, boolean instant){
 }
 
 void initializeFlashMemory(){
-  pinMode(10, OUTPUT);
+  pinMode(2, OUTPUT);
   delay(10);
-  if (!SD.begin(10)) {
+  if (!card.init(SPI_HALF_SPEED, 2) {
     Serial.println("SD Card initialization failed!");
-    return;
+    //return;
   }
   // THIS IS THE LINE THAT DELETES THE DATAFILE EVERY TIME! 
   // deleteSaveFile();

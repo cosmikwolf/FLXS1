@@ -259,6 +259,11 @@ font_t fontSm;
 font_t fontMd;
 font_t fontLg;
 
+Sd2Card card;
+SdVolume volume;
+SdFile root;
+
+
 void setup() {
 	Serial.begin(115200);
 	delay(10);
@@ -293,6 +298,9 @@ void setup() {
   Serial.println("Initializing MIDI");
   MIDI.begin(MIDI_CHANNEL_OMNI);
 //  midiSetup();
+
+Serial.println("Initializing Flash Memory");
+	initializeFlashMemory();
 
 	Serial.println("Beginning Master Clock");
 	masterClock.begin(masterClockFunc,masterClockInterval);
