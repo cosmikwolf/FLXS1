@@ -9,7 +9,7 @@ void ledSetup(){
 
 void ledLoop(){
   if (pixelTimer > 20000){
-    switch (settingMode ){
+    switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
           if (i == sequence[selectedSequence].activeStep ){
@@ -22,6 +22,17 @@ void ledLoop(){
             } else {
               pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedSequence].getStepPitch(i) ) );
             }
+          }
+        }
+      break;
+      case CHANNEL_SELECT:
+        for (int i=0; i < 20; i++){
+          if (i<4){
+            pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
+          } else if (i == 17) {
+            pixels.setPixelColor(ledMapping[i], Wheel((millis()/5) % 255));
+          }else{
+            pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
           }
         }
       break;

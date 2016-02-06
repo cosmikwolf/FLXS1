@@ -43,6 +43,7 @@ void displayStartup(){
   changeState(STEP_DISPLAY);
 
   gdispFillStringBox( 64,  0, 64 , 10, "TESTING", fontSm , White, Blue, justifyCenter);
+  
 /*
   i = j = 0;
     while(TRUE) {
@@ -73,12 +74,22 @@ void displayLoop() {
   if (displayTimer > 50000) {
    // runState(STEP_MODE);
     switch(currentState) {
-      case SEQUENCE_SELECT:
-        sequenceMenuDisplay();
+      case CHANNEL_SELECT:
+        channelSelectDisplay();
       break;
       case STEP_DISPLAY:
         stepDisplay();
       break;
+      case PATTERN_SELECT:
+        patternSelectDisplay();
+      break;
+      case SEQUENCE_MENU:
+        sequenceMenuDisplay();
+      break;
+      case INSTRUMENT_SELECT:
+        instrumentSelectDisplay();
+      break;
+
     }
     //    stepDisplay();
     //  } else if (settingMode == 1){
@@ -94,18 +105,6 @@ void displayLoop() {
  // gdispBlitArea(0, 0, PIXMAP_WIDTH, PIXMAP_HEIGHT, surface);
 }
 
-void menuItem(uint8_t menuItem){ 
-  //nonBlockingRainbow(2);
-  gdispDrawStringBox(0, 0, 32, 64, "ZETAOHM", fontSm, White, justifyCenter);
-  gdispDrawStringBox(0, height/2, width, 30, "MENU MODE", fontSm, White, justifyCenter);
-}
-
-void sequenceMenuDisplay(){
- // nonBlockingRainbow(2);
-  gdispFillStringBox(0, 0, width, 10, "ZETAOHM", fontSm , Red, Green, justifyCenter);
-  gdispFillStringBox(0, height/2, width, 15,  "SEQUENCE", fontSm, Blue, White, justifyCenter);
-  gdispFillStringBox(0, height/3, width, 15,  "MEMU", fontSm, White, Black, justifyCenter);
- }
 
 void globalMenuDisplay(){
   //nonBlockingRainbow(5);
@@ -123,18 +122,22 @@ void stepDisplay(){
   element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
   gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
 
+  element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
+  gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
+
+  element = String(String("Gate: ") + sequence[selectedSequence].stepData[selectedStep].gateLength).c_str();
+  gdispFillStringBox( 64, 34, 64 , 10, element, fontSm ,Blue , White, justifyCenter);
+
   // Instrument selection
   element = String(instrumentNames[sequence[selectedSequence].instrument]).c_str();
-  gdispFillStringBox( 64, 34, 64 , 10, element, fontTny ,White , Blue, justifyCenter);
+  gdispFillStringBox( 64, 44, 64 , 10, element, fontTny ,White , Blue, justifyCenter);
 
   // Selected Sequence Number
-  element =  String("trak: " + String(selectedSequence)).c_str();
-  gdispFillStringBox( 64, 54, 32 , 10, element, fontSm, Green, White, justifyCenter);
-  element = String(selectedSequence).c_str();
-  gdispFillStringBox( 64, 64, 32 , 16, element, fontMd, Blue, White, justifyCenter);
+  element =  String("ch: " + String(selectedSequence+1)).c_str();
+  gdispFillStringBox( 64, 86, 32 , 10, element, fontSm, Blue, White, justifyCenter);
 
-  element = String(currentPattern).c_str();
-  gdispFillStringBox( 96, 64, 32 , 16, element, fontSm, White, Magenta, justifyCenter);
+  element = String("pt: " + String(currentPattern)).c_str();
+  gdispFillStringBox( 96, 86, 32 , 10, element, fontSm, White, Magenta, justifyCenter);
 
   element =  String("state: " + String(currentState)).c_str();
   gdispFillStringBox( 0, 0, 64 , 10, element, fontSm, Green, White, justifyCenter);
@@ -142,13 +145,62 @@ void stepDisplay(){
   element =  String("step: " + String(sequence[selectedSequence].activeStep)).c_str();
   gdispFillStringBox( 0, 10, 64 , 10, element, fontSm, Green, White, justifyCenter);
 
-  element =  String("stng: " + String(settingMode)).c_str();
+  element =  String("stmd: " + String(stepMode)).c_str();
   gdispFillStringBox( 0, 20, 64 , 10, element, fontSm, Green, White, justifyCenter);
   
   element =  String("sqnc: " + String(selectedSequence)).c_str();
   gdispFillStringBox( 0, 30, 64 , 10, element, fontSm, Green, White, justifyCenter);
 }
 
+void channelSelectDisplay() {
+  const char* element;
+
+  element =  "1";
+  gdispFillStringBox(  0, 0, 32 , 96, element, fontLg, Red, White, justifyCenter);
+  element =  "2";
+  gdispFillStringBox( 32, 0, 32 , 96, element, fontLg, Green, White, justifyCenter);
+  element =  "3";
+  gdispFillStringBox( 64, 0, 32 , 96, element, fontLg, Blue, White, justifyCenter);
+  element =  "4";
+  gdispFillStringBox( 96, 0, 32 , 96, element, fontLg, Purple, White, justifyCenter);
+
+}
+
+void patternSelectDisplay(){
+ // nonBlockingRainbow(2);
+  gdispFillStringBox(0, 0, width, 10, "ZETAOHM", fontSm , Red, Green, justifyCenter);
+  gdispFillStringBox(0, height/2, width, 15,  "SEQUENCE", fontSm, Blue, White, justifyCenter);
+  gdispFillStringBox(0, height/3, width, 15,  "MEMU", fontSm, White, Black, justifyCenter);
+ }
+
+void sequenceMenuDisplay(){ 
+  const char* element;
+
+  element =  "INST";
+  gdispFillStringBox(   0, 0, 32 , 24, element, fontSm, Orange, Red, justifyCenter);
+  element =  "1";
+  gdispFillStringBox(  32, 0, 32 , 24, element, fontLg, Red, Orange, justifyCenter);
+  element =  "1";
+  gdispFillStringBox(  64, 0, 32 , 24, element, fontLg, Red, Blue, justifyCenter);
+  element =  "1";
+  gdispFillStringBox(  96, 0, 32 , 24, element, fontLg, Red, Purple, justifyCenter);
+
+}
+
+void instrumentSelectDisplay(){
+  const char* element;
+
+  element =  "INSTRUMENT SELECT";
+  gdispFillStringBox(   0, 31, 128 , 10, element, fontSm, Orange, Red, justifyCenter);
+
+  element = String(instrumentNames[sequence[selectedSequence].instrument]).c_str();
+  gdispFillStringBox(   0, 41, 128 , 24, element, fontSm, Red, Orange, justifyCenter);
+  element = String("vol: " + String(sequence[selectedSequence].volume)).c_str();
+  gdispFillStringBox(   0, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
+  element = String("bank: " + String(sequence[selectedSequence].bank)).c_str();
+  gdispFillStringBox(   64, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
+
+}
 
 /*
 
@@ -270,7 +322,7 @@ void menuItem(uint8_t menuItem){
       
       break;
 
-    case SEQUENCE_INST:
+    case INSTRUMENT_SELECT:
       display.setTextColor(WHITE);
       display.setCursor(0,1);
       display.setTextSize(1);

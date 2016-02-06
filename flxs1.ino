@@ -15,7 +15,7 @@
 #define SEQUENCE_NAME   65
 #define SEQUENCE_SPED   66
 #define SEQUENCE_TRAN   67
-#define SEQUENCE_INST   68
+#define INSTRUMENT_SELECT   68
 #define SEQUENCE_QUAN   69
 #define SEQUENCE_EUCL   70
 #define SEQUENCE_GENE   71
@@ -246,7 +246,7 @@ elapsedMicros displayTimer;
 
 IntervalTimer masterClock;
 Sequencer sequence[4];
-NoteDatum noteData[1];
+NoteDatum noteData[4];
 File saveData;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(20, 0, NEO_GRB + NEO_KHZ800);
 Zetaohm_SAM2695 sam2695;

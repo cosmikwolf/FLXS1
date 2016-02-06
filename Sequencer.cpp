@@ -15,11 +15,11 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, flo
   this->instrument = 0;
   this->instType = 0;
   this->volume = 100;
-	//for (int i=0; i < 16; i++){
-  //  stepData[i].gateLength = 1;
+	for (int i=0; i < 16; i++){
+   // stepData[i].gateLength = 1;
   //  stepData[i].velocity = 127;
-  //  stepData[i].pitch = 24;
-	//};
+    stepData[i].pitch = 24;
+	};
   beatLength = 60000000/tempo;
   calculateStepTimers();
   monophonic = true;
@@ -35,7 +35,7 @@ void Sequencer::initNewSequence(){
   bank = 0;
   instType = 2; //initialized regular instrument
   for(int n=0; n < 16; n++){
-    stepData[n].pitch      = 0;
+    stepData[n].pitch      = 24;
     stepData[n].gateLength = 1;
     stepData[n].gateType   = 0;
     stepData[n].velocity   = 127;
