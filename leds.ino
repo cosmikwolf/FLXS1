@@ -1,5 +1,10 @@
 uint8_t ledMapping[] = {3,2,1,0,8,7,6,5,13,12,11,10,18,17,16,15,4,9,14,19};
 
+uint8_t getNoteLED(uint8_t index){
+  return index + notePage * 16;
+}
+
+
 void ledSetup(){
   pinMode(0, OUTPUT);
   digitalWrite(0, LOW);
@@ -12,15 +17,15 @@ void ledLoop(){
     switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
-          if (i == sequence[selectedSequence].activeStep ){
+          if (getNote(i) == sequence[selectedSequence].activeStep ){
             pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );      
-          } else if ( i == selectedStep) {
-            pixels.setPixelColor(ledMapping[selectedStep], Wheel(int(millis()/3)%255) );      
+          } else if (getNote(i) == selectedStep) {
+            pixels.setPixelColor(ledMapping[i], Wheel(int(millis()/3)%255) );      
           } else {
-            if(sequence[selectedSequence].stepData[i].gateType == 0){
+            if(sequence[selectedSequence].stepData[getNote(i)].gateType == 0){
               pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
             } else {
-              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedSequence].getStepPitch(i) ) );
+              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedSequence].getStepPitch(getNote(i)) ) );
             }
           }
         }
@@ -36,6 +41,19 @@ void ledLoop(){
           }
         }
       break;
+
+      case SEQUENCE_MENU:
+        for (int i=0; i < 20; i++){
+          if (i<2){
+            pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
+          } else if (i == 17) {
+            pixels.setPixelColor(ledMapping[i], Wheel((millis()/5) % 255));
+          }else{
+            pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
+          }
+        }
+      break;
+
       case PATTERN_SELECT:
         nonBlockingRainbow(10);
       break;

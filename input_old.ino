@@ -17,7 +17,7 @@ void snapDomeLoop(){
           break;
         case PATTERN_SELECT:
           break;
-        case INSTRUMENT_SELECT:
+        case INSTRUMENT_MENU:
           instrumentSelectInputHandler(i);
         default:
          // menuItemButtonHandler(currentState, i);
@@ -135,7 +135,7 @@ void encoderLoop(){
         }
         break;
 
-      case SEQUENCE_SPED: // speed setting
+      case TIMING_MENU: // speed setting
         switch(menuSelection){
           case 0:
             sequence[selectedSequence].setStepCount( positive_modulo(stepModeBuffer + knobRead, 63)+1 );
@@ -145,7 +145,7 @@ void encoderLoop(){
             break;
         }
         break;
-      case INSTRUMENT_SELECT:
+      case INSTRUMENT_MENU:
         int instBuffer = sequence[selectedSequence].instrument;
         switch(menuSelection){
           case 0:
@@ -208,7 +208,7 @@ void menuItemButtonHandler(uint8_t selectedMode, uint8_t buttonNum){
           break;
       }
       break;
-    case SEQUENCE_SPED:
+    case TIMING_MENU:
       switch(buttonNum){
         case 0:
           menuSelection = 0;
@@ -220,7 +220,7 @@ void menuItemButtonHandler(uint8_t selectedMode, uint8_t buttonNum){
           break;
       }
       break;
-    case SEQUENCE_GENE:
+    case GENERATIVE_MENU:
       switch(buttonNum){
         case 0:
           sequence[selectedSequence].initNewSequence();
@@ -286,7 +286,7 @@ void menuItemButtonHandler(uint8_t selectedMode, uint8_t buttonNum){
       }
       break;
 
-    case INSTRUMENT_SELECT:
+    case INSTRUMENT_MENU:
       switch(buttonNum){
         case 0:
           menuSelection = 0;

@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <SD.h>
+#include <Audio.h>
 #include <MIDI.h>
 #include <ssd1351-ugfx-config.h>
 #include <Adafruit_NeoPixel.h>
@@ -12,13 +13,14 @@
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		 0
 #define	SEQUENCE_MENU		 1
-#define SEQUENCE_NAME   65
-#define SEQUENCE_SPED   66
+#define TIMING_MENU 	  66
+#define INSTRUMENT_MENU 68
+#define GENERATIVE_MENU   71
+
 #define SEQUENCE_TRAN   67
-#define INSTRUMENT_SELECT   68
+#define SEQUENCE_NAME   65
 #define SEQUENCE_QUAN   69
 #define SEQUENCE_EUCL   70
-#define SEQUENCE_GENE   71
 #define SEQUENCE_ORDE   72
 #define SEQUENCE_RAND   73
 #define SEQUENCE_POSI   74
@@ -203,6 +205,8 @@ uint8_t settingMode = 0;
 uint8_t selectedStep = 0;
 uint8_t menuSelection = 127;
 
+uint8_t notePage;
+
 double bpm;
 
 float tempo = 120.0;
@@ -261,18 +265,20 @@ font_t fontLg;
 
 void setup() {
 	Serial.begin(115200);
-	delay(10);
+
 	Serial.println("Initializing SPI");
+  AudioMemory(30);
 
 	SPI.begin();
 	SPI.setMOSI(11);
 	SPI.setSCK(13);
-
+		Serial.println("Freeram: " + String(FreeRam()));
+		delay(500);
 	Serial.println("Initializing Sequence Objects");
-	sequence[0].initialize(0, 16, 4, tempo);
-	sequence[1].initialize(1, 16, 4, tempo);
-	sequence[2].initialize(2, 16, 4, tempo);
-	sequence[3].initialize(3, 16, 4, tempo);
+	sequence[0].initialize(0, 128, 4, tempo);
+	sequence[1].initialize(1, 128, 4, tempo);
+	sequence[2].initialize(2, 128, 4, tempo);
+	sequence[3].initialize(3, 128, 4, tempo);
 		
   Serial.println("Initializing SAM2695");
   sam2695.begin();
@@ -303,8 +309,35 @@ void loop() {
 	displayLoop();
 	ledLoop();
 	buttonLoop();
+	//if (millis() % 1000 ){
+		Serial.println(String(millis()) + " Freeram: " + String(FreeRam()));
+		Serial.println("sequenceObject: " + String(sizeof(sequence[0])));
+	
 }
 
 inline int positive_modulo(int i, int n) {
 	return (i % n + n) % n;
 }
+
+
+uint8_t getNote(uint8_t index){
+  return index + notePage * 16;
+}
+
+uint32_t FreeRam2(){ // for Teensy 3.0
+    uint32_t stackTop;
+    uint32_t heapTop;
+
+    // current position of the stack.
+    stackTop = (uint32_t) &stackTop;
+
+    // current position of heap.
+    void* hTop = malloc(1);
+    heapTop = (uint32_t) hTop;
+    free(hTop);
+
+    // The difference is the free, available ram.
+    return stackTop - heapTop;
+}
+
+
