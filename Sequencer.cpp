@@ -15,7 +15,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, flo
   this->instrument = 0;
   this->instType = 0;
   this->volume = 100;
-	for (int i=0; i < 16; i++){
+	for (int i=0; i < stepCount; i++){
    // stepData[i].gateLength = 1;
   //  stepData[i].velocity = 127;
     stepData[i].pitch = 24;
@@ -27,14 +27,14 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, flo
 
 
 void Sequencer::initNewSequence(){
-  stepCount = 16;
+  stepCount = stepCount;
   beatCount = 4;
   quantizeKey = 0;
   instrument = 0;
   volume = 100;
   bank = 0;
   instType = 2; //initialized regular instrument
-  for(int n=0; n < 16; n++){
+  for(int n=0; n < stepCount; n++){
     stepData[n].pitch      = 24;
     stepData[n].gateLength = 1;
     stepData[n].gateType   = 0;
@@ -86,7 +86,7 @@ void Sequencer::calculateStepTimers(){
   stepLength = beatLength*beatCount/stepCount;
 
  // Serial.println(" stepCount: " + String(stepCount) + " stepLength: " + String(stepLength) + " beatLength: " + String(beatLength) + " tempo: " + String(tempo));
-  for (int stepNum = 0; stepNum < 16; stepNum++){
+  for (int stepNum = 0; stepNum < stepCount; stepNum++){
     stepUtil[stepNum].noteTimerMcs = (stepData[stepNum].gateLength*stepLength);
     stepUtil[stepNum].beat = floor(noteTimerMcsCounter / beatLength);
     stepUtil[stepNum].offset = stepNum*stepLength;
@@ -132,7 +132,7 @@ void Sequencer::beatPulse(uint32_t beatLength){
   }
 
   if (beatTracker == 0) {
-    for(int i = 0; i < 16; i++){
+    for(int i = 0; i < stepCount; i++){
       // reset the note status for notes that have been played.
       // leave notes that have not been turned off yet.
     //  if (stepData[i].noteStatus == 4){
@@ -163,7 +163,7 @@ void Sequencer::runSequence(NoteDatum *noteData){
 
   noteData->noteOff = false;
   noteData->noteOn = false;
-  for(int i = 0; i < 16; i++){
+  for(int i = 0; i < stepCount; i++){
     noteData->noteOnArray[i] = NULL;
     noteData->noteVelArray[i] = NULL;
     noteData->noteOffArray[i] = NULL;
@@ -177,7 +177,7 @@ void Sequencer::runSequence(NoteDatum *noteData){
     stepTimer = 0;
   }
 
-  for (int stepNum = 0; stepNum < 16; stepNum++){
+  for (int stepNum = 0; stepNum < stepCount; stepNum++){
     // set notes to be stopped, and marked as played.
     if ( (stepUtil[stepNum].stepTimer > stepUtil[stepNum].noteTimerMcs) && (stepUtil[stepNum].noteStatus == 1) ){
       // if the note is playing and has played out the gate length, end the note.
@@ -185,7 +185,7 @@ void Sequencer::runSequence(NoteDatum *noteData){
       noteData->channel = channel;
       noteData->noteOffStep = stepNum;
       int n = 0;
-      for (int f=0; f<16; f++){
+      for (int f=0; f<stepCount; f++){
         if (noteData->noteOffArray[f] == NULL){
           noteData->noteOffArray[f] = stepUtil[stepNum].notePlaying;
           break;
@@ -212,12 +212,12 @@ void Sequencer::runSequence(NoteDatum *noteData){
 
 
           //shut off any other notes that might still be playing.
-          for (int stepNum = 0; stepNum < 16; stepNum++){
+          for (int stepNum = 0; stepNum < stepCount; stepNum++){
             if(stepUtil[stepNum].noteStatus == 1){
               noteData->noteOff = true;
               noteData->channel = channel;
               noteData->noteOffStep = stepNum;
-              for (int f=0; f<16; f++){
+              for (int f=0; f<stepCount; f++){
                 if (noteData->noteOffArray[f] == NULL){
                   noteData->noteOffArray[f] = stepUtil[stepNum].notePlaying;
                   break;
@@ -243,7 +243,7 @@ void Sequencer::runSequence(NoteDatum *noteData){
             stepUtil[stepNum].notePlaying = stepData[stepNum].pitch;          
           }
 
-          for (int i=0; i<16; i++){
+          for (int i=0; i< stepCount; i++){
             if (noteData->noteOnArray[i] == NULL){
               noteData->noteOnArray[i] = stepUtil[stepNum].notePlaying;                
               noteData->noteVelArray[i] = stepData[stepNum].velocity;

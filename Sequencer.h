@@ -28,7 +28,7 @@ class Sequencer
 		boolean  monophonic;
 		uint8_t  beatTracker;		// keeps track of how long the sequence has been playing
 		uint8_t	 activeStep;
-    	uint32_t beatLength;
+    uint32_t beatLength;
 		uint16_t tempo;
 		uint8_t  channel;
 		boolean  tempoPulse;
@@ -38,8 +38,7 @@ class Sequencer
 		elapsedMicros stepTimer;			// timer for step to step
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
 		elapsedMicros beatTimer;
-    
-    	uint32_t aminor = 0b101011010101;
+    uint32_t aminor = 0b101011010101;
 
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
 
@@ -73,8 +72,8 @@ class Sequencer
 
 		};
 	 	
-		StepDatum stepData[16];
-		StepUtil stepUtil[16];
+		StepDatum stepData[128];
+		StepUtil stepUtil[128];
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;

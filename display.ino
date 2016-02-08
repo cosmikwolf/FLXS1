@@ -11,22 +11,15 @@ int color = 0;
 void displayStartup(){
  
   gfxInit();
-  //gdispSetOrientation(GDISP_ROTATE_0);
 
   width = gdispGetWidth();
   height = gdispGetHeight();
-
- // pixmap = gdispPixmapCreate(PIXMAP_WIDTH, PIXMAP_HEIGHT);
- // surface = gdispPixmapGetBits(pixmap);
 
   fontTny = gdispOpenFont("fixed_5x8");
   fontSm = gdispOpenFont("DejaVuSans10");
   fontMd = gdispOpenFont("DejaVuSans20");
   fontLg = gdispOpenFont("DejaVuSans32");
   gdispClear(Black);
-
- // gdispGDrawStringBox(pixmap, 0, 0, width, 50, "ZETAOHM", fontSm, White, justifyCenter);
- // gdispGDrawStringBox(pixmap, 0, height/2, width, 30, "FLXS1 SEQUENCER", fontSm, White, justifyCenter);
 
   nonBlockingRainbow(2);
   delay(100);
@@ -44,35 +37,10 @@ void displayStartup(){
 
   gdispFillStringBox( 64,  0, 64 , 10, "TESTING", fontSm , White, Blue, justifyCenter);
   
-/*
-  i = j = 0;
-    while(TRUE) {
-      // Clear the old position
-      Serial.println("loop!" + String(millis()));
-      gdispFillArea(i, j, PIXMAP_WIDTH, PIXMAP_HEIGHT, Black);
- 
-      // Change the position
-      i += PIXMAP_WIDTH/2;
-      if (i >= width - PIXMAP_WIDTH/2) {
-        i %= width - PIXMAP_WIDTH/2;
-        j = (j + PIXMAP_HEIGHT/2) % (height - PIXMAP_HEIGHT/2);
-      }
- 
-      // Blit the pixmap to the real display at the new position
-      gdispBlitArea(i, j, PIXMAP_WIDTH, PIXMAP_HEIGHT, surface);
-      
-      // Wait
-      gfxSleepMilliseconds(100);
-    }
- 
-    // Clean up
-    gdispPixmapDelete(pixmap);
-*/
 }
 
 void displayLoop() {
   if (displayTimer > 50000) {
-   // runState(STEP_MODE);
     switch(currentState) {
       case CHANNEL_SELECT:
         channelSelectDisplay();
@@ -86,25 +54,18 @@ void displayLoop() {
       case SEQUENCE_MENU:
         sequenceMenuDisplay();
       break;
-      case INSTRUMENT_SELECT:
+      case INSTRUMENT_MENU:
         instrumentSelectDisplay();
+      break;
+      case TIMING_MENU:
+        timingMenuDisplay();
       break;
 
     }
-    //    stepDisplay();
-    //  } else if (settingMode == 1){
-    //    sequenceMenuDisplay();
-    //  } else if (settingMode == 2){
-    //    globalMenuDisplay();
-    //  } else {
-    //    menuItem(settingMode);
-    //  }
-   displayTimer = 0;
   }
-
- // gdispBlitArea(0, 0, PIXMAP_WIDTH, PIXMAP_HEIGHT, surface);
 }
 
+// STATE VARIABLE DISPLAY HANDLERS
 
 void globalMenuDisplay(){
   //nonBlockingRainbow(5);
@@ -125,7 +86,15 @@ void stepDisplay(){
   element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
   gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
 
-  element = String(String("Gate: ") + sequence[selectedSequence].stepData[selectedStep].gateLength).c_str();
+  if ( sequence[selectedSequence].stepData[selectedStep].gateType == 0 ){
+    element = String("Note Off").c_str();
+  } else if (sequence[selectedSequence].stepData[selectedStep].gateLength == 0){
+    element = String("pulse").c_str();
+  } else if (sequence[selectedSequence].stepData[selectedStep].gateLength == 1){
+    element = String("1 beat").c_str();
+  } else {
+    element = String(String(sequence[selectedSequence].stepData[selectedStep].gateLength) + " beats").c_str();
+  }
   gdispFillStringBox( 64, 34, 64 , 10, element, fontSm ,Blue , White, justifyCenter);
 
   // Instrument selection
@@ -150,6 +119,10 @@ void stepDisplay(){
   
   element =  String("sqnc: " + String(selectedSequence)).c_str();
   gdispFillStringBox( 0, 30, 64 , 10, element, fontSm, Green, White, justifyCenter);
+
+  element =  String("step: " + String(selectedStep)).c_str();
+  gdispFillStringBox( 0, 40, 64 , 10, element, fontSm, Green, White, justifyCenter);
+
 }
 
 void channelSelectDisplay() {
@@ -178,8 +151,8 @@ void sequenceMenuDisplay(){
 
   element =  "INST";
   gdispFillStringBox(   0, 0, 32 , 24, element, fontSm, Orange, Red, justifyCenter);
-  element =  "1";
-  gdispFillStringBox(  32, 0, 32 , 24, element, fontLg, Red, Orange, justifyCenter);
+  element =  "TIME";
+  gdispFillStringBox(  32, 0, 32 , 24, element, fontSm, Red, Orange, justifyCenter);
   element =  "1";
   gdispFillStringBox(  64, 0, 32 , 24, element, fontLg, Red, Blue, justifyCenter);
   element =  "1";
@@ -201,6 +174,32 @@ void instrumentSelectDisplay(){
   gdispFillStringBox(   64, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
 
 }
+
+void timingMenuDisplay(){
+  const char* element;
+
+  element =  "TIMING SELECT";
+  gdispFillStringBox(   0, 10, 128 , 20, element, fontMd, Orange, Purple, justifyCenter);
+ 
+  if (sequence[selectedSequence].stepCount > 1){
+    element =  String("play " + String(sequence[selectedSequence].stepCount) + " steps").c_str(); 
+  } else {
+    element =  String("play 1 step").c_str();
+  }
+  gdispFillStringBox(   0, 30, 128 , 10, element, fontSm, Orange, Purple, justifyCenter);
+ 
+  if (sequence[selectedSequence].stepCount > 1){
+    element =  String("over " + String(sequence[selectedSequence].beatCount) + " beats").c_str(); 
+  } else {
+    element =  String("over 1 beat").c_str();
+  }
+
+  gdispFillStringBox(   0, 40, 128 , 10, element, fontSm, Orange, Purple, justifyCenter);
+
+}
+
+
+
 
 /*
 
@@ -229,7 +228,7 @@ void menuItem(uint8_t menuItem){
       };
       break;
 
-    case SEQUENCE_SPED:
+    case TIMING_MENU:
 
       nonBlockingRainbow(5, spedSkip, 14 );
 
@@ -256,7 +255,7 @@ void menuItem(uint8_t menuItem){
       display.setTextColor(WHITE);
 
       break;
-    case SEQUENCE_GENE:
+    case GENERATIVE_MENU:
       nonBlockingRainbow(2, generatorSkip, 13 );
       display.setTextColor(WHITE);
       display.setCursor(0,1);
@@ -322,7 +321,7 @@ void menuItem(uint8_t menuItem){
       
       break;
 
-    case INSTRUMENT_SELECT:
+    case INSTRUMENT_MENU:
       display.setTextColor(WHITE);
       display.setCursor(0,1);
       display.setTextSize(1);
