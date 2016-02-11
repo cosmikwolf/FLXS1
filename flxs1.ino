@@ -198,6 +198,7 @@ void setup() {
 
 	Serial.println("Setting up debug pin");
 	pinMode(DEBUG_PIN, OUTPUT);
+	pinMode(4, OUTPUT);
 
 	Serial.println("initializing gate outputs");
 	mcp.begin(1);      // use default address 0

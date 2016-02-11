@@ -117,6 +117,7 @@ void Sequencer::clockStart(elapsedMicros startTime){
 void Sequencer::beatPulse(uint32_t beatLength){
   // this is sent every 24 pulses received from midi clock
   // and also when a play or continue command is received.
+
   this->beatLength = beatLength;
   calculateStepTimers();
   beatTimer = 0;
@@ -151,6 +152,7 @@ void Sequencer::beatPulse(uint32_t beatLength){
     // so we must reset it manually here.
     stepUtil[0].noteStatus = 0;
   } 
+
 };
 
 void Sequencer::runSequence(NoteDatum *noteData){
@@ -171,10 +173,27 @@ void Sequencer::runSequence(NoteDatum *noteData){
   noteData->channel = 0;         
   noteData->noteOnStep = 0;      
   noteData->noteOffStep = 0;     
+ 
+  int stepDifferenceAverage = 0;
+  for(int i = 0; i < 5; i++){
+    stepDifferenceAverage += stepDifference[i];
+  }
+  stepDifferenceAverage = stepDifferenceAverage / 5;
 
-  if (stepTimer > stepLength) {
+
+  if (stepTimer > (stepLength - 10*stepDifferenceAverage) ){
+  Serial.println("ActiveStep: " + String(activeStep) + " stepTimer: " + String(stepTimer) + " StepLength: " + String(stepLength) + " StepDifferenceAvg: " + String(stepDifferenceAverage));
+
+    for(int i = 5; i > 1; i--){
+      stepDifference[i] = stepDifference[i-1];
+    } 
+    stepDifference[0] = stepTimer - stepLength;
+
+    digitalWriteFast(4, HIGH);
     activeStep = positive_modulo(activeStep + 1, stepCount);
     stepTimer = 0;
+    digitalWriteFast(4, LOW);
+
   }
 
   for (int stepNum = 0; stepNum < stepCount; stepNum++){
@@ -267,6 +286,7 @@ void Sequencer::runSequence(NoteDatum *noteData){
     }
   }
   //timekeeper = ((micros() - timer)+9*timekeeper)/10;
+
 }
 
 uint8_t Sequencer::quantizePitch(uint8_t note, uint32_t scale, bool direction){
