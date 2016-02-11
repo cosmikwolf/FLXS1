@@ -11,7 +11,6 @@ elapsedMicros loopTimer = 0;
 
 
 if (inputTimer > 10000){
-  buttonLoop();
   inputTimer = 0;
 }
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
@@ -36,11 +35,6 @@ if (inputTimer > 10000){
   wasPlaying = playing;
   lastTimer = loopTimer;
 
-if( displayTimer > 50000){
-     // ad5676.setVoltage(0, 1253 );
-    displayLoop();
-    displayTimer = 0;
-}
 //if (pixelTimer > 2000){
 //  pixelTimer = 0;
 //}

@@ -215,10 +215,17 @@ void setup() {
 
 	Serial.println("Beginning Master Clock");
 	masterClock.begin(masterClockFunc,masterClockInterval);
+	SPI.usingInterrupt(masterClock);
 }
 
 void loop() {
 	  ledLoop();
+  	buttonLoop();
+
+if( displayTimer > 40000){
+	      displayLoop();
+    displayTimer = 0;
+}
 
 //	digitalWriteFast(DEBUG_PIN, HIGH);
 //
