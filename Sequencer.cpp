@@ -12,7 +12,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, flo
 	this->tempo = tempo;
 	this->stepTimer = 0;
 	this->sequenceTimer = 0;
-  this->instrument = 0;
+  this->instrument = 38;
   this->instType = 0;
   this->volume = 100;
 	for (int i=0; i < stepCount; i++){

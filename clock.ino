@@ -2,13 +2,18 @@
 void changeTempo(uint16_t newTempo){
 	tempo = newTempo;
 	beatLength = 60000000/tempo;
-
 }
 
-
 void masterClockFunc(){ 
-  elapsedMicros loopTimer = 0;
+  digitalWriteFast(DEBUG_PIN, HIGH);
 
+elapsedMicros loopTimer = 0;
+
+
+if (inputTimer > 10000){
+  buttonLoop();
+  inputTimer = 0;
+}
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 //  timerAvg = (lastTimer + 9*timerAvg) /10;
 //  lastMicros = micros();
@@ -30,6 +35,17 @@ void masterClockFunc(){
 
   wasPlaying = playing;
   lastTimer = loopTimer;
+
+if( displayTimer > 50000){
+     // ad5676.setVoltage(0, 1253 );
+    displayLoop();
+    displayTimer = 0;
+}
+//if (pixelTimer > 2000){
+//  pixelTimer = 0;
+//}
+digitalWriteFast(DEBUG_PIN, LOW);
+//
 }
 
 
@@ -86,6 +102,7 @@ void noteOffSwitch(){
           continue;
         }
          // noteOn(noteData[i].channel,noteData[i].noteOffArray[n]);
+        mcp.digitalWrite(noteData[i].channel+4, LOW);
         MIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
         sam2695.noteOff(noteData[i].channel, noteData[i].noteOffArray[n]);
          // usbMIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
@@ -98,18 +115,17 @@ void noteOffSwitch(){
 void noteOnSwitch(){
   for (int i=0; i< sequenceCount; i++){
     if (noteData[i].noteOn == true){
-      for (int n=0; n< 16; n++){
+      for (int n=0; n< 128; n++){
         if (noteData[i].noteOnArray[n] == NULL){
           continue;
         }
 
-        for (int i=0; i<8; i++){
-           //  ad5676.setVoltage(i, map(noteData[i].noteOnArray[n], 0,127,0,65535 ) );
-        } 
-
-        sam2695.noteOn(noteData[i].channel, noteData[i].noteOnArray[n], 127);
+        ad5676.setVoltage(noteData[i].channel,  map(noteData[i].noteOnArray[n], 0,127,0, 65535 ) );
+        Serial.println("Note Data: " + String(noteData[i].noteOnArray[n]) + " \t\tsetting voltage to: " + String( map(noteData[i].noteOnArray[n], 0,127,0, 65535 )));
         MIDI.sendNoteOn(noteData[i].noteOnArray[n], noteData[i].noteVelArray[n], noteData[i].channel);
-
+        sam2695.noteOn(noteData[i].channel, noteData[i].noteOnArray[n], 127);
+        mcp.digitalWrite(noteData[i].channel+4, HIGH);
+        Serial.println("triggering Note");
         //Serial.println( "noteOn: " + String(noteData[i].noteOnArray[n]) 
         // + "\tbt: " + String(sequence[selectedSequence].beatTracker) 
         // + "\tch: " + String(noteData[i].channel)

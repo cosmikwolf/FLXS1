@@ -17,8 +17,8 @@ void displayStartup(){
 
   fontTny = gdispOpenFont("fixed_5x8");
   fontSm = gdispOpenFont("DejaVuSans10");
-  fontMd = gdispOpenFont("DejaVuSans20");
-  fontLg = gdispOpenFont("DejaVuSans32");
+  fontMd = gdispOpenFont("DejaVuSans12");
+  fontLg = gdispOpenFont("DejaVuSans20");
   gdispClear(Black);
 
   nonBlockingRainbow(2);
@@ -35,33 +35,31 @@ void displayStartup(){
   delay(100);
   changeState(STEP_DISPLAY);
 
-  gdispFillStringBox( 64,  0, 64 , 10, "TESTING", fontSm , White, Blue, justifyCenter);
+  gdispFillStringBox( 64,  0, 64 , 10, "Display Load", fontSm , White, Blue, justifyCenter);
   
 }
 
 void displayLoop() {
-  if (displayTimer > 50000) {
-    switch(currentState) {
-      case CHANNEL_SELECT:
-        channelSelectDisplay();
-      break;
-      case STEP_DISPLAY:
-        stepDisplay();
-      break;
-      case PATTERN_SELECT:
-        patternSelectDisplay();
-      break;
-      case SEQUENCE_MENU:
-        sequenceMenuDisplay();
-      break;
-      case INSTRUMENT_MENU:
-        instrumentSelectDisplay();
-      break;
-      case TIMING_MENU:
-        timingMenuDisplay();
-      break;
+  switch(currentState) {
+    case CHANNEL_SELECT:
+      channelSelectDisplay();
+    break;
+    case STEP_DISPLAY:
+      stepDisplay();
+    break;
+    case PATTERN_SELECT:
+      patternSelectDisplay();
+    break;
+    case SEQUENCE_MENU:
+      sequenceMenuDisplay();
+    break;
+    case INSTRUMENT_MENU:
+      instrumentSelectDisplay();
+    break;
+    case TIMING_MENU:
+      timingMenuDisplay();
+    break;
 
-    }
   }
 }
 
@@ -81,10 +79,7 @@ void stepDisplay(){
   // Pitch Display
   gdispFillStringBox( 64,  0, 64 , 10, "pitch", fontSm , White, Blue, justifyCenter);
   element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
-  gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
-
-  element = String(midiNotes[sequence[selectedSequence].stepData[selectedStep].pitch]).c_str();
-  gdispFillStringBox( 64, 10, 64 , 24, element, fontMd ,Blue , White, justifyCenter);
+  gdispFillStringBox( 64, 10, 64 , 24, element, fontLg ,Blue , White, justifyCenter);
 
   if ( sequence[selectedSequence].stepData[selectedStep].gateType == 0 ){
     element = String("Note Off").c_str();

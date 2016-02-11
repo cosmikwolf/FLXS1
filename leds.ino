@@ -13,6 +13,7 @@ void ledSetup(){
 }
 
 void ledLoop(){
+  noInterrupts();
   if (pixelTimer > 20000){
     switch (currentState ){
       case STEP_DISPLAY:
@@ -61,6 +62,7 @@ void ledLoop(){
     pixels.show();
     pixelTimer = 0;
   }
+  interrupts();
 }
 
 

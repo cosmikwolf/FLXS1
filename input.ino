@@ -1,8 +1,5 @@
 //button stuff
-#include <SPI.h>
-#include <Zetaohm_MAX7301.h>   // import library
-#include <Encoder.h>
-
+ 
 #define SW_00    0
 #define SW_01    1
 #define SW_02    2
@@ -174,6 +171,7 @@ void altButtonHandler(){
           if (!playing){ //if the sequence is already paused, stop kills all internal sound.
             for(int s = 0; s < sequenceCount; s++){
               sam2695.allNotesOff(s);
+              mcp.digitalWrite(s+4, LOW);
             }
           }
           playing = false;
@@ -326,10 +324,10 @@ void timingMenuInputHandler() {
   }
   switch(menuSelector){
     case 0:
-    sequence[selectedSequence].stepCount = positive_modulo(sequence[selectedSequence].stepCount + knobChange, 128);
+    sequence[selectedSequence].stepCount = positive_modulo(sequence[selectedSequence].stepCount + knobChange, 129);
     break;
     case 4:
-    sequence[selectedSequence].beatCount = positive_modulo(sequence[selectedSequence].beatCount + knobChange, 128);    
+    sequence[selectedSequence].beatCount = positive_modulo(sequence[selectedSequence].beatCount + knobChange, 129);    
     break;
   }
 }
