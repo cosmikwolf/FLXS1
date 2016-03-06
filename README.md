@@ -35,10 +35,10 @@ OVERCLOCK Notes:
 
 
 168		Neopixels don't work at this speed
-		SSD1351 doesn't work at this speed
-144		SSD1351 - SLOWWWWWWWWWWWW @ SPI_CLOCK_DIV2 
-144		SSD1351 - 515k pixels/sec @ SPI_CLOCK_DIV2 
+		SSD.351 doesn't work at this speed
+144		SSD.351 - SLOWWWWWWWWWWWW @ SPI_CLOCK_DIV2 
+144		SSD.351 - 515k pixels/sec @ SPI_CLOCK_DIV2 
 							 SPI_CLOCK_DIV4
 
-120		SSD1351 - 562k pixels/sec @ SPI_CLOCK_DIV2
-96 		SSD1351 - 449k pixels/sec @ SPI_CLOCK_DIV2
+120		SSD.351 - 562k pixels/sec @ SPI_CLOCK_DIV2
+96 		SSD.351 - 449k pixels/sec @ SPI_CLOCK_DIV2

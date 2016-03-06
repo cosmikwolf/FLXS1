@@ -1,5 +1,4 @@
 //button stuff
- 
 #define SW_00    0
 #define SW_01    1
 #define SW_02    2
@@ -27,7 +26,6 @@
 #define SW_PGUP  24
 #define SW_MENU  25
 #define SW_ALT   26
-
 #define ENCODER1LEFTPIN 17
 #define ENCODER1RIGHTPIN 16
 
@@ -96,6 +94,8 @@ void buttonLoop(){
   //we always want the alt (non matrix) buttons to behave the same way
   altButtonHandler();
 
+  dispSwitch = max7301.pressed(SW_REC);
+
   // now to handle the rest of the buttons.
   switch (currentState) {
     case STEP_DISPLAY:
@@ -107,24 +107,46 @@ void buttonLoop(){
     case CHANNEL_SELECT:
     channelSelectHandler();
     break;
+
+    case PATTERN_SELECT:
+    patternSelectHandler();
+    break;
+
     case INSTRUMENT_MENU:
     instrumentSelectInputHandler();
     break;
+
     case TIMING_MENU:
     timingMenuInputHandler();
+    break;
+
+    case DEBUG_SCREEN:
+    debugScreenInputHandler();
     break;
   }
 }
 
 // STATE VARIABLE INPUT HANDLERS
 
-void channelSelectHandler(){
-  for (int i=0; i < sequenceCount; i++){
+void patternSelectHandler(){
+  for (int i=0; i < 16; i++){
     if (max7301.fell(i)){
-      selectedSequence = i;
+      changePattern(i, TRUE, TRUE);
       changeState(STEP_DISPLAY);
     }
   }
+}
+
+void channelSelectHandler(){
+  for (int i=0; i < 16; i++){
+    if (max7301.fell(i)){
+     // selectedSequence = i;
+      changeState(STEP_DISPLAY);
+    }
+  }
+
+  selectedSequence =  positive_modulo(selectedSequence + knobChange, sequenceCount);
+
 }
 
 void altButtonHandler(){
@@ -133,38 +155,52 @@ void altButtonHandler(){
       switch (i){
         // left row bottom up
         case SW_M0:
+        if(currentState == CHANNEL_SELECT){
+          changeState(STEP_DISPLAY);
+        } else {
+          changeState(CHANNEL_SELECT);
+        }
+        break;
+
+        case SW_M1:
         if(currentState == PATTERN_SELECT){
           changeState(STEP_DISPLAY);
-          } else {
-            changeState(PATTERN_SELECT);
-          }
-          break;
+        } else {
+          changeState(PATTERN_SELECT);
+        }
+        break;
 
-          case SW_M1:
-          if(currentState == CHANNEL_SELECT){
-            changeState(STEP_DISPLAY);
-            } else {
-              changeState(CHANNEL_SELECT);
-            }
-            break;
+        case SW_M2:
+        if( currentState != STEP_DISPLAY){
+          changeState(STEP_DISPLAY);
+        }   
+        if (stepMode == 4) {
+          stepMode = 5;
+        } else {
+          stepMode = 4;
+        };
 
-            case SW_M2:
-            if(currentState == SEQUENCE_MENU){
-              changeState(STEP_DISPLAY);
-              } else {
-                changeState(SEQUENCE_MENU);
-              }
-              break;
+        break;
 
         case SW_M3: //switch M3 toggles the sequence menu
+        if( currentState != STEP_DISPLAY){
+          changeState(STEP_DISPLAY);
+        }   
+        if (stepMode == 3) {
+          stepMode = 6;
+        } else if(stepMode == 6){
+          stepMode = 7;
+        } else {
+          stepMode = 3;
+        };
         break;
 
         case SW_PGDN:
-          notePage = positive_modulo(notePage - 1, 4);     
+        notePage = positive_modulo(notePage - 1, 4);     
         break;
 
         case SW_PGUP:
-          notePage = positive_modulo(notePage + 1, 4);     
+        notePage = positive_modulo(notePage + 1, 4);     
         break;
 
         case SW_STOP:
@@ -178,26 +214,27 @@ void altButtonHandler(){
           for(int s = 0; s < sequenceCount; s++){
             sequence[s].activeStep = 0;
            // sam2695.allNotesOff(s);
-         }
-         break;
+          }
+          break;
 
         // right two, bottom up
-        case SW_PLAY:
-        playing = !playing;
-        break;
+          case SW_PLAY:
+          playing = !playing;
+          break;
+        }
       }
     }
   }
-}
 
 
-void stepModeMatrixHandler(){
+  void stepModeMatrixHandler(){
   //  need2save = true;
   //  saveTimer = 0;
+    uint8_t instrumentSelectValue;
 
-  for (int i=0; i < 16; i++){
-    if (max7301.fell(i)){
-      if(selectedStep == getNote(i) && stepMode == 0){
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        if(selectedStep == getNote(i) && stepMode == 0){
           stepMode = 1; // change the step length
 
           knobBuffer = sequence[selectedSequence].stepData[getNote(i)].gateLength - knobRead;
@@ -208,126 +245,177 @@ void stepModeMatrixHandler(){
     //   //   knob1.write(0);
     //   //   stepModeBuffer = sequence[selectedSequence].stepData[i].gateType;
     //      knobBuffer = sequence[selectedSequence].stepData[i].gateType - knobRead;
+        } else if (selectedStep == getNote(i) && stepMode == 1){
+          stepMode = 2;
+          knobBuffer = sequence[selectedSequence].stepData[getNote(i)].velocity - knobRead;
+        }else {
+          stepMode = 0;
+          selectedStep = getNote(i);
+          knobBuffer = sequence[selectedSequence].getStepPitch(selectedStep) - knobRead;
+        }
+      }
+    }
+
+
+    if (knobRead != knobPrev) {
+      knobPrev = knobRead;
+      switch (stepMode) {
+        case 0:
+      // just change the note
+        if (knobRead + sequence[selectedSequence].getStepPitch(selectedStep) < 0){
+          // you can turn off a note by turning the value to 0
+          // turn off a note by setting gate type and pitch to 0 
+          sequence[selectedSequence].stepData[selectedStep].gateType = 0;
+          sequence[selectedSequence].setStepPitch(selectedStep, 0);
+          knob1.write(4);  
+        } else {
+          if(sequence[selectedSequence].stepData[selectedStep].gateType == 0){
+            // if a note is not active, turn it on and give it a length.
+            sequence[selectedSequence].stepData[selectedStep].gateType = 1; 
+            sequence[selectedSequence].stepData[selectedStep].gateLength = 1; 
+          } 
+          // and finally set the new step value!
+          sequence[selectedSequence].setStepPitch(selectedStep, positive_modulo(sequence[selectedSequence].getStepPitch(selectedStep) + knobChange, 127));
+
+        }
+        break;
+
+        case 1:
+    // change the gate type
+        if ((sequence[selectedSequence].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
+          sequence[selectedSequence].stepData[selectedStep].gateType = 0;
+        } else if(knobChange > 0) {
+          sequence[selectedSequence].stepData[selectedStep].gateType = 1;
+        }
+        
+        if (sequence[selectedSequence].stepData[selectedStep].gateType > 0){
+          sequence[selectedSequence].stepData[selectedStep].gateLength =  positive_modulo(sequence[selectedSequence].stepData[selectedStep].gateLength + knobChange, 127);
+        }
+
+        break;
+
+        case 2:  
+      // change length of gate
+        sequence[selectedSequence].stepData[selectedStep].velocity = positive_modulo(sequence[selectedSequence].stepData[selectedStep].velocity + knobChange, 128 );
+        break;
+
+        case 3:
+        if (tempoX100 > 100100) {
+          tempoX100 = 100100;
+        }
+        tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
+        if(tempoX100 == 0){
+          tempoX100 = 100;
+        }
+        changeTempo(tempoX100);
+        break;
+
+        case 4:
+        instrumentSelectValue = positive_modulo(sequence[selectedSequence].instrument + knobChange,128);
+        if (sequence[selectedSequence].instrument != instrumentSelectValue){
+          sequence[selectedSequence].instrument = instrumentSelectValue;
+          sam2695.programChange(0, selectedSequence, sequence[selectedSequence].instrument);
+        }
+        break;
+
+        case 5:
+        instrumentSelectValue = positive_modulo(sequence[selectedSequence].volume + knobChange, 128);
+        if (sequence[selectedSequence].volume != instrumentSelectValue ){
+          sequence[selectedSequence].volume = instrumentSelectValue;
+          sam2695.setChannelVolume(selectedSequence, sequence[selectedSequence].volume);
+        }
+        break;
+
+        case 6:
+        sequence[selectedSequence].stepCount = positive_modulo(sequence[selectedSequence].stepCount + knobChange, 129);
+        break;
+
+        case 7:
+        sequence[selectedSequence].beatCount = positive_modulo(sequence[selectedSequence].beatCount + knobChange, 129);    
+        break;
+
+      }
+    }
+  }
+
+
+
+
+  void sequencerMenuHandler(){
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        switch (i) {
+          case 0:
+          changeState(INSTRUMENT_MENU);
+          break;
+          case 1:
+          changeState(TIMING_MENU);
+          break;
+
+        }
+      }
+    }
+  }
+
+  void instrumentSelectInputHandler() {
+
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        menuSelector = i;
+      }
+    }
+    uint8_t instrumentSelectValue;
+
+    switch(menuSelector){
+      case 0:
+     //changing the instrument every loop causes weird problems with playback during instrument selection
+      instrumentSelectValue = positive_modulo(sequence[selectedSequence].instrument + knobChange,128);
+      if (sequence[selectedSequence].instrument != instrumentSelectValue){
+        sequence[selectedSequence].instrument = instrumentSelectValue;
+        sam2695.programChange(0, selectedSequence, sequence[selectedSequence].instrument);
+      }
+      break;
+      case 4: 
+      instrumentSelectValue = positive_modulo(sequence[selectedSequence].volume + knobChange, 128);
+      if (sequence[selectedSequence].volume != instrumentSelectValue ){
+        sequence[selectedSequence].volume = instrumentSelectValue;
+        sam2695.setChannelVolume(selectedSequence, sequence[selectedSequence].volume);
+      }
+      break;
+      case 8: 
+      instrumentSelectValue = positive_modulo(sequence[selectedSequence].bank + knobChange, 128) ;
+      if (sequence[selectedSequence].bank != instrumentSelectValue ){
+        sequence[selectedSequence].bank = instrumentSelectValue;
+        sam2695.setChannelBank(selectedSequence, sequence[selectedSequence].bank);
+      }
+      break;
+    }
+
+  }
+
+  void timingMenuInputHandler() {
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        menuSelector = i;
+      }
+    }
+    switch(menuSelector){
+      case 0:
+      sequence[selectedSequence].stepCount = positive_modulo(sequence[selectedSequence].stepCount + knobChange, 129);
+      break;
+      case 4:
+      sequence[selectedSequence].beatCount = positive_modulo(sequence[selectedSequence].beatCount + knobChange, 129);    
+      break;
+    }
+  }
+
+
+  void debugScreenInputHandler(){
+    if(max7301.pressed(SW_ALT)){
+      voltManual = positive_modulo(voltManual + 10*knobChange, 65535);
+
     } else {
-      stepMode = 0;
-      selectedStep = getNote(i);
-      knobBuffer = sequence[selectedSequence].getStepPitch(selectedStep) - knobRead;
+      voltManual = positive_modulo(voltManual + knobChange, 65535);
+
     }
   }
-}
-
-
-if (knobRead != knobPrev) {
-  knobPrev = knobRead;
-  switch (stepMode) {
-    case 0:
-          // just change the note
-          if (knobRead + sequence[selectedSequence].getStepPitch(selectedStep) < 0){
-              // you can turn off a note by turning the value to 0
-              // turn off a note by setting gate type and pitch to 0 
-              sequence[selectedSequence].stepData[selectedStep].gateType = 0;
-              sequence[selectedSequence].setStepPitch(selectedStep, 0);
-              knob1.write(4);  
-              } else {
-                if(sequence[selectedSequence].stepData[selectedStep].gateType == 0){
-                // if a note is not active, turn it on and give it a length.
-                sequence[selectedSequence].stepData[selectedStep].gateType = 1; 
-                sequence[selectedSequence].stepData[selectedStep].gateLength = 1; 
-              } 
-              // and finally set the new step value!
-              sequence[selectedSequence].setStepPitch(selectedStep, positive_modulo(sequence[selectedSequence].getStepPitch(selectedStep) + knobChange, 127));
-
-            }
-            break;
-
-            case 1:
-          // change the gate type
-              if ((sequence[selectedSequence].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
-                sequence[selectedSequence].stepData[selectedStep].gateType = 0;
-              } else if(knobChange > 0) {
-                sequence[selectedSequence].stepData[selectedStep].gateType = 1;
-              }
-              
-              if (sequence[selectedSequence].stepData[selectedStep].gateType > 0){
-                sequence[selectedSequence].stepData[selectedStep].gateLength =  positive_modulo(sequence[selectedSequence].stepData[selectedStep].gateLength + knobChange, 127);
-              }
-
-          break;
-
-          case 2:  
-          // change length of gate
-          sequence[selectedSequence].setGateType(selectedStep, positive_modulo(sequence[selectedSequence].stepData[selectedStep].gateType + knobChange, 3) );
-          break;
-
-          case 3:
-          break;
-
-          case 4:
-
-          break;
-        }
-      }
-    }
-
-
-
-
-    void sequencerMenuHandler(){
-      menuSelection = 127;
-
-      for (int i=0; i < 16; i++){
-        if (max7301.fell(i)){
-          switch (i) {
-            case 0:
-            changeState(INSTRUMENT_MENU);
-            break;
-            case 1:
-            changeState(TIMING_MENU);
-            break;
-
-          }
-        }
-      }
-    }
-
-void instrumentSelectInputHandler() {
-
-  for (int i=0; i < 16; i++){
-    if (max7301.fell(i)){
-      menuSelector = i;
-    }
-  }
-
-  switch(menuSelector){
-    case 0:
-    sequence[selectedSequence].instrument = positive_modulo(sequence[selectedSequence].instrument + knobChange,128);
-    sam2695.programChange(0, selectedSequence, sequence[selectedSequence].instrument);
-    break;
-    case 4: 
-    sequence[selectedSequence].volume = positive_modulo(sequence[selectedSequence].volume + knobChange, 128) ;
-    sam2695.setChannelVolume(selectedSequence, sequence[selectedSequence].volume);
-    break;
-    case 8: 
-    sequence[selectedSequence].bank = positive_modulo(sequence[selectedSequence].bank + knobChange, 128) ;
-    sam2695.setChannelBank(selectedSequence, sequence[selectedSequence].bank);
-    break;
-  }
-
-}
-
-
-void timingMenuInputHandler() {
-  for (int i=0; i < 16; i++){
-    if (max7301.fell(i)){
-      menuSelector = i;
-    }
-  }
-  switch(menuSelector){
-    case 0:
-    sequence[selectedSequence].stepCount = positive_modulo(sequence[selectedSequence].stepCount + knobChange, 129);
-    break;
-    case 4:
-    sequence[selectedSequence].beatCount = positive_modulo(sequence[selectedSequence].beatCount + knobChange, 129);    
-    break;
-  }
-}

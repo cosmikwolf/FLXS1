@@ -1,7 +1,15 @@
+// DAC Mapping for each channel:
 
-void changeTempo(uint16_t newTempo){
-	tempo = newTempo;
-	beatLength = 60000000/tempo;
+uint8_t gateMap[]  = {4, 6, 5, 7};
+uint8_t dacCvMap[] = {0, 4, 2, 6};
+uint8_t dacCcMap[] = {1, 5, 3, 7};
+
+void changeTempo(uint32_t newTempoX100){
+	tempoX100 = newTempoX100;
+	beatLength = 60000000/(tempoX100/100);
+  for (int i = 0; i < sequenceCount; i++ ){
+    sequence[i].setTempo(tempoX100);
+  }
 }
 
 void masterClockFunc(){ 
@@ -28,7 +36,9 @@ if (inputTimer > 10000){
     }
 
     noteOffSwitch();
+
     noteOnSwitch();
+
   }
 
   wasPlaying = playing;
@@ -38,10 +48,14 @@ if (inputTimer > 10000){
 //  pixelTimer = 0;
 //}
 //
+
 }
 
 
 void internalClockTick(){
+ //digitalWriteFast(DEBUG_PIN, HIGH);
+
+  debug("begin internal clock tick");
         // int clock
   if (wasPlaying == false){
     Serial.println("TestTimer: " + String(testTimer));
@@ -57,17 +71,15 @@ void internalClockTick(){
       sequence[i].beatPulse(beatLength);
       sequence[i].runSequence(&noteData[i]);
     }
-  } else  if (internalClockTimer > 60000000/tempo){
+  } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
     if (queuePattern != currentPattern) {
       //changePattern(queuePattern, true, true);
     }
     for (int i=0; i< sequenceCount; i++){
-      digitalWriteFast(DEBUG_PIN, HIGH);
       sequence[i].runSequence(&noteData[i]);
       sequence[i].beatPulse(beatLength); 
 
-      digitalWriteFast(DEBUG_PIN, LOW);
 
     }
     tempoBlip = !tempoBlip;
@@ -79,6 +91,9 @@ void internalClockTick(){
       sequence[i].runSequence(&noteData[i]);
     } 
   }
+    debug("end internal clock tick");
+  //digitalWriteFast(DEBUG_PIN, LOW);
+
 }
 
 void externalClockTick(){
@@ -92,11 +107,13 @@ void noteOffSwitch(){
   for (int i=0; i< sequenceCount; i++){
     if (noteData[i].noteOff == true){
       for (int n=0; n< 16; n++){
-        if (noteData[i].noteOffArray[n] == NULL){
+        if (!noteData[i].noteOffArray[n]){
           continue;
         }
          // noteOn(noteData[i].channel,noteData[i].noteOffArray[n]);
-        mcp.digitalWrite(noteData[i].channel+4, LOW);
+       // mcp.digitalWrite(noteData[i].channel+4, LOW);
+        mcp.digitalWrite(gateMap[noteData[i].channel], LOW);
+    
         MIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
         sam2695.noteOff(noteData[i].channel, noteData[i].noteOffArray[n]);
          // usbMIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
@@ -107,27 +124,45 @@ void noteOffSwitch(){
 }
 
 void noteOnSwitch(){
+    Serial.println(millis());
+    debug( "\tbegin note on switch");
+
   for (int i=0; i< sequenceCount; i++){
     if (noteData[i].noteOn == true){
       for (int n=0; n< 128; n++){
-        if (noteData[i].noteOnArray[n] == NULL){
+        if (!noteData[i].noteOnArray[n]){
           continue;
         }
 
-        ad5676.setVoltage(noteData[i].channel,  map(noteData[i].noteOnArray[n], 0,127,0, 65535 ) );
-      //  Serial.println("Note Data: " + String(noteData[i].noteOnArray[n]) + " \t\tsetting voltage to: " + String( map(noteData[i].noteOnArray[n], 0,127,0, 65535 )));
+// calibration numbers: 0v: 22180   5v: 43340
+
+        ad5676.setVoltage(dacCvMap[noteData[i].channel],  map(noteData[i].noteOnArray[n], 0,127,13716, 58504 ) );
         MIDI.sendNoteOn(noteData[i].noteOnArray[n], noteData[i].noteVelArray[n], noteData[i].channel);
-        sam2695.noteOn(noteData[i].channel, noteData[i].noteOnArray[n], 127);
-        mcp.digitalWrite(noteData[i].channel+4, HIGH);
-       // Serial.println("triggering Note");
-        //Serial.println( "noteOn: " + String(noteData[i].noteOnArray[n]) 
-        // + "\tbt: " + String(sequence[selectedSequence].beatTracker) 
-        // + "\tch: " + String(noteData[i].channel)
-        // + "\tseq: " + String(noteData[i].sequenceTime)
-        // + "\toff: " + String(noteData[i].offset)
-        // + "\tstartTime: " + String(startTime));
+        sam2695.noteOn(noteData[i].channel, noteData[i].noteOnArray[n], noteData[i].noteVelArray[n]);
+        ad5676.setVoltage(dacCcMap[noteData[i].channel],  map(noteData[i].noteVelArray[n], 0,127,0, 43340 ) );
+
+      //  Serial.println("Note Data: " + String(noteData[i].noteOnArray[n]) + " \t\tsetting voltage to: " + String( map(noteData[i].noteOnArray[n], 0,127,0, 65535 )));
+        //mcp.digitalWrite(noteData[i].channel+4, HIGH);
+
+        mcp.digitalWrite(gateMap[noteData[i].channel], HIGH);
+        /*
+        digitalWriteFast(DEBUG_PIN, HIGH);
+
+         Serial.println("triggering Note");
+         Serial.println( "ch: " + String(noteData[i].channel) 
+         // + "\tbt: " + String(sequence[selectedSequence].beatTracker) 
+          + "\tnoteOn: " + String(noteData[i].noteOnArray[n])
+          + "\tvel: " + String(map(noteData[i].noteVelArray[n], 0,127,22180, 43340 ))
+          + "\tgate: " + String(gateMap[noteData[i].channel])
+          + "\tcv: " + String(dacCvMap[noteData[i].channel])
+          + "\tcc: " + String(dacCcMap[noteData[i].channel]) );
+        digitalWriteFast(DEBUG_PIN, LOW);
+        */
+
       }
     }
   }
+      debug("end note on switch");
+
 }
 

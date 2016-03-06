@@ -9,7 +9,7 @@ void ledSetup(){
   pinMode(0, OUTPUT);
   digitalWrite(0, LOW);
   pixels.begin();
-  pixels.setBrightness(10);
+  pixels.setBrightness(100);
 }
 
 void ledLoop(){
@@ -33,7 +33,7 @@ void ledLoop(){
       break;
       case CHANNEL_SELECT:
         for (int i=0; i < 20; i++){
-          if (i<4){
+          if (i<16){
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
           } else if (i == 17) {
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/5) % 255));

@@ -8,8 +8,8 @@ class Sequencer
 	public:	
 		Sequencer();
 		
-		void initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, float tempo);
-		void setTempo(uint16_t tempo);
+		void initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
+		void setTempo(uint32_t tempoX100);
 		void setStepPitch(uint8_t step, uint8_t pitch);
 		void setGateLength(uint8_t step, uint8_t length);
 		void setGateType(uint8_t step, uint8_t gate);
@@ -29,16 +29,14 @@ class Sequencer
 		uint8_t  beatTracker;		// keeps track of how long the sequence has been playing
 		uint8_t	 activeStep;
     	uint32_t beatLength;
-		uint16_t tempo;
+		uint32_t tempoX100;
 		uint8_t  channel;
 		boolean  tempoPulse;
 		boolean	 firstBeat;		// this signal is sent when midi clock starts.
 		//uint32_t beatCounter;	// internal beat counter for sync purposes
 		uint32_t stepLength;
-		elapsedMicros stepTimer;			// timer for step to step
-		int16_t stepDifference[5] = {1000,1000,1000,1000, 1000};			// variable to capture average timing error, to compensate.
-
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
+		int16_t sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
 		elapsedMicros beatTimer;
     	uint32_t aminor = 0b101011010101;
 

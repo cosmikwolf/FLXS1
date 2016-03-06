@@ -5,12 +5,11 @@ Sequencer::Sequencer() {
 
 };
 
-void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, float tempo){
+void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100){
 	this->channel = ch;
 	this->stepCount = stepCount;
   this->beatCount = beatCount;
-	this->tempo = tempo;
-	this->stepTimer = 0;
+	this->tempoX100 = tempoX100;
 	this->sequenceTimer = 0;
   this->instrument = 38;
   this->instType = 0;
@@ -20,7 +19,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, flo
   //  stepData[i].velocity = 127;
     stepData[i].pitch = 24;
 	};
-  beatLength = 60000000/tempo;
+  beatLength = 60000000/(tempoX100/100);
   calculateStepTimers();
   monophonic = true;
 };	
@@ -44,9 +43,9 @@ void Sequencer::initNewSequence(){
 };
 
 
-void Sequencer::setTempo(uint16_t tempo){
-  this->tempo = tempo;
-  beatLength = 60000000/tempo;
+void Sequencer::setTempo(uint32_t tempoX100){
+  this->tempoX100 = tempoX100;
+  beatLength = 60000000/(tempoX100/100);
   calculateStepTimers();
 }
 
@@ -87,6 +86,8 @@ void Sequencer::calculateStepTimers(){
 
  // Serial.println(" stepCount: " + String(stepCount) + " stepLength: " + String(stepLength) + " beatLength: " + String(beatLength) + " tempo: " + String(tempo));
   for (int stepNum = 0; stepNum < stepCount; stepNum++){
+     digitalWriteFast(15, HIGH);
+
     stepUtil[stepNum].noteTimerMcs = (stepData[stepNum].gateLength*stepLength);
     stepUtil[stepNum].beat = floor(noteTimerMcsCounter / beatLength);
     stepUtil[stepNum].offset = stepNum*stepLength;
@@ -102,6 +103,8 @@ void Sequencer::calculateStepTimers(){
       "\tOC: " + String(noteTimerMcsCounter) 
     );
   */
+     digitalWriteFast(15, LOW);
+
   }
 
 
@@ -111,7 +114,7 @@ void Sequencer::calculateStepTimers(){
 
 void Sequencer::clockStart(elapsedMicros startTime){
   firstBeat = true;
-  stepTimer = startTime;
+  sequenceTimer = startTime;
 };
 
 void Sequencer::beatPulse(uint32_t beatLength){
@@ -141,7 +144,6 @@ void Sequencer::beatPulse(uint32_t beatLength){
     //  }
     }
     activeStep = 0;
-    stepTimer = 0;
     if(channel == 1){
      // Serial.println("Resetting Sequence Timer " + String(sequenceTimer));
     }
@@ -156,6 +158,8 @@ void Sequencer::beatPulse(uint32_t beatLength){
 };
 
 void Sequencer::runSequence(NoteDatum *noteData){
+  int32_t sequenceTimerInt = sequenceTimer;
+
   // clear noteData from last iteration.
   // if (firstBeat){
   //   Serial.println("firstBeat - runSequenceStart: " + String(sequenceTimer) );
@@ -174,27 +178,37 @@ void Sequencer::runSequence(NoteDatum *noteData){
   noteData->noteOnStep = 0;      
   noteData->noteOffStep = 0;     
  
-  int stepDifferenceAverage = 0;
-  for(int i = 0; i < 5; i++){
-    stepDifferenceAverage += stepDifference[i];
+
+
+
+  int sequenceAvgJitter = 0;
+  for(int i = 0; i < 3; i++){
+    sequenceAvgJitter += sequenceJitter[i];
   }
-  stepDifferenceAverage = stepDifferenceAverage / 5;
+  sequenceAvgJitter = sequenceAvgJitter / 3;
 
 
-  if (stepTimer > (stepLength - 10*stepDifferenceAverage) ){
-  Serial.println("ActiveStep: " + String(activeStep) + " stepTimer: " + String(stepTimer) + " StepLength: " + String(stepLength) + " StepDifferenceAvg: " + String(stepDifferenceAverage));
-
-    for(int i = 5; i > 1; i--){
-      stepDifference[i] = stepDifference[i-1];
-    } 
-    stepDifference[0] = stepTimer - stepLength;
+  if(sequenceTimerInt > (activeStep+1)*stepLength - sequenceAvgJitter/2 ){
 
     digitalWriteFast(4, HIGH);
-    activeStep = positive_modulo(activeStep + 1, stepCount);
-    stepTimer = 0;
+    //Serial.println("SequenceTimer: " + String(sequenceTimer) + "\tactiveStep:  " + String(activeStep) + "\ttrigtime:" + String((activeStep+1)*stepLength) + "\t\tdifference: " + String(sequenceTimerInt - (activeStep+1)*stepLength) + "\tavgJitter: " + String(sequenceAvgJitter) );
+
+    for(int i = 3; i > 1; i--){
+      sequenceJitter[i] = sequenceJitter[i-1];
+    } 
+    sequenceJitter[0] = sequenceTimerInt - (activeStep+1)*stepLength;
+
+   // activeStep = positive_modulo(activeStep + 1, stepCount);
+
+    if (activeStep < stepCount -1 ){
+      activeStep++;
+    }
     digitalWriteFast(4, LOW);
 
   }
+
+
+
 
   for (int stepNum = 0; stepNum < stepCount; stepNum++){
     // set notes to be stopped, and marked as played.
@@ -257,7 +271,7 @@ void Sequencer::runSequence(NoteDatum *noteData){
 
           if (quantizeKey == 1){
             stepUtil[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch, aminor, 1);
-            Serial.println("quantized note: " + String(stepData[stepNum].pitch) + " -> " + String(stepUtil[stepNum].notePlaying));
+           // Serial.println("quantized note: " + String(stepData[stepNum].pitch) + " -> " + String(stepUtil[stepNum].notePlaying));
           } else {
             stepUtil[stepNum].notePlaying = stepData[stepNum].pitch;          
           }

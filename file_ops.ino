@@ -15,9 +15,8 @@ void changePattern(uint8_t pattern, boolean saveFirst, boolean instant){
 }
 
 void initializeFlashMemory(){
- /* pinMode(2, OUTPUT);
-  delay(10);
-  if (!SD.init(SPI_HALF_SPEED, 2) {
+
+  if (!SD.begin(SD_CS_PIN)){
     Serial.println("SD Card initialization failed!");
     //return;
   }
@@ -32,7 +31,8 @@ void initializeFlashMemory(){
   } 
 
   Serial.println("SD Card and save file initialization complete.");
-  */
+
+  loadPattern(0);
 }
  
 
