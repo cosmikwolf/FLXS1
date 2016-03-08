@@ -38,6 +38,7 @@ int8_t knobPrev = 0;
 int8_t knobBuffer = 0;
 int8_t knobPrevious = 0;
 int8_t knobChange = 0;
+int8_t patternSelectChannel;
 
 int16_t stepModeBuffer;
 //int16_t pitchBuffer;
@@ -155,52 +156,56 @@ void altButtonHandler(){
       switch (i){
         // left row bottom up
         case SW_M0:
-        if(currentState == CHANNEL_SELECT){
+          if (selectedSequence == 0){
+            patternSelectChannel == 0;
+          }
+          selectedSequence = 0;
           changeState(STEP_DISPLAY);
-        } else {
-          changeState(CHANNEL_SELECT);
-        }
         break;
 
         case SW_M1:
-        if(currentState == PATTERN_SELECT){
+          selectedSequence = 1;
           changeState(STEP_DISPLAY);
-        } else {
-          changeState(PATTERN_SELECT);
-        }
         break;
 
         case SW_M2:
-        if( currentState != STEP_DISPLAY){
+          selectedSequence = 2;
           changeState(STEP_DISPLAY);
-        }   
-        if (stepMode == 4) {
-          stepMode = 5;
-        } else {
-          stepMode = 4;
-        };
-
         break;
 
-        case SW_M3: //switch M3 toggles the sequence menu
-        if( currentState != STEP_DISPLAY){
+        case SW_M3:
+          selectedSequence = 3;
           changeState(STEP_DISPLAY);
-        }   
-        if (stepMode == 3) {
-          stepMode = 6;
-        } else if(stepMode == 6){
-          stepMode = 7;
-        } else {
-          stepMode = 3;
-        };
+        break;
+
+        case SW_MENU:
+          if(currentState == PATTERN_SELECT){
+            changeState(STEP_DISPLAY);
+          } else {
+            changeState(PATTERN_SELECT);
+          }
+        break;
+
+        case SW_ALT: //switch M3 toggles the sequence menu
+      
+          if (stepMode < 3 || stepMode > 7) {
+            stepMode = 3;
+          } else {
+            stepMode++;
+          }
+
+          if( currentState != STEP_DISPLAY){
+            changeState(STEP_DISPLAY);
+          }   
+
         break;
 
         case SW_PGDN:
-        notePage = positive_modulo(notePage - 1, 4);     
+          notePage = positive_modulo(notePage - 1, 4);     
         break;
 
         case SW_PGUP:
-        notePage = positive_modulo(notePage + 1, 4);     
+          notePage = positive_modulo(notePage + 1, 4);     
         break;
 
         case SW_STOP:
