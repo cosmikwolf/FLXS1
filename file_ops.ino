@@ -138,6 +138,7 @@ void loadPattern(uint8_t pattern) {
     sam2695.programChange(0, i, sequence[i].instrument);
     sam2695.setChannelVolume(i, sequence[i].volume);
 
+    sequence[i].quantizeKey = 1;
     // if no steps are set, it is an empty sequence. initialize a new default sequence.
   // if (sequence[i].instType == 0 ) {
   //   Serial.println("###### INITIALIZING NEW SEQUENCE ######");

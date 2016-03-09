@@ -87,9 +87,10 @@ void displayLoop() {
       timingMenuDisplay();
     break;
 
-    case TEMPO_MENU:
-
+    case DELETE_MENU:
+      deleteMenuDisplay();
     break;
+
 
     case DEBUG_SCREEN:
       debugScreenDisplay();
@@ -107,6 +108,32 @@ void globalMenuDisplay(){
   gdispFillStringBox(0, height/3, width, 15,  "MENU", fontSm, White, Black, justifyCenter);
 }
 
+
+void deleteMenuDisplay(){
+  uint8_t previousHighlight = highlight;
+  highlight = selectedSequence;
+  displayElement[0] = strdup("to clear this pattern");
+  renderStringBox(0, highlight, previousHighlight ,0, 60 , 32 , 128, fontSm,  White, Red, justifyCenter);
+
+  displayElement[1] = strdup("press step 16");
+  renderStringBox(1, highlight, previousHighlight ,0, 70 , 32 , 128, fontSm, White, Red,  justifyCenter);
+ 
+  for (int i=2; i< MAX_DISPLAY_ELEMENTS; i++){
+    //filling display buffer with dummy data. dirty, but i need to have a reliable buffer size.
+    displayElement[i] = strdup("a");
+  }
+
+  for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
+    if (displayCache[i]){
+      free(displayCache[i]);
+    }
+    if ( displayElement[i] ){
+      displayCache[i] = strdup(displayElement[i]);      
+      free(displayElement[i]);
+    }
+  }
+
+};
 
 void stepDisplayTest(){
   Serial.println(String(runcount) + "\t" + String(millis()) + "\tbegin stepdisplay test");
@@ -294,46 +321,48 @@ void channelSelectDisplay() {
 }
 
 void patternSelectDisplay(){
+    uint8_t previousHighlight = highlight;
+
   highlight = currentPattern;
   //nonBlockingRainbow(2);
 
   displayElement[16] = "PATTERN SELECT";
-  renderStringBox(16, highlight, highlight, 0, 0, 128 , 16, fontSm, Black, Pink, justifyCenter);
+  renderStringBox(16, highlight, previousHighlight, 0, 0, 128 , 16, fontSm, Black, Pink, justifyCenter);
   displayElement[0] =  "0";
-  renderStringBox(0, highlight, highlight,  0, 16, 32 , 20, fontLg, Black, Red, justifyCenter);
+  renderStringBox(0, highlight, previousHighlight,  0, 16, 32 , 20, fontLg, Black, Red, justifyCenter);
   displayElement[1] =  "1";
-  renderStringBox(1, highlight, highlight, 32, 16, 32 , 20, fontLg, Black, Green, justifyCenter);
+  renderStringBox(1, highlight, previousHighlight, 32, 16, 32 , 20, fontLg, Black, Green, justifyCenter);
   displayElement[2] =  "2";
-  renderStringBox(2, highlight, highlight, 64, 16, 32 , 20, fontLg, Black, Blue, justifyCenter);
+  renderStringBox(2, highlight, previousHighlight, 64, 16, 32 , 20, fontLg, Black, Blue, justifyCenter);
   displayElement[3] =  "3";
-  renderStringBox(3, highlight, highlight, 96, 16, 32 , 20, fontLg, Black, Purple, justifyCenter);
+  renderStringBox(3, highlight, previousHighlight, 96, 16, 32 , 20, fontLg, Black, Purple, justifyCenter);
 
   displayElement[4] =  "4";
-  renderStringBox(4, highlight, highlight,  0, 36, 32 , 20, fontLg, Black, Red, justifyCenter);
+  renderStringBox(4, highlight, previousHighlight,  0, 36, 32 , 20, fontLg, Black, Red, justifyCenter);
   displayElement[5] =  "5";
-  renderStringBox(5, highlight, highlight, 32, 36, 32 , 20, fontLg, Black, Green, justifyCenter);
+  renderStringBox(5, highlight, previousHighlight, 32, 36, 32 , 20, fontLg, Black, Green, justifyCenter);
   displayElement[6] =  "6";
-  renderStringBox(6, highlight, highlight, 64, 36, 32 , 20, fontLg, Black, Blue, justifyCenter);
+  renderStringBox(6, highlight, previousHighlight, 64, 36, 32 , 20, fontLg, Black, Blue, justifyCenter);
   displayElement[7] =  "7";
-  renderStringBox(7, highlight, highlight, 96, 36, 32 , 20, fontLg, Black, Purple, justifyCenter);
+  renderStringBox(7, highlight, previousHighlight, 96, 36, 32 , 20, fontLg, Black, Purple, justifyCenter);
 
   displayElement[8] =  "8";
-  renderStringBox(8, highlight, highlight,  0, 56, 32 , 20, fontLg, Black, Red, justifyCenter);
+  renderStringBox(8, highlight, previousHighlight,  0, 56, 32 , 20, fontLg, Black, Red, justifyCenter);
   displayElement[9] =  "9";
-  renderStringBox(9, highlight, highlight, 32, 56, 32 , 20, fontLg, Black, Green, justifyCenter);
+  renderStringBox(9, highlight, previousHighlight, 32, 56, 32 , 20, fontLg, Black, Green, justifyCenter);
   displayElement[10] =  "A";
-  renderStringBox(10, highlight, highlight, 64, 56, 32 , 20, fontLg, Black, Blue, justifyCenter);
+  renderStringBox(10, highlight,previousHighlight, 64, 56, 32 , 20, fontLg, Black, Blue, justifyCenter);
   displayElement[11] =  "B";
-  renderStringBox(11, highlight, highlight, 96, 56, 32 , 20, fontLg, Black, Purple, justifyCenter);
+  renderStringBox(11, highlight,previousHighlight, 96, 56, 32 , 20, fontLg, Black, Purple, justifyCenter);
 
   displayElement[12] =  "C";
-  renderStringBox(12, highlight, highlight,  0, 76, 32 , 20, fontLg, Black, Red, justifyCenter);
+  renderStringBox(12, highlight,previousHighlight,  0, 76, 32 , 20, fontLg, Black, Red, justifyCenter);
   displayElement[13] =  "D";
-  renderStringBox(13, highlight, highlight, 32, 76, 32 , 20, fontLg, Black, Green, justifyCenter);
+  renderStringBox(13, highlight,previousHighlight, 32, 76, 32 , 20, fontLg, Black, Green, justifyCenter);
   displayElement[14] =  "E";
-  renderStringBox(14, highlight, highlight, 64, 76, 32 , 20, fontLg, Black, Blue, justifyCenter);
+  renderStringBox(14, highlight,previousHighlight, 64, 76, 32 , 20, fontLg, Black, Blue, justifyCenter);
   displayElement[15] =  "F";
-  renderStringBox(15, highlight, highlight, 96, 76, 32 , 20, fontLg, Black, Purple, justifyCenter);
+  renderStringBox(15, highlight,previousHighlight, 96, 76, 32 , 20, fontLg, Black, Purple, justifyCenter);
 
   for( int i=0; i< 17; i++ ){
     if (displayCache[i]){

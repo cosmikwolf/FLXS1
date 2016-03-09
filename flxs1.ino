@@ -38,6 +38,7 @@
 #define TEMPO_MENU      	 95
 #define PATTERN_SELECT  	 96
 #define	CHANNEL_SELECT		 97
+#define	DELETE_MENU				 98
 #define	DEBUG_SCREEN			127
 #define DEBUG_PIN					 15
 #define SD_CS_PIN					  2
