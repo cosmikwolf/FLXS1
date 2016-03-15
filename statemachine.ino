@@ -8,9 +8,15 @@ void changeState(uint8_t state){
 	}
 
 	currentState = state;
-	knobRead = 0;
-	knob1.write(0);
+	resetKnobValues();
 	gdispClear(Black);
 	Serial.println("   - state change complete");
-	
+
 }
+
+
+void resetKnobValues(){
+	knobRead = 0;
+	knob1.write(0);
+	Serial.println("resetting knob1: " + String(knob1.read()));
+};

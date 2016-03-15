@@ -117,14 +117,13 @@ void noteOffSwitch(){
         MIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
         sam2695.noteOff(noteData[i].channel, noteData[i].noteOffArray[n]);
          // usbMIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
-          //Serial.println("noteOff: " + String(noteData[i].noteOffArray[n]) + "\tbt: " + String(sequence[selectedSequence].beatTracker) ) ;
+          //Serial.println("noteOff: " + String(noteData[i].noteOffArray[n]) + "\tbt: " + String(sequence[selectedChannel].beatTracker) ) ;
       }
     }
   }
 }
 
 void noteOnSwitch(){
-    Serial.println(millis());
     debug( "\tbegin note on switch");
 
   for (int i=0; i< sequenceCount; i++){
@@ -150,7 +149,7 @@ void noteOnSwitch(){
 
          Serial.println("triggering Note");
          Serial.println( "ch: " + String(noteData[i].channel) 
-         // + "\tbt: " + String(sequence[selectedSequence].beatTracker) 
+         // + "\tbt: " + String(sequence[selectedChannel].beatTracker) 
           + "\tnoteOn: " + String(noteData[i].noteOnArray[n])
           + "\tvel: " + String(map(noteData[i].noteVelArray[n], 0,127,22180, 43340 ))
           + "\tgate: " + String(gateMap[noteData[i].channel])

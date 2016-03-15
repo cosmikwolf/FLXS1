@@ -37,7 +37,7 @@
 #define GLOBAL_FILE     	 94
 #define TEMPO_MENU      	 95
 #define PATTERN_SELECT  	 96
-#define	CHANNEL_SELECT		 97
+#define	CHANNEL_MENU		 97
 #define	DELETE_MENU				 98
 #define	DEBUG_SCREEN			127
 #define DEBUG_PIN					 15
@@ -75,7 +75,7 @@ uint8_t masterPulseCount =24;
 uint8_t sequenceCount = 4;
 uint8_t currentPattern = 0;
 uint8_t queuePattern = 0;
-uint8_t selectedSequence = 0;
+uint8_t selectedChannel = 0;
 uint8_t numSteps = 16;
 uint8_t	currentState = 0;
 uint8_t previousState = 0;
@@ -90,7 +90,6 @@ boolean wasPlaying = false;
 boolean tempoBlip = false;
 boolean firstRun = false;
 boolean extClock = false;
-boolean need2save = false;
 boolean dispSwitch = false;;
 boolean debugBoolean = 0;
 
@@ -218,7 +217,7 @@ void setup() {
 
 void loop() {
 	ledLoop();
-  buttonLoop();
+  	buttonLoop();
 
 	if( displayTimer > 10000){
 		if (!dispSwitch){

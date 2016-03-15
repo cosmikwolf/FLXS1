@@ -6,6 +6,7 @@ Sequencer::Sequencer() {
 };
 
 void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100){
+  // initialization routine that runs during setup
 	this->channel = ch;
 	this->stepCount = stepCount;
   this->beatCount = beatCount;
@@ -14,25 +15,27 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
   this->instrument = 38;
   this->instType = 0;
   this->volume = 100;
-	for (int i=0; i < stepCount; i++){
-   // stepData[i].gateLength = 1;
+	//for (int i=0; i < stepCount; i++){
+  // stepData[i].gateLength = 1;
   //  stepData[i].velocity = 127;
-    stepData[i].pitch = 24;
-	};
+  // stepData[i].pitch = 24;
+	//};
   beatLength = 60000000/(tempoX100/100);
   calculateStepTimers();
   monophonic = true;
 };	
 
 
-void Sequencer::initNewSequence(){
-  stepCount = stepCount;
-  beatCount = 4;
-  quantizeKey = 1;
-  instrument = 0;
-  volume = 100;
-  bank = 0;
-  instType = 2; //initialized regular instrument
+void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
+  this->stepCount = stepCount;
+  this->beatCount = 4;
+  this->quantizeKey = 1;
+  this->instrument = 0;
+  this->volume = 100;
+  this->bank = 0;
+  this->patternIndex = index;
+  this->channel = ch;
+  this->instType = 2; //initialized regular instrument
   for(int n=0; n < 128; n++){
     stepData[n].pitch      = 24;
     stepData[n].gateLength = 1;

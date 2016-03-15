@@ -18,33 +18,39 @@ void ledLoop(){
     switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
-          if (getNote(i) == sequence[selectedSequence].activeStep ){
+          if (getNote(i) == sequence[selectedChannel].activeStep ){
             pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );      
           } else if (getNote(i) == selectedStep) {
             pixels.setPixelColor(ledMapping[i], Wheel(int(millis()/3)%255) );      
           } else {
-            if(sequence[selectedSequence].stepData[getNote(i)].gateType == 0){
+            if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
               pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
             } else {
-              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedSequence].getStepPitch(getNote(i)) ) );
+              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedChannel].getStepPitch(getNote(i)) ) );
             }
           }
         }
+        for (int i=0; i < 4; i++){
+          if (selectedChannel == i) {
+            pixels.setPixelColor(ledMapping[i+16], Wheel((sequence[selectedChannel].patternIndex * 16) % 255)); 
+          } else {
+            pixels.setPixelColor(ledMapping[i+16], pixels.Color(0,0,0));
+          }
+        }
+
       break;
-      case CHANNEL_SELECT:
+      case CHANNEL_MENU:
         for (int i=0; i < 20; i++){
-          if (i<16){
+          if (i == 0 || i == 4 || i == 8){
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
-          } else if (i == 17) {
-            pixels.setPixelColor(ledMapping[i], Wheel((millis()/5) % 255));
-          }else{
+          } else{
             pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
           }
         }
       break;
 
       case SEQUENCE_MENU:
-        for (int i=0; i < 20; i++){
+        for (int i=0; i < 16; i++){
           if (i<2){
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
           } else if (i == 17) {
@@ -53,10 +59,22 @@ void ledLoop(){
             pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
           }
         }
+
+
       break;
 
       case PATTERN_SELECT:
-        nonBlockingRainbow(10);
+        for (int i=0; i < 16; i++){
+          pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
+        }
+
+        for (int i=0; i < 4; i++){
+          if( patternChannelSelector & (1<<i) ){
+            pixels.setPixelColor(ledMapping[i+16], Wheel((millis()/20 + i*64) % 255)); 
+          } else {
+            pixels.setPixelColor(ledMapping[i+16], pixels.Color(0,0,0));
+          }
+        }
       break;
     }
     pixels.show();

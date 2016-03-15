@@ -22,7 +22,7 @@ class Sequencer
 		int  positive_modulo(int i, int n);
 		void setStepCount(uint8_t stepCountNew);
 		void setBeatCount(uint16_t beatCountNew);
-		void initNewSequence();
+		void initNewSequence(uint8_t index, uint8_t ch);
 		uint8_t  quantizePitch(uint8_t note, uint32_t scale, bool direction);
 		uint8_t  getStepPitch(uint8_t step);
 		boolean  monophonic;
@@ -30,7 +30,6 @@ class Sequencer
 		uint8_t	 activeStep;
     	uint32_t beatLength;
 		uint32_t tempoX100;
-		uint8_t  channel;
 		boolean  tempoPulse;
 		boolean	 firstBeat;		// this signal is sent when midi clock starts.
 		//uint32_t beatCounter;	// internal beat counter for sync purposes
@@ -43,13 +42,15 @@ class Sequencer
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
 
 		// data that needs to be stored
-		uint8_t	 quantizeKey;
 		uint8_t  stepCount;  		// sequence length in 1/16th notes]
 		uint16_t beatCount;
+		uint8_t	 quantizeKey;
 		uint16_t instrument;
 		uint8_t	 instType;
 		uint8_t  volume;
 		uint8_t  bank;
+		uint8_t	 channel;
+		uint8_t  patternIndex;
 		
 		struct StepDatum {
 			// data that needs to be stored
@@ -63,13 +64,12 @@ class Sequencer
 
 		struct StepUtil {
 			uint16_t		beat;			// beat in which the note is triggered - recalculated each beat
-			unsigned long	offset;		    // note start time offset in mcs from the beat start - recalculated each beat
+			uint32_t		offset;		    // note start time offset in mcs from the beat start - recalculated each beat
 			uint8_t			noteStatus;		// if note is playing or not
 			uint8_t			notePlaying;	// stores the note that is played so it can be turned off.
-			unsigned long	lengthMcs;	    // length timer for step in microseconds.
-			unsigned long	noteTimerMcs;
+			uint32_t		lengthMcs;	    // length timer for step in microseconds.
+			uint32_t		noteTimerMcs;
 			elapsedMicros	stepTimer;		// a timer to compare with lengthMcs to determine when to send noteOff.
-
 		};
 	 	
 		StepDatum stepData[128];
