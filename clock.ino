@@ -13,8 +13,7 @@ void changeTempo(uint32_t newTempoX100){
 }
 
 void masterClockFunc(){ 
-
-elapsedMicros loopTimer = 0;
+  elapsedMicros loopTimer = 0;
 
 
 if (inputTimer > 10000){
@@ -29,6 +28,7 @@ if (inputTimer > 10000){
 //  lastAvgInterval = avgInterval;
 
   if(playing){
+
     if( extClock == false ){ 
       internalClockTick();
     } else {
@@ -48,7 +48,7 @@ if (inputTimer > 10000){
 //  pixelTimer = 0;
 //}
 //
-
+    midiClockSyncFunc();
 }
 
 
@@ -58,7 +58,6 @@ void internalClockTick(){
   debug("begin internal clock tick");
         // int clock
   if (wasPlaying == false){
-    Serial.println("TestTimer: " + String(testTimer));
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
     masterTempoTimer = 0;
@@ -68,8 +67,8 @@ void internalClockTick(){
 
     for (int i=0; i< sequenceCount; i++){
       sequence[i].clockStart(startTime);
-      sequence[i].beatPulse(beatLength);
-      sequence[i].runSequence(&noteData[i]);
+      sequence[i].beatPulse(beatLength, &life);
+      sequence[i].runSequence(&noteData[i], &life);
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
@@ -77,8 +76,8 @@ void internalClockTick(){
       //changePattern(queuePattern, true, true);
     }
     for (int i=0; i< sequenceCount; i++){
-      sequence[i].runSequence(&noteData[i]);
-      sequence[i].beatPulse(beatLength); 
+      sequence[i].runSequence(&noteData[i], &life);
+      sequence[i].beatPulse(beatLength, &life); 
 
 
     }
@@ -88,7 +87,7 @@ void internalClockTick(){
        // Serial.print(" b5 ");
   }  else { 
     for (int i=0; i< sequenceCount; i++){
-      sequence[i].runSequence(&noteData[i]);
+      sequence[i].runSequence(&noteData[i], &life);
     } 
   }
     debug("end internal clock tick");
@@ -99,7 +98,7 @@ void internalClockTick(){
 void externalClockTick(){
   // ext clock sync
   for (int i=0; i< sequenceCount; i++){
-    sequence[i].runSequence(&noteData[i]);
+    sequence[i].runSequence(&noteData[i], &life);
   }
 }
 
@@ -132,10 +131,13 @@ void noteOnSwitch(){
         if (!noteData[i].noteOnArray[n]){
           continue;
         }
+    digitalWriteFast(DEBUG_PIN, HIGH);
 
 // calibration numbers: 0v: 22180   5v: 43340
 
         ad5676.setVoltage(dacCvMap[noteData[i].channel],  map(noteData[i].noteOnArray[n], 0,127,13716, 58504 ) );
+       // digitalWriteFast(15, HIGH);
+
         MIDI.sendNoteOn(noteData[i].noteOnArray[n], noteData[i].noteVelArray[n], noteData[i].channel);
         sam2695.noteOn(noteData[i].channel, noteData[i].noteOnArray[n], noteData[i].noteVelArray[n]);
         ad5676.setVoltage(dacCcMap[noteData[i].channel],  map(noteData[i].noteVelArray[n], 0,127,0, 43340 ) );
@@ -144,6 +146,9 @@ void noteOnSwitch(){
         //mcp.digitalWrite(noteData[i].channel+4, HIGH);
 
         mcp.digitalWrite(gateMap[noteData[i].channel], HIGH);
+//        Serial.println("i: " + String(i) + "\tn: " + String(n) + "\tchan: " + String(noteData[i].channel) + "\tnoteOn: " + String(noteData[i].noteOnArray[n]) + "\tvel: " + noteData[i].noteVelArray[n] );
+        //digitalWriteFast(15, LOW);
+
         /*
         digitalWriteFast(DEBUG_PIN, HIGH);
 
@@ -157,6 +162,7 @@ void noteOnSwitch(){
           + "\tcc: " + String(dacCcMap[noteData[i].channel]) );
         digitalWriteFast(DEBUG_PIN, LOW);
         */
+    digitalWriteFast(DEBUG_PIN, LOW);
 
       }
     }

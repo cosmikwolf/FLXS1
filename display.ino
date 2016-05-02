@@ -61,8 +61,11 @@ void displayLoop() {
       channelMenuDisplay();
     break;
     case STEP_DISPLAY:
-      stepDisplay();
-   // stepDisplayTest();
+      if (sequence[selectedChannel].instType == 1){
+        gameOfLifeDisplay();
+      } else {
+        stepDisplay();
+      }
     break;
     case PATTERN_SELECT:
       patternSelectDisplay();
@@ -98,6 +101,57 @@ void globalMenuDisplay(){
   gdispFillStringBox(0, height/3, width, 15,  "MENU", fontSm, White, Black, justifyCenter);
 }
 
+void gameOfLifeDisplay(){
+
+  for(int row=0; row < LIFELINES; row++){
+    for(int col=0; col < LIFEWIDTH; col++){
+
+      color_t color;
+
+      if (col == sequence[selectedChannel].activeStep) {
+        if (life.grid[row][col] < 1){
+          color = Yellow;
+        } else {
+          color = Magenta;
+        }
+   /*     } else if (life.grid[row][col] < 32){
+          color =  Green;
+        } else if (life.grid[row][col] < 48){
+          color =  Red;
+        } else if ( life.grid[row][col] < 64){
+          color =  Purple;
+        } else if ( life.grid[row][col] < 96){
+          color = Yellow;
+        } else if (life.grid[row][col] < 112){
+          color = Yellow;
+        } else if (life.grid[row][col] < 128){
+          color = Olive;
+        }
+
+        */
+      } else {
+        if (life.grid[row][col] < 1){
+          color = Black;
+          } else if (life.grid[row][col] < 32){
+          color =  Orange;
+        } else if (life.grid[row][col] < 48){
+          color =  Yellow;
+        } else if ( life.grid[row][col] < 64){
+          color =  Green;
+        } else if ( life.grid[row][col] < 96){
+          color = Blue;
+        } else if (life.grid[row][col] < 112){
+          color = Navy;
+        } else if (life.grid[row][col] < 128){
+          color = Magenta;
+        }
+      
+      }
+
+      gdispFillArea( ((col+0)*8), ((row+0)*8), 8, 8,  color);
+    }
+  }
+}
 
 void deleteMenuDisplay(){
   uint8_t previousHighlight = highlight;
@@ -234,12 +288,15 @@ void stepDisplay(){
   displayElement[5] = strdup(buf);
   renderStringBox(5, highlight, previousHighlight, 0, 60, 64 , 10, fontTny ,background , foreground, justifyLeft);
 
-
   displayElement[7] = strdup("tempo");
   renderStringBox(7, highlight, previousHighlight, 64, 0, 64 , 10, fontSm ,Black , White, justifyCenter);
 
-  sprintf(buf, "%d bpm", tempoX100/100 );  
-  displayElement[6] = strdup(buf);
+  if (extClock) {
+    displayElement[6] = strdup("MIDI");
+  } else {
+    sprintf(buf, "%d bpm", tempoX100/100 );  
+    displayElement[6] = strdup(buf);
+  }
   renderStringBox(6, highlight, previousHighlight, 64, 10, 64 , 24, fontMd ,Black , White, justifyCenter);
 
   sprintf(buf, "%d steps", sequence[selectedChannel].stepCount);  
@@ -290,16 +347,28 @@ void channelMenuDisplay() {
   displayElement[0] = strdup("CHANNEL MENU");
   renderStringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, fontSm,  White, Red, justifyCenter);
 
-  displayElement[1] = strdup("INIT CHANNEL");
-  renderStringBox(1, highlight, previousHighlight, 0 , 16 , 128 , 16, fontSm, White, Green,  justifyLeft);
+  displayElement[1] = strdup("INIT CH");
+  renderStringBox(1, highlight, previousHighlight, 0 , 16 , 64 , 16, fontSm, White, Green,  justifyLeft);
  
-  displayElement[2] = strdup("INIT PATTERN");
-  renderStringBox(2, highlight, previousHighlight, 0 , 32 , 128 , 16, fontSm, White, Blue,  justifyLeft);
+  displayElement[2] = strdup("INIT PAT");
+  renderStringBox(2, highlight, previousHighlight, 0 , 32 , 64 , 16, fontSm, White, Blue,  justifyLeft);
 
   displayElement[3] = strdup("DELETE SAVE FILE");
-  renderStringBox(3, highlight, previousHighlight ,0, 48 , 32 , 16, fontSm, White, Black,  justifyCenter);
+  renderStringBox(3, highlight, previousHighlight ,0, 48 , 128 , 16, fontSm, White, Black,  justifyCenter);
 
-  for (int i=4; i< MAX_DISPLAY_ELEMENTS; i++){
+  displayElement[4] = strdup("TOGGLE GAME OF LIFE");
+  renderStringBox(4, highlight, previousHighlight ,0, 64 , 128 , 16, fontSm, White, Black,  justifyCenter);
+
+
+  displayElement[5] = strdup("EXTCLOCK");
+  renderStringBox(5, highlight, previousHighlight, 64 , 16 , 64 , 16, fontSm, White, Green,  justifyLeft);
+ 
+  displayElement[6] = strdup("--------");
+  renderStringBox(6, highlight, previousHighlight, 64 , 32 , 64 , 16, fontSm, White, Blue,  justifyLeft);
+
+
+
+  for (int i=7; i< MAX_DISPLAY_ELEMENTS; i++){
     //filling display buffer with dummy data. dirty, but i need to have a reliable buffer size.
     displayElement[i] = strdup("a");
   }

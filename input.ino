@@ -157,9 +157,21 @@ void channelMenuHandler(){
     deleteSaveFile();
     changeState(STEP_DISPLAY);
 
-  }
-  
+  } else if (max7301.fell(12)){
+    if (sequence[selectedChannel].instType == 0){
+      sequence[selectedChannel].setInstType(1);
+      //sequence[selectedChannel].stepCount = 16;
+      //sequence[selectedChannel].beatCount = 16;
+      life.genGrid(micros());
+    } else {
+      sequence[selectedChannel].setInstType(0);
+    }
+    changeState(STEP_DISPLAY);
+  } else if (max7301.fell(3)){
+    extClock = !extClock;
+        changeState(STEP_DISPLAY);
 
+  }
 }
 
 void channelButtonHandler(uint8_t channel){

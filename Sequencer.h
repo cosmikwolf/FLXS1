@@ -2,43 +2,48 @@
 #define _Sequencer_h_
 
 #include "NoteDatum.h"
+#include "GameOfLife.h"
 
 class Sequencer
 {
 	public:	
 		Sequencer();
 		
-		void initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void setTempo(uint32_t tempoX100);
-		void setStepPitch(uint8_t step, uint8_t pitch);
-		void setGateLength(uint8_t step, uint8_t length);
-		void setGateType(uint8_t step, uint8_t gate);
-		void setStepVelocity(uint8_t step, uint8_t velocity);
-		void setStepGlide(uint8_t step, uint8_t glideTime);
-		void runSequence(NoteDatum *noteData);
-		void calculateStepTimers();
-		void beatPulse(uint32_t beatLength);
-		void clockStart(elapsedMicros startTime);
-		int  positive_modulo(int i, int n);
-		void setStepCount(uint8_t stepCountNew);
-		void setBeatCount(uint16_t beatCountNew);
-		void initNewSequence(uint8_t index, uint8_t ch);
-		uint8_t  quantizePitch(uint8_t note, uint32_t scale, bool direction);
-		uint8_t  getStepPitch(uint8_t step);
-		boolean  monophonic;
-		uint8_t  beatTracker;		// keeps track of how long the sequence has been playing
-		uint8_t	 activeStep;
-    	uint32_t beatLength;
-		uint32_t tempoX100;
-		boolean  tempoPulse;
-		boolean	 firstBeat;		// this signal is sent when midi clock starts.
-		//uint32_t beatCounter;	// internal beat counter for sync purposes
-		uint32_t stepLength;
-		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
-		int16_t sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
-		elapsedMicros beatTimer;
-    	uint32_t aminor = 0b101011010101;
+		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
+		void 		setTempo(uint32_t tempoX100);
+		void 		setStepPitch(uint8_t step, uint8_t pitch);
+		void 		setGateLength(uint8_t step, uint8_t length);
+		void 		setGateType(uint8_t step, uint8_t gate);
+		void 		setStepVelocity(uint8_t step, uint8_t velocity);
+		void 		setStepGlide(uint8_t step, uint8_t glideTime);
+		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
+		void 		calculateStepTimers();
+		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
+		void 		clockStart(elapsedMicros startTime);
+		int  		positive_modulo(int i, int n);
+		void 		setStepCount(uint8_t stepCountNew);
+		void 		setBeatCount(uint16_t beatCountNew);
+		void 		initNewSequence(uint8_t index, uint8_t ch);
+		void 		setInstType(boolean type);
 
+		uint8_t  	quantizePitch(uint8_t note, uint32_t scale, bool direction);
+		uint8_t  	getStepPitch(uint8_t step);
+		boolean  	monophonic;
+		uint8_t  	beatTracker;		// keeps track of how long the sequence has been playing
+		uint8_t	 	activeStep;
+    	uint32_t 	beatLength;
+		uint32_t 	tempoX100;
+		boolean  	tempoPulse;
+		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
+		uint32_t 	stepLength;
+		int16_t 	sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
+		uint32_t 	aminor = 0b101011010101;
+		uint8_t		lifeCellToPlay;
+		uint8_t		lifeCellsPlayed;
+
+		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
+		elapsedMicros beatTimer;
+    	
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
 
 		// data that needs to be stored

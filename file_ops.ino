@@ -11,7 +11,7 @@ void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, 
     for(int i=0; i < sequenceCount; i++){
   		saveChannelPattern(i);
     }
-    Serial.println("=*-.-*= Pattern " + String(pattern) + " saved. =*-.-*= ");
+    Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	}
 
   if (instant || !playing) {
@@ -61,7 +61,6 @@ void deleteSaveFile(){
 
 void saveChannelPattern(uint8_t channel) {
   Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card. time:\t" + String(micros()) );
-  saveData = SD.open("data.txt", FILE_WRITE);
  // for(int i=0; i < sequenceCount; i++){
  	  int index = int(
     ( channel  + sequence[channel].patternIndex * sequenceCount ) 
@@ -91,6 +90,11 @@ void saveChannelPattern(uint8_t channel) {
       + "\tpatternIndex: "  + String(sizeof(sequence[0].patternIndex) )
       );
 
+
+  saveData = SD.open("data.txt", FILE_WRITE);
+  if (!saveData) {
+    Serial.println("===***=== SAVE DATA DID NOT WORK, SAVEDATA DID NOT OPEN ===***===");
+  } else {
     saveData.seek(index);
     saveData.write( (byte*)&sequence[channel].stepData,     sizeof(sequence[channel].stepData));
     saveData.write( (byte*)&sequence[channel].stepCount,    sizeof(sequence[channel].stepCount));
@@ -103,8 +107,10 @@ void saveChannelPattern(uint8_t channel) {
     saveData.write( (byte*)&sequence[channel].channel,      sizeof(sequence[channel].channel));
     saveData.write( (byte*)&sequence[channel].patternIndex, sizeof(sequence[channel].patternIndex));
   //}
-  saveData.close();
-	Serial.println("Done saving to SD..." + String(micros()));
+    saveData.close();
+	  Serial.println("Done saving to SD..." + String(micros()));
+  }
+    
 
 }
 
@@ -160,11 +166,12 @@ void loadPattern(uint8_t pattern, uint8_t channelSelector) {
     saveData.read( (byte*)&sequence[i].channel,     sizeof(sequence[i].channel));
     saveData.read( (byte*)&sequence[i].patternIndex,       sizeof(sequence[i].patternIndex));
 
-    if (sequence[i].instType == 0 || saveData.size() <= index){
+    if (saveData.size() <= index){
+    //if (sequence[i].instType == 0 || saveData.size() <= index){ // original line, not sure why it checked instType?
       Serial.println("saveData not available, initializing sequence");
       sequence[i].initNewSequence(pattern, i);
     } else {
-      Serial.println("saveDataAvailable, loading sequence --- instType: " + String(sequence[i].instType));
+      Serial.println("saveData available, loading sequence --- instType: " + String(sequence[i].instType));
     }
     Serial.println("reading complete!");
     

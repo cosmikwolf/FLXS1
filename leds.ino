@@ -9,7 +9,7 @@ void ledSetup(){
   pinMode(0, OUTPUT);
   digitalWrite(0, LOW);
   pixels.begin();
-  pixels.setBrightness(25);
+  pixels.setBrightness(100);
 }
 
 void ledLoop(){
@@ -41,7 +41,7 @@ void ledLoop(){
       break;
       case CHANNEL_MENU:
         for (int i=0; i < 20; i++){
-          if (i == 0 || i == 4 || i == 8){
+          if (i%4==0 || i == 3){
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));
           } else{
             pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));

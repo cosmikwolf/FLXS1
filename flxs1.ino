@@ -13,6 +13,7 @@
 #include "NoteDatum.h"
 #include <Audio.h>
 #include <analyze_notefreq.h>
+#include "GameOfLife.h"
 
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		 	  0
@@ -45,6 +46,9 @@
 #define OLED_DC						 10
 #define OLED_CS						  6
 #define OLED_RST					  9
+
+
+
 
 float midiFreq[128] = { 8.17, 8.66, 9.17, 9.72, 10.30, 10.91, 11.56, 12.24, 12.97, 13.75, 14.56, 15.43, 16.35, 17.32, 18.35,
 19.44, 20.60, 21.82, 23.12, 24.49, 25.95, 27.50, 29.13, 30.86, 32.70, 34.64, 36.70, 38.89, 41.20, 43.65, 46.24, 48.99, 51.91,
@@ -127,6 +131,8 @@ uint32_t masterClockInterval = 500;
 
 Sequencer sequence[4];
 NoteDatum noteData[4];
+GameOfLife	life;
+
 File saveData;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(20, 0, NEO_GRB + NEO_KHZ800);
 Zetaohm_SAM2695 sam2695;
@@ -145,6 +151,8 @@ font_t fontMd;
 font_t fontLg;
 
 uint16_t voltManual = 0;
+
+
 
 void setup() {
 	Serial.begin(115200);
@@ -181,8 +189,7 @@ void setup() {
 	buttonSetup();
 
 	Serial.println("Initializing MIDI");
-	MIDI.begin(MIDI_CHANNEL_OMNI);
-	//midiSetup();
+	midiSetup();
 
 	Serial.println("Initializing DAC");
 
@@ -222,7 +229,7 @@ void loop() {
 	if( displayTimer > 10000){
 		if (!dispSwitch){
 			displayLoop();
-	    displayTimer = 0;
+	   		displayTimer = 0;
 		}
 	}
 
