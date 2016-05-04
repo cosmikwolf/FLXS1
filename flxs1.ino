@@ -1,7 +1,9 @@
 #include <SPI.h>
 #include <SD.h>
 #include <MIDI.h>
-#include <ssd1351-ugfx-config.h>
+//#include <ssd1351-ugfx-config.h>
+#include <OLED_SSD1351.h>
+
 #include <Adafruit_NeoPixel.h>
 #include <i2c_t3.h>
 #include <Zetaohm_MAX7301.h>
@@ -46,6 +48,7 @@
 #define OLED_DC						 10
 #define OLED_CS						  6
 #define OLED_RST					  9
+
 
 
 
@@ -144,11 +147,18 @@ AudioInputAnalog			adc1(A9);           //xy=579.2000274658203,275.2000274658203
 AudioAnalyzeNoteFrequency	notefreq;      //xy=716.2000274658203,275.2000274658203
 AudioConnection				patchCord1(adc1, notefreq);
 
-coord_t height, width;
-font_t fontTny;
-font_t fontSm;
-font_t fontMd;
-font_t fontLg;
+//coord_t height, width;
+//font_t fontTny;
+//font_t fontSm;
+//font_t fontMd;
+//font_t fontLg;
+
+#define LCD_DC        10//out (SSD1351/sharp refresh todo) OK
+#define LCD_CS        6//out (SSD1351/sharp) OK
+#define LCD_RST       9//out (SSD1351)/sharp disp todo) OK
+
+OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
+
 
 uint16_t voltManual = 0;
 

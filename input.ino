@@ -30,6 +30,7 @@
 #define ENCODER1LEFTPIN 17
 #define ENCODER1RIGHTPIN 16
 
+
 Encoder knob1(ENCODER1LEFTPIN, ENCODER1RIGHTPIN);
 max7301 max7301(5);
 
@@ -136,7 +137,7 @@ void buttonLoop(){
 void patternSelectHandler(){
   for (int i=0; i < 16; i++){
     if (max7301.fell(i)){
-      changePattern(i, patternChannelSelector,  TRUE, TRUE);
+      changePattern(i, patternChannelSelector,  true, true);
       changeState(STEP_DISPLAY);
     }
   }

@@ -9,7 +9,8 @@ void changeState(uint8_t state){
 
 	currentState = state;
 	resetKnobValues();
-	gdispClear(Black);
+	//gdispClear(Black);
+	oled.clearScreen();
 	Serial.println("   - state change complete");
 
 }
