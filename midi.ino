@@ -8,7 +8,6 @@ void midiSetup(){
   MIDI.setHandleStart(midiStartContinueHandler);
   MIDI.setHandleContinue(midiStartContinueHandler);
   MIDI.setHandleStop(midiStopHandler);
-
 }
 
 void midiStopHandler(){

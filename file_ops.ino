@@ -59,40 +59,55 @@ void deleteSaveFile(){
 
 }
 
-void initializeSDandJSON(){
-
-  if (!SD.begin(SD_CS_PIN)){
-    Serial.println("SD Card initialization failed!");
-    //return;
-  }
-  // THIS IS THE LINE THAT DELETES THE DATAFILE EVERY TIME! 
-   //deleteSaveFile();
-  if (SD.exists("data.txt")) {
-    Serial.println("data.txt exists.");
-  } else {
-    Serial.println("data.txt does not exist, creating file...");
-    saveData = SD.open("data.txt", FILE_WRITE);
-    saveData.close();
-  } 
-
-  Serial.println("SD Card and save file initialization complete.");
-
-  loadPattern(0, 0b1111);
-
+void serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
+  // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
   StaticJsonBuffer<512> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
-}
+  JsonArray& data = root.createNestedArray("data");
 
+  root["stepCount"] = sequence.stepCount;
+  root["beatCount"] = sequence.beatCount;
+  root["quantizeKey"] = sequence.quantizeKey;
+  root["instrument"] = sequence.instrument;
+  root["instType"] = sequence.instType;
+  root["volume"] = sequence.volume;
+  root["bank"] = sequence.bank;
+  root["channel"] = sequence.channel;
+  root["patternIndex"] = sequence.patternIndex;
+    JsonObject& stepDataParent = root.createNestedObject("stepData");
+
+  for (int i=0; i< 128; i++){
+    JsonObject& stepDataObj[i] = root.createNestedObject(i);
+    stepDataObj[i]["stepNum"] = sequence.stepData[i].stepNum ;
+    stepDataObj[i]["pitch"] = sequence.stepData[i].pitch ;
+    stepDataObj[i]["gateLength"] = sequence.stepData[i].gateLength ;
+    stepDataObj[i]["gateType"] = sequence.stepData[i].gateType ;
+    stepDataObj[i]["velocity"] = sequence.stepData[i].velocity ;
+    stepDataObj[i]["glide"] = sequence.stepData[i].glide ;
+  }
+  
+  root.prettyPrintTo(json, maxSize);
+}
 
 void saveChannelPattern_JSON(uint8_t channel) {
     Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card as JSON FILE. time:\t" + String(micros()) );
     
     root.createNestedObject(String(sequence[channel].patternIndex).concat(String(channel));
+// 2 ways this could be done. saving a single file per channel - pattern and saving a single file per pattern. saving per channel pattern would require less memory, and would probably require less seeking.
+    sequence[channel].stepData(1-127)
 
+    sequence[channel].stepData[selectedStep].pitch
+    sequence[channel].stepData[selectedStep].gateLength
+    sequence[channel].stepData[selectedStep].gateType
+    sequence[channel].stepData[selectedStep].velocity
+    sequence[channel].stepData[selectedStep].glide
+;     
+;
+; 
+;  
+;    
 
-
-    sequence[channel].stepData
     sequence[channel].stepCount
     sequence[channel].beatCount
     sequence[channel].quantizeKey
