@@ -59,6 +59,54 @@ void deleteSaveFile(){
 
 }
 
+void initializeSDandJSON(){
+
+  if (!SD.begin(SD_CS_PIN)){
+    Serial.println("SD Card initialization failed!");
+    //return;
+  }
+  // THIS IS THE LINE THAT DELETES THE DATAFILE EVERY TIME! 
+   //deleteSaveFile();
+  if (SD.exists("data.txt")) {
+    Serial.println("data.txt exists.");
+  } else {
+    Serial.println("data.txt does not exist, creating file...");
+    saveData = SD.open("data.txt", FILE_WRITE);
+    saveData.close();
+  } 
+
+  Serial.println("SD Card and save file initialization complete.");
+
+  loadPattern(0, 0b1111);
+
+  StaticJsonBuffer<512> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+
+}
+
+
+void saveChannelPattern_JSON(uint8_t channel) {
+    Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card as JSON FILE. time:\t" + String(micros()) );
+    
+    root.createNestedObject(String(sequence[channel].patternIndex).concat(String(channel));
+
+
+
+    sequence[channel].stepData
+    sequence[channel].stepCount
+    sequence[channel].beatCount
+    sequence[channel].quantizeKey
+    sequence[channel].instrument 
+    sequence[channel].instType
+    sequence[channel].volume
+    sequence[channel].bank
+    sequence[channel].channel
+    sequence[channel].patternIndex
+
+
+}
+
+
 void saveChannelPattern(uint8_t channel) {
   Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card. time:\t" + String(micros()) );
  // for(int i=0; i < sequenceCount; i++){
