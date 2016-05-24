@@ -16,7 +16,7 @@
 #include "Sequencer.h"
 #include "NoteDatum.h"
 #include <Audio.h>
-#include <analyze_notefreq.h>
+//#include <analyze_notefreq.h>
 #include "GameOfLife.h"
 
 //STATE DEFINITIONS:
@@ -141,9 +141,9 @@ Zetaohm_AD5676 ad5676;
 Adafruit_MCP23017 mcp;
 
 //end afx-01a
-AudioInputAnalog			adc1(A9);           //xy=579.2000274658203,275.2000274658203
-AudioAnalyzeNoteFrequency	notefreq;      //xy=716.2000274658203,275.2000274658203
-AudioConnection				patchCord1(adc1, notefreq);
+//AudioInputAnalog			adc1(A9);           //xy=579.2000274658203,275.2000274658203
+//AudioAnalyzeNoteFrequency	notefreq;      //xy=716.2000274658203,275.2000274658203
+//AudioConnection				patchCord1(adc1, notefreq);
 
 //coord_t height, width;
 //font_t fontTny;
@@ -165,7 +165,7 @@ uint16_t voltManual = 0;
 void setup() {
 	Serial.begin(115200);
 	Serial.println("Initializing SPI");
-	AudioMemory(25);
+	//AudioMemory(25);
 
 	SPI.begin();
 	SPI.setMOSI(11);
