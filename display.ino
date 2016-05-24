@@ -366,7 +366,7 @@ void stepDisplay(){
   if (extClock) {
     displayElement[6] = strdup("MIDI");
   } else {
-    sprintf(buf, "%d bpm", tempoX100/100 );
+    sprintf(buf, "%d bpm", int(tempoX100/100) );
     displayElement[6] = strdup(buf);
   }
 
