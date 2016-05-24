@@ -219,10 +219,26 @@ void setup() {
 	//notefreq.begin(.1);
 
 	//currentState = DEBUG_SCREEN;
-
+	//Serial.println("reading");
+	//delay(500);
+//	pinMode(A6, INPUT);
+//	   int val21 =  analogRead(A6);
+	//   Serial.print("read: ");
+	//   Serial.println(val21);
 }
 
 void loop() {
+ //  int val20 =  analogRead(20);
+//   int val22 =  analogRead(22);
+//   int val23 =  analogRead(23);
+	//if (inputDebugTimer > 100000) {
+//		Serial.println("analog read 20: " + String(val20));
+	//	Serial.println("analog read 21: " + String(val21));
+//		Serial.println("analog read 22: " + String(val22));
+//		Serial.println("analog read 23: " + String(val23));
+		//inputDebugTimer = 0;	
+	//}
+		
 	ledLoop();
   	buttonLoop();
 
@@ -244,6 +260,7 @@ void loop() {
 //	   Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
 //	   Serial.println(String(millis() )+ " -- " + String(AudioMemoryUsage()));
 //	}  
+
 }
 // 
 // 

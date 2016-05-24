@@ -53,6 +53,7 @@ void deleteSaveFile(){
       sequence[n].initNewSequence(i, n);
       saveChannelPattern(n);
     }
+    Serial.println("initialized pattern " + String(i));
   }
 
   loadPattern(0, 0b1111);
@@ -164,7 +165,7 @@ void loadPattern(uint8_t pattern, uint8_t channelSelector) {
     saveData.read( (byte*)&sequence[i].volume,      sizeof(sequence[i].volume));
     saveData.read( (byte*)&sequence[i].bank,        sizeof(sequence[i].bank));
     saveData.read( (byte*)&sequence[i].channel,     sizeof(sequence[i].channel));
-    saveData.read( (byte*)&sequence[i].patternIndex,       sizeof(sequence[i].patternIndex));
+    saveData.read( (byte*)&sequence[i].patternIndex, sizeof(sequence[i].patternIndex));
 
     if (saveData.size() <= index){
     //if (sequence[i].instType == 0 || saveData.size() <= index){ // original line, not sure why it checked instType?
