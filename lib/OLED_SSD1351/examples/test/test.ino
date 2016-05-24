@@ -2,15 +2,13 @@
 #include <SPI.h>
 
 
-#define LCD_DC        10//out (SSD1351/sharp refresh todo) OK
-#define LCD_CS        6//out (SSD1351/sharp) OK
-#define LCD_RST       9//out (SSD1351)/sharp disp todo) OK
+#define LCD_DC        23//out (SSD1351/sharp refresh todo) OK
+#define LCD_CS        10//out (SSD1351/sharp) OK
+#define LCD_RST       21//out (SSD1351)/sharp disp todo) OK
 
 OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
 
 float p = 3.1415926;
-
-elapsedMillis timer;
 
 void setup(void) {
   Serial.begin(38400);
@@ -25,8 +23,6 @@ void setup(void) {
   oled.fillRect(0, 0, oled.width(), oled.height(), BLACK);
   time = millis() - time;
 
-  Serial.println("Width: " + String(oled.width()));
-  Serial.println("Height: " + String(oled.height()));
   Serial.println(time, DEC);
   delay(500);
 
@@ -85,29 +81,8 @@ void setup(void) {
 }
 
 void loop() {
-
-  testdrawtext("TESTING", WHITE);
-  delay(300);
-  timer = 0;
-
-  for(int i=0; i<1000; i++){
-    oled.fillScreen(BLACK);
-    oled.fillScreen(RED);
-    oled.fillScreen(GREEN);
-    oled.fillScreen(BLUE);
-  }
-  oled.clearScreen();
-  testdrawtext( String(timer).c_str(), WHITE);
-  delay(10000);
 }
 
-void fillColor(uint16_t color) {
-  for (int16_t x = 0; x < oled.width(); x++) {
-    for (int16_t y = 0; y < oled.height(); y++) {
-      oled.drawPixel(x, y, color);
-    }
-  }
-}
 
 void fillpixelbypixel() {
   for (int16_t x = 0; x < oled.width(); x++) {

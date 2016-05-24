@@ -82,7 +82,7 @@
 
 #endif
 
-#include "commonFonts.h"
+#include "../commonFonts/commonFonts.h"
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MKL26Z64__)
 //ok, code support included
@@ -192,18 +192,18 @@ class OLED_SSD1351 : public Print {
 			} while ((sr & 0xF0F0) > 0);// wait both RX & TX empty
 		}
 
-			void waitTransmitComplete(uint32_t mcr)
-			__attribute__((always_inline)) {
-				uint32_t tmp __attribute__((unused));
-				while (1) {
-					uint32_t sr = KINETISK_SPI0.SR;
-					if (sr & SPI_SR_EOQF) break;  // wait for last transmit
-					if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
-				}
-				KINETISK_SPI0.SR = SPI_SR_EOQF;
-				SPI0_MCR = mcr;
-				while (KINETISK_SPI0.SR & 0xF0) { tmp = KINETISK_SPI0.POPR; }
+		void waitTransmitComplete(uint32_t mcr)
+		__attribute__((always_inline)) {
+			uint32_t tmp __attribute__((unused));
+			while (1) {
+				uint32_t sr = KINETISK_SPI0.SR;
+				if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+				if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
 			}
+			KINETISK_SPI0.SR = SPI_SR_EOQF;
+			SPI0_MCR = mcr;
+			while (KINETISK_SPI0.SR & 0xF0) { tmp = KINETISK_SPI0.POPR; }
+		}
 
 		void writecommand_cont(uint8_t c)
 		__attribute__((always_inline)) {

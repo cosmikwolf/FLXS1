@@ -1,7 +1,7 @@
 #ifndef _common_font_ArialBold_
 #define _common_font_ArialBold_
 
-#include "commonFonts.h"
+//#include "font_parameters.h"
 
 #ifdef __cplusplus
 extern "C" {

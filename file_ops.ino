@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
 /*
-¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! 
-This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files. 
-¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! 
+¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
+This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
+¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 */
 
 
@@ -18,7 +18,7 @@ void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, 
 
   if (instant || !playing) {
     Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
-    loadPattern(pattern, channelSelector);    
+    loadPattern(pattern, channelSelector);
   } else {
     queuePattern = pattern;
     Serial.println("Queueing pattern: " + String(pattern));
@@ -32,7 +32,7 @@ void initializeFlashMemory(){
     Serial.println("SD Card initialization failed!");
     //return;
   }
-  // THIS IS THE LINE THAT DELETES THE DATAFILE EVERY TIME! 
+  // THIS IS THE LINE THAT DELETES THE DATAFILE EVERY TIME!
    //deleteSaveFile();
   if (SD.exists("data.txt")) {
     Serial.println("data.txt exists.");
@@ -40,13 +40,13 @@ void initializeFlashMemory(){
     Serial.println("data.txt does not exist, creating file...");
     saveData = SD.open("data.txt", FILE_WRITE);
     saveData.close();
-  } 
+  }
 
   Serial.println("SD Card and save file initialization complete.");
 
   loadPattern(0, 0b1111);
 }
- 
+
 
 void deleteSaveFile(){
   SD.remove("data.txt");
@@ -88,13 +88,13 @@ void serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
     stepDataObj[i]["velocity"] = sequence.stepData[i].velocity ;
     stepDataObj[i]["glide"] = sequence.stepData[i].glide ;
   }
-  
+
   root.prettyPrintTo(json, maxSize);
 }
 
 void saveChannelPattern_JSON(uint8_t channel) {
     Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card as JSON FILE. time:\t" + String(micros()) );
-    
+
     root.createNestedObject(String(sequence[channel].patternIndex).concat(String(channel));
 // 2 ways this could be done. saving a single file per channel - pattern and saving a single file per pattern. saving per channel pattern would require less memory, and would probably require less seeking.
     sequence[channel].stepData(1-127)
@@ -104,16 +104,16 @@ void saveChannelPattern_JSON(uint8_t channel) {
     sequence[channel].stepData[selectedStep].gateType
     sequence[channel].stepData[selectedStep].velocity
     sequence[channel].stepData[selectedStep].glide
-;     
 ;
-; 
-;  
-;    
+;
+;
+;
+;
 
     sequence[channel].stepCount
     sequence[channel].beatCount
     sequence[channel].quantizeKey
-    sequence[channel].instrument 
+    sequence[channel].instrument
     sequence[channel].instType
     sequence[channel].volume
     sequence[channel].bank
@@ -128,20 +128,20 @@ void saveChannelPattern(uint8_t channel) {
   Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card. time:\t" + String(micros()) );
  // for(int i=0; i < sequenceCount; i++){
  	  int index = int(
-    ( channel  + sequence[channel].patternIndex * sequenceCount ) 
-    * ( sizeof(sequence[0].stepData) 
-      + sizeof(sequence[0].stepCount) 
-      + sizeof(sequence[0].beatCount) 
-      + sizeof(sequence[0].quantizeKey) 
-      + sizeof(sequence[0].instrument) 
-      + sizeof(sequence[0].instType) 
-      + sizeof(sequence[0].volume) 
-      + sizeof(sequence[0].bank) 
-      + sizeof(sequence[0].channel) 
-      + sizeof(sequence[0].patternIndex) 
-    )); 
-  
-  	Serial.println("channel: " + String(channel) + " " + String(index) 
+    ( channel  + sequence[channel].patternIndex * sequenceCount )
+    * ( sizeof(sequence[0].stepData)
+      + sizeof(sequence[0].stepCount)
+      + sizeof(sequence[0].beatCount)
+      + sizeof(sequence[0].quantizeKey)
+      + sizeof(sequence[0].instrument)
+      + sizeof(sequence[0].instType)
+      + sizeof(sequence[0].volume)
+      + sizeof(sequence[0].bank)
+      + sizeof(sequence[0].channel)
+      + sizeof(sequence[0].patternIndex)
+    ));
+
+  	Serial.println("channel: " + String(channel) + " " + String(index)
       + "\tsize"
       + "\tstepData: "      + String(sizeof(sequence[0].stepData) )
       + "\tstepCount: "     + String(sizeof(sequence[0].stepCount) )
@@ -175,19 +175,19 @@ void saveChannelPattern(uint8_t channel) {
     saveData.close();
 	  Serial.println("Done saving to SD..." + String(micros()));
   }
-    
+
 
 }
 
 void loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
-  Serial.println("========= LOADING PATTERN: " + String(pattern)); 
+  Serial.println("========= LOADING PATTERN: " + String(pattern));
   printPattern();
 
   saveData = SD.open("data.txt");
 
 	for(int i=0; i < sequenceCount; i++){
-    
+
     if ( !(channelSelector & (1 << i) ) ){
       Serial.println("skipping loading channel " + String(i));
       continue; // if channel is not selected to be loaded, don't load the channel!
@@ -196,21 +196,21 @@ void loadPattern(uint8_t pattern, uint8_t channelSelector) {
     }
 
     int index = int(
-    ( i  + pattern * sequenceCount ) 
-    * ( sizeof(sequence[0].stepData) 
-      + sizeof(sequence[0].stepCount) 
-      + sizeof(sequence[0].beatCount) 
-      + sizeof(sequence[0].quantizeKey) 
-      + sizeof(sequence[0].instrument) 
-      + sizeof(sequence[0].instType) 
-      + sizeof(sequence[0].volume) 
-      + sizeof(sequence[0].bank) 
-      + sizeof(sequence[0].channel) 
-      + sizeof(sequence[0].patternIndex) 
+    ( i  + pattern * sequenceCount )
+    * ( sizeof(sequence[0].stepData)
+      + sizeof(sequence[0].stepCount)
+      + sizeof(sequence[0].beatCount)
+      + sizeof(sequence[0].quantizeKey)
+      + sizeof(sequence[0].instrument)
+      + sizeof(sequence[0].instType)
+      + sizeof(sequence[0].volume)
+      + sizeof(sequence[0].bank)
+      + sizeof(sequence[0].channel)
+      + sizeof(sequence[0].patternIndex)
     ));
 
     Serial.println("seeking to index: " + String(index) + " for sequence " + String(i) + "\t\tfileSize: " + saveData.size());
-    
+
   //  Serial.println("stepData size: \t" + String(sizeof(sequence[i].stepData)) );
   //  Serial.println("stepCount size: \t" + String(sizeof(sequence[i].stepCount)));
   //  Serial.println("beatCount size: \t" + String(sizeof(sequence[i].beatCount)) );
@@ -239,7 +239,7 @@ void loadPattern(uint8_t pattern, uint8_t channelSelector) {
       Serial.println("saveData available, loading sequence --- instType: " + String(sequence[i].instType));
     }
     Serial.println("reading complete!");
-    
+
     sam2695.programChange(0, i, sequence[i].instrument);
     sam2695.setChannelVolume(i, sequence[i].volume);
 
@@ -265,7 +265,7 @@ void loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
 void printDirectory(File dir, int numTabs) {
    while(true) {
-     
+
      File entry =  dir.openNextFile();
      if (! entry) {
        // no more files

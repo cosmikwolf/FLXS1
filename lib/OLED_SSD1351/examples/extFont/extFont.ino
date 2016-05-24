@@ -4,9 +4,9 @@
 #include "../commonFonts/fonts/font_Arial.c"
 
 //Uncomment this block to use hardware SPI
-#define OLED_DC     10
-#define OLED_CS     6
-#define OLED_RESET  9
+#define OLED_DC     21
+#define OLED_CS     10
+#define OLED_RESET  6
 
 OLED_SSD1351 oled(OLED_CS, OLED_DC, OLED_RESET);
 

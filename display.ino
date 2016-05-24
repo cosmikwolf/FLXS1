@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 /* in addition to:
-  BLACK  BLUE  RED ORANGE  GREEN CYAN MAGENTA YELLOW WHITE 
+  BLACK  BLUE  RED ORANGE  GREEN CYAN MAGENTA YELLOW WHITE
   more colors available at: http://www.rinkydinkelectronics.com/calc_rgb565.php
   */
 #define NAVY            0x000F      /*   0,   0, 128 */
@@ -200,7 +200,7 @@ void gameOfLifeDisplay(){
 //        } else if (life.grid[row][col] < 128){
 //          color = Magenta;
 //        }
-//      
+//
 //      }
 //
 // //     gdispFillArea( ((col+0)*8), ((row+0)*8), 8, 8,  color);
@@ -217,7 +217,7 @@ void deleteMenuDisplay(){
 
   displayElement[1] = strdup("press step 16");
   renderStringBox(1, highlight, previousHighlight ,0, 70 , 32 , 128, fontSm, White, Red,  justifyCenter);
- 
+
   for (int i=2; i< MAX_DISPLAY_ELEMENTS; i++){
     //filling display buffer with dummy data. dirty, but i need to have a reliable buffer size.
     displayElement[i] = strdup("a");
@@ -228,7 +228,7 @@ void deleteMenuDisplay(){
       free(displayCache[i]);
     }
     if ( displayElement[i] ){
-      displayCache[i] = strdup(displayElement[i]);      
+      displayCache[i] = strdup(displayElement[i]);
       free(displayElement[i]);
     }
   }
@@ -242,8 +242,8 @@ void stepDisplayTest(){
   char *buf = new char[255]; // sprintf buffer
   //displayElement[0] = "pitch";
   for (int i=0; i< 10000;i++){
-    displayElement[0] = strdup("midiNotes[sequence[selectedChannel].stepData[selectedStep].pitch]");  
-    //displayElement[0] = strdup(midiNotes[sequence[selectedChannel].stepData[selectedStep].pitch]);  
+    displayElement[0] = strdup("midiNotes[sequence[selectedChannel].stepData[selectedStep].pitch]");
+    //displayElement[0] = strdup(midiNotes[sequence[selectedChannel].stepData[selectedStep].pitch]);
     //gdispFillStringBox( 64,  0, 64 , 10, displayElement[0], fontSm , White, Blue, justifyCenter);
     //free(displayElement[0]);
 
@@ -263,7 +263,7 @@ void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHigh
   uint16_t color1;
   uint16_t color2;
 
-  if ( strcmp(displayElement[index], displayCache[index]) != 0  || previousHighlight != highlight ) {  
+  if ( strcmp(displayElement[index], displayCache[index]) != 0  || previousHighlight != highlight ) {
     if (highlight == index){
       color1 = color;
       color2 = bgColor;
@@ -286,10 +286,10 @@ void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHigh
 void cleanupTextBuffers(char *buf){
   for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
       free(displayCache[i]);
-      displayCache[i] = strdup(displayElement[i]);      
+      displayCache[i] = strdup(displayElement[i]);
       free(displayElement[i]);
   }
-  delete buf;  
+  delete buf;
 }
 
 
@@ -324,7 +324,7 @@ void stepDisplay(){
   } else if (stepMode == 1){
     highlight = 2;
   } else if (stepMode == 2) {
-    highlight = 3; 
+    highlight = 3;
   } else if (stepMode == 3) {
     highlight = 6;
   } else if (stepMode == 4) {
@@ -336,7 +336,7 @@ void stepDisplay(){
   } else if (stepMode == 7) {
     highlight = 9;
   };
- 
+
 
   displayElement[0] = strdup("step info");
   displayElement[1] = strdup(midiNotes[sequence[selectedChannel].stepData[selectedStep].pitch]);
@@ -349,16 +349,16 @@ void stepDisplay(){
     displayElement[2] = strdup("L: 1 step");
   } else {
     sprintf(buf, "L: %d steps", sequence[selectedChannel].stepData[selectedStep].gateLength);
-    displayElement[2] = strdup(buf);  
+    displayElement[2] = strdup(buf);
   }
 
   sprintf(buf, "V: %d", sequence[selectedChannel].stepData[selectedStep].velocity);
-  displayElement[3] = strdup(buf); 
+  displayElement[3] = strdup(buf);
 
-  sprintf(buf, "%s", instrumentNames[sequence[selectedChannel].instrument]);  
+  sprintf(buf, "%s", instrumentNames[sequence[selectedChannel].instrument]);
   displayElement[4] = strdup(buf);
 
-  sprintf(buf, "vol: %d", sequence[selectedChannel].volume);  
+  sprintf(buf, "vol: %d", sequence[selectedChannel].volume);
   displayElement[5] = strdup(buf);
 
   displayElement[7] = strdup("TEMPO");
@@ -366,17 +366,17 @@ void stepDisplay(){
   if (extClock) {
     displayElement[6] = strdup("MIDI");
   } else {
-    sprintf(buf, "%d bpm", tempoX100/100 );  
+    sprintf(buf, "%d bpm", tempoX100/100 );
     displayElement[6] = strdup(buf);
   }
 
-  sprintf(buf, "%d steps", sequence[selectedChannel].stepCount);  
+  sprintf(buf, "%d steps", sequence[selectedChannel].stepCount);
   displayElement[8] = strdup(buf);
 
-  sprintf(buf, "/ %d beats", sequence[selectedChannel].beatCount);  
+  sprintf(buf, "/ %d beats", sequence[selectedChannel].beatCount);
   displayElement[9] = strdup(buf);
 
-  sprintf(buf, "stmd: %d", stepMode);  
+  sprintf(buf, "stmd: %d", stepMode);
   displayElement[10] = strdup(buf);
 
   sprintf(buf, "steps: %d-%d", notePage*16 , (notePage+1)*16 );
@@ -408,7 +408,7 @@ void stepDisplay(){
 
 // for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
 //     free(displayCache[i]);
-//     displayCache[i] = strdup(displayElement[i]);      
+//     displayCache[i] = strdup(displayElement[i]);
 //     free(displayElement[i]);
 // }
 
@@ -422,7 +422,7 @@ void channelMenuDisplay() {
   uint8_t previousHighlight = highlight;
   uint16_t foreground, background;
   oled.setFont(Arial_8);
-  
+
   displayElement[0] = strdup("CHANNEL MENU");
   displayElement[1] = strdup("INIT CH");
   displayElement[2] = strdup("INIT PAT");
@@ -494,14 +494,14 @@ void patternSelectDisplay(){
       free(displayCache[i]);
     }
     if ( displayElement[i] ){
-      displayCache[i] = strdup(displayElement[i]);      
+      displayCache[i] = strdup(displayElement[i]);
      // free(displayElement[i]);
     }
   }
 */
 }
 
-void sequenceMenuDisplay(){ 
+void sequenceMenuDisplay(){
   /*
   const char* element;
 
@@ -534,16 +534,16 @@ void timingMenuDisplay(){
 
   element =  "TIMING SELECT";
   gdispFillStringBox(   0, 10, 128 , 20, element, fontMd, Orange, Purple, justifyCenter);
- 
+
   if (sequence[selectedChannel].stepCount > 1){
-    element =  String("play " + String(sequence[selectedChannel].stepCount) + " steps").c_str(); 
+    element =  String("play " + String(sequence[selectedChannel].stepCount) + " steps").c_str();
   } else {
     element =  String("play 1 step").c_str();
   }
   gdispFillStringBox(   0, 30, 128 , 10, element, fontSm, Orange, Purple, justifyCenter);
- 
+
   if (sequence[selectedChannel].stepCount > 1){
-    element =  String("over " + String(sequence[selectedChannel].beatCount) + " beats").c_str(); 
+    element =  String("over " + String(sequence[selectedChannel].beatCount) + " beats").c_str();
   } else {
     element =  String("over 1 beat").c_str();
   }
