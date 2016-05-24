@@ -1,7 +1,7 @@
 /*  -------------------------------------------------------
     Zetaohm_SAM2695.cpp
     A library to facilitate playing music on the Modern Device Zetaohm_SAM2695 board.
-    More info is at www.moderndevice.com; refer to "Using the Zetaohm_SAM2695 Arduino 
+    More info is at www.moderndevice.com; refer to "Using the Zetaohm_SAM2695 Arduino
     Library" in the DocsWiki.
     -------------------------------------
     This version was derived from the library provided by Modern Devices
@@ -28,9 +28,9 @@
 // Test TX pin for Serial 3 for Mega
 // This may allow for using serial ports but will not use hardware serial support
 // In most cases the speed hit will not be great enough to be a large tradeoff
-                                                                  
+
 //Zetaohm_SAM2695::Zetaohm_SAM2695(): synth(255, 4) {      // was synth(255, 4)   // 255 -> do not use rx; pin 4 for tx
-Zetaohm_SAM2695::Zetaohm_SAM2695() {    
+Zetaohm_SAM2695::Zetaohm_SAM2695() {
     synthInitialized = 0;                                        // Initialization needs to be done
 }
 /*
@@ -44,6 +44,8 @@ void Zetaohm_SAM2695::begin() {
     //  this->_HardSerial.begin(31250);                                  // Set MIDI baud rate
  //     this->_HardSerial.begin(31250);                                  // Set MIDI baud rate
         Serial1.begin(31250);
+        CORE_PIN0_CONFIG = 0;
+
   //    this->Serial.begin(31250);                                  // Set MIDI baud rate
       delay(2);                                                  // let the port settle
       this->synthInitialized = -1;                               // Initialization has been done
@@ -143,19 +145,19 @@ void Zetaohm_SAM2695::setMasterVolume(byte level) {
 }
 
 void Zetaohm_SAM2695::setReverb(byte channel, byte program, byte level, byte delayFeedback) {
-    // Program 
-    // 0: Room1   1: Room2    2: Room3 
+    // Program
+    // 0: Room1   1: Room2    2: Room3
     // 3: Hall1   4: Hall2    5: Plate
     // 6: Delay   7: Pan delay
     this->samWrite(0xb0 | (channel & 0x0f));
     this->samWrite(0x50);
     this->samWrite(program & 0x07);
- 
+
     // Set send level
     this->samWrite(0xb0 | (channel & 0x0f));
     this->samWrite(0x5b);
     this->samWrite(level & 0x7f);
-  
+
     if (delayFeedback > 0) {
       //F0H 41H 00H 42H 12H 40H 01H 35H vv xx F7H
       byte command[11] = { 0xf0, 0x41, byte(0x00), 0x42, 0x12, 0x40, 0x01, 0x35, (delayFeedback & 0x7f), 0xf7 };
@@ -164,25 +166,25 @@ void Zetaohm_SAM2695::setReverb(byte channel, byte program, byte level, byte del
 }
 
 void Zetaohm_SAM2695::setChorus(byte channel, byte program, byte level, byte feedback, byte chorusDelay) {
-    // Program 
-    // 0: Chorus1   1: Chorus2    2: Chorus3 
+    // Program
+    // 0: Chorus1   1: Chorus2    2: Chorus3
     // 3: Chorus4   4: Feedback   5: Flanger
     // 6: Short delay   7: FB delay
     this->samWrite(0xb0 | (channel & 0x0f));
     this->samWrite(0x51);
     this->samWrite(program & 0x07);
- 
+
     // Set send level
     this->samWrite(0xb0 | (channel & 0x0f));
     this->samWrite(0x5d);
     this->samWrite(level & 0x7f);
-  
+
     if (feedback > 0) {
     //F0H 41H 00H 42H 12H 40H 01H 3BH vv xx F7H
 	byte command[11] = { 0xf0, 0x41, byte(0x00), 0x42, 0x12, 0x40, 0x01, 0x3B, (feedback & 0x7f), 0xf7 };
 	this->samWrite(command, 11);
     }
-  
+
     if (chorusDelay > 0) {
     // F0H 41H 00H 42H 12H 40H 01H 3CH vv xx F7H
         byte command[11] = { 0xf0, 0x41, byte(0x00), 0x42, 0x12, 0x40, 0x01, 0x3C, (chorusDelay & 0x7f), 0xf7 };

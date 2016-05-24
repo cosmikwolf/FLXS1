@@ -6,8 +6,8 @@
 //#include <ssd1351-ugfx-config.h>
 #include <OLED_SSD1351.h>
 
-#include <Adafruit_NeoPixel.h>
-#include <i2c_t3.h>
+//#include <Adafruit_NeoPixel.h>
+#include <Wire.h>
 #include <Zetaohm_MAX7301.h>
 #include <Encoder.h>
 #include "Adafruit_MCP23017.h"
@@ -135,7 +135,7 @@ NoteDatum noteData[4];
 GameOfLife	life;
 
 File saveData;
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(20, 0, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel pixels = Adafruit_NeoPixel(20, 0, NEO_GRB + NEO_KHZ800);
 Zetaohm_SAM2695 sam2695;
 Zetaohm_AD5676 ad5676;
 Adafruit_MCP23017 mcp;
@@ -164,12 +164,17 @@ uint16_t voltManual = 0;
 
 void setup() {
 	Serial.begin(115200);
+
 	Serial.println("Initializing SPI");
 	//AudioMemory(25);
 
 	SPI.begin();
 	SPI.setMOSI(11);
 	SPI.setSCK(13);
+
+	Serial.println("Initializing Display");
+	displayStartup();
+
 
 	Serial.println("Freeram: " + String(FreeRam2()));
 	delay(500);
@@ -178,6 +183,7 @@ void setup() {
 	sequence[1].initialize(1, 16, 4, (tempoX100/100));
 	sequence[2].initialize(2, 16, 4, (tempoX100/100));
 	sequence[3].initialize(3, 16, 4, (tempoX100/100));
+	Serial.println("Freeram: " + String(FreeRam2()));
 
 	Serial.println("Initializing SAM2695");
 	sam2695.begin();
@@ -187,11 +193,6 @@ void setup() {
 	sam2695.programChange(0, 3, 29);
 
 
-	Serial.println("Initializing Neopixels");
-	ledSetup();
-
-	Serial.println("Initializing Display");
-	displayStartup();
 
 	Serial.println("Initializing Button Array");
 	buttonSetup();
@@ -221,6 +222,10 @@ void setup() {
 	Serial.println("Initializing Flash Memory");
 	initializeFlashMemory();
 
+
+
+		Serial.println("Initializing Neopixels");
+		ledSetup();
 	Serial.println("Beginning Master Clock");
 	masterClock.begin(masterClockFunc,masterClockInterval);
 	SPI.usingInterrupt(masterClock);
@@ -232,11 +237,11 @@ void setup() {
 
 void loop() {
 	ledLoop();
-  	buttonLoop();
+	buttonLoop();
 
 	if( displayTimer > 10000){
 		if (!dispSwitch){
-			displayLoop();
+	  		displayLoop();
 	   		displayTimer = 0;
 		}
 	}
@@ -245,73 +250,11 @@ void loop() {
 //	    ad5676.setVoltage(i,  voltManual );
 	  //  ad5676.setVoltage(i,  positive_modulo(10*millis(), 65535) );
 	}
-	//debugScreenInputHandler();
-//	if (notefreq.available()) {
-//	   float note = notefreq.read();
-//	   float prob = notefreq.probability();
-//	   Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
-//	   Serial.println(String(millis() )+ " -- " + String(AudioMemoryUsage()));
-//	}
+
 }
-//
-//
-//
-//
-//
-//
-
-//	digitalWriteFast(DEBUG_PIN, HIGH);
-//
-//	noInterrupts();
-//	displayDebugTimer = 0;
-//	displayLoop();
-//	Serial.println("display loop timer: " + String(displayDebugTimer));
-//	ledLoop();
-//	inputDebugTimer = 0;
-//	buttonLoop();
-//	Serial.println("input loop timer: " + String(inputDebugTimer));
-//	interrupts();
-//    digitalWriteFast(DEBUG_PIN, LOW);
-
-//	mcp.digitalWrite(0, HIGH);
-//    ad5676.setVoltage(0, 0);
-//    delay(10);
-//	mcp.digitalWrite(0, LOW);
-//    ad5676.setVoltage(0, 65535);
-//    delay(10);
-//	Serial.println("Testing " + String(millis()));
-/*Serial.println("Testing 1 - 0");
-displayDebugTimer = 0;
-ad5676.setVoltage(0,  0 );
-int temp1 = displayDebugTimer;
-Serial.println("debug Timer: " + String(temp1) );
-delay(1);
-Serial.println("Testing 2 - 20000");
-displayDebugTimer = 0;
-
-ad5676.setVoltage(0,  20000 );
- temp1 = displayDebugTimer;
-
-Serial.println("debug Timer: " + String(temp1) );
 
 
-Serial.println("Testing 3 - 4k");
-	displayDebugTimer = 0;
 
-ad5676.setVoltage(0,  40000 );
- temp1 = displayDebugTimer;
-
-Serial.println("debug Timer: " + String(temp1) );
-
-
-Serial.println("Testing 4 - 6k");
-	displayDebugTimer = 0;
-
-ad5676.setVoltage(0,  60000 );
- temp1 = displayDebugTimer;
-Serial.println("debug Timer: " + String(temp1) );
-
-*/
 void debug(const char* text){
 	if (debugBoolean == 1){
 		Serial.println(text);

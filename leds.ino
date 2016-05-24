@@ -1,18 +1,70 @@
 #include <Arduino.h>
+#include <FastLED.h>
+#define NUM_LEDS 20
+#define DATA_PIN 0
+
+CRGB leds[NUM_LEDS];
 
 uint8_t ledMapping[] = {3,2,1,0,8,7,6,5,13,12,11,10,18,17,16,15,4,9,14,19};
-
+/*
 uint8_t getNoteLED(uint8_t index){
   return index + notePage * 16;
 }
-
-
+*/
 void ledSetup(){
   pinMode(0, OUTPUT);
-  digitalWrite(0, LOW);
+  LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
+	LEDS.setBrightness(84);
+};
+
+void nonBlockingRainbow(uint8_t interval, uint8_t *skipArr, uint8_t skipArrSize) { };
+void nonBlockingRainbow(uint8_t interval) { };
+void theaterChaseRainbow(uint8_t wait) { };
+
+uint32_t Wheel(byte WheelPos) { };
+void colorWipe(uint32_t c, uint8_t wait) { };
+void ledLoop(){
+  static uint8_t hue = 0;
+
+  for(int i = 0; i < NUM_LEDS; i++) {
+		// Set the i'th led to red
+		leds[i] = CHSV(hue++, 255, 255);
+		// Show the leds
+		FastLED.show();
+		// now that we've shown the leds, reset the i'th led to black
+		// leds[i] = CRGB::Black;
+		fadeall();
+		// Wait a little bit before we loop around and do it again
+	}
+	Serial.print("x");
+
+	// Now go in the other direction.
+	for(int i = (NUM_LEDS)-1; i >= 0; i--) {
+		// Set the i'th led to red
+		leds[i] = CHSV(hue++, 255, 255);
+		// Show the leds
+		FastLED.show();
+		// now that we've shown the leds, reset the i'th led to black
+		// leds[i] = CRGB::Black;
+		fadeall();
+		// Wait a little bit before we loop around and do it again
+	}
+
+};
+void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
+
+/*
+void ledSetup(){
+  pinMode(0, OUTPUT);
+//  digitalWrite(0, LOW);
   pixels.begin();
   pixels.setBrightness(25);
+  for (int i=0; i < 16; i++){
+    pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );
+  }
 }
+
+
 
 void ledLoop(){
   noInterrupts();
@@ -21,9 +73,9 @@ void ledLoop(){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
           if (getNote(i) == sequence[selectedChannel].activeStep ){
-            pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );      
+            pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );
           } else if (getNote(i) == selectedStep) {
-            pixels.setPixelColor(ledMapping[i], Wheel(int(millis()/3)%255) );      
+            pixels.setPixelColor(ledMapping[i], Wheel(int(millis()/3)%255) );
           } else {
             if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
               pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
@@ -34,7 +86,7 @@ void ledLoop(){
         }
         for (int i=0; i < 4; i++){
           if (selectedChannel == i) {
-            pixels.setPixelColor(ledMapping[i+16], Wheel((sequence[selectedChannel].patternIndex * 16) % 255)); 
+            pixels.setPixelColor(ledMapping[i+16], Wheel((sequence[selectedChannel].patternIndex * 16) % 255));
           } else {
             pixels.setPixelColor(ledMapping[i+16], pixels.Color(0,0,0));
           }
@@ -72,7 +124,7 @@ void ledLoop(){
 
         for (int i=0; i < 4; i++){
           if( patternChannelSelector & (1<<i) ){
-            pixels.setPixelColor(ledMapping[i+16], Wheel((millis()/20 + i*64) % 255)); 
+            pixels.setPixelColor(ledMapping[i+16], Wheel((millis()/20 + i*64) % 255));
           } else {
             pixels.setPixelColor(ledMapping[i+16], pixels.Color(0,0,0));
           }
@@ -117,9 +169,9 @@ void theaterChaseRainbow(uint8_t wait) {
           pixels.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
         }
         pixels.show();
-       
+
         delay(wait);
-       
+
         for (int i=0; i < pixels.numPixels(); i=i+3) {
           pixels.setPixelColor(i+q, 0);        //turn every third pixel off
         }
@@ -178,4 +230,4 @@ void nonBlockingRainbow(uint8_t interval, uint8_t *skipArr, uint8_t skipArrSize)
   pixels.show();
 
 }
-
+*/
