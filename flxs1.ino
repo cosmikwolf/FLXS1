@@ -72,7 +72,7 @@ const char* midiNotes[] = {
 "C  5","C# 5","D  5","D# 5","E  5","F  5","F# 5","G  5","G# 5","A  5","A# 5","B  5",
 "C  6","C# 6","D  6","D# 6","E  6","F  6","F# 6","G  6","G# 6","A  6","A# 6","B  6",
 "C  7","C# 7","D  7","D# 7","E  7","F  7","F# 7","G  7","G# 7","A  7","A# 7","B  7",
-"C  8","C# 8","D  8","D# 8","E  8","F  8","F# 8","G  8" }; 
+"C  8","C# 8","D  8","D# 8","E  8","F  8","F# 8","G  8" };
 
 const char* instrumentNames[] = { "Grand Piano  ", "Bright Piano ", "Electric Grnd", "HnkytonkPiano", "El. Piano 1", "El. Piano 2", "Harpsichord", "Clavi", "Celesta", "Glockenspiel", "Music Box", "Vibraphone", "Marimba", "Xylophone", "Tubular Bells", "Santur", "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ", "Reed Organ", "Accordion (French)", "Harmonica", "Tango Accordion", "Acoustic Guitar (nylon)", "Acoustic Guitar (steel)", "El. Guitar (jazz)", "El. Guitar (clean)", "El. Guitar (muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics", "Acoustic Bass", "Finger Bass", "Picked Bass", "Fretless Bass", "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2", "Violin", "Viola", "Cello", "Contrabass", "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani", "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2", "Choir Aahs", "Voice Oohs", "Synth Voice", "Orchestra Hit", "Trumpet", "Trombone", "Tuba", "Muted Trumpet", "French Horn", "Brass Section", "Synth Brass 1", "Synth Brass 2", "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax", "Oboe", "English Horn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "Pan Flute", "Blown Bottle", "Shakuhachi", "Whistle", "Ocarina", "Lead 1 (square)", "Lead 2 (sawtooth)", "Lead 3 (calliope)", "Lead 4 (chiff)", "Lead 5 (charang)", "Lead 6 (voice)", "Lead 7 (fifths)", "Lead 8 (bass+lead)", "Pad 1 (fantasia)", "Pad 2 (warm)", "Pad 3 (polysynth)", "Pad 4 (choir)", "Pad 5 (bowed)", "Pad 6 (metallic)", "Pad 7 (halo)", "Pad 8 (sweep)", "FX 1 (rain)", "FX 2 (soundtrack)", "FX 3 (crystal)", "FX4 (atmosphere)", "FX 5 (brightness)", "FX 6 (goblins)", "FX 7 (echoes)", "FX 8 (sci-fi)", "Sitar", "Banjo", "Shamisen", "Koto", "Kalimba", "Bagpipe", "Fiddle", "Shanai", "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock", "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal", "Guitar Fret Noise", "Breath Noise", "Seashore", "Bird Tweet", "Teleph. Ring", "Helicopter", "Applause", "Gunshot"};
 
@@ -84,7 +84,7 @@ uint8_t selectedChannel = 0;
 uint8_t numSteps = 16;
 uint8_t	currentState = 0;
 uint8_t previousState = 0;
-uint8_t stepMode = 0; 
+uint8_t stepMode = 0;
 uint8_t settingMode = 0;
 uint8_t selectedStep = 0;
 uint8_t notePage;
@@ -171,7 +171,7 @@ void setup() {
 	SPI.setMOSI(11);
 	SPI.setSCK(13);
 
-	Serial.println("Freeram: " + String(FreeRam()));
+	Serial.println("Freeram: " + String(FreeRam2()));
 	delay(500);
 	Serial.println("Initializing Sequence Objects");
 	sequence[0].initialize(0, 16, 4, (tempoX100/100));
@@ -244,21 +244,21 @@ void loop() {
 	for (int i=0; i<8; i++){
 //	    ad5676.setVoltage(i,  voltManual );
 	  //  ad5676.setVoltage(i,  positive_modulo(10*millis(), 65535) );
-	}	
+	}
 	//debugScreenInputHandler();
 //	if (notefreq.available()) {
 //	   float note = notefreq.read();
 //	   float prob = notefreq.probability();
 //	   Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
 //	   Serial.println(String(millis() )+ " -- " + String(AudioMemoryUsage()));
-//	}  
+//	}
 }
-// 
-// 
-// 
-// 
-// 
-// 
+//
+//
+//
+//
+//
+//
 
 //	digitalWriteFast(DEBUG_PIN, HIGH);
 //
@@ -343,5 +343,3 @@ uint32_t FreeRam2(){ // for Teensy 3.0
     // The difference is the free, available ram.
 	return stackTop - heapTop;
 }
-
-

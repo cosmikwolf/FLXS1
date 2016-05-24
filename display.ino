@@ -17,9 +17,9 @@
 #define PINK            0xF81F
 
 #define MAX_DISPLAY_ELEMENTS 17
-#include "../commonFonts/fonts/font_ArialBold.c"
-#include "../commonFonts/fonts/font_Arial.c"
-
+/*#include "../commonFonts/fonts/font_ArialBold.cpp"
+#include "../commonFonts/fonts/font_Arial.cpp"
+*/
 //    coord_t   i, j;
 
 int color = 0;
@@ -298,7 +298,7 @@ void stepDisplay(){
   char *buf = new char[51]; // sprintf buffer
   uint8_t previousHighlight = highlight;
   uint16_t foreground, background;
-  oled.setFont(Arial_8);
+  //oled.setFont(Arial_8);
 
   switch (selectedChannel){
     case 0:
@@ -421,7 +421,7 @@ void channelMenuDisplay() {
 
   uint8_t previousHighlight = highlight;
   uint16_t foreground, background;
-  oled.setFont(Arial_8);
+  //oled.setFont(Arial_8);
 
   displayElement[0] = strdup("CHANNEL MENU");
   displayElement[1] = strdup("INIT CH");
