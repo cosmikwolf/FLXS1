@@ -1,4 +1,8 @@
 .pioenvs
 .clang_complete
 .gcc-flags.json
+<<<<<<< b421c654f1074b9085f36bb21b69b645d4b52be9
 .piolibdeps
+=======
+.DS_Store
+>>>>>>> updating git ignore
