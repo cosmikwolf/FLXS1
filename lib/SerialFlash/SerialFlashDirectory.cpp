@@ -26,11 +26,12 @@
  */
 
 #include "SerialFlash.h"
+#include "util/crc16.h"
 
 /* On-chip SerialFlash file allocation data structures:
 
   uint32_t signature = 0xFA96554C;
-  uint16_t maxfiles
+  uint16_t maxfiles          
   uint16_t stringssize  // div by 4
   uint16_t hashes[maxfiles]
   struct {
@@ -74,7 +75,7 @@ static uint32_t check_signature(void)
 	if (sig[0] == 0xFA96554C) return sig[1];
 	if (sig[0] == 0xFFFFFFFF) {
 		sig[0] = 0xFA96554C;
-		sig[1] = ((uint32_t)(DEFAULT_STRINGS_SIZE/4) << 16) | DEFAULT_MAXFILES;
+		sig[1] = ((DEFAULT_STRINGS_SIZE/4) << 16) | DEFAULT_MAXFILES;
 		SerialFlash.write(0, sig, 8);
 		while (!SerialFlash.ready()) ; // TODO: timeout
 		SerialFlash.read(0, sig, 8);
@@ -238,12 +239,12 @@ static uint32_t string_length(uint32_t addr)
 			len++;
 			if (*p == 0) return len;
 		}
-		addr += sizeof(buf);
+		addr += len;
 	}
 }
 
 //  uint32_t signature = 0xFA96554C;
-//  uint16_t maxfiles
+//  uint16_t maxfiles          
 //  uint16_t stringssize  // div by 4
 //  uint16_t hashes[maxfiles]
 //  struct {
@@ -310,7 +311,7 @@ bool SerialFlashChip::create(const char *filename, uint32_t length, uint32_t ali
 	// last check, if enough space exists...
 	len = strlen(filename);
 	// TODO: check for enough string space for filename
-	uint8_t id[5];
+	uint8_t id[3];
 	SerialFlash.readID(id);
 	if (address + length > SerialFlash.capacity(id)) return false;
 
@@ -322,7 +323,7 @@ bool SerialFlashChip::create(const char *filename, uint32_t length, uint32_t ali
 	 //Serial.printf("  write %u: ", 8 + maxfiles * 2 + index * 10);
 	 //pbuf(buf, 10);
 	while (!SerialFlash.ready()) ;  // TODO: timeout
-
+	 
 	buf[0] = filename_hash(filename);
 	 //Serial.printf("hash = %04X\n", buf[0]);
 	SerialFlash.write(8 + index * 2, buf, 2);
@@ -341,7 +342,7 @@ bool SerialFlashChip::readdir(char *filename, uint32_t strsize, uint32_t &filesi
 	filename[0] = 0;
 	maxfiles = check_signature();
 	if (!maxfiles) return false;
-	maxfiles &= 0xFFFF;
+	maxfiles &= 0xFFFF; 
 	index = dirindex;
 	while (1) {
 		if (index >= maxfiles) return false;
@@ -371,7 +372,6 @@ bool SerialFlashChip::readdir(char *filename, uint32_t strsize, uint32_t &filesi
 			}
 		}
 		strsize -= n;
-		straddr += n;
 	}
 	*(p - 1) = 0;
 	 //Serial.printf("  name(overflow) = %s\n", filename);
@@ -391,8 +391,3 @@ void SerialFlashFile::erase()
 	}
 }
 
-void SerialFlashFile::erase4k()
-{
-	SerialFlash.eraseBlock4k(address + offset);
-
-}

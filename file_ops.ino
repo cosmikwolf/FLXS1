@@ -60,8 +60,9 @@ void deleteSaveFile(){
   loadPattern(0, 0b1111);
 
 }
-
+/*
 void serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
+
   // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
   StaticJsonBuffer<512> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
@@ -104,11 +105,6 @@ void saveChannelPattern_JSON(uint8_t channel) {
     sequence[channel].stepData[selectedStep].gateType
     sequence[channel].stepData[selectedStep].velocity
     sequence[channel].stepData[selectedStep].glide
-;
-;
-;
-;
-;
 
     sequence[channel].stepCount
     sequence[channel].beatCount
@@ -122,7 +118,7 @@ void saveChannelPattern_JSON(uint8_t channel) {
 
 
 }
-
+*/
 
 void saveChannelPattern(uint8_t channel) {
   Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card. time:\t" + String(micros()) );

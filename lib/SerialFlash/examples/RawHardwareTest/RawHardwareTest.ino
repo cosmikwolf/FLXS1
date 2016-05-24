@@ -18,11 +18,9 @@
 // the exact part number and manufacturer of the chip.
 
 
+
 #include <SerialFlash.h>
 #include <SPI.h>
-
-const int FlashChipSelect = 6; // digital pin for flash chip CS pin
-//const int FlashChipSelect = 21; // Arduino 101 built-in SPI Flash
 
 SerialFlashFile file;
 
@@ -34,25 +32,15 @@ void setup() {
   //SPI.setSCK(14);  // Audio shield has SCK on pin 14
   //SPI.setMOSI(7);  // Audio shield has MOSI on pin 7
 
-  //uncomment these if you have other SPI chips connected
-  //to keep them disabled while using only SerialFlash
-  //pinMode(4, INPUT_PULLUP);
-  //pinMode(10, INPUT_PULLUP);
-
-  Serial.begin(9600);
-
   while (!Serial) ;
   delay(100);
 
   Serial.println("Raw SerialFlash Hardware Test");
-  SerialFlash.begin(FlashChipSelect);
+  SerialFlash.begin();
 
   if (test()) {
     Serial.println();
     Serial.println("All Tests Passed  :-)");
-    Serial.println();
-    Serial.println("Test data was written to your chip.  You must run");
-    Serial.println("EraseEverything before using this chip for files.");
   } else {
     Serial.println();
     Serial.println("Tests Failed  :{");
@@ -390,7 +378,6 @@ const char * id2chip(const unsigned char *id)
 		// Winbond
 		if (id[1] == 0x40) {
 			if (id[2] == 0x14) return "W25Q80BV";
-			if (id[2] == 0x15) return "W25Q16DV";
 			if (id[2] == 0x17) return "W25Q64FV";
 			if (id[2] == 0x18) return "W25Q128FV";
 			if (id[2] == 0x19) return "W25Q256FV";

@@ -1,9 +1,6 @@
 #include <SerialFlash.h>
 #include <SPI.h>
 
-const int FlashChipSelect = 6; // digital pin for flash chip CS pin
-//const int FlashChipSelect = 21; // Arduino 101 built-in SPI Flash
-
 SerialFlashFile file;
 
 const unsigned long testIncrement = 4096;
@@ -13,20 +10,13 @@ void setup() {
   //SPI.setSCK(14);  // Audio shield has SCK on pin 14
   //SPI.setMOSI(7);  // Audio shield has MOSI on pin 7
 
-  //uncomment these if you have other SPI chips connected
-  //to keep them disabled while using only SerialFlash
-  //pinMode(4, INPUT_PULLUP);
-  //pinMode(10, INPUT_PULLUP);
-
-  Serial.begin(9600);
-
   // wait up to 10 seconds for Arduino Serial Monitor
   unsigned long startMillis = millis();
   while (!Serial && (millis() - startMillis < 10000)) ;
   delay(100);
 
-  SerialFlash.begin(FlashChipSelect);
-  unsigned char id[5];
+  SerialFlash.begin();
+  unsigned char id[3];
   SerialFlash.readID(id);
   unsigned long size = SerialFlash.capacity(id);
 
