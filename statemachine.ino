@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 // this subroutine initializes the new state. 
 void changeState(uint8_t state){
 	Serial.print("Changin State from " + String(currentState) + " to " + String(state));

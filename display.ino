@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /* in addition to:
   BLACK  BLUE  RED ORANGE  GREEN CYAN MAGENTA YELLOW WHITE 
   more colors available at: http://www.rinkydinkelectronics.com/calc_rgb565.php

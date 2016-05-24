@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 uint8_t ledMapping[] = {3,2,1,0,8,7,6,5,13,12,11,10,18,17,16,15,4,9,14,19};
 
 uint8_t getNoteLED(uint8_t index){

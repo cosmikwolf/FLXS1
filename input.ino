@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 //button stuff
 #define SW_00    0
 #define SW_01    1

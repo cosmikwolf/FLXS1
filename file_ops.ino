@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /*
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! 
 This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files. 

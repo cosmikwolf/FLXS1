@@ -1,3 +1,5 @@
+
+
 // DAC Mapping for each channel:
 
 uint8_t gateMap[]  = {4, 6, 5, 7};
@@ -12,7 +14,7 @@ void changeTempo(uint32_t newTempoX100){
   }
 }
 
-void masterClockFunc(){ 
+void masterClockFunc(){
   elapsedMicros loopTimer = 0;
 
 
@@ -29,7 +31,7 @@ if (inputTimer > 10000){
 
   if(playing){
 
-    if( extClock == false ){ 
+    if( extClock == false ){
       internalClockTick();
     } else {
       externalClockTick();
@@ -77,7 +79,7 @@ void internalClockTick(){
     }
     for (int i=0; i< sequenceCount; i++){
       sequence[i].runSequence(&noteData[i], &life);
-      sequence[i].beatPulse(beatLength, &life); 
+      sequence[i].beatPulse(beatLength, &life);
 
 
     }
@@ -85,10 +87,10 @@ void internalClockTick(){
     internalClockTimer = 0;
 
        // Serial.print(" b5 ");
-  }  else { 
+  }  else {
     for (int i=0; i< sequenceCount; i++){
       sequence[i].runSequence(&noteData[i], &life);
-    } 
+    }
   }
     debug("end internal clock tick");
   //digitalWriteFast(DEBUG_PIN, LOW);
@@ -112,7 +114,7 @@ void noteOffSwitch(){
          // noteOn(noteData[i].channel,noteData[i].noteOffArray[n]);
        // mcp.digitalWrite(noteData[i].channel+4, LOW);
         mcp.digitalWrite(gateMap[noteData[i].channel], LOW);
-    
+
         MIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
         sam2695.noteOff(noteData[i].channel, noteData[i].noteOffArray[n]);
          // usbMIDI.sendNoteOff(noteData[i].noteOffArray[n], 64, noteData[i].channel);
@@ -153,8 +155,8 @@ void noteOnSwitch(){
         digitalWriteFast(DEBUG_PIN, HIGH);
 
          Serial.println("triggering Note");
-         Serial.println( "ch: " + String(noteData[i].channel) 
-         // + "\tbt: " + String(sequence[selectedChannel].beatTracker) 
+         Serial.println( "ch: " + String(noteData[i].channel)
+         // + "\tbt: " + String(sequence[selectedChannel].beatTracker)
           + "\tnoteOn: " + String(noteData[i].noteOnArray[n])
           + "\tvel: " + String(map(noteData[i].noteVelArray[n], 0,127,22180, 43340 ))
           + "\tgate: " + String(gateMap[noteData[i].channel])
@@ -170,4 +172,3 @@ void noteOnSwitch(){
       debug("end note on switch");
 
 }
-

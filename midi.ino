@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 
 void midiSetup(){
   MIDI.begin(MIDI_CHANNEL_OMNI);
