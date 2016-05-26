@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include "midiModule.h"
 
 void midiSetup(){
   MIDI.begin(MIDI_CHANNEL_OMNI);
@@ -75,10 +75,10 @@ void midiClockPulseHandler(){
 
     // 1 beat = 24 puleses
     // = 24* avg pulse = 24*(masterTempoTimer/(masterPulseCount+1))
-    // = 24*(20831/1) = 499944 microseconds per beat /1000000 = .4999 seconds per beat 
+    // = 24*(20831/1) = 499944 microseconds per beat /1000000 = .4999 seconds per beat
     if (firstRun){
         firstRun = false;
-    } 
+    }
     //Serial.print(" D5 ");
 
     masterPulseCount = (masterPulseCount + 1) % 24;
@@ -95,7 +95,7 @@ void midiClockPulseHandler(){
       tempoBlip = !tempoBlip;
       blipTimer = 0;
       for (int i=0; i< sequenceCount; i++){
-        sequence[i].beatPulse(beatLength, &life);  
+        sequence[i].beatPulse(beatLength, &life);
       }
 
      // Serial.println("beatPulse - beatlength: " + String(int(beatLength)) + "\tbeatLengthJitter: " + String(int(lastBeatLength) - int(beatLength))+ "\tavgPulseLength: " + String(avgPulseLength) + "\tavgPulseJitter: " + String(avgPulseJitter));

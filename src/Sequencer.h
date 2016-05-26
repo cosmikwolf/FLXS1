@@ -2,7 +2,6 @@
 #define _Sequencer_h_
 
 #include "NoteDatum.h"
-#include "global.h"
 #include "GameOfLife.h"
 
 class Sequencer
@@ -11,47 +10,34 @@ class Sequencer
 		Sequencer();
 
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
-		// Sequencing Modes
-		void 		sequenceModeStandardStep(NoteDatum *noteData);
-		void    sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life);
-
-		// Note Trigger Utilities
-		void  	clearNoteData(NoteDatum *noteData);
-		void 		incrementActiveStep();
-		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig);
-		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
-
-		void 		calculateStepTimers();
-		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
-		void 		clockStart(elapsedMicros startTime);
-		int  		positive_modulo(int i, int n);
-		void 		initNewSequence(uint8_t index, uint8_t ch);
-
 		void 		setTempo(uint32_t tempoX100);
-		void 		setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
+		void 		setStepPitch(uint8_t step, uint8_t pitch);
 		void 		setGateLength(uint8_t step, uint8_t length);
 		void 		setGateType(uint8_t step, uint8_t gate);
 		void 		setStepVelocity(uint8_t step, uint8_t velocity);
 		void 		setStepGlide(uint8_t step, uint8_t glideTime);
-
+		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
+		void 		calculateStepTimers();
+		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
+		void 		clockStart(elapsedMicros startTime);
+		int  		positive_modulo(int i, int n);
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
-		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
+		void 		initNewSequence(uint8_t index, uint8_t ch);
+		void 		setInstType(boolean type);
 
-		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
-
-		uint32_t  getStepLength(uint8_t stepNum);
+		uint8_t  	quantizePitch(uint8_t note, uint32_t scale, bool direction);
+		uint8_t  	getStepPitch(uint8_t step);
 		boolean  	monophonic;
+		uint8_t  	beatTracker;		// keeps track of how long the sequence has been playing
 		uint8_t	 	activeStep;
     uint32_t 	beatLength;
-		uint32_t 	stepLength;		// length of each step in mcs
-
 		uint32_t 	tempoX100;
 		boolean  	tempoPulse;
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
-		int16_t 	sequenceJitter[9];
-
+		uint32_t 	stepLength;
+		int16_t 	sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
+		uint32_t 	aminor = 0b101011010101;
 		uint8_t		lifeCellToPlay;
 		uint8_t		lifeCellsPlayed;
 
@@ -59,16 +45,40 @@ class Sequencer
 		elapsedMicros beatTimer;
 
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
+
 		// data that needs to be stored
 		uint8_t  stepCount;  		// sequence length in 1/16th notes]
 		uint16_t beatCount;
 		uint8_t	 quantizeKey;
-		uint8_t	 quantizeScale;
-		uint8_t  patternIndex;
+		uint16_t instrument;
+		uint8_t	 instType;
+		uint8_t  volume;
+		uint8_t  bank;
 		uint8_t	 channel;
-		uint8_t  inputAttenuvert;
+		uint8_t  patternIndex;
 
-		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
+		struct StepDatum {
+			// data that needs to be stored
+			uint8_t			pitch;		    // note pitch
+			uint8_t			gateLength;		// gate length
+			uint8_t 		gateType;		// gate type (hold, repeat, arpeggio)
+			uint8_t			velocity;	    // note velocity
+			uint8_t			glide;			// portamento time - to be implemented.
+			// utility variables - dont need to be saved.
+		};
+
+		struct StepUtil {
+			uint16_t		beat;			// beat in which the note is triggered - recalculated each beat
+			uint32_t		offset;		    // note start time offset in mcs from the beat start - recalculated each beat
+			uint8_t			noteStatus;		// if note is playing or not
+			uint8_t			notePlaying;	// stores the note that is played so it can be turned off.
+			uint32_t		lengthMcs;	    // length timer for step in microseconds.
+			uint32_t		noteTimerMcs;
+			elapsedMicros	stepTimer;		// a timer to compare with lengthMcs to determine when to send noteOff.
+		};
+
+		StepDatum stepData[128];
+		StepUtil stepUtil[128];
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;
@@ -88,6 +98,7 @@ class Sequencer
 
 };
 
+extern Sequencer sequence[4];
 
 #endif
 

@@ -1,4 +1,4 @@
-/*************************************************** 
+/***************************************************
  This is a library for the MCP23017 i2c port expander
 
  These displays use I2C to communicate, 2 pins are required to
@@ -278,5 +278,3 @@ uint8_t Adafruit_MCP23017::getLastInterruptPinValue(){
 
 	return MCP23017_INT_ERR;
 }
-
-
