@@ -1,7 +1,7 @@
 #ifndef NoteDatum_h
 #define NoteDatum_h
 
-	typedef struct {
+typedef struct NoteDatum{
 	  boolean   noteOn;             // is a note going to play?
 	  boolean   noteOff;            // does a note need to be shut off?
 	  uint8_t   noteOnArray[128];   // contains all notes that need to be played
@@ -14,5 +14,7 @@
 	  uint32_t	offset;
 	  uint32_t	sequenceTime;
 	} NoteDatum ;
+
+extern NoteDatum noteData[4];
 
 #endif

@@ -1,6 +1,8 @@
 #include "Arduino.h"
 #include "Sequencer.h"
 
+Sequencer sequence[4];
+
 Sequencer::Sequencer() {
 
 };
@@ -23,7 +25,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
   beatLength = 60000000/(tempoX100/100);
   calculateStepTimers();
   monophonic = true;
-};	
+};
 
 
 void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
@@ -103,18 +105,18 @@ void Sequencer::calculateStepTimers(){
     Serial.println( String(channel) + " " + String(stepNum) + " " +
       "ntm: " + String(stepData[stepNum].noteTimerMcs) +
       "\tbt: " + String(stepData[stepNum].beat) +
-      "\toff: " + String(stepData[stepNum].offset)  + 
-      "\tgaL: " + String(stepData[stepNum].gateLength) + 
+      "\toff: " + String(stepData[stepNum].offset)  +
+      "\tgaL: " + String(stepData[stepNum].gateLength) +
       "\tgaT: " + String(stepData[stepNum].gateType) +
       "\tptch: " + String(stepData[stepNum].pitch) +
-      "\tOC: " + String(noteTimerMcsCounter) 
+      "\tOC: " + String(noteTimerMcsCounter)
     );
   */
 
   }
 
 
-  
+
 }
 
 
@@ -132,12 +134,12 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
   beatTimer = 0;
   tempoPulse = true;
 
-  if(firstBeat){  
+  if(firstBeat){
     activeStep = 0;
     beatTracker = 0;
-    firstBeat = false; 
+    firstBeat = false;
   } else {
-    //beatTracker= positive_modulo(beatTracker + 1, beatCount); 
+    //beatTracker= positive_modulo(beatTracker + 1, beatCount);
     beatTracker = (beatTracker + 1) % beatCount;
   }
 
@@ -154,17 +156,17 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
      // Serial.println("Resetting Sequence Timer " + String(sequenceTimer));
     }
     sequenceTimer = 0;
-    // We are resetting the note status when the sequenceTimer is no longer larger than 
+    // We are resetting the note status when the sequenceTimer is no longer larger than
     // the offset value. This means that runSequence needs to run at least once before
     // it can reset the note statuses. For the first note, that means it wont ever reset
     // so we must reset it manually here.
     stepUtil[0].noteStatus = 0;
-  } 
-  
+  }
+
   if(instType == 1 && channel == 0){
-  
+
     life->lifeIterate(life->grid);
-  
+
   }
 
 };
@@ -186,10 +188,10 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
     noteData->noteVelArray[i] = NULL;
     noteData->noteOffArray[i] = NULL;
   }
-  noteData->channel = 0;         
-  noteData->noteOnStep = 0;      
-  noteData->noteOffStep = 0;     
- 
+  noteData->channel = 0;
+  noteData->noteOnStep = 0;
+  noteData->noteOffStep = 0;
+
   int sequenceAvgJitter = 0;
   for(int i = 0; i < 3; i++){
     sequenceAvgJitter += sequenceJitter[i];
@@ -198,13 +200,13 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 
 
   if(sequenceTimerInt > (activeStep+1)*stepLength - sequenceAvgJitter/2 ){
-    // here we increment the active step in order to 
+    // here we increment the active step in order to
     //digitalWriteFast(4, HIGH);
     //Serial.println("SequenceTimer: " + String(sequenceTimer) + "\tactiveStep:  " + String(activeStep) + "\ttrigtime:" + String((activeStep+1)*stepLength) + "\t\tdifference: " + String(sequenceTimerInt - (activeStep+1)*stepLength) + "\tavgJitter: " + String(sequenceAvgJitter) );
 
     for(int i = 3; i > 1; i--){
       sequenceJitter[i] = sequenceJitter[i-1];
-    } 
+    }
     sequenceJitter[0] = sequenceTimerInt - (activeStep+1)*stepLength;
 
    // activeStep = positive_modulo(activeStep + 1, stepCount);
@@ -237,7 +239,7 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
         activeCellCount++;
       };
     }
-    
+
     //if the step just began, trigger the first note
     //if the step has passed a percentage, trigger the next note:
     //percentage is cells played divided by represented by number of active cells
@@ -253,7 +255,7 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 
     int cellPlayLength = stepLength/activeCellCount;
 
-    
+
     for(int d=0; d<16; d++){
       if(stepUtil[activeStep].stepTimer > d * cellPlayLength ){
         lifeCellToPlay = d;
@@ -293,10 +295,10 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
         stepUtil[lifeCellToPlay].notePlaying = quantizePitch(activeCellValues[lifeCellToPlay], aminor, 1);
              // Serial.println("quantized note: " + String(stepData[stepNum].pitch) + " -> " + String(stepUtil[stepNum].notePlaying));
       } else {
-        stepUtil[lifeCellToPlay].notePlaying = activeCellValues[lifeCellToPlay];          
+        stepUtil[lifeCellToPlay].notePlaying = activeCellValues[lifeCellToPlay];
       }
       stepUtil[lifeCellToPlay].noteStatus = 1;
-      noteData->noteOnArray[lifeCellToPlay] = stepUtil[lifeCellToPlay].notePlaying;                
+      noteData->noteOnArray[lifeCellToPlay] = stepUtil[lifeCellToPlay].notePlaying;
       noteData->noteVelArray[lifeCellToPlay] = stepData[lifeCellToPlay].velocity;
       lifeCellsPlayed++;
     }
@@ -358,7 +360,7 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
             noteData->noteOn = true;
             noteData->channel = channel;
             noteData->noteOnStep = stepNum;
-            
+
             noteData->triggerTime = micros();
             noteData->sequenceTime = sequenceTimer;
             noteData->offset = stepUtil[stepNum].offset;
@@ -369,12 +371,12 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
               stepUtil[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch, aminor, 1);
              // Serial.println("quantized note: " + String(stepData[stepNum].pitch) + " -> " + String(stepUtil[stepNum].notePlaying));
             } else {
-              stepUtil[stepNum].notePlaying = stepData[stepNum].pitch;          
+              stepUtil[stepNum].notePlaying = stepData[stepNum].pitch;
             }
 
             for (int i=0; i< stepCount; i++){
               if (noteData->noteOnArray[i] == NULL){
-                noteData->noteOnArray[i] = stepUtil[stepNum].notePlaying;                
+                noteData->noteOnArray[i] = stepUtil[stepNum].notePlaying;
                 noteData->noteVelArray[i] = stepData[stepNum].velocity;
                 break;
               }
@@ -386,7 +388,7 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
             // 2 indicates the note is currently queued.
             // 3 indicates that the note is currently playing and currently queued
             // 4 indicates that the note has been played this iteration
-            // stepData[activeStep].noteStatus = stepData[activeStep].pitch;   
+            // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
           }
         } else {
           if (stepUtil[stepNum].noteStatus == 4){
@@ -424,5 +426,3 @@ uint8_t Sequencer::getStepPitch(uint8_t step){
 int Sequencer::positive_modulo(int i, int n) {
     return (i % n + n) % n;
 }
-
-

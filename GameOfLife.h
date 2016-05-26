@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #ifndef _GameOfLife_h_
 #define _GameOfLife_h_
 // https://github.com/MLXXXp/MicroViewLife/blob/master/MicroViewLife.ino
@@ -28,5 +30,6 @@ private:
 
 };
 
+extern GameOfLife	life;
 
 #endif

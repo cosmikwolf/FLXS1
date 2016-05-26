@@ -1,35 +1,17 @@
 #include <Arduino.h>
+#include "displayModule.h"
 
-/* in addition to:
-  BLACK  BLUE  RED ORANGE  GREEN CYAN MAGENTA YELLOW WHITE
-  more colors available at: http://www.rinkydinkelectronics.com/calc_rgb565.php
-  */
-#define NAVY            0x000F      /*   0,   0, 128 */
-#define DARKGREEN       0x03E0      /*   0, 128,   0 */
-#define DARKCYAN        0x03EF      /*   0, 128, 128 */
-#define MAROON          0x7800      /* 128,   0,   0 */
-#define PURPLE          0x780F      /* 128,   0, 128 */
-#define OLIVE           0x7BE0      /* 128, 128,   0 */
-#define LIGHTGREY       0xC618      /* 192, 192, 192 */
-#define DARKGREY        0x7BEF      /* 128, 128, 128 */
-#define ORANGE          0xFD20      /* 255, 165,   0 */
-#define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
-#define PINK            0xF81F
-
-#define MAX_DISPLAY_ELEMENTS 17
 /*#include "../commonFonts/fonts/font_ArialBold.cpp"
 #include "../commonFonts/fonts/font_Arial.cpp"
 */
 //    coord_t   i, j;
+displayModule display;
 
-int color = 0;
-uint32_t runcount;
+displayModule::displayModule(){
 
-char *displayCache[MAX_DISPLAY_ELEMENTS];
-char *displayElement[MAX_DISPLAY_ELEMENTS];
-uint8_t highlight;
+};
 
-void displayStartup(){
+void displayModule::initialize(){
  /*
   gfxInit();
 
@@ -106,7 +88,7 @@ void displayStartup(){
 
 }
 
-void displayLoop() {
+void displayModule::displayLoop() {
 
  // if (previousState != currentState) { memset(displayCache, 0, sizeof(displayCache));}
   switch(currentState) {
@@ -147,7 +129,7 @@ void displayLoop() {
 
 // STATE VARIABLE DISPLAY HANDLERS
 
-void globalMenuDisplay(){
+void displayModule::globalMenuDisplay(){
   /*
   //nonBlockingRainbow(5);
   gdispFillStringBox(0, 0, width, 10, "ZETAOHM", fontSm , Red, Green, justifyCenter);
@@ -156,7 +138,7 @@ void globalMenuDisplay(){
   */
 }
 
-void gameOfLifeDisplay(){
+void displayModule::gameOfLifeDisplay(){
 
 //  for(int row=0; row < LIFELINES; row++){
 //    for(int col=0; col < LIFEWIDTH; col++){
@@ -208,7 +190,7 @@ void gameOfLifeDisplay(){
 //  }
 }
 
-void deleteMenuDisplay(){
+void displayModule::deleteMenuDisplay(){
   /*
   uint8_t previousHighlight = highlight;
   highlight = selectedChannel;
@@ -235,7 +217,7 @@ void deleteMenuDisplay(){
 */
 };
 
-void stepDisplayTest(){
+void displayModule::stepDisplayTest(){
   /*
   Serial.println(String(runcount) + "\t" + String(millis()) + "\tbegin stepdisplay test");
 
@@ -254,11 +236,11 @@ void stepDisplayTest(){
 */
 }
 
-void setupDisplayState(){
+void displayModule::setupDisplayState(){
 
 }
 
-void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
+void displayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
   // renders a string box only once.
   uint16_t color1;
   uint16_t color2;
@@ -283,7 +265,7 @@ void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHigh
   }
 }
 
-void cleanupTextBuffers(char *buf){
+void displayModule::cleanupTextBuffers(char *buf){
   for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
       free(displayCache[i]);
       displayCache[i] = strdup(displayElement[i]);
@@ -293,7 +275,7 @@ void cleanupTextBuffers(char *buf){
 }
 
 
-void stepDisplay(){
+void displayModule::stepDisplay(){
 
   char *buf = new char[51]; // sprintf buffer
   uint8_t previousHighlight = highlight;
@@ -416,7 +398,7 @@ void stepDisplay(){
 
 }
 
-void channelMenuDisplay() {
+void displayModule::channelMenuDisplay() {
   char *buf = new char[51]; // sprintf buffer
 
   uint8_t previousHighlight = highlight;
@@ -444,7 +426,7 @@ void channelMenuDisplay() {
   cleanupTextBuffers(buf);
 }
 
-void patternSelectDisplay(){
+void displayModule::patternSelectDisplay(){
   /*
     uint8_t previousHighlight = highlight;
 
@@ -501,7 +483,7 @@ void patternSelectDisplay(){
 */
 }
 
-void sequenceMenuDisplay(){
+void displayModule::sequenceMenuDisplay(){
   /*
   const char* element;
 
@@ -512,7 +494,7 @@ void sequenceMenuDisplay(){
 */
 }
 
-void instrumentSelectDisplay(){
+void displayModule::instrumentSelectDisplay(){
   /*
   const char* element;
 
@@ -528,7 +510,7 @@ void instrumentSelectDisplay(){
 */
 }
 
-void timingMenuDisplay(){
+void displayModule::timingMenuDisplay(){
   /*
   const char* element;
 
@@ -553,11 +535,23 @@ void timingMenuDisplay(){
 }
 
 
-void debugScreenDisplay(){
+void displayModule::debugScreenDisplay(){
   /*
   const char* element;
 
   element =  String(voltManual).c_str();
   gdispFillStringBox(   0, 30, 128 , 20, element, fontMd, White, Black, justifyCenter);
 */
+}
+
+void displayModule::clearDisplay(){
+  oled.clearScreen();
+}
+
+void displayModule::freeDisplayCache(){
+  for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
+    //clear displaycache so all data redraws.
+      free(displayCache[i]);
+    displayCache[i] = 0;
+  }
 }

@@ -1,12 +1,11 @@
+#include <Arduino.h>
+#include "masterClock.h"
 
+masterClock::masterClock(){
 
-// DAC Mapping for each channel:
+};
 
-uint8_t gateMap[]  = {4, 6, 5, 7};
-uint8_t dacCvMap[] = {0, 4, 2, 6};
-uint8_t dacCcMap[] = {1, 5, 3, 7};
-
-void changeTempo(uint32_t newTempoX100){
+void masterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
   for (int i = 0; i < sequenceCount; i++ ){
@@ -14,7 +13,7 @@ void changeTempo(uint32_t newTempoX100){
   }
 }
 
-void masterClockFunc(){
+void masterClock::masterClockFunc(){
   elapsedMicros loopTimer = 0;
 
 
@@ -49,12 +48,11 @@ if (inputTimer > 10000){
 //if (pixelTimer > 2000){
 //  pixelTimer = 0;
 //}
-//
-    midiClockSyncFunc();
+  midiClockSyncFunc();
 }
 
 
-void internalClockTick(){
+void masterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
 
   debug("begin internal clock tick");
@@ -97,14 +95,14 @@ void internalClockTick(){
 
 }
 
-void externalClockTick(){
+void masterClock::externalClockTick(){
   // ext clock sync
   for (int i=0; i< sequenceCount; i++){
     sequence[i].runSequence(&noteData[i], &life);
   }
 }
 
-void noteOffSwitch(){
+void masterClock::noteOffSwitch(){
   for (int i=0; i< sequenceCount; i++){
     if (noteData[i].noteOff == true){
       for (int n=0; n< 16; n++){
@@ -124,7 +122,7 @@ void noteOffSwitch(){
   }
 }
 
-void noteOnSwitch(){
+void masterClock::noteOnSwitch(){
     debug( "\tbegin note on switch");
 
   for (int i=0; i< sequenceCount; i++){

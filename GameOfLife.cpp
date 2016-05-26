@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "GameOfLife.h"
 
+GameOfLife	life;
 
 GameOfLife::GameOfLife(){};
 

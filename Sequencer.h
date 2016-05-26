@@ -6,9 +6,9 @@
 
 class Sequencer
 {
-	public:	
+	public:
 		Sequencer();
-		
+
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
 		void 		setTempo(uint32_t tempoX100);
 		void 		setStepPitch(uint8_t step, uint8_t pitch);
@@ -31,7 +31,7 @@ class Sequencer
 		boolean  	monophonic;
 		uint8_t  	beatTracker;		// keeps track of how long the sequence has been playing
 		uint8_t	 	activeStep;
-    	uint32_t 	beatLength;
+    uint32_t 	beatLength;
 		uint32_t 	tempoX100;
 		boolean  	tempoPulse;
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
@@ -43,7 +43,7 @@ class Sequencer
 
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
 		elapsedMicros beatTimer;
-    	
+
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
 
 		// data that needs to be stored
@@ -56,7 +56,7 @@ class Sequencer
 		uint8_t  bank;
 		uint8_t	 channel;
 		uint8_t  patternIndex;
-		
+
 		struct StepDatum {
 			// data that needs to be stored
 			uint8_t			pitch;		    // note pitch
@@ -76,7 +76,7 @@ class Sequencer
 			uint32_t		noteTimerMcs;
 			elapsedMicros	stepTimer;		// a timer to compare with lengthMcs to determine when to send noteOff.
 		};
-	 	
+
 		StepDatum stepData[128];
 		StepUtil stepUtil[128];
 
@@ -98,6 +98,8 @@ class Sequencer
 
 };
 
+extern Sequencer sequence[4];
+
 #endif
 
 /*
@@ -109,9 +111,9 @@ All musical logic is set here.
 Each sequence at its base is just a set of numbers, stored in a few arrays.
 The index of the array equates to the step number of the note value.
 
-At every interval of the midi engine, 
-each sequencer object should be polled 
-to identify what, if any, notes should 
+At every interval of the midi engine,
+each sequencer object should be polled
+to identify what, if any, notes should
 be played, and should have already played.
 
 Each sequence can be played differently.
@@ -119,7 +121,7 @@ Each sequence can be played differently.
 HOW THIS SHOULD BE RUN:
 
 noteToPlay(time) should be called very frequently
-	it should check to see what note should have played between lastRun and now 
+	it should check to see what note should have played between lastRun and now
 
 There is basic linear sequencing. This has a few attributes:
 	Step Length:			1/32 notes - 1 whole note
@@ -127,12 +129,12 @@ There is basic linear sequencing. This has a few attributes:
 	Retrigger step: 	0  - Last
 
 Each step has various attributes:
-	Step Type:	
+	Step Type:
 		Sequence Trigger Type:
 			Sequence number: 	Int
 			Repeat:						boolean
 		Note Trigger Type:
-			
+
 	Pitch 1: note value
 	Pitch 2: note value
 	Pitch 3: note value
@@ -160,7 +162,7 @@ All generators share thes attributes:
 		Period:								0-2œÄ
 		Amplitude:						0-64
 		Quantization:					Scale
-	
+
 There are some post processing functions that can modify the sequence at runtime:
 
 	Randomization:
@@ -173,7 +175,7 @@ There are some post processing functions that can modify the sequence at runtime
 
 	Random Order
 		Play notes in random Order
-		Note Length Preservation: boolean 
+		Note Length Preservation: boolean
 			- preserve the original length of each note, just randomize note pitch
 
 	Inverse:
@@ -189,10 +191,9 @@ There are some post processing functions that can modify the sequence at runtime
 		/*
 
 		other notes:
-		
+
 		Dynamic Arrays:
 		http://www.fredosaurus.com/notes-cpp/newdelete/50dynamalloc.html
 
 
 */
-

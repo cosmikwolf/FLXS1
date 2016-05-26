@@ -1,29 +1,23 @@
 #include <Arduino.h>
-#include <FastLED.h>
-#define NUM_LEDS 20
-#define DATA_PIN 0
+#include "LEDArray.h"
 
-CRGB leds[NUM_LEDS];
 
-uint8_t ledMapping[] = {3,2,1,0,8,7,6,5,13,12,11,10,18,17,16,15,4,9,14,19};
 /*
 uint8_t getNoteLED(uint8_t index){
   return index + notePage * 16;
 }
 */
-void ledSetup(){
+LEDArray leds;
+
+LEDArray::LEDArray(){};
+
+void LEDArray::initialize(){
   pinMode(0, OUTPUT);
   LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
 	LEDS.setBrightness(84);
 };
 
-void nonBlockingRainbow(uint8_t interval, uint8_t *skipArr, uint8_t skipArrSize) { };
-void nonBlockingRainbow(uint8_t interval) { };
-void theaterChaseRainbow(uint8_t wait) { };
-
-uint32_t Wheel(byte WheelPos) { };
-void colorWipe(uint32_t c, uint8_t wait) { };
-void ledLoop(){
+void LEDArray::loop(){
   static uint8_t hue = 0;
 
   for(int i = 0; i < NUM_LEDS; i++) {
@@ -51,7 +45,7 @@ void ledLoop(){
 	}
 
 };
-void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
+void LEDArray::fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
 
 /*
 void ledSetup(){

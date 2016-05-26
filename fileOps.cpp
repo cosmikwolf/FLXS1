@@ -1,13 +1,14 @@
 #include <Arduino.h>
-
+#include "fileOps.h"
 /*
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 */
+fileOps saveFile;
+fileOps::fileOps(){};
 
-
-void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
+void fileOps::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
 	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
 	if(saveFirst){
     for(int i=0; i < sequenceCount; i++){
@@ -26,7 +27,7 @@ void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, 
 
 }
 
-void initializeFlashMemory(){
+void fileOps::initializeFlashMemory(){
 
   if (!SD.begin(SD_CS_PIN)){
     Serial.println("SD Card initialization failed!");
@@ -47,8 +48,7 @@ void initializeFlashMemory(){
   loadPattern(0, 0b1111);
 }
 
-
-void deleteSaveFile(){
+void fileOps::deleteSaveFile(){
   SD.remove("data.txt");
   for(int i=0; i<16; i++){
     for(int n=0; n<sequenceCount; n++){
@@ -61,7 +61,7 @@ void deleteSaveFile(){
 
 }
 /*
-void serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
+void fileOps::serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
 
   // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
   StaticJsonBuffer<512> jsonBuffer;
@@ -93,7 +93,7 @@ void serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
   root.prettyPrintTo(json, maxSize);
 }
 
-void saveChannelPattern_JSON(uint8_t channel) {
+void fileOps::saveChannelPattern_JSON(uint8_t channel) {
     Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card as JSON FILE. time:\t" + String(micros()) );
 
     root.createNestedObject(String(sequence[channel].patternIndex).concat(String(channel));
@@ -120,7 +120,7 @@ void saveChannelPattern_JSON(uint8_t channel) {
 }
 */
 
-void saveChannelPattern(uint8_t channel) {
+void fileOps::saveChannelPattern(uint8_t channel) {
   Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card. time:\t" + String(micros()) );
  // for(int i=0; i < sequenceCount; i++){
  	  int index = int(
@@ -175,7 +175,7 @@ void saveChannelPattern(uint8_t channel) {
 
 }
 
-void loadPattern(uint8_t pattern, uint8_t channelSelector) {
+void fileOps::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
   Serial.println("========= LOADING PATTERN: " + String(pattern));
   printPattern();
@@ -259,7 +259,7 @@ void loadPattern(uint8_t pattern, uint8_t channelSelector) {
   printPattern();
 }
 
-void printDirectory(File dir, int numTabs) {
+void fileOps::printDirectory(File dir, int numTabs) {
    while(true) {
 
      File entry =  dir.openNextFile();
@@ -284,7 +284,7 @@ void printDirectory(File dir, int numTabs) {
    }
 }
 
-void printPattern(){
+void fileOps::printPattern(){
   Serial.println("Printing Data for pattern: " + String(currentPattern));
   for(int i=0; i < sequenceCount; i++){
     Serial.print("sc:\t"+String(sequence[i].stepCount) +"\tbc:\t"+String(sequence[i].beatCount) +"\tqk:\t"+String(sequence[i].quantizeKey)+"\tinst:\t"+String(sequence[i].instrument)+"\tit:\t"+String(sequence[i].instType) + "\t");
