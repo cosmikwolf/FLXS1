@@ -54,14 +54,6 @@ uint32_t masterClockInterval = 500;
 uint8_t masterPulseCount =24;
 
 
-void setup();
-void loop();
-void masterLoop();
-
-void masterLoop(){
-  clock.masterClockFunc();
-}
-
 void setup() {
 	Serial.begin(115200);
 
@@ -124,7 +116,7 @@ void setup() {
 	Serial.println("Initializing Neopixels");
 	leds.initialize();
 	Serial.println("Beginning Master Clock");
-//	masterClockTimer.begin(masterLoop,masterClockInterval);
+	masterClockTimer.begin(masterLoop,masterClockInterval);
 	SPI.usingInterrupt(masterClockTimer);
 	//notefreq.begin(.1);
 
@@ -146,4 +138,8 @@ void loop() {
 	  //  ad5676.setVoltage(i,  positive_modulo(10*millis(), 65535) );
 	}
 
+}
+
+void masterLoop(){
+  clockMaster.masterClockFunc();
 }

@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "masterClock.h"
 
+masterClock clockMaster;
+
 masterClock::masterClock(){
 
 };
@@ -14,7 +16,7 @@ void masterClock::changeTempo(uint32_t newTempoX100){
 }
 
 void masterClock::masterClockFunc(){
-  elapsedMicros loopTimer = 0;
+/*  elapsedMicros loopTimer = 0;
 
 
 if (inputTimer > 10000){
@@ -48,7 +50,7 @@ if (inputTimer > 10000){
 //if (pixelTimer > 2000){
 //  pixelTimer = 0;
 //}
-  midiClockSyncFunc();
+  midiClockSyncFunc();*/
 }
 
 
