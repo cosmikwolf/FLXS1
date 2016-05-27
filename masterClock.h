@@ -24,5 +24,5 @@ public:
 
 };
 
-extern masterClock clock;
+extern masterClock clockMaster;
 #endif
