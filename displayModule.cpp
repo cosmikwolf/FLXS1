@@ -51,6 +51,35 @@ void displayModule::initialize(){
   oled.begin();
 
     oled.fillScreen(BLACK);
+    delay(100);
+    oled.fillScreen(RED);
+    delay(100);
+    oled.fillScreen(ORANGE);
+    delay(100);
+    oled.fillScreen(YELLOW);
+    delay(100);
+    oled.fillScreen(GREEN);
+    delay(100);
+    oled.fillScreen(BLUE);
+    delay(100);
+    oled.fillScreen(NAVY);
+    delay(100);
+    oled.fillScreen(PURPLE);
+    delay(100);
+    oled.fillScreen(RED);
+    delay(100);
+    oled.fillScreen(ORANGE);
+    delay(100);
+    oled.fillScreen(YELLOW);
+    delay(100);
+    oled.fillScreen(GREEN);
+    delay(100);
+    oled.fillScreen(BLUE);
+    delay(100);
+    oled.fillScreen(NAVY);
+    delay(100);
+    oled.fillScreen(PURPLE);
+    
     delay(500);
     oled.invert(true);
     delay(500);
