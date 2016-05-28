@@ -9,6 +9,7 @@ fileOps saveFile;
 fileOps::fileOps(){};
 
 void fileOps::jsonTest(){
+  /*
     if (SD.exists("json.txt")) {
     Serial.println("json.txt exists. deleting...");
     SD.remove("json.txt");
@@ -25,10 +26,9 @@ void fileOps::jsonTest(){
   jsonFile.seek(0);
   jsonFile.close();
 
-
   Serial.println("Parsing json file!");
-
-
+*/
+StaticJsonBuffer<1024> jsonBuffer;
 
   char* charBuffer;                              // Declare a pointer to your buffer.
   jsonFile = SD.open("json.txt", FILE_READ);
@@ -46,12 +46,13 @@ void fileOps::jsonTest(){
   JsonObject& jsonReader = jsonBuffer.parseObject(charBuffer);
   free(charBuffer);                              // Free the memory that was used by the buffer.
 
-  if (!root.success()) {
+  if (!jsonReader.success()) {
     Serial.println("parseObject() failed");
     return;
   }
-  Serial.println("Printing Parsed Data:");
+  /*
 
+  Serial.println("Printing Parsed Data:");
   const char* sensor = jsonReader["sensor"];
   long time = jsonReader["time"];
   double latitude = jsonReader["data"][0];
@@ -62,8 +63,7 @@ void fileOps::jsonTest(){
   Serial.println(time);
   Serial.println(latitude, 6);
   Serial.println(longitude, 6);
-  jsonFile.close();
-
+*/
 }
 
 void fileOps::initialize(){
@@ -119,39 +119,48 @@ void fileOps::deleteSaveFile(){
   loadPattern(0, 0b1111);
 
 }
-/*
-void fileOps::serializeJSON(Sequencer& sequence, char* json, size_t maxSize){
 
+void fileOps::saveSequenceJSON(Sequencer& sequence){
+//elaspedMicros jsonSaveTimer = 0;
+  StaticJsonBuffer<16384> jsonBuffer;
+
+  SD.remove("json.txt");
   // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
-  StaticJsonBuffer<512> jsonBuffer;
+  //StaticJsonBuffer<512> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
-  JsonArray& data = root.createNestedArray("data");
+  //JsonArray& data = root.createNestedArray("data");
 
-  root["stepCount"] = sequence.stepCount;
-  root["beatCount"] = sequence.beatCount;
-  root["quantizeKey"] = sequence.quantizeKey;
-  root["instrument"] = sequence.instrument;
-  root["instType"] = sequence.instType;
-  root["volume"] = sequence.volume;
-  root["bank"] = sequence.bank;
-  root["channel"] = sequence.channel;
-  root["patternIndex"] = sequence.patternIndex;
-    JsonObject& stepDataParent = root.createNestedObject("stepData");
+  root["stepCount"]     = sequence.stepCount;
+  root["beatCount"]     = sequence.beatCount;
+  root["quantizeKey"]   = sequence.quantizeKey;
+  root["instrument"]    = sequence.instrument;
+  root["instType"]      = sequence.instType;
+  root["volume"]        = sequence.volume;
+  root["bank"]          = sequence.bank;
+  root["channel"]       = sequence.channel;
+  root["patternIndex"]  = sequence.patternIndex;
+
+  JsonArray& stepDataArray = root.createNestedArray("stepData");
 
   for (int i=0; i< 128; i++){
-    JsonObject& stepDataObj[i] = root.createNestedObject(i);
-    stepDataObj[i]["stepNum"] = sequence.stepData[i].stepNum ;
-    stepDataObj[i]["pitch"] = sequence.stepData[i].pitch ;
-    stepDataObj[i]["gateLength"] = sequence.stepData[i].gateLength ;
-    stepDataObj[i]["gateType"] = sequence.stepData[i].gateType ;
-    stepDataObj[i]["velocity"] = sequence.stepData[i].velocity ;
-    stepDataObj[i]["glide"] = sequence.stepData[i].glide ;
+    JsonObject& stepDataObj = jsonBuffer.createObject();
+    stepDataObj["stepnum"] = i ;
+    stepDataObj["pitch"] = sequence.stepData[i].pitch ;
+    stepDataObj["gateLength"] = sequence.stepData[i].gateLength ;
+    stepDataObj["gateType"] = sequence.stepData[i].gateType ;
+    stepDataObj["velocity"] = sequence.stepData[i].velocity ;
+    stepDataObj["glide"] = sequence.stepData[i].glide ;
+    stepDataArray.add(stepDataObj);
   }
 
-  root.prettyPrintTo(json, maxSize);
-}
+  jsonFile = SD.open("json.txt", FILE_WRITE);
+  root.prettyPrintTo(jsonFile);
+  jsonFile.close();
+//  Serial.println(String(jsonSaveTimer))
 
+}
+/*
 void fileOps::saveChannelPattern_JSON(uint8_t channel) {
     Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card as JSON FILE. time:\t" + String(micros()) );
 

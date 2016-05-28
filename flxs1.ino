@@ -117,6 +117,7 @@ void setup() {
 
 	currentState = STEP_DISPLAY;
 
+  saveFile.saveSequenceJSON(sequence[0]);
   saveFile.jsonTest();
 }
 
