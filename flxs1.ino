@@ -57,8 +57,6 @@ void setup() {
 
 	Serial.println("Initializing SPI");
 	//AudioMemory(25);
-
-
 	SPI.begin();
 	SPI.setMOSI(11);
 	SPI.setSCK(13);
@@ -66,7 +64,6 @@ void setup() {
 	Serial.println("Initializing Display");
 	display.initialize();
 
-	delay(500);
 	Serial.println("Initializing Sequence Objects");
 	sequence[0].initialize(0, 16, 4, (tempoX100/100));
 	sequence[1].initialize(1, 16, 4, (tempoX100/100));
@@ -109,7 +106,7 @@ void setup() {
 	mcp.pinMode(7, OUTPUT);
 //
 	Serial.println("Initializing Flash Memory");
-	saveFile.initializeFlashMemory();
+	saveFile.initialize();
 
 	Serial.println("Initializing Neopixels");
 	leds.initialize();
@@ -120,6 +117,7 @@ void setup() {
 
 	currentState = STEP_DISPLAY;
 
+  saveFile.jsonTest();
 }
 
 void loop() {

@@ -37,29 +37,31 @@ class displayModule
 
     char *displayCache[MAX_DISPLAY_ELEMENTS];
     char *displayElement[MAX_DISPLAY_ELEMENTS];
-    uint8_t highlight;
+    char *buf = new char[51]; // sprintf buffer
 
+    uint8_t highlight;
+    uint8_t previouslySelectedChannel;
     OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
     elapsedMicros displayTimer;
 
     displayModule();
     void initialize();
-    void stepDisplay();
     void displayLoop();
+
+    void clearDisplay();
+    void freeDisplayCache();
+
+    void stepDisplay(char *buf);
+    void patternSelectDisplay();
+    void channelMenuDisplay(char *buf) ;
+
     void globalMenuDisplay();
     void gameOfLifeDisplay();
     void deleteMenuDisplay();
-    void stepDisplayTest();
-    void setupDisplayState();
-    void cleanupTextBuffers(char *buf, int count);
-    void channelMenuDisplay() ;
-    void patternSelectDisplay();
+    void cleanupTextBuffers();
     void sequenceMenuDisplay();
     void instrumentSelectDisplay();
     void timingMenuDisplay();
-    void debugScreenDisplay();
-    void clearDisplay();
-    void freeDisplayCache();
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 
