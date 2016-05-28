@@ -16,7 +16,7 @@ void masterClock::changeTempo(uint32_t newTempoX100){
 }
 
 void masterClock::masterClockFunc(){
-/*  elapsedMicros loopTimer = 0;
+ elapsedMicros loopTimer = 0;
 
 
 if (inputTimer > 10000){
@@ -50,7 +50,7 @@ if (inputTimer > 10000){
 //if (pixelTimer > 2000){
 //  pixelTimer = 0;
 //}
-  midiClockSyncFunc();*/
+  midiClockSyncFunc();
 }
 
 
@@ -80,8 +80,6 @@ void masterClock::internalClockTick(){
     for (int i=0; i< sequenceCount; i++){
       sequence[i].runSequence(&noteData[i], &life);
       sequence[i].beatPulse(beatLength, &life);
-
-
     }
     tempoBlip = !tempoBlip;
     internalClockTimer = 0;

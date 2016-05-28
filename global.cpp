@@ -13,6 +13,7 @@ uint8_t previousState = 0;      // Display module + LED moduleextern
 
 uint8_t selectedChannel = 0;
 uint8_t selectedStep;
+uint8_t patternChannelSelector = 0b1111;
 
 boolean extClock = false;
 boolean debugBoolean = 0;
@@ -38,15 +39,6 @@ elapsedMicros testTimer;
 elapsedMicros pulseTimer;
 boolean firstRun = false;
 unsigned long lastBeatLength;
-
-
-
-
-
-
-
-
-
 
 
 void debug(const char* text){

@@ -7,8 +7,9 @@
 #define _global_h_
 
 //STATE DEFINITIONS:
-#define STEP_DISPLAY		 	  0
-#define	SEQUENCE_MENU		 	  1
+#define STEP_DISPLAY		 	 7
+
+#define	SEQUENCE_MENU		 	  2
 #define TIMING_MENU 	  	 66
 #define INSTRUMENT_MENU 	 68
 #define GENERATIVE_MENU 	 71
@@ -29,7 +30,7 @@
 #define GLOBAL_FILE     	 94
 #define TEMPO_MENU      	 95
 #define PATTERN_SELECT  	 96
-#define	CHANNEL_MENU		 97
+#define	CHANNEL_MENU		   97
 #define	DELETE_MENU				 98
 #define	DEBUG_SCREEN			127
 #define DEBUG_PIN					 15
@@ -50,6 +51,7 @@ extern uint8_t previousState;      // Display module + LED moduleextern
 
 extern uint8_t selectedChannel;
 extern uint8_t selectedStep;
+extern uint8_t patternChannelSelector;
 
 extern boolean extClock;
 extern boolean debugBoolean;

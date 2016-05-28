@@ -11,7 +11,7 @@ inputModule::inputModule(){
 void inputModule::buttonSetup() {
   Serial.println("button setup start");  delay(1);
 
-  max7301.begin(0);                      delay(1);
+  max7301.begin(5);                      delay(1);
   max7301.gpioPinMode(INPUT_PULLUP);     delay(1);
   max7301.init(0, 14);   // SW_00
   max7301.init(1, 7);    // SW_01
@@ -423,18 +423,18 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
   void inputModule::resetKnobValues(){
   	knobRead = 0;
   	knob.write(0);
-  	Serial.println("resetting knob: " + String(knob.read()));
+  	//Serial.println("resetting knob: " + String(knob.read()));
   };
 
 
   // this subroutine initializes the new state.
-  void inputModule::changeState(uint8_t state){
-    Serial.print("Changin State from " + String(currentState) + " to " + String(state));
+  void inputModule::changeState(uint8_t targetState){
+    Serial.println("State change - current: " + String(currentState) + "\ttarget: " + String(targetState));
     display.freeDisplayCache();
-
-    currentState = state;
-    interface.resetKnobValues();
-    //gdispClear(Black);
     display.clearDisplay();
+    interface.resetKnobValues();
+
+    currentState = targetState;
+
     Serial.println("   - state change complete");
   }
