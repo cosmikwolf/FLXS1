@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
+#include <ArduinoJson.h>
 #include "global.h"
 #include "Sequencer.h"
 
@@ -13,14 +14,17 @@ public:
   fileOps();
 
   void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant);
-  void initializeFlashMemory();
+  void initialize();
   void deleteSaveFile();
   void saveChannelPattern(uint8_t channel) ;
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
   void printPattern();
 
+  void jsonTest();
   File saveData;
+  File jsonFile;
+  StaticJsonBuffer<200> jsonBuffer;
 
 };
 

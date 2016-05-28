@@ -52,7 +52,7 @@ void inputModule::buttonLoop(){
   knobChange = knobRead - knobPrevious;
   //we always want the alt (non matrix) buttons to behave the same way
   altButtonHandler();
-
+  
   // now to handle the rest of the buttons.
   switch (currentState) {
     case STEP_DISPLAY:
@@ -91,6 +91,8 @@ void inputModule::patternSelectHandler(){
   for (int i=0; i < 16; i++){
     if (max7301.fell(i)){
       saveFile.changePattern(i, patternChannelSelector,  true, true);
+
+      delay(10);
       changeState(STEP_DISPLAY);
     }
   }
@@ -229,9 +231,7 @@ void inputModule::altButtonHandler(){
       if (max7301.fell(i)){
         if(selectedStep == getNote(i) && stepMode == 0){
           stepMode = 1; // change the step length
-
           knobBuffer = sequence[selectedChannel].stepData[getNote(i)].gateLength - knobRead;
-
          // stepModeBuffer = sequence[selectedChannel].stepData[i].gateLength;
     //    } else if (selectedStep == i && stepMode != 0){
     //      stepMode = positive_modulo(stepMode + 1, 3); // change the step length
@@ -430,8 +430,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
   // this subroutine initializes the new state.
   void inputModule::changeState(uint8_t targetState){
     Serial.println("State change - current: " + String(currentState) + "\ttarget: " + String(targetState));
-    display.freeDisplayCache();
-    display.clearDisplay();
+
     interface.resetKnobValues();
 
     currentState = targetState;

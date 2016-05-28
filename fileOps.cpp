@@ -8,30 +8,69 @@ This file contains code that enables saving and loading of patterns. Changing th
 fileOps saveFile;
 fileOps::fileOps(){};
 
-void fileOps::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
-	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
-	if(saveFirst){
-    for(int i=0; i < sequenceCount; i++){
-  		saveChannelPattern(i);
-    }
-    Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
-	}
+void fileOps::jsonTest(){
+    if (SD.exists("json.txt")) {
+    Serial.println("json.txt exists. deleting...");
+    SD.remove("json.txt");
+  };
+  JsonObject& root = jsonBuffer.createObject();
+  root["sensor"] = "gps";
+  root["time"] = 1351824120;
+  JsonArray& data = root.createNestedArray("data");
+  data.add(double_with_n_digits(48.756080, 6));
+  data.add(double_with_n_digits(2.302038, 6));
 
-  if (instant || !playing) {
-    Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
-    loadPattern(pattern, channelSelector);
-  } else {
-    queuePattern = pattern;
-    Serial.println("Queueing pattern: " + String(pattern));
+  jsonFile = SD.open("json.txt", FILE_WRITE);
+  root.printTo(jsonFile);
+  jsonFile.seek(0);
+  jsonFile.close();
+
+
+  Serial.println("Parsing json file!");
+
+
+
+  char* charBuffer;                              // Declare a pointer to your buffer.
+  jsonFile = SD.open("json.txt", FILE_READ);
+  if (jsonFile)
+  {
+      unsigned int fileSize = jsonFile.size();  // Get the file size.
+      charBuffer = (char*)malloc(fileSize + 1);  // Allocate memory for the file and a terminating null char.
+      jsonFile.read(charBuffer, fileSize);         // Read the file into the buffer.
+      charBuffer[fileSize] = '\0';               // Add the terminating null char.
+      Serial.println(charBuffer);                // Print the file to the serial monitor.
+      jsonFile.close();                         // Close the file.
   }
+  // *** Use the buffer as needed here. ***
+  Serial.println("Sizeof charBuffer: " + String(sizeof(charBuffer)));
+  JsonObject& jsonReader = jsonBuffer.parseObject(charBuffer);
+  free(charBuffer);                              // Free the memory that was used by the buffer.
+
+  if (!root.success()) {
+    Serial.println("parseObject() failed");
+    return;
+  }
+  Serial.println("Printing Parsed Data:");
+
+  const char* sensor = jsonReader["sensor"];
+  long time = jsonReader["time"];
+  double latitude = jsonReader["data"][0];
+  double longitude = jsonReader["data"][1];
+
+  // Print values.
+  Serial.println(sensor);
+  Serial.println(time);
+  Serial.println(latitude, 6);
+  Serial.println(longitude, 6);
+  jsonFile.close();
 
 }
 
-void fileOps::initializeFlashMemory(){
+void fileOps::initialize(){
 
   if (!SD.begin(SD_CS_PIN)){
     Serial.println("SD Card initialization failed!");
-    //return;
+    return;
   }
   // THIS IS THE LINE THAT DELETES THE DATAFILE EVERY TIME!
    //deleteSaveFile();
@@ -46,6 +85,26 @@ void fileOps::initializeFlashMemory(){
   Serial.println("SD Card and save file initialization complete.");
 
   loadPattern(0, 0b1111);
+
+
+}
+
+void fileOps::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
+	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
+	if(saveFirst){
+    for(int i=0; i < sequenceCount; i++){
+  		//saveChannelPattern(i);
+    }
+    Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
+	}
+
+  if (instant || !playing) {
+    Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
+    loadPattern(pattern, channelSelector);
+  } else {
+    queuePattern = pattern;
+    Serial.println("Queueing pattern: " + String(pattern));
+  }
 }
 
 void fileOps::deleteSaveFile(){
@@ -179,8 +238,7 @@ void fileOps::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
   Serial.println("========= LOADING PATTERN: " + String(pattern));
   printPattern();
-
-  saveData = SD.open("data.txt");
+  saveData = SD.open("data.txt", FILE_READ);
 
 	for(int i=0; i < sequenceCount; i++){
 
@@ -250,8 +308,11 @@ void fileOps::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
 
   }
+
   Serial.println("closing file handle");
+
   saveData.close();
+
   Serial.println("file handle closed");
   Serial.println("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
   currentPattern = pattern;

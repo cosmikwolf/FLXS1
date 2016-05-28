@@ -62,7 +62,6 @@ public:
   void changeState(uint8_t state);
 
   Encoder knob = Encoder(ENCODER1LEFTPIN, ENCODER1RIGHTPIN);
-
   Zetaohm_MAX7301 max7301;
 
   // Encoder vars
@@ -70,10 +69,9 @@ public:
   int8_t knobBuffer = 0;
   int8_t knobPrevious = 0;
   int8_t knobChange = 0;
-
-  int16_t stepModeBuffer;
   int8_t menuSelector = 0;
   int8_t instBuffer;
+  int16_t stepModeBuffer;
 
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;
