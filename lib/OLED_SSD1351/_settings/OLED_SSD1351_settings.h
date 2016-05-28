@@ -6,12 +6,12 @@
 // #define SSD1351_COLORORDER_BGR
 
 
-#define SSD1351_128_128
-	//#define SSD1351_128_96
-	
+//#define SSD1351_128_128
+#define SSD1351_128_96
+
 #define _SSD1351_BACKGROUND BLACK
 #define _SSD1351_FOREGROUND WHITE
-	
+
 
 #if defined SSD1351_COLORORDER_RGB && defined SSD1351_COLORORDER_BGR
   #error "RGB and BGR can not both be defined for SSD1351_COLORODER."

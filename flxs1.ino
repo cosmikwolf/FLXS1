@@ -32,8 +32,6 @@ unsigned long timerAvg;
 
 elapsedMicros printTimer;
 elapsedMicros saveTimer;
-elapsedMicros pixelTimer;
-elapsedMicros displayTimer;
 elapsedMicros displayDebugTimer;
 elapsedMicros inputDebugTimer;
 /*  MIGHT NOT NEED ANY OF THESE VARIABLES! */
@@ -120,18 +118,15 @@ void setup() {
 	SPI.usingInterrupt(masterClockTimer);
 	//notefreq.begin(.1);
 
-	//currentState = DEBUG_SCREEN;
+	currentState = STEP_DISPLAY;
 
 }
 
 void loop() {
-//	leds.loop();
+	leds.loop();
 	interface.buttonLoop();
 
-	if( displayTimer > 10000){
-//	  		display.displayLoop();
-	   		displayTimer = 0;
-	}
+	display.displayLoop();
 
 	for (int i=0; i<8; i++){
 //	    ad5676.setVoltage(i,  voltManual );

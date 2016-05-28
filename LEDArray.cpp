@@ -1,50 +1,125 @@
 #include <Arduino.h>
 #include "LEDArray.h"
-
-
 /*
 uint8_t getNoteLED(uint8_t index){
   return index + notePage * 16;
 }
 */
 LEDArray leds;
+elapsedMicros pixelTimer;
 
 LEDArray::LEDArray(){};
 
 void LEDArray::initialize(){
   pinMode(0, OUTPUT);
   LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
+  //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
 	LEDS.setBrightness(84);
-};
 
-void LEDArray::loop(){
   static uint8_t hue = 0;
 
   for(int i = 0; i < NUM_LEDS; i++) {
-		// Set the i'th led to red
-		leds[i] = CHSV(hue++, 255, 255);
-		// Show the leds
-		FastLED.show();
-		// now that we've shown the leds, reset the i'th led to black
-		// leds[i] = CRGB::Black;
-		fadeall();
-		// Wait a little bit before we loop around and do it again
-	}
-	Serial.print("x");
+    // Set the i'th led to red
+    leds[i] = CHSV(hue++, 255, 255);
+    // Show the leds
+    FastLED.show();
+    // now that we've shown the leds, reset the i'th led to black
+    // leds[i] = CRGB::Black;
+    fadeall();
+    // Wait a little bit before we loop around and do it again
+    delay(10);
+  }
+  Serial.print("x");
 
-	// Now go in the other direction.
-	for(int i = (NUM_LEDS)-1; i >= 0; i--) {
-		// Set the i'th led to red
-		leds[i] = CHSV(hue++, 255, 255);
-		// Show the leds
-		FastLED.show();
-		// now that we've shown the leds, reset the i'th led to black
-		// leds[i] = CRGB::Black;
-		fadeall();
-		// Wait a little bit before we loop around and do it again
-	}
+  // Now go in the other direction.
+  for(int i = (NUM_LEDS)-1; i >= 0; i--) {
+    // Set the i'th led to red
+    leds[i] = CHSV(hue++, 255, 255);
+    // Show the leds
+    FastLED.show();
+    // now that we've shown the leds, reset the i'th led to black
+    // leds[i] = CRGB::Black;
+    fadeall();
+    // Wait a little bit before we loop around and do it again
+    delay(10);
+  };
 
 };
+
+void LEDArray::loop(){
+
+  if (pixelTimer > 30000){
+    pixelTimer = 0;
+
+
+    switch (currentState ){
+      case STEP_DISPLAY:
+        for (int i=0; i < 16; i++){
+          if (getNote(i) == sequence[selectedChannel].activeStep ){
+            leds[ledMapping[i]] = CRGB(255, 255, 255);
+          } else if (getNote(i) == selectedStep) {
+            leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
+          } else {
+            if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
+              leds[ledMapping[i]] = CHSV(0,0,0);
+            } else {
+              leds[ledMapping[i]] = CHSV(sequence[selectedChannel].getStepPitch(getNote(i)),255,255);
+            }
+          }
+        }
+        for (int i=0; i < 4; i++){
+          if (selectedChannel == i) {
+            leds[ledMapping[i+16]] = CHSV((sequence[selectedChannel].patternIndex * 16) % 255,255,255);
+          } else {
+            leds[ledMapping[i+16]] = CHSV(0,0,0);
+          }
+        }
+      break;
+
+      case CHANNEL_MENU:
+        for (int i=0; i < 20; i++){
+          if (i%4==0 || i == 3){
+            leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
+          } else{
+            leds[ledMapping[i]] = CHSV(0,0,0);
+          }
+        }
+      break;
+
+      case SEQUENCE_MENU:
+        for (int i=0; i < 16; i++){
+          if (i<2){
+            leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
+          } else if (i == 17) {
+            leds[ledMapping[i]] = CHSV(int(millis()/5)%255, 255, 255);
+          }else{
+            leds[ledMapping[i]] = CHSV(0,0,0);
+          }
+        }
+      break;
+
+      case PATTERN_SELECT:
+        for (int i=0; i < 16; i++){
+          leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
+        }
+
+        for (int i=0; i < 4; i++){
+          if( patternChannelSelector & (1<<i) ){
+            leds[ledMapping[i+16]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
+          } else {
+            leds[ledMapping[i+16]] = CHSV(0,0,0);
+          }
+        }
+      break;
+    }
+    noInterrupts();
+      FastLED.show();
+    interrupts();
+
+  }
+}
+
+
 void LEDArray::fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
 
 /*

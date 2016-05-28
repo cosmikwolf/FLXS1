@@ -70,7 +70,6 @@ public:
   int8_t knobBuffer = 0;
   int8_t knobPrevious = 0;
   int8_t knobChange = 0;
-  uint8_t patternChannelSelector = 0b1111;
 
   int16_t stepModeBuffer;
   int8_t menuSelector = 0;

@@ -40,6 +40,7 @@ class displayModule
     uint8_t highlight;
 
     OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
+    elapsedMicros displayTimer;
 
     displayModule();
     void initialize();
@@ -50,7 +51,7 @@ class displayModule
     void deleteMenuDisplay();
     void stepDisplayTest();
     void setupDisplayState();
-    void cleanupTextBuffers(char *buf);
+    void cleanupTextBuffers(char *buf, int count);
     void channelMenuDisplay() ;
     void patternSelectDisplay();
     void sequenceMenuDisplay();
