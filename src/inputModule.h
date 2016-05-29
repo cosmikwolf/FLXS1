@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <Zetaohm_MAX7301.h>
+#include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 #include <Encoder.h>
 #include "DisplayModule.h"
 #include "Sequencer.h"

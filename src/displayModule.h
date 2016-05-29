@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <OLED_SSD1351.h>
+#include "OLED_SSD1351/OLED_SSD1351.h"
 #include "Sequencer.h"
 #include "global.h"
 
