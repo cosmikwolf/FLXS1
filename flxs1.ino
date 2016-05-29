@@ -3,8 +3,6 @@
 ********************************** */
 #include <Arduino.h>
 #include <Wire.h>
-//#include <Audio.h>
-//#include <analyze_notefreq.h>
 #include "inputModule.h"
 #include "displayModule.h"
 #include "masterClock.h"
@@ -14,52 +12,20 @@
 #include "Sequencer.h"
 #include "global.h"
 
-/* MIGHT NOT NEED ANY OF THESE VARIABLES? */
-uint8_t numSteps = 16;
-uint8_t settingMode = 0;
-
-unsigned long lastMicros;
-unsigned long avgDelta;
-unsigned long lastPulseLength;
-unsigned long avgPulseLength;
-unsigned long avgPulseJitter;
-unsigned long pulseLength;
-unsigned long avgInterval;
-unsigned long lastAvgInterval;
-unsigned long intervalJitter;
-unsigned long avgIntervalJitter;
-unsigned long timerAvg;
-
-elapsedMicros printTimer;
-elapsedMicros saveTimer;
-elapsedMicros displayDebugTimer;
-elapsedMicros inputDebugTimer;
-/*  MIGHT NOT NEED ANY OF THESE VARIABLES! */
-
-
-//end afx-01a
-//AudioInputAnalog			adc1(A9);           //xy=579.2000274658203,275.2000274658203
-//AudioAnalyzeNoteFrequency	notefreq;      //xy=716.2000274658203,275.2000274658203
-//AudioConnection				patchCord1(adc1, notefreq);
-
-//coord_t height, width;
-//font_t fontTny;
-//font_t fontSm;
-//font_t fontMd;
-//font_t fontLg;
-IntervalTimer masterClockTimer;
-uint32_t masterClockInterval = 500;
-uint8_t masterPulseCount =24;
-
+#define kClockInterval 500
+#define kSerialSpeed 115200
+#define kMosiPin 11
+#define kSpiClockPin 13
 
 void setup() {
-	Serial.begin(115200);
+  IntervalTimer masterClockTimer;
+
+	Serial.begin(kSerialSpeed);
 
 	Serial.println("Initializing SPI");
-	//AudioMemory(25);
 	SPI.begin();
-	SPI.setMOSI(11);
-	SPI.setSCK(13);
+	SPI.setMOSI(kMosiPin);
+	SPI.setSCK(kSpiClockPin);
 
 	Serial.println("Initializing Display");
 	display.initialize();
@@ -78,8 +44,6 @@ void setup() {
 	sam2695.programChange(0, 2, 128);       // give our two channels different voices
 	sam2695.programChange(0, 3, 29);
 
-
-
 	Serial.println("Initializing Button Array");
 	interface.buttonSetup();
 
@@ -87,12 +51,12 @@ void setup() {
 	midiSetup();
 
 	Serial.println("Initializing DAC");
-
 	ad5676.begin(3);
 	ad5676.softwareReset();
 	delay(1);
 	ad5676.internalReferenceEnable(true);
 	ad5676.internalReferenceEnable(true);
+
 	Serial.println("Setting up debug pin");
 	pinMode(DEBUG_PIN, OUTPUT);
 	pinMode(4, OUTPUT);
@@ -104,34 +68,22 @@ void setup() {
 	mcp.pinMode(5, OUTPUT);
 	mcp.pinMode(6, OUTPUT);
 	mcp.pinMode(7, OUTPUT);
-//
-	Serial.println("Initializing Flash Memory");
+
+ 	Serial.println("Initializing Flash Memory");
 	saveFile.initialize();
 
 	Serial.println("Initializing Neopixels");
 	leds.initialize();
+
 	Serial.println("Beginning Master Clock");
-	masterClockTimer.begin(masterLoop,masterClockInterval);
+	masterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(masterClockTimer);
-	//notefreq.begin(.1);
-
-	currentState = STEP_DISPLAY;
-
-  saveFile.saveSequenceJSON(sequence[0]);
-  saveFile.jsonTest();
 }
 
 void loop() {
 	leds.loop();
 	interface.buttonLoop();
-
 	display.displayLoop();
-
-	for (int i=0; i<8; i++){
-//	    ad5676.setVoltage(i,  voltManual );
-	  //  ad5676.setVoltage(i,  positive_modulo(10*millis(), 65535) );
-	}
-
 }
 
 void masterLoop(){
