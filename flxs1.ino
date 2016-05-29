@@ -6,7 +6,7 @@
 #include <SPI.h>
 
 #include "inputModule.h"
-#include "displayModule.h"
+#include "DisplayModule.h"
 #include "masterClock.h"
 #include "midiModule.h"
 #include "fileOps.h"
@@ -18,7 +18,6 @@
 #define kSerialSpeed 115200
 #define kMosiPin 11
 #define kSpiClockPin 13
-
 
 /*
   Globals to refactor (in this file)
@@ -32,6 +31,7 @@
   - saveFile
   - leds
 */
+masterClock clockMaster;
 
 void setup() {
   IntervalTimer masterClockTimer;

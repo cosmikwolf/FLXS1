@@ -1,17 +1,16 @@
 #include <Arduino.h>
-#include "displayModule.h"
+#include "DisplayModule.h"
 
 /*#include "../commonFonts/fonts/font_ArialBold.cpp"
 #include "../commonFonts/fonts/font_Arial.cpp"
 */
 //    coord_t   i, j;
-displayModule display;
+DisplayModule display;
 
-displayModule::displayModule(){
-
+DisplayModule::DisplayModule(){
 };
 
-void displayModule::initialize(){
+void DisplayModule::initialize(){
   displayTimer = 0;
   oled.begin();
   oled.fillScreen(BLACK);     delay(10);
@@ -55,13 +54,13 @@ void displayModule::initialize(){
   oled.fillScreen(BLUE);
 }
 
-void displayModule::clearDisplay(){
+void DisplayModule::clearDisplay(){
   oled.clearScreen();
 //  oled.fillScreen(BLUE);
 
 }
 
-void displayModule::freeDisplayCache(){
+void DisplayModule::freeDisplayCache(){
   for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
     //clear displaycache so all data redraws.
       free(displayCache[i]);
@@ -71,7 +70,7 @@ void displayModule::freeDisplayCache(){
   }
 }
 
-void displayModule::cleanupTextBuffers(){
+void DisplayModule::cleanupTextBuffers(){
   for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
     if (displayElement[i] == NULL) {
       displayElement[i] = strdup("--------");
@@ -85,7 +84,7 @@ void displayModule::cleanupTextBuffers(){
   //delete buf;
 };
 
-void displayModule::displayLoop() {
+void DisplayModule::displayLoop() {
   if( displayTimer > 10000){
 	  displayTimer = 0;
 
@@ -140,7 +139,7 @@ void displayModule::displayLoop() {
 
 // STATE VARIABLE DISPLAY HANDLERS
 
-void displayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
+void DisplayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
   // renders a string box only once.
   uint16_t color1;
   uint16_t color2;
@@ -164,7 +163,7 @@ void displayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8
   }
 }
 
-void displayModule::stepDisplay(char *buf){
+void DisplayModule::stepDisplay(char *buf){
 
   //  char *buf = new char[51]; // sprintf buffer
   uint8_t previousHighlight = highlight;
@@ -283,7 +282,7 @@ void displayModule::stepDisplay(char *buf){
   //  cleanupTextBuffers(buf, 13);
 };
 
-void displayModule::channelMenuDisplay(char *buf) {
+void DisplayModule::channelMenuDisplay(char *buf) {
 
   uint8_t previousHighlight = highlight;
   //uint16_t foreground, background;
@@ -308,7 +307,7 @@ void displayModule::channelMenuDisplay(char *buf) {
 
 }
 
-void displayModule::patternSelectDisplay(){
+void DisplayModule::patternSelectDisplay(){
 
   uint8_t previousHighlight = highlight;
   highlight = currentPattern;
@@ -351,7 +350,7 @@ void displayModule::patternSelectDisplay(){
 
 }
 
-void displayModule::globalMenuDisplay(){
+void DisplayModule::globalMenuDisplay(){
   /*
   //nonBlockingRainbow(5);
   gdispFillStringBox(0, 0, width, 10, "ZETAOHM", fontSm , Red, Green, justifyCenter);
@@ -360,7 +359,7 @@ void displayModule::globalMenuDisplay(){
   */
 }
 
-void displayModule::gameOfLifeDisplay(){
+void DisplayModule::gameOfLifeDisplay(){
 
   //  for(int row=0; row < LIFELINES; row++){
   //    for(int col=0; col < LIFEWIDTH; col++){
@@ -412,7 +411,7 @@ void displayModule::gameOfLifeDisplay(){
   //  }
 }
 
-void displayModule::deleteMenuDisplay(){
+void DisplayModule::deleteMenuDisplay(){
   /*
   uint8_t previousHighlight = highlight;
   highlight = selectedChannel;
@@ -439,7 +438,7 @@ void displayModule::deleteMenuDisplay(){
   */
 };
 
-void displayModule::sequenceMenuDisplay(){
+void DisplayModule::sequenceMenuDisplay(){
   /*
   const char* element;
 
@@ -450,7 +449,7 @@ void displayModule::sequenceMenuDisplay(){
   */
 }
 
-void displayModule::instrumentSelectDisplay(){
+void DisplayModule::instrumentSelectDisplay(){
   /*
   const char* element;
 
@@ -466,7 +465,7 @@ void displayModule::instrumentSelectDisplay(){
   */
 }
 
-void displayModule::timingMenuDisplay(){
+void DisplayModule::timingMenuDisplay(){
   /*
   const char* element;
 

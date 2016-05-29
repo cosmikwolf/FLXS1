@@ -28,7 +28,7 @@
 #define LCD_CS        6//out (SSD1351/sharp) OK
 #define LCD_RST       9//out (SSD1351)/sharp disp todo) OK
 
-class displayModule
+class DisplayModule
 {
   public:
 
@@ -44,7 +44,7 @@ class displayModule
     OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
     elapsedMicros displayTimer;
 
-    displayModule();
+    DisplayModule();
     void initialize();
     void displayLoop();
 
@@ -83,6 +83,6 @@ class displayModule
 
 };
 
-extern displayModule display;
+extern DisplayModule display;
 
 #endif
