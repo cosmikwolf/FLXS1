@@ -2,9 +2,8 @@
 *** ZETAOHM FLXS1 MUSIC SEQUENCER ***
 ********************************** */
 #include <Arduino.h>
-#include <Wire.h>
 #include <SPI.h>
-
+#include <i2c_t3.h>
 #include "inputModule.h"
 #include "DisplayModule.h"
 #include "masterClock.h"
