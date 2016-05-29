@@ -3,40 +3,30 @@
 
 #include <Arduino.h>
 #include <Encoder.h>
-#include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
-#include <ADC.h>
+#include <Adafruit_MCP23017.h>
 
 #include "DisplayModule.h"
 #include "LEDArray.h"
-#include "InputModule.h"
-#include "FlashMemory.h"
-#include "MasterClock.h"
-#include "OutputController.h"
-#include "Sequencer.h"
+#include "Zetaohm_AD5676/Zetaohm_AD5676.h"
+#include "Zetaohm_SAM2695/Zetaohm_SAM2695.h"
+#include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
+
 #include "global.h"
 
 class TimeController {
   public:
-    TimeController();
-    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc);
+    void initialize();
     void runLoopHandler();
     void masterClockHandler();
 
   private:
-    MasterClock clockMaster;
-    OutputController outputControl;
-    InputModule buttonIo;
-    DisplayModule display;
-    LEDArray ledArray;
-    FlashMemory saveFile;
-    Zetaohm_MAX7301 midplaneGPIO;
-    Zetaohm_MAX7301 backplaneGPIO;
-    MidiModule *midiControl;
-    midi::MidiInterface<HardwareSerial>* serialMidi;
-    Sequencer *sequencerArray;
-    ADC *adc;
-
+    Zetaohm_AD5676 *dac;
+    Zetaohm_SAM2695 *midiSam;
+    Adafruit_MCP23017 *gateIo;
+    Zetaohm_MAX7301 *buttonIo;
+    Encoder *rotaryKnob;
+    DisplayModule *display;
+    LEDArray *ledArray;
 };
-//extern Sequencer sequence[4];
 
 #endif

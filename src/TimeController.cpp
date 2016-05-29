@@ -1,70 +1,75 @@
-#include <Arduino.h>
 #include "TimeController.h"
-#include "midiModule.h"
 
-#define DISPLAY_FREQUENCY 10000
-#define INPUT_FREQUENCY 10000
-#define LED_FREQUENCY 30000
+#define kClockInterval 500
+#define kSerialSpeed 115200
+#define kMosiPin 11
+#define kSpiClockPin 13
 
+void TimeController::initialize() {
+  	Serial.begin(kSerialSpeed);
 
-TimeController::TimeController(){ };
+  	Serial.println("Initializing SPI");
+  	SPI.begin();
+  	SPI.setMOSI(kMosiPin);
+  	SPI.setSCK(kSpiClockPin);
 
-void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc) {
+  	Serial.println("Initializing Display");
+  	display.initialize();
 
-	Serial.println("Initializing TimeController");
+  	Serial.println("Initializing Sequence Objects");
+  	sequence[0].initialize(0, 16, 4, (tempoX100/100));
+  	sequence[1].initialize(1, 16, 4, (tempoX100/100));
+  	sequence[2].initialize(2, 16, 4, (tempoX100/100));
+  	sequence[3].initialize(3, 16, 4, (tempoX100/100));
 
-	this->serialMidi = serialMidi;
-  this->sequencerArray = sequencerArray;
-	this->adc = adc;
-	sequencerArray[0].initialize(0, 16, 4, (tempoX100/100));
-  sequencerArray[1].initialize(1, 16, 4, (tempoX100/100));
-  sequencerArray[2].initialize(2, 16, 4, (tempoX100/100));
-  sequencerArray[3].initialize(3, 16, 4, (tempoX100/100));
+  	Serial.println("Freeram: " + String(FreeRam2()));
+  	Serial.println("Initializing SAM2695");
+  	sam2695.begin();
+  	sam2695.programChange(0, 0, 38);       // give our two channels different voices
+  	sam2695.programChange(0, 1, 30);
+  	sam2695.programChange(0, 2, 128);       // give our two channels different voices
+  	sam2695.programChange(0, 3, 29);
 
-	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
-	buttonIo.changeState(CHANNEL_PITCH_MODE);
+  	Serial.println("Initializing Button Array");
+  	interface.buttonSetup();
 
+  	Serial.println("Initializing MIDI");
+  	midiSetup();
 
-	display.initialize(sequencerArray);
+  	Serial.println("Initializing DAC");
+  	ad5676.begin(3);
+  	ad5676.softwareReset();
+  	delay(1);
+  	ad5676.internalReferenceEnable(true);
+  	ad5676.internalReferenceEnable(true);
 
-	ledArray.initialize(sequencerArray);
+  	Serial.println("Setting up debug pin");
+  	pinMode(DEBUG_PIN, OUTPUT);
+  	pinMode(4, OUTPUT);
 
+  	Serial.println("initializing gate outputs");
+  	mcp.begin(1);      // use default address 0
+  	mcp.pinMode(9, INPUT);
+  	mcp.pinMode(4, OUTPUT);
+  	mcp.pinMode(5, OUTPUT);
+  	mcp.pinMode(6, OUTPUT);
+  	mcp.pinMode(7, OUTPUT);
 
-	outputControl.initialize(&backplaneGPIO, serialMidi, adc);
+   	Serial.println("Initializing Flash Memory");
+  	saveFile.initialize();
 
-	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
+  	Serial.println("Initializing Neopixels");
+  	leds.initialize();
 
-
-	saveFile.initialize(sequencerArray, &SerialFlash);
-	saveFile.loadPattern(0, 0b1111);
-	//saveFile.deleteSaveFile();
-/*
-	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
-	delay(200);
-	saveFile.readSequenceJSON(sequence[0], 0, 0);
-	File root = SD.open("/");
-  saveFile.printDirectory(root, 2);
-	*/
+  	Serial.println("Beginning Master Clock");
 }
 
 void TimeController::runLoopHandler() {
-	ledArray.loop(LED_FREQUENCY);
-	buttonIo.loop(INPUT_FREQUENCY);
-	//display.displayLoop(DISPLAY_FREQUENCY);
-
-	outputControl.inputRead();
-	saveFile.cacheWriteLoop();
-
-	if(currentState == CALIBRATION_MENU){
-		playing = 0;
-		outputControl.dacTestLoop();
-		return;
-	}
-
-//	outputControl.dacTestLoop();
-
+	leds.loop();
+	interface.buttonLoop();
+	display.displayLoop();
 }
 
 void TimeController::masterClockHandler(){
-	clockMaster.masterClockFunc();
+
 }
