@@ -1,7 +1,10 @@
 #include <Arduino.h>
-#include <OLED_SSD1351.h>
+#include <SPI.h>
 #include "Sequencer.h"
 #include "global.h"
+#include <SSD_13XX.h>
+#include "_fonts/unborn_small.c"
+#include "_fonts/orbitron14.c"
 
 #ifndef _display_h_
 #define _display_h_
@@ -21,8 +24,9 @@
 #define ORANGE          0xFD20      /* 255, 165,   0 */
 #define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
 #define PINK            0xF81F
+#define DARKPURPLE 0x48B3
 
-#define MAX_DISPLAY_ELEMENTS 17
+#define MAX_DISPLAY_ELEMENTS 30
 
 #define LCD_DC        10//out (SSD1351/sharp refresh todo) OK
 #define LCD_CS        6//out (SSD1351/sharp) OK
@@ -31,6 +35,7 @@
 class DisplayModule
 {
   public:
+    DisplayModule();
 
     int color = 0;
     uint32_t runcount;
@@ -41,30 +46,59 @@ class DisplayModule
 
     uint8_t highlight;
     uint8_t previouslySelectedChannel;
-    OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
-    elapsedMicros displayTimer;
+    SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
-    DisplayModule();
-    void initialize();
-    void displayLoop();
+    elapsedMicros displayTimer;
+    void initialize(Sequencer *sequenceArray);
+    void displayLoop(uint16_t frequency);
 
     void clearDisplay();
     void freeDisplayCache();
 
     void stepDisplay(char *buf);
     void patternSelectDisplay();
-    void channelMenuDisplay(char *buf) ;
 
+    void channelPitchMenuDisplay(char *buf);
+    void channelVelocityMenuDisplay(char *buf);
+    void channelEnvelopeMenuDisplay(char *buf);
+    void channelStepMenuDisplay(char *buf);
+
+    void channelTunerDisplay(char *buf);
+
+    void sequenceMenuDisplay();
     void globalMenuDisplay();
+    void tempoMenuDisplay();
+
     void gameOfLifeDisplay();
     void deleteMenuDisplay();
     void cleanupTextBuffers();
-    void sequenceMenuDisplay();
-    void instrumentSelectDisplay();
     void timingMenuDisplay();
+    void calibrationMenuDisplay();
+    void inputDebugMenuDisplay();
+    uint16_t foreground, background;
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 
+    //void renderOnce_StringBox(Element element);
+private:
+
+    Sequencer *sequenceArray;
+
+  /*  struct element {
+      uint8_t index;
+      uint8_t highlight;
+      uint8_t previousHighlight;
+      int16_t x;
+      int16_t y;
+      int16_t w;
+      int16_t h;
+      bool border;
+      uint8_t textSize;
+      uint16_t color;
+      uint16_t bgColor;
+    };
+    typedef struct element Element;
+    */
 
     const char* midiNotes[128] = {
     "C -2","C#-2","D -2","D#-2","E -2","F -2","F#-2","G -2","G#-2","A -2","A#-2","B -2",
@@ -79,10 +113,8 @@ class DisplayModule
     "C  7","C# 7","D  7","D# 7","E  7","F  7","F# 7","G  7","G# 7","A  7","A# 7","B  7",
     "C  8","C# 8","D  8","D# 8","E  8","F  8","F# 8","G  8" };
 
-    const char* instrumentNames[128] = { "Grand Piano  ", "Bright Piano ", "Electric Grnd", "HnkytonkPiano", "El. Piano 1", "El. Piano 2", "Harpsichord", "Clavi", "Celesta", "Glockenspiel", "Music Box", "Vibraphone", "Marimba", "Xylophone", "Tubular Bells", "Santur", "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ", "Reed Organ", "Accordion (French)", "Harmonica", "Tango Accordion", "Acoustic Guitar (nylon)", "Acoustic Guitar (steel)", "El. Guitar (jazz)", "El. Guitar (clean)", "El. Guitar (muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics", "Acoustic Bass", "Finger Bass", "Picked Bass", "Fretless Bass", "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2", "Violin", "Viola", "Cello", "Contrabass", "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani", "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2", "Choir Aahs", "Voice Oohs", "Synth Voice", "Orchestra Hit", "Trumpet", "Trombone", "Tuba", "Muted Trumpet", "French Horn", "Brass Section", "Synth Brass 1", "Synth Brass 2", "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax", "Oboe", "English Horn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "Pan Flute", "Blown Bottle", "Shakuhachi", "Whistle", "Ocarina", "Lead 1 (square)", "Lead 2 (sawtooth)", "Lead 3 (calliope)", "Lead 4 (chiff)", "Lead 5 (charang)", "Lead 6 (voice)", "Lead 7 (fifths)", "Lead 8 (bass+lead)", "Pad 1 (fantasia)", "Pad 2 (warm)", "Pad 3 (polysynth)", "Pad 4 (choir)", "Pad 5 (bowed)", "Pad 6 (metallic)", "Pad 7 (halo)", "Pad 8 (sweep)", "FX 1 (rain)", "FX 2 (soundtrack)", "FX 3 (crystal)", "FX4 (atmosphere)", "FX 5 (brightness)", "FX 6 (goblins)", "FX 7 (echoes)", "FX 8 (sci-fi)", "Sitar", "Banjo", "Shamisen", "Koto", "Kalimba", "Bagpipe", "Fiddle", "Shanai", "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock", "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal", "Guitar Fret Noise", "Breath Noise", "Seashore", "Bird Tweet", "Teleph. Ring", "Helicopter", "Applause", "Gunshot"};
 
 };
 
-extern DisplayModule display;
 
 #endif

@@ -1,260 +1,125 @@
 #include <Arduino.h>
 #include "LEDArray.h"
+/*
+uint8_t getNoteLED(uint8_t index){
+  return index + notePage * 16;
+}
+*/
+LEDArray leds;
+elapsedMicros pixelTimer;
 
 LEDArray::LEDArray(){};
 
-void LEDArray::initialize(Sequencer *sequenceArray){
-  Serial.println("Initializing LED Array");
-  this->sequenceArray = sequenceArray;
-
-  pinMode(LED_PIN, OUTPUT);
-
-  //LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
+void LEDArray::initialize(){
+  pinMode(0, OUTPUT);
+  LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
-  leds.setBrightness(64);
-  leds.begin();
-  leds.show(); // Initialize all pixels to 'off'
+	LEDS.setBrightness(84);
 
   static uint8_t hue = 0;
-  for (int j=0; j < 256; j++){
-    for (int i=0; i < 16; i++){
-      leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
-    }
-    leds.show();
-    delay(1);
+
+  for(int i = 0; i < NUM_LEDS; i++) {
+    // Set the i'th led to red
+    leds[i] = CHSV(hue++, 255, 255);
+    // Show the leds
+    FastLED.show();
+    // now that we've shown the leds, reset the i'th led to black
+    // leds[i] = CRGB::Black;
+    fadeall();
+    // Wait a little bit before we loop around and do it again
+    delay(10);
   }
-  for (int j=255; j > 0 ; j--){
-    for (int i=0; i < 16; i++){
-      leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
-    }
-    leds.show();
-    delay(1);
-  }
-  rainbowCycle(1);
-/*
+  Serial.print("x");
 
-  for(int m=0; m<10; m++ ) {
-    for(int i = 0; i < NUM_LEDS; i++) {
-      // Set the i'th led to red
-      leds[i] = CHSV(hue++, 255, 255);
-      // Show the leds
+  // Now go in the other direction.
+  for(int i = (NUM_LEDS)-1; i >= 0; i--) {
+    // Set the i'th led to red
+    leds[i] = CHSV(hue++, 255, 255);
+    // Show the leds
+    FastLED.show();
+    // now that we've shown the leds, reset the i'th led to black
+    // leds[i] = CRGB::Black;
+    fadeall();
+    // Wait a little bit before we loop around and do it again
+    delay(10);
+  };
 
-      FastLED.show();
-      // now that we've shown the leds, reset the i'th led to black
-      // leds[i] = CRGB::Black;
-      fadeall();
-      // Wait a little bit before we loop around and do it again
-      delay(1);
-    }
-
-    // Now go in the other direction.
-    for(int i = (NUM_LEDS)-1; i >= 0; i--) {
-      // Set the i'th led to red
-      leds[i] = CHSV(hue++, 255, 255);
-      // Show the leds
-      FastLED.show();
-      // now that we've shown the leds, reset the i'th led to black
-      // leds[i] = CRGB::Black;
-      fadeall();
-      // Wait a little bit before we loop around and do it again
-      delay(1);
-    };
-}
-*/
 };
 
-void LEDArray::loop(uint16_t frequency){
+void LEDArray::loop(){
 
-  if (pixelTimer > frequency){
+  if (pixelTimer > 30000){
     pixelTimer = 0;
 
     switch (currentState ){
-      case CHANNEL_PITCH_MODE:
-        channelPitchModeLEDHandler();
+      case STEP_DISPLAY:
+        for (int i=0; i < 16; i++){
+          if (getNote(i) == sequence[selectedChannel].activeStep ){
+            leds[ledMapping[i]] = CRGB(255, 255, 255);
+          } else if (getNote(i) == selectedStep) {
+            leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
+          } else {
+            if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
+              leds[ledMapping[i]] = CHSV(0,0,0);
+            } else {
+              leds[ledMapping[i]] = CHSV(sequence[selectedChannel].getStepPitch(getNote(i)),255,255);
+            }
+          }
+        }
+        for (int i=0; i < 4; i++){
+          if (selectedChannel == i) {
+            leds[ledMapping[i+16]] = CHSV((sequence[selectedChannel].patternIndex * 16) % 255,255,255);
+          } else {
+            leds[ledMapping[i+16]] = CHSV(0,0,0);
+          }
+        }
       break;
-      case CHANNEL_VELOCITY_MODE:
-        channelGateModeLEDHandler();
-      break;
-      case CHANNEL_ENVELOPE_MODE:
-        channelEnvelopeModeLEDHandler();
-      break;
-      case CHANNEL_STEP_MODE:
-        channelStepModeLEDHandler();
+
+      case CHANNEL_MENU:
+        for (int i=0; i < 20; i++){
+          if (i%4==0 || i == 3){
+            leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
+          } else{
+            leds[ledMapping[i]] = CHSV(0,0,0);
+          }
+        }
       break;
 
       case SEQUENCE_MENU:
         for (int i=0; i < 16; i++){
-          /*if (i%4==0 || i == 3){
-          //  leds[ledMapping[i]] = CHSV(int(millis()/3)%r2g255, 255, 255);
-          } else{
-        //    leds[ledMapping[i]] = CHSV(0,0,0);
-      }*/
-          leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
-
-        };
-        for (int i=0;i<4;i++){
-          leds.setPixelColor(ledChannelButtons[i], 0,0,0);
+          if (i<2){
+            leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
+          } else if (i == 17) {
+            leds[ledMapping[i]] = CHSV(int(millis()/5)%255, 255, 255);
+          }else{
+            leds[ledMapping[i]] = CHSV(0,0,0);
+          }
         }
-
       break;
-
 
       case PATTERN_SELECT:
         for (int i=0; i < 16; i++){
-          //leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
-          leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
-
+          leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
         }
 
         for (int i=0; i < 4; i++){
           if( patternChannelSelector & (1<<i) ){
-            leds.setPixelColor(ledChannelButtons[i], 255,255,255, 255);
+            leds[ledMapping[i+16]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
           } else {
-            leds.setPixelColor(ledChannelButtons[i], 0,255,127, 0);
+            leds[ledMapping[i+16]] = CHSV(0,0,0);
           }
-
-/*          if( patternChannelSelector & (1<<i) ){
-          //  leds[ledMapping[i+16]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
-          } else {
-          //  leds[ledMapping[i+16]] = CHSV(0,0,0);
-          }
-          */
         }
       break;
     }
     noInterrupts();
-    leds.show();
-    //FastLED.show();
+      FastLED.show();
     interrupts();
+
   }
 }
 
-void LEDArray::channelPitchModeLEDHandler(){
-  for (int i=0; i < 16; i++){
-    if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
-    //  leds[ledMapping[i]] = CRGB(255, 255, 255);
-      leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
 
-    } else if (getNote(i) == selectedStep) {
-    //  leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
-      leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5)%255));
-
-    } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
-        //    leds[ledMapping[i]] = CHSV(0,0,0);
-        leds.setPixelColor(ledMainMatrix[i], 1,1,1,1);
-    } else {
-        //  leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0),255,255);
-        leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
-    }
-  }
-  for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-    leds.setPixelColor(ledChannelButtons[i], wheel(0));
-
-    } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
-    }
-  }
-
-};
-
-void LEDArray::channelGateModeLEDHandler(){
-  for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-      leds.setPixelColor(ledChannelButtons[i], wheel(64));
-
-    } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
-    }
-  }
-  for (int i=0; i < 16; i++){
-    if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
-    //  leds[ledMapping[i]] = CRGB(255, 255, 255);
-    if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 1 ){
-      leds.setPixelColor(ledMainMatrix[i], 0,0,255,128);
-    } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 2 ){
-      leds.setPixelColor(ledMainMatrix[i], 255,0,0,128);
-    } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 3 ){
-      leds.setPixelColor(ledMainMatrix[i], 0,255,0,128);
-    } else {
-      leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
-    }
-
-    } else if (getNote(i) == selectedStep) {
-    //  leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
-      leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5)%255));
-
-    } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
-        //    leds[ledMapping[i]] = CHSV(0,0,0);
-        leds.setPixelColor(ledMainMatrix[i], 0,0,0,0);
-    } else {
-        //  leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0),255,255);
-        if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 1 ){
-          leds.setPixelColor(ledMainMatrix[i], 0,0,255,0);
-        } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 2 ){
-          leds.setPixelColor(ledMainMatrix[i], 255,0,0,0);
-        } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 3 ){
-          leds.setPixelColor(ledMainMatrix[i], 0,255,0,0);
-        }
-      }
-  }
-};
-void LEDArray::channelEnvelopeModeLEDHandler(){
-  for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-    leds.setPixelColor(ledChannelButtons[i], wheel(128));
-
-    } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
-    }
-  }
-
-};
-
-void LEDArray::channelStepModeLEDHandler(){
-  for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-    leds.setPixelColor(ledChannelButtons[i], wheel(196));
-
-    } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
-    }
-  }
-};
-
-void LEDArray::fadeall() {
-//   for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); }
-}
-
-void LEDArray::rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256 * 1; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< 16; i++) {
-      leds.setPixelColor(ledMainMatrix[i], wheel(((i * 256 / 16) + j) & 255));
-      leds.setPixelColor(ledChannelButtons[i%4], wheel(((i * 256 / 16) + j) & 255));
-    }
-    leds.show();
-    delay(wait);
-  }
-}
-
-uint32_t LEDArray::wheel(byte WheelPos) {
-  WheelPos = 255 - WheelPos;
-  if(WheelPos < 85) {
-    return leds.Color(255 - WheelPos * 3, 0, WheelPos * 3,0);
-  }
-  if(WheelPos < 170) {
-    WheelPos -= 85;
-    return leds.Color(0, WheelPos * 3, 255 - WheelPos * 3,0);
-  }
-  WheelPos -= 170;
-  return leds.Color(WheelPos * 3, 255 - WheelPos * 3, 0,0);
-}
+void LEDArray::fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
 
 /*
 void ledSetup(){
@@ -275,28 +140,28 @@ void ledLoop(){
     switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
-          if (getNote(i) == sequenceArray[selectedChannel]->activeStep ){
+          if (getNote(i) == sequence[selectedChannel].activeStep ){
             pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );
           } else if (getNote(i) == selectedStep) {
             pixels.setPixelColor(ledMapping[i], Wheel(int(millis()/3)%255) );
           } else {
-            if(sequenceArray[selectedChannel]->stepData[getNote(i)].gateType == 0){
+            if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
               pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
             } else {
-              pixels.setPixelColor(ledMapping[i], Wheel( sequenceArray[selectedChannel]->getStepPitch(getNote(i)) ) );
+              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedChannel].getStepPitch(getNote(i)) ) );
             }
           }
         }
         for (int i=0; i < 4; i++){
           if (selectedChannel == i) {
-            pixels.setPixelColor(ledMapping[i+16], Wheel((sequenceArray[selectedChannel]->patternIndex * 16) % 255));
+            pixels.setPixelColor(ledMapping[i+16], Wheel((sequence[selectedChannel].patternIndex * 16) % 255));
           } else {
             pixels.setPixelColor(ledMapping[i+16], pixels.Color(0,0,0));
           }
         }
 
       break;
-      case CHANNEL_PITCH_MODE:
+      case CHANNEL_MENU:
         for (int i=0; i < 20; i++){
           if (i%4==0 || i == 3){
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));

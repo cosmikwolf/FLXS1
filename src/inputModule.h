@@ -1,18 +1,16 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
-#define ENCODER_OPTIMIZE_INTERRUPTS
-
 #include <Encoder.h>
-#include "OutputController.h"
 #include "DisplayModule.h"
 #include "Sequencer.h"
-#include "MasterClock.h"
+#include "masterClock.h"
+#include "fileOps.h"
 #include "GameOfLife.h"
 #include "global.h"
 
-#ifndef _InputModule_h_
-#define _InputModule_h_
+#ifndef _inputModule_h_
+#define _inputModule_h_
 //button stuff
 #define SW_00    0
 #define SW_01    1
@@ -39,58 +37,39 @@
 #define SW_M3    22
 #define SW_PGDN  23
 #define SW_PGUP  24
-#define SW_PATTERN  25
-#define SW_MENU   26
-#define SW_SHIFT   27
-#define ENCODER1LEFTPIN 16
-#define ENCODER1RIGHTPIN 25 
+#define SW_MENU  25
+#define SW_ALT   26
+#define SW_SPARE   27
+#define ENCODER1LEFTPIN 17
+#define ENCODER1RIGHTPIN 16
 #define MAX7301PIN  5
-
-class InputModule
+class inputModule
 {
 public:
-  InputModule();
-  Encoder knob;
-  Zetaohm_MAX7301* midplaneGPIO;
-  Zetaohm_MAX7301* backplaneGPIO;
-  OutputController* outputControl;
-  MasterClock* clockMaster;
-
-  void initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
-
-  void loop(uint16_t frequency);
-
+  inputModule();
+  void buttonSetup();
+  void buttonLoop();
   void patternSelectHandler();
-  //void channelMenuHandler();
+  void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
-  void channelButtonShiftHandler(uint8_t channel);
   void altButtonHandler();
   void stepModeMatrixHandler();
-
-  void channelPitchModeInputHandler();
-  void channelVelocityModeInputHandler();
-  void channelEnvelopeModeInputHandler();
-  void channelStepModeInputHandler();
-
-
-  void sequenceMenuHandler();
-  void globalMenuHandler();
-  void tempoMenuHandler();
-
+  void sequencerMenuHandler();
+  void instrumentSelectInputHandler();
   void timingMenuInputHandler();
   void debugScreenInputHandler();
-  void calibrationMenuHandler();
-
   void resetKnobValues();
   void changeState(uint8_t state);
 
+  Encoder knob = Encoder(ENCODER1LEFTPIN, ENCODER1RIGHTPIN);
+  Zetaohm_MAX7301 max7301;
 
   // Encoder vars
-  int8_t knobRead;
-  int8_t knobBuffer;
-  int8_t knobPrevious;
-  int8_t knobChange;
-  int8_t menuSelector;
+  int8_t knobRead = 0;
+  int8_t knobBuffer = 0;
+  int8_t knobPrevious = 0;
+  int8_t knobChange = 0;
+  int8_t menuSelector = 0;
   int8_t instBuffer;
   int16_t stepModeBuffer;
 
@@ -98,12 +77,8 @@ public:
   unsigned long smallButtonLoopTime;
   unsigned long encoderButtonTime;
   unsigned long matrixButtonTime;
-
-
-private:
-  Sequencer *sequenceArray;
-  FlashMemory *saveFile;
-  elapsedMicros inputTimer;
 };
+
+extern inputModule interface;
 
 #endif

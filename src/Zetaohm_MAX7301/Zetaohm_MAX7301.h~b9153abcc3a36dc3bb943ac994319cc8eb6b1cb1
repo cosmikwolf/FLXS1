@@ -14,12 +14,14 @@ class Zetaohm_MAX7301 {
 
 public:
 	Zetaohm_MAX7301();
-	virtual void 	begin(const uint8_t csPin, uint32_t spispeed = SPI_CLOCK_DIV4, bool protocolInitOverride=false); //protocolInitOverride=true	will not init the SPI
-	void 			gpioPinMode(uint16_t mode);					//OUTPUT=all out,INPUT=all in,0xxxx=you choose
-	uint16_t 		readAddress(byte addr);
+	void 	    begin(uint8_t csPin); //protocolInitOverride=true	will not init the SPI
+	void			initPort(uint8_t index, uint8_t port, uint16_t mode);		// initialize a new button
+	void 			updateGpioPinModes();					//OUTPUT=all out,INPUT=all in,0xxxx=you choose
+	uint16_t 	readAddress(byte addr);
+	void			digitalWrite(uint8_t index, bool value);
+	bool			digitalRead(uint8_t index);
 	void			setSPIspeed(uint32_t spispeed);//for SPI trans0actions
 	void			writeByte(byte addr, byte data);
-	void			init(uint8_t index, uint8_t pin);		// initialize a new button
 	void			update();								// update the input buffer
 	bool			fell(uint8_t index);					// was the button pressed since the last check?
 	bool			rose(uint8_t index);					// was the button pressed since the last check?
@@ -28,6 +30,7 @@ public:
 	uint32_t		fellBuffer;
 	uint32_t		roseBuffer;
 	uint8_t			indexMap[32];
+	uint8_t			portConfig[7];
 
 	elapsedMicros 	debounceTimer;
 protected:

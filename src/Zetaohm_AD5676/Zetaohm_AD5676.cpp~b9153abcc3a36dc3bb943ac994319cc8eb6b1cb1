@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*! 
+/*!
     @file     Zetaohm_AD5676.h
     @author   T. Kariya
 		@license  BSD (see license.txt)
@@ -12,10 +12,10 @@
 //#include <spi4teensy3.h>
 #include <SPI.h>
 
-#include <Zetaohm_AD5676.h>
+#include "Zetaohm_AD5676.h"
 
 /**************************************************************************/
-/*! 
+/*!
     @brief  Instantiates a new AD5676 class
 */
 /**************************************************************************/
@@ -23,7 +23,7 @@ Zetaohm_AD5676::Zetaohm_AD5676() {
 }
 
 /**************************************************************************/
-/*! 
+/*!
     @brief  Setups the HW
 */
 /**************************************************************************/
@@ -39,7 +39,7 @@ Zetaohm_AD5676::Zetaohm_AD5676() {
 }
 
 /**************************************************************************/
-/*! 
+/*!
 Command Bits
       C3  C2  C1  C0  Description
 0x00  0   0   0   0   No operation
@@ -55,7 +55,7 @@ Command Bits
 0x0A  1   0   1   0   Update all channels of the input register simultaneously with the input data
 0x0B  1   0   1   1   Update all channels of the DAC register and input register simultaneously with the input data
 0x0C  1   1   0   0   Reserved
-0x0D  1   1   1   1   Reserved 
+0x0D  1   1   1   1   Reserved
 
 Address Bits
       A3  A2  A1  A0
@@ -66,7 +66,7 @@ Address Bits
 0x04  0   1   0   0   DAC 4
 0x05  0   1   0   1   DAC 5
 0x06  0   1   1   0   DAC 6
-0x07  0   1   1   1   DAC 7 
+0x07  0   1   1   1   DAC 7
 */
 /**************************************************************************/
 void Zetaohm_AD5676::softwareReset(){
@@ -95,11 +95,11 @@ void Zetaohm_AD5676::internalReferenceEnable(bool enable)
   //spi4teensy3::send( (0x07 << 4) + 0x00 );   //  FRAME 1 COMMAND BYTE - Command + DAC Address (C3 C2 C1 C0 A3 A2 A1 A0)
   //spi4teensy3::send(0x00);                   //  FRAME 2 MOST SIGNIFICANT DATA BYTE
   if (enable) {
-    SPI.transfer(0x04);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE  
-    //spi4teensy3::send(0x00);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE  
+    SPI.transfer(0x04);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE
+    //spi4teensy3::send(0x00);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE
   } else {
-    SPI.transfer(0x01);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE  
-    //spi4teensy3::send(0x01);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE  
+    SPI.transfer(0x01);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE
+    //spi4teensy3::send(0x01);           //  FRAME 3 LEAST SIGNIFICANT DATA BYTE
   }
 
   digitalWriteFast(_cs_pin, HIGH);  // End transmission, bring SYNC line high
@@ -121,7 +121,7 @@ void Zetaohm_AD5676::setVoltage( uint8_t dac, uint16_t output )
   SPI.transfer(buffer, 3 );  //  FRAME 1 COMMAND BYTE - Command + DAC Address (C3 C2 C1 C0 A3 A2 A1 A0)
 
   digitalWriteFast(_cs_pin, HIGH);  // End transmission, bring SYNC line high
-  digitalWriteFast(_cs_pin, LOW);  // Begin transmission, bring SYNC line low
+/*  digitalWriteFast(_cs_pin, LOW);  // Begin transmission, bring SYNC line low
 
   buffer[0] = (0x03 << 4) + dac;
   buffer[1] = output / 256;
@@ -131,13 +131,13 @@ void Zetaohm_AD5676::setVoltage( uint8_t dac, uint16_t output )
   SPI.transfer(buffer, 3 );  //  FRAME 1 COMMAND BYTE - Command + DAC Address (C3 C2 C1 C0 A3 A2 A1 A0)
 
   digitalWriteFast(_cs_pin, HIGH);  // End transmission, bring SYNC line high
-
+*/
   endTransaction();
 
- //     digitalWrite(_ldac_pin, HIGH); 
+ //     digitalWrite(_ldac_pin, HIGH);
  //
- // digitalWrite(_ldac_pin, LOW); 
- // digitalWrite(_ldac_pin, HIGH); 
+ // digitalWrite(_ldac_pin, LOW);
+ // digitalWrite(_ldac_pin, HIGH);
  // delay(1);
  // digitalWriteFast(_cs_pin, LOW);  // Begin transmission, bring SYNC line low
  // buffer[1] = 0xFF;

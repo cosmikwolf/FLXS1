@@ -1,391 +1,214 @@
 #include <Arduino.h>
-#include "InputModule.h"
+#include "inputModule.h"
 
 Zetaohm_MAX7301 max7301();
 
-InputModule::InputModule():knob(ENCODER1LEFTPIN, ENCODER1RIGHTPIN)
-{
-// Encoder lib has no default constructor, so need to use initializer list instead
-// from https://forum.pjrc.com/threads/25082-How-do-I-include-a-library-in-a-library
+inputModule interface;
 
-//pinMode(ENCODER1LEFTPIN, INPUT);
-//pinMode(ENCODER1RIGHTPIN, INPUT);
-
-knobRead = 0;;
-knobBuffer = 0;;
-knobPrevious = 0;;
-knobChange = 0;;
-
+inputModule::inputModule(){
 };
 
-void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster){
-  Serial.println("button setup start");
+void inputModule::buttonSetup() {
+  Serial.println("button setup start");  delay(1);
 
-  this->saveFile = saveFile;
-  this->sequenceArray = sequenceArray;
-  this->outputControl = outputControl;
-  this->clockMaster= clockMaster;
-  this->midplaneGPIO= midplaneGPIO;
-  this->backplaneGPIO= backplaneGPIO;
-
-  midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
-
-  midplaneGPIO->initPort(0, 22, INPUT_PULLUP);   // SW_00
-  midplaneGPIO->initPort(1, 21, INPUT_PULLUP);    // SW_01
-  midplaneGPIO->initPort(2, 6, INPUT_PULLUP);    // SW_02
-  midplaneGPIO->initPort(3, 9, INPUT_PULLUP);   // SW_03
-  midplaneGPIO->initPort(4, 23, INPUT_PULLUP);   // SW_04
-  midplaneGPIO->initPort(5, 20, INPUT_PULLUP);   // SW_05
-  midplaneGPIO->initPort(6, 11, INPUT_PULLUP);    // SW_06
-  midplaneGPIO->initPort(7, 7, INPUT_PULLUP);    // SW_07
-  midplaneGPIO->initPort(8, 24, INPUT_PULLUP);   // SW_08
-  midplaneGPIO->initPort(9, 19, INPUT_PULLUP);   // SW_09
-  midplaneGPIO->initPort(10, 14, INPUT_PULLUP);   // SW_10
-  midplaneGPIO->initPort(11, 13, INPUT_PULLUP);  // SW_11
-  midplaneGPIO->initPort(12, 3, INPUT_PULLUP);  // SW_12
-  midplaneGPIO->initPort(13, 18, INPUT_PULLUP);  // SW_13
-  midplaneGPIO->initPort(14, 17, INPUT_PULLUP);  // SW_14
-  midplaneGPIO->initPort(15, 16, INPUT_PULLUP);   // SW_15
-  midplaneGPIO->initPort(16, 0, INPUT_PULLUP);   // SW_PLAY
-  midplaneGPIO->initPort(17, 27, INPUT_PULLUP);   // SW_PAUSE
-  midplaneGPIO->initPort(18, 4, INPUT_PULLUP);   // SW_STOP
-  midplaneGPIO->initPort(19, 1, INPUT_PULLUP);  // SW_M0
-  midplaneGPIO->initPort(20, 26, INPUT_PULLUP);  // SW_M1
-  midplaneGPIO->initPort(21, 2, INPUT_PULLUP);  // SW_M2
-  midplaneGPIO->initPort(22, 25, INPUT_PULLUP);  // SW_M3
-  midplaneGPIO->initPort(23, 5, INPUT_PULLUP);   // SW_PGDN
-  midplaneGPIO->initPort(24, 8, INPUT_PULLUP);  // SW_PGUP
-  midplaneGPIO->initPort(25, 10, INPUT_PULLUP);  // SW_PATTERN
-  midplaneGPIO->initPort(26, 12, INPUT_PULLUP);  // SW_MENU
-  midplaneGPIO->initPort(27, 15, INPUT_PULLUP);  // SW_SHIFT
-
-  midplaneGPIO->updateGpioPinModes();
-
+  max7301.begin(5);                      delay(1);
+  max7301.gpioPinMode(INPUT_PULLUP);     delay(1);
+  max7301.init(0, 14);   // SW_00
+  max7301.init(1, 7);    // SW_01
+  max7301.init(2, 5);    // SW_02
+  max7301.init(3, 26);   // SW_03
+  max7301.init(4, 15);   // SW_04
+  max7301.init(5, 11);   // SW_05
+  max7301.init(6, 9);    // SW_06
+  max7301.init(7, 1);    // SW_07
+  max7301.init(8, 16);   // SW_08
+  max7301.init(9, 12);   // SW_09
+  max7301.init(10, 6);   // SW_10
+  max7301.init(11, 27);  // SW_11
+  max7301.init(12, 17);  // SW_12
+  max7301.init(13, 13);  // SW_13
+  max7301.init(14, 10);  // SW_14
+  max7301.init(15, 0);   // SW_15
+  max7301.init(16, 8);   // SW_PLAY
+  max7301.init(17, 4);   // SW_PAUSE
+  max7301.init(18, 2);   // SW_STOP
+  max7301.init(19, 21);  // SW_M0
+  max7301.init(20, 20);  // SW_M1
+  max7301.init(21, 19);  // SW_M2
+  max7301.init(22, 18);  // SW_M3
+  max7301.init(23, 3);   // SW_PGDN
+  max7301.init(24, 25);  // SW_PGUP
+  max7301.init(25, 24);  // SW_MENU
+  max7301.init(26, 23);  // SW_ALT
+  max7301.init(27, 22);  // SW_SPARE
+  Serial.println("button setup end");
 }
 
-void InputModule::loop(uint16_t frequency){
-  if (inputTimer > frequency){
-    inputTimer = 0;
-    knobPrevious = knobRead;
-    knobRead = knob.read()/-4  ;
-    knobChange = knobRead - knobPrevious;
-    midplaneGPIO->update();
+void inputModule::buttonLoop(){
 
-    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) ){
-      currentState = CALIBRATION_MENU;
-    }
+  max7301.update();
+  knobPrevious = knobRead;
+  knobRead = knob.read()/-4  ;
+  knobChange = knobRead - knobPrevious;
+  //we always want the alt (non matrix) buttons to behave the same way
+  altButtonHandler();
+  
+  // now to handle the rest of the buttons.
+  switch (currentState) {
+    case STEP_DISPLAY:
+    stepModeMatrixHandler();
+    break;
+    case SEQUENCE_MENU:
+    sequencerMenuHandler();
+    break;
 
-    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_REC) ){
-      currentState = INPUT_DEBUG_MENU;
-    }
-    //we always want the alt (non matrix) buttons to behave the same way
-    altButtonHandler();
+   case CHANNEL_MENU:
+   channelMenuHandler();
+   break;
 
-    // now to handle the rest of the buttons.
-    switch (currentState) {
-      case STEP_DISPLAY:
-        channelPitchModeInputHandler();
-      break;
-      case SEQUENCE_MENU:
-        sequenceMenuHandler();
-      break;
+    case PATTERN_SELECT:
+    patternSelectHandler();
+    break;
 
-      case GLOBAL_MENU:
-        globalMenuHandler();
-      break;
+    case INSTRUMENT_MENU:
+    instrumentSelectInputHandler();
+    break;
 
-      case CHANNEL_PITCH_MODE:
-        channelPitchModeInputHandler();
-      break;
+    case TIMING_MENU:
+    timingMenuInputHandler();
+    break;
 
-      case CHANNEL_VELOCITY_MODE:
-        channelVelocityModeInputHandler();
-      break;
 
-      case CHANNEL_ENVELOPE_MODE:
-        channelEnvelopeModeInputHandler();
-      break;
-
-      case CHANNEL_STEP_MODE:
-        channelStepModeInputHandler();
-      break;
-
-      case PATTERN_SELECT:
-      patternSelectHandler();
-      break;
-
-      case TEMPO_MENU:
-        tempoMenuHandler();
-      break;
-
-      case TIMING_MENU:
-      timingMenuInputHandler();
-      break;
-
-      case DEBUG_SCREEN:
-      debugScreenInputHandler();
-      break;
-
-      case CALIBRATION_MENU:
-        calibrationMenuHandler();
-      break;
-    }
+    case DEBUG_SCREEN:
+    debugScreenInputHandler();
+    break;
   }
-
 }
 
 // STATE VARIABLE INPUT HANDLERS
 
-void InputModule::patternSelectHandler(){
+void inputModule::patternSelectHandler(){
   for (int i=0; i < 16; i++){
-    if (midplaneGPIO->fell(i)){
-      saveFile->changePattern(i, patternChannelSelector,  true, true);
+    if (max7301.fell(i)){
+      saveFile.changePattern(i, patternChannelSelector,  true, true);
 
       delay(10);
-      changeState(CHANNEL_PITCH_MODE);
+      changeState(STEP_DISPLAY);
     }
   }
 }
 
-void InputModule::tempoMenuHandler(){
+void inputModule::channelMenuHandler(){
+  if (max7301.fell(0)){
+    sequence[selectedChannel].initNewSequence(sequence[selectedChannel].patternIndex, selectedChannel);
+      changeState(STEP_DISPLAY);
 
-  if(knobChange){
-    switch (stepMode){
-      case STEPMODE_TEMPO:
-        if (tempoX100 > 100100) {
-          tempoX100 = 100100;
-        }
-        tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
-        if(tempoX100 == 0){
-          tempoX100 = 100;
-        }
-        clockMaster->changeTempo(tempoX100);
-      break;
-
-      case STEPMODE_EXTCLOCK:
-        if (knobChange > 0){
-          extClock = 1;
-        } else {
-          extClock = 0;
-        }
-      break;
-    }
-  }
-
-}
-
-void InputModule::sequenceMenuHandler(){
-  if(knobChange){
-    switch(stepMode){
-    case STEPMODE_QUANTIZEKEY:
-      for (int i=0; i<4; i++){
-        sequenceArray[i].quantizeKey = positive_modulo(sequenceArray[selectedChannel].quantizeKey + knobChange, 12);
-      }
-      break;
-    case STEPMODE_QUANTIZESCALE:
-    for (int i=0; i<4; i++){
-      sequenceArray[i].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 15);
-    }
-    break;
-
-    }
-  }
-
-}
-
-void InputModule::globalMenuHandler(){
-  if (midplaneGPIO->fell(0)){
-    sequenceArray[selectedChannel].initNewSequence(sequenceArray[selectedChannel].patternIndex, selectedChannel);
-      changeState(CHANNEL_PITCH_MODE);
-
-  } else if (midplaneGPIO->fell(4)){
+  } else if (max7301.fell(4)){
     for (int i=0; i < 4; i++){
-      sequenceArray[i].initNewSequence(sequenceArray[i].patternIndex, i);
+      sequence[i].initNewSequence(sequence[i].patternIndex, i);
     }
-    changeState(CHANNEL_PITCH_MODE);
+      changeState(STEP_DISPLAY);
 
-  } else if (midplaneGPIO->fell(8)){
-    saveFile->deleteSaveFile();
-    changeState(CHANNEL_PITCH_MODE);
+  } else if (max7301.fell(8)){
+    saveFile.deleteSaveFile();
+    changeState(STEP_DISPLAY);
 
-  } else if (midplaneGPIO->fell(12)){
-  /*  if (sequenceArray[selectedChannel].instType == 0){
-      sequenceArray[selectedChannel].setInstType(1);
-      //sequenceArray[selectedChannel].stepCount = 16;
-      //sequenceArray[selectedChannel].beatCount = 16;
+  } else if (max7301.fell(12)){
+    if (sequence[selectedChannel].instType == 0){
+      sequence[selectedChannel].setInstType(1);
+      //sequence[selectedChannel].stepCount = 16;
+      //sequence[selectedChannel].beatCount = 16;
       life.genGrid(micros());
     } else {
-      sequenceArray[selectedChannel].setInstType(0);
+      sequence[selectedChannel].setInstType(0);
     }
-    */
-    changeState(CHANNEL_PITCH_MODE);
-  } else if (midplaneGPIO->fell(3)){
+    changeState(STEP_DISPLAY);
+  } else if (max7301.fell(3)){
     extClock = !extClock;
-        changeState(CHANNEL_PITCH_MODE);
+        changeState(STEP_DISPLAY);
+
   }
 }
 
-void InputModule::channelButtonShiftHandler(uint8_t channel){
-  if (selectedChannel != channel){
-    selectedChannel = channel;
-  }
-  changeState(CHANNEL_TUNER_MODE);
-};
-
-void InputModule::channelButtonHandler(uint8_t channel){
+void inputModule::channelButtonHandler(uint8_t channel){
   uint8_t previous = patternChannelSelector;
-
-  resetKnobValues();
-  if (currentState != PATTERN_SELECT){
-    if (selectedChannel != channel){
-      selectedChannel = channel;
-      return;
+  if (currentState == PATTERN_SELECT) {
+    patternChannelSelector =  patternChannelSelector ^ (1 << channel);
+    if (patternChannelSelector == 0) {
+      patternChannelSelector = previous;
     }
-  }
+  } else {
+    selectedChannel = channel;
+    changeState(STEP_DISPLAY);
+    resetKnobValues();
 
-  switch (currentState){
-    case PATTERN_SELECT:
-      patternChannelSelector =  patternChannelSelector ^ (1 << channel);
-      if (patternChannelSelector == 0) {
-        patternChannelSelector = previous;
-      }
-    break;
-
-    case CHANNEL_PITCH_MODE:
-      changeState(CHANNEL_VELOCITY_MODE);
-      stepMode = STEPMODE_VELOCITY;
-    break;
-
-    case CHANNEL_VELOCITY_MODE:
-      changeState(CHANNEL_PITCH_MODE);
-    break;
-
-    case CHANNEL_ENVELOPE_MODE:
-      changeState(CHANNEL_STEP_MODE);
-    break;
-
-    case CHANNEL_STEP_MODE:
-      changeState(CHANNEL_PITCH_MODE);
-    break;
-
-
-    default:
-      changeState(CHANNEL_PITCH_MODE);
-    break;
   }
 }
 
-void InputModule::altButtonHandler(){
-
-
+void inputModule::altButtonHandler(){
   for (int i=16; i <28; i++){
-    if (midplaneGPIO->fell(i) ){
+    if (max7301.fell(i) ){
       switch (i){
         // left row bottom up
         case SW_M0:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(0);
-          } else {
-            channelButtonHandler(0);
-          }
+          channelButtonHandler(0);
         break;
 
         case SW_M1:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(1);
-          } else {
-            channelButtonHandler(1);
-          }
+          channelButtonHandler(1);
         break;
 
         case SW_M2:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(2);
-          } else {
-            channelButtonHandler(2);
-          }
+          channelButtonHandler(2);
         break;
 
         case SW_M3:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(3);
-          } else {
-            channelButtonHandler(3);
-          }
+          channelButtonHandler(3);
         break;
 
-        case SW_PATTERN:
+        case SW_MENU:
           if(currentState == PATTERN_SELECT){
-            changeState(CHANNEL_PITCH_MODE);
+            changeState(STEP_DISPLAY);
           } else {
             changeState(PATTERN_SELECT);
           }
         break;
 
-        case SW_MENU: //switch M3 toggles the sequence menu
-         if (midplaneGPIO->pressed(SW_SHIFT)){
-           changeState(GLOBAL_MENU);
-         } else {
-           if (currentState == SEQUENCE_MENU){
-             switch (stepMode){
-              case STEPMODE_QUANTIZEKEY:
-                stepMode = STEPMODE_QUANTIZESCALE;
-              break;
-              case STEPMODE_QUANTIZESCALE:
-                stepMode = STEPMODE_QUANTIZEKEY;
-              break;
-              default:
-                stepMode = STEPMODE_QUANTIZEKEY;
-              break;
-             }
-           } else {
-             stepMode = STEPMODE_QUANTIZEKEY;
-             changeState(SEQUENCE_MENU);
-           }
-         }
-        break;
+        case SW_ALT: //switch M3 toggles the sequence menu
 
-        case SW_SHIFT:
-
-        break;
-
-        case SW_PGDN:
-          if (stepMode == STEPMODE_TEMPO){
-            stepMode = STEPMODE_EXTCLOCK;
-            break;
-          } else if (stepMode == STEPMODE_EXTCLOCK){
-            stepMode = STEPMODE_TEMPO;
-            break;
-          }
-
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            changeState(TEMPO_MENU);
-            stepMode = STEPMODE_TEMPO;
-            knobBuffer = tempoX100 - knobRead;
+          if (stepMode < 3 || stepMode > 7) {
+            stepMode = 3;
           } else {
-            notePage = positive_modulo(notePage - 1, 4);
+            stepMode++;
           }
 
+          if( currentState != STEP_DISPLAY){
+            changeState(STEP_DISPLAY);
+          }
+
+        break;
+
+        case SW_SPARE:
+          changeState(CHANNEL_MENU);
+        break;
+        case SW_PGDN:
+          notePage = positive_modulo(notePage - 1, 4);
         break;
 
         case SW_PGUP:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            //changeState(GLOBAL_MENU);
-          } else {
-            notePage = positive_modulo(notePage + 1, 4);
-          }
-
+          notePage = positive_modulo(notePage + 1, 4);
         break;
 
         case SW_STOP:
           if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-            for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
-              outputControl->allNotesOff(channel);
+            for(int s = 0; s < sequenceCount; s++){
+              sam2695.allNotesOff(s);
+              mcp.digitalWrite(s+4, LOW);
             }
           }
           playing = false;
-          for(int s = 0; s < SEQUENCECOUNT; s++){
-            sequenceArray[s].activeStep = 0;
+          for(int s = 0; s < sequenceCount; s++){
+            sequence[s].activeStep = 0;
            // sam2695.allNotesOff(s);
           }
           break;
@@ -394,292 +217,223 @@ void InputModule::altButtonHandler(){
           case SW_PLAY:
           playing = !playing;
           break;
-
-          case SW_REC:
-
-          break;
         }
       }
     }
   }
 
 
-  void InputModule::channelPitchModeInputHandler(){
-  // selectedStep == getNote(i) means that the user pressed the button that is selected.
-    uint8_t chrd;
-    uint8_t newBeatDiv;
-    for (int i=0; i < 16; i++){
-      if (midplaneGPIO->fell(i)){
-        if(selectedStep == getNote(i)){
-          // if currentstep is already selected, change stepMode
-          stepMode = (stepMode + 1) % 11;
+  void inputModule::stepModeMatrixHandler(){
+  //  saveTimer = 0;
+    uint8_t instrumentSelectValue;
 
-          switch( stepMode ){
-            case STEPMODE_GATELENGTH:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateLength - knobRead;
-              break;
-            case STEPMODE_GATETYPE:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
-              break;
-            case STEPMODE_CHORD:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].chord - knobRead;
-              break;
-            case STEPMODE_GLIDE:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].glide - knobRead;
-              break;
-            case STEPMODE_PITCH1:
-              knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 1) - knobRead;
-              break;
-            case STEPMODE_PITCH2:
-              knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 2) - knobRead;
-              break;
-            case STEPMODE_PITCH3:
-              knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) - knobRead;
-              break;
-            case STEPMODE_STEPCOUNT:
-              knobBuffer = sequenceArray[selectedChannel].stepCount - knobRead;
-              break;
-            case STEPMODE_BEATCOUNT:
-              knobBuffer =  sequenceArray[selectedChannel].stepData[selectedStep].beatDiv - knobRead;
-              break;
-            case STEPMODE_ARPTYPE:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpType - knobRead;
-              break;
-            case STEPMODE_ARPSPEEDNUM:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpdNum - knobRead;
-              break;
-            case STEPMODE_ARPSPEEDDEN:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpdDen - knobRead;
-              break;
-            case STEPMODE_ARPOCTAVE:
-              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpOctave - knobRead;
-              break;
-          }
-        } else {
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        if(selectedStep == getNote(i) && stepMode == 0){
+          stepMode = 1; // change the step length
+          knobBuffer = sequence[selectedChannel].stepData[getNote(i)].gateLength - knobRead;
+         // stepModeBuffer = sequence[selectedChannel].stepData[i].gateLength;
+    //    } else if (selectedStep == i && stepMode != 0){
+    //      stepMode = positive_modulo(stepMode + 1, 3); // change the step length
+    //   //   knob1.write(0);
+    //   //   stepModeBuffer = sequence[selectedChannel].stepData[i].gateType;
+    //      knobBuffer = sequence[selectedChannel].stepData[i].gateType - knobRead;
+        } else if (selectedStep == getNote(i) && stepMode == 1){
+          stepMode = 2;
+          knobBuffer = sequence[selectedChannel].stepData[getNote(i)].velocity - knobRead;
+        }else {
           stepMode = 0;
           selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
+          knobBuffer = sequence[selectedChannel].getStepPitch(selectedStep) - knobRead;
         }
       }
     }
 
+
+  //  if (knobRead != knobPrev) {
     if (knobChange){
       //knobPrev = knobRead;
-
-//      if (midplaneGPIO->pressed(selectedStep%16) ){
-      backplaneGPIO->update();
-      if ( backplaneGPIO->pressed(22) || midplaneGPIO->pressed(selectedStep%16) ) {// Encoder Switch
-        stepMode = positive_modulo(stepMode + knobChange, 11);
-      } else {
-
-        switch (stepMode) {
-          case STEPMODE_PITCH0:
-        // just change the note
-          if (knobRead + sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) < 0){
-            // you can turn off a note by turning the value to 0
-            // turn off a note by setting gate type and pitch to 0
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, 0, 0);
-            knob.write(4);
-          } else {
-            if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-              // if a note is not active, turn it on and give it a length.
-              sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
-              sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
-            }
-            // and finally set the new step value!
-            // monophonic so pitch[0] only
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,127), 0);
+      switch (stepMode) {
+        case 0:
+      // just change the note
+        if (knobRead + sequence[selectedChannel].getStepPitch(selectedStep) < 0){
+          // you can turn off a note by turning the value to 0
+          // turn off a note by setting gate type and pitch to 0
+          sequence[selectedChannel].stepData[selectedStep].gateType = 0;
+          sequence[selectedChannel].setStepPitch(selectedStep, 0);
+          knob.write(4);
+        } else {
+          if(sequence[selectedChannel].stepData[selectedStep].gateType == 0){
+            // if a note is not active, turn it on and give it a length.
+            sequence[selectedChannel].stepData[selectedStep].gateType = 1;
+            sequence[selectedChannel].stepData[selectedStep].gateLength = 1;
           }
+          // and finally set the new step value!
+          sequence[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequence[selectedChannel].getStepPitch(selectedStep) + knobChange, 127));
+
+        }
+        break;
+
+        case 1:
+    // change the gate type
+        if ((sequence[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
+          sequence[selectedChannel].stepData[selectedStep].gateType = 0;
+        } else if(knobChange > 0) {
+          sequence[selectedChannel].stepData[selectedStep].gateType = 1;
+        }
+
+        if (sequence[selectedChannel].stepData[selectedStep].gateType > 0){
+          sequence[selectedChannel].stepData[selectedStep].gateLength =  positive_modulo(sequence[selectedChannel].stepData[selectedStep].gateLength + knobChange, 127);
+        }
+
+        break;
+
+        case 2:
+      // change length of gate
+        sequence[selectedChannel].stepData[selectedStep].velocity = positive_modulo(sequence[selectedChannel].stepData[selectedStep].velocity + knobChange, 128 );
+        break;
+
+        case 3:
+        if (tempoX100 > 100100) {
+          tempoX100 = 100100;
+        }
+        tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
+        if(tempoX100 == 0){
+          tempoX100 = 100;
+        }
+      /* THIS CAUSES A CRAZY COMPILATION ERROR! :
+      /Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/4.8.4/../../../../arm-none-eabi/lib/armv7e-m/libc_s.a(lib_a-timesr.o): In funct
+ion `_times_r':
+timesr.c:(.text._times_r+0x2): undefined reference to `_times'
+*/
+      // --->  clock.changeTempo(tempoX100);  <--
+        break;
+
+        case 4:
+        instrumentSelectValue = positive_modulo(sequence[selectedChannel].instrument + knobChange,128);
+        if (sequence[selectedChannel].instrument != instrumentSelectValue){
+          sequence[selectedChannel].instrument = instrumentSelectValue;
+          sam2695.programChange(0, selectedChannel, sequence[selectedChannel].instrument);
+        }
+        break;
+
+        case 5:
+        instrumentSelectValue = positive_modulo(sequence[selectedChannel].volume + knobChange, 128);
+        if (sequence[selectedChannel].volume != instrumentSelectValue ){
+          sequence[selectedChannel].volume = instrumentSelectValue;
+          sam2695.setChannelVolume(selectedChannel, sequence[selectedChannel].volume);
+        }
+        break;
+
+        case 6:
+        sequence[selectedChannel].stepCount = positive_modulo(sequence[selectedChannel].stepCount + knobChange, 129);
+        break;
+
+        case 7:
+        sequence[selectedChannel].beatCount = positive_modulo(sequence[selectedChannel].beatCount + knobChange, 129);
+        break;
+
+      }
+    }
+};
+
+
+
+
+  void inputModule::sequencerMenuHandler(){
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        switch (i) {
+          case 0:
+          changeState(INSTRUMENT_MENU);
           break;
-
-          case STEPMODE_PITCH1:
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 1) + knobChange, 1), 72);
+          case 1:
+          changeState(TIMING_MENU);
           break;
-
-          case STEPMODE_PITCH2:
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 2) + knobChange, 2), 72);
-          break;
-
-          case STEPMODE_PITCH3:
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) + knobChange, 3), 72);
-          break;
-
-          case STEPMODE_CHORD:
-            chrd = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].chord + knobChange, 27);
-            sequenceArray[selectedChannel].stepData[selectedStep].chord = chrd;
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][0],1);
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][1],2);
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][2],3);
-          break;
-
-          case STEPMODE_GATELENGTH:
-      // change the gate type
-              if ((sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
-                sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
-              } else if(knobChange > 0) {
-                if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-                  sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
-                }
-              }
-              if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
-                sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 0, 255);
-              }
-
-          break;
-
-          case STEPMODE_STEPCOUNT:
-            sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
-
-            if (sequenceArray[selectedChannel].stepCount == 0) {
-              sequenceArray[selectedChannel].stepCount = 64;
-            }
-            break;
-
-          case STEPMODE_BEATCOUNT:
-            newBeatDiv = min_max(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange,-16, 16);
-
-            for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
-                sequenceArray[selectedChannel].stepData[i].beatDiv = newBeatDiv;
-            }
-            break;
-
-          case STEPMODE_GATETYPE:
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 0, 3);
-            break;
-
-          case STEPMODE_GLIDE:
-            sequenceArray[selectedChannel].stepData[selectedStep].glide =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].glide + knobChange, 0, 128);
-            break;
-
-          case STEPMODE_ARPTYPE:
-            sequenceArray[selectedChannel].stepData[selectedStep].arpType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 0, 6);
-          break;
-
-          case STEPMODE_ARPSPEEDNUM:
-          sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum = min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum + knobChange, 1, 16) ;
-          break;
-          case STEPMODE_ARPSPEEDDEN:
-          sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen = min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen + knobChange, 1, 64);
-          break;
-
-          case STEPMODE_ARPOCTAVE:
-          sequenceArray[selectedChannel].stepData[selectedStep].arpOctave=  min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpOctave + knobChange, 1, 5);
-          break;
-;
 
         }
       }
     }
-};
+  }
 
-void InputModule::channelVelocityModeInputHandler(){
+  void inputModule::instrumentSelectInputHandler() {
 
-  for (int i=0; i < 16; i++){
-    if (midplaneGPIO->fell(i)){
-
-      if (selectedStep == getNote(i)){
-        stepMode = (stepMode + 1) % 3;
-      } else {
-        stepMode = 0;
-        selectedStep = getNote(i);
-      }
-      switch(stepMode){
-        case STEPMODE_VELOCITY:
-          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocity - knobRead;
-        break;
-
-        case STEPMODE_VELOCITYTYPE:
-          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocityType - knobRead;
-        break;
-
-        case STEPMODE_LFOSPEED:
-          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].lfoSpeed - knobRead;
-        break;
-
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        menuSelector = i;
       }
     }
+    uint8_t instrumentSelectValue;
+
+    switch(menuSelector){
+      case 0:
+     //changing the instrument every loop causes weird problems with playback during instrument selection
+      instrumentSelectValue = positive_modulo(sequence[selectedChannel].instrument + knobChange,128);
+      if (sequence[selectedChannel].instrument != instrumentSelectValue){
+        sequence[selectedChannel].instrument = instrumentSelectValue;
+        sam2695.programChange(0, selectedChannel, sequence[selectedChannel].instrument);
+      }
+      break;
+      case 4:
+      instrumentSelectValue = positive_modulo(sequence[selectedChannel].volume + knobChange, 128);
+      if (sequence[selectedChannel].volume != instrumentSelectValue ){
+        sequence[selectedChannel].volume = instrumentSelectValue;
+        sam2695.setChannelVolume(selectedChannel, sequence[selectedChannel].volume);
+      }
+      break;
+      case 8:
+      instrumentSelectValue = positive_modulo(sequence[selectedChannel].bank + knobChange, 128) ;
+      if (sequence[selectedChannel].bank != instrumentSelectValue ){
+        sequence[selectedChannel].bank = instrumentSelectValue;
+        sam2695.setChannelBank(selectedChannel, sequence[selectedChannel].bank);
+      }
+      break;
+    }
+
   }
 
-  if (knobChange){
-    //knobPrev = knobRead;
-    switch (stepMode) {
-      case STEPMODE_VELOCITY:
-      sequenceArray[selectedChannel].stepData[selectedStep].velocity =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].velocity + knobChange, 127);
+  void inputModule::timingMenuInputHandler() {
+    for (int i=0; i < 16; i++){
+      if (max7301.fell(i)){
+        menuSelector = i;
+      }
+    }
+    switch(menuSelector){
+      case 0:
+      sequence[selectedChannel].stepCount = positive_modulo(sequence[selectedChannel].stepCount + knobChange, 129);
       break;
-      case STEPMODE_VELOCITYTYPE:
-      sequenceArray[selectedChannel].stepData[selectedStep].velocityType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].velocityType + knobChange, 0, 4);
+      case 4:
+      sequence[selectedChannel].beatCount = positive_modulo(sequence[selectedChannel].beatCount + knobChange, 129);
       break;
-      case STEPMODE_LFOSPEED:
-      sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed = min_max(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed + knobChange, 1, 255);
-      break;
+    }
+  }
+
+
+  void inputModule::debugScreenInputHandler(){
+    if(max7301.pressed(SW_ALT)){
+//      voltManual = positive_modulo(voltManual + 10*knobChange, 65535);
+
+    } else {
+      //voltManual = positive_modulo(voltManual + knobChange, 65535);
 
     }
   }
-};
-
-void InputModule::channelEnvelopeModeInputHandler(){
-
-};
-
-void InputModule::channelStepModeInputHandler(){
-
-};
 
 
-void InputModule::timingMenuInputHandler() {
-  /*
-  for (int i=0; i < 16; i++){
-    if (midplaneGPIO->fell(i)){
-      menuSelector = i;
-    }
+  void inputModule::resetKnobValues(){
+  	knobRead = 0;
+  	knob.write(0);
+  	//Serial.println("resetting knob: " + String(knob.read()));
+  };
+
+
+  // this subroutine initializes the new state.
+  void inputModule::changeState(uint8_t targetState){
+    Serial.println("State change - current: " + String(currentState) + "\ttarget: " + String(targetState));
+
+    interface.resetKnobValues();
+
+    currentState = targetState;
+
+    Serial.println("   - state change complete");
   }
-  switch(menuSelector){
-    case 0:
-    sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 129);
-    break;
-    case 4:
-    sequenceArray[selectedChannel].beatCount = positive_modulo(sequenceArray[selectedChannel].beatCount + knobChange, 129);
-    break;
-  }
-  */
-}
-
-
-void InputModule::debugScreenInputHandler(){
-  if(midplaneGPIO->pressed(SW_MENU)){
-    //voltManual = positive_modulo(voltManual + 10*knobChange, 65535);
-  } else {
-    //voltManual = positive_modulo(voltManual + knobChange, 65535);
-  }
-}
-
-void InputModule::resetKnobValues(){
-	knobRead = 0;
-	knob.write(0);
-	//Serial.println("resetting knob: " + String(knob.read()));
-};
-
-
-// this subroutine initializes the new state.
-void InputModule::changeState(uint8_t targetState){
-  Serial.println("State change - current: " + String(currentState) + "\ttarget: " + String(targetState));
-
-  this->resetKnobValues();
-
-  currentState = targetState;
-
-  Serial.println("   - state change complete");
-}
-
-void InputModule::calibrationMenuHandler(){
-  uint8_t multiplier = 100;
-  if (midplaneGPIO->pressed(SW_REC)){
-    multiplier = 10;
-  }
-  if (knobChange){
-    calibrationBuffer += knobChange * multiplier;
-    outputControl->calibrationRoutine();
-  }
-
-}
