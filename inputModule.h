@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include <Zetaohm_MAX7301.h>
 #include <Encoder.h>
-#include "displayModule.h"
+#include "DisplayModule.h"
 #include "Sequencer.h"
 #include "masterClock.h"
 #include "fileOps.h"

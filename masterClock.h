@@ -16,7 +16,7 @@ public:
   uint8_t dacCcMap[4] = {1, 5, 3, 7};
 
   void changeTempo(uint32_t newTempoX100);
-  void masterClockFunc();
+  void masterClockFunc(void);
   void internalClockTick();
   void externalClockTick();
   void noteOffSwitch();
@@ -24,5 +24,4 @@ public:
 
 };
 
-extern masterClock clockMaster;
 #endif

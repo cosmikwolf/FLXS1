@@ -6,7 +6,6 @@
 #ifndef _midiModule_h_
 #define _midiModule_h_
 
-
   void midiSetup();
   void midiStopHandler();
   void midiNoteOffHandler(byte channel, byte note, byte velocity);

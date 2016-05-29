@@ -51,7 +51,6 @@ void LEDArray::loop(){
   if (pixelTimer > 30000){
     pixelTimer = 0;
 
-
     switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){

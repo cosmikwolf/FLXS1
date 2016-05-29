@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "masterClock.h"
 
-masterClock clockMaster;
 
 masterClock::masterClock(){
 
@@ -15,7 +14,7 @@ void masterClock::changeTempo(uint32_t newTempoX100){
   }
 }
 
-void masterClock::masterClockFunc(){
+void masterClock::masterClockFunc(void){
  elapsedMicros loopTimer = 0;
 
 
