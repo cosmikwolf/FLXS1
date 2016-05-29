@@ -3,6 +3,8 @@
 ********************************** */
 #include <Arduino.h>
 #include <Wire.h>
+#include <SPI.h>
+
 #include "inputModule.h"
 #include "displayModule.h"
 #include "masterClock.h"
@@ -16,6 +18,20 @@
 #define kSerialSpeed 115200
 #define kMosiPin 11
 #define kSpiClockPin 13
+
+
+/*
+  Globals to refactor (in this file)
+  - display
+  - sequence
+  - sam2695
+  - tempoX100
+  - interface
+  - ad5676
+  - mcp
+  - saveFile
+  - leds
+*/
 
 void setup() {
   IntervalTimer masterClockTimer;
