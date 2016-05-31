@@ -9,8 +9,8 @@
 #include "GameOfLife.h"
 #include "global.h"
 
-#ifndef _inputModule_h_
-#define _inputModule_h_
+#ifndef _InputModule_h_
+#define _InputModule_h_
 //button stuff
 #define SW_00    0
 #define SW_01    1
@@ -43,10 +43,10 @@
 #define ENCODER1LEFTPIN 17
 #define ENCODER1RIGHTPIN 16
 #define MAX7301PIN  5
-class inputModule
+class InputModule
 {
 public:
-  inputModule();
+  InputModule();
   void buttonSetup();
   void buttonLoop();
   void patternSelectHandler();
@@ -78,7 +78,5 @@ public:
   unsigned long encoderButtonTime;
   unsigned long matrixButtonTime;
 };
-
-extern inputModule interface;
 
 #endif

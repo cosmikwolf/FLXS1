@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <i2c_t3.h>
-#include "inputModule.h"
+#include "InputModule.h"
 #include "DisplayModule.h"
 #include "masterClock.h"
 #include "midiModule.h"
@@ -13,6 +13,7 @@
 #include "Sequencer.h"
 #include "global.h"
 #include "TimeController.h"
+#define kClockInterval 500
 
 /*
   Globals to refactor (in this file)
@@ -27,18 +28,18 @@
   - leds
 */
 
-TimeController controller;
+TimeController timeControl;
 masterClock clockMaster;
 
 void setup() {
   IntervalTimer masterClockTimer;
-  contoller.initialize();
+  timeControl.initialize();
 	masterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(masterClockTimer);
 }
 
 void loop() {
-  controller.runLoopHandler();
+  timeControl.runLoopHandler();
 }
 
 void masterLoop(){

@@ -1,14 +1,13 @@
 #include <Arduino.h>
-#include "inputModule.h"
+#include "InputModule.h"
 
 Zetaohm_MAX7301 max7301();
 
-inputModule interface;
 
-inputModule::inputModule(){
+InputModule::InputModule(){
 };
 
-void inputModule::buttonSetup() {
+void InputModule::buttonSetup() {
   Serial.println("button setup start");  delay(1);
 
   max7301.begin(5);                      delay(1);
@@ -44,7 +43,7 @@ void inputModule::buttonSetup() {
   Serial.println("button setup end");
 }
 
-void inputModule::buttonLoop(){
+void InputModule::buttonLoop(){
 
   max7301.update();
   knobPrevious = knobRead;
@@ -52,7 +51,7 @@ void inputModule::buttonLoop(){
   knobChange = knobRead - knobPrevious;
   //we always want the alt (non matrix) buttons to behave the same way
   altButtonHandler();
-  
+
   // now to handle the rest of the buttons.
   switch (currentState) {
     case STEP_DISPLAY:
@@ -87,7 +86,7 @@ void inputModule::buttonLoop(){
 
 // STATE VARIABLE INPUT HANDLERS
 
-void inputModule::patternSelectHandler(){
+void InputModule::patternSelectHandler(){
   for (int i=0; i < 16; i++){
     if (max7301.fell(i)){
       saveFile.changePattern(i, patternChannelSelector,  true, true);
@@ -98,7 +97,7 @@ void inputModule::patternSelectHandler(){
   }
 }
 
-void inputModule::channelMenuHandler(){
+void InputModule::channelMenuHandler(){
   if (max7301.fell(0)){
     sequence[selectedChannel].initNewSequence(sequence[selectedChannel].patternIndex, selectedChannel);
       changeState(STEP_DISPLAY);
@@ -130,7 +129,7 @@ void inputModule::channelMenuHandler(){
   }
 }
 
-void inputModule::channelButtonHandler(uint8_t channel){
+void InputModule::channelButtonHandler(uint8_t channel){
   uint8_t previous = patternChannelSelector;
   if (currentState == PATTERN_SELECT) {
     patternChannelSelector =  patternChannelSelector ^ (1 << channel);
@@ -145,7 +144,7 @@ void inputModule::channelButtonHandler(uint8_t channel){
   }
 }
 
-void inputModule::altButtonHandler(){
+void InputModule::altButtonHandler(){
   for (int i=16; i <28; i++){
     if (max7301.fell(i) ){
       switch (i){
@@ -223,7 +222,7 @@ void inputModule::altButtonHandler(){
   }
 
 
-  void inputModule::stepModeMatrixHandler(){
+  void InputModule::stepModeMatrixHandler(){
   //  saveTimer = 0;
     uint8_t instrumentSelectValue;
 
@@ -340,7 +339,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
 
 
 
-  void inputModule::sequencerMenuHandler(){
+  void InputModule::sequencerMenuHandler(){
     for (int i=0; i < 16; i++){
       if (max7301.fell(i)){
         switch (i) {
@@ -356,7 +355,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
     }
   }
 
-  void inputModule::instrumentSelectInputHandler() {
+  void InputModule::instrumentSelectInputHandler() {
 
     for (int i=0; i < 16; i++){
       if (max7301.fell(i)){
@@ -392,7 +391,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
 
   }
 
-  void inputModule::timingMenuInputHandler() {
+  void InputModule::timingMenuInputHandler() {
     for (int i=0; i < 16; i++){
       if (max7301.fell(i)){
         menuSelector = i;
@@ -409,18 +408,16 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
   }
 
 
-  void inputModule::debugScreenInputHandler(){
+  void InputModule::debugScreenInputHandler(){
     if(max7301.pressed(SW_ALT)){
 //      voltManual = positive_modulo(voltManual + 10*knobChange, 65535);
 
     } else {
       //voltManual = positive_modulo(voltManual + knobChange, 65535);
-
     }
   }
 
-
-  void inputModule::resetKnobValues(){
+  void InputModule::resetKnobValues(){
   	knobRead = 0;
   	knob.write(0);
   	//Serial.println("resetting knob: " + String(knob.read()));
@@ -428,10 +425,10 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
 
 
   // this subroutine initializes the new state.
-  void inputModule::changeState(uint8_t targetState){
+  void InputModule::changeState(uint8_t targetState){
     Serial.println("State change - current: " + String(currentState) + "\ttarget: " + String(targetState));
 
-    interface.resetKnobValues();
+    this->resetKnobValues();
 
     currentState = targetState;
 
