@@ -5,7 +5,6 @@ uint8_t getNoteLED(uint8_t index){
   return index + notePage * 16;
 }
 */
-LEDArray leds;
 elapsedMicros pixelTimer;
 
 LEDArray::LEDArray(){};

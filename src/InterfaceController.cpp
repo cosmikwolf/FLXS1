@@ -1,11 +1,10 @@
-#include "TimeController.h"
+#include "InterfaceController.h"
 
-#define kClockInterval 500
 #define kSerialSpeed 115200
 #define kMosiPin 11
 #define kSpiClockPin 13
 
-void TimeController::initialize() {
+void InterfaceController::initialize() {
   	Serial.begin(kSerialSpeed);
 
   	Serial.println("Initializing SPI");
@@ -15,16 +14,8 @@ void TimeController::initialize() {
 
   	Serial.println("Initializing Display");
     // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
-  	display.initialize();
+  	display->initialize();
 
-  	Serial.println("Initializing Sequence Objects");
-    // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
-  	sequence[0].initialize(0, 16, 4, (tempoX100/100));
-  	sequence[1].initialize(1, 16, 4, (tempoX100/100));
-  	sequence[2].initialize(2, 16, 4, (tempoX100/100));
-  	sequence[3].initialize(3, 16, 4, (tempoX100/100));
-
-  	Serial.println("Freeram: " + String(FreeRam2()));
   	Serial.println("Initializing SAM2695");
     // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
   	sam2695.begin();
@@ -34,7 +25,7 @@ void TimeController::initialize() {
   	sam2695.programChange(0, 3, 29);
 
   	Serial.println("Initializing Button Array");
-  	interface.buttonSetup();
+  	buttonIo->buttonSetup();
 
   	Serial.println("Initializing MIDI");
   	midiSetup();
@@ -66,17 +57,20 @@ void TimeController::initialize() {
 
   	Serial.println("Initializing Neopixels");
     // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
-    leds.initialize();
+    ledArray->initialize();
 
   	Serial.println("Beginning Master Clock");
 }
 
-void TimeController::runLoopHandler() {
-	leds.loop();
-	interface.buttonLoop();
-	display.displayLoop();
+void InterfaceController::displayLoop(){
+
 }
 
-void TimeController::masterClockHandler(){
+void InterfaceController::inputLoop(){
+  ledArray->loop();
+  buttonIo->buttonLoop();
+}
+
+void InterfaceController::ledLoop(){
 
 }
