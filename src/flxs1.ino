@@ -14,7 +14,6 @@
 #include "global.h"
 #include "TimeController.h"
 
-
 /*
   Globals to refactor (in this file)
   - display
