@@ -1,11 +1,5 @@
 #include <Arduino.h>
 #include "LEDArray.h"
-/*
-uint8_t getNoteLED(uint8_t index){
-  return index + notePage * 16;
-}
-*/
-
 
 LEDArray::LEDArray(){};
 
@@ -18,33 +12,33 @@ void LEDArray::initialize(){
 	LEDS.setBrightness(84);
 
   static uint8_t hue = 0;
+  for(int m=0; m<10; m++ ) {
+    for(int i = 0; i < NUM_LEDS; i++) {
+      // Set the i'th led to red
+      leds[i] = CHSV(hue++, 255, 255);
+      // Show the leds
 
-  for(int i = 0; i < NUM_LEDS; i++) {
-    // Set the i'th led to red
-    leds[i] = CHSV(hue++, 255, 255);
-    // Show the leds
+      FastLED.show();
+      // now that we've shown the leds, reset the i'th led to black
+      // leds[i] = CRGB::Black;
+      fadeall();
+      // Wait a little bit before we loop around and do it again
+      delay(1);
+    }
 
-    FastLED.show();
-    // now that we've shown the leds, reset the i'th led to black
-    // leds[i] = CRGB::Black;
-    fadeall();
-    // Wait a little bit before we loop around and do it again
-    delay(10);
-  }
-
-  // Now go in the other direction.
-  for(int i = (NUM_LEDS)-1; i >= 0; i--) {
-    // Set the i'th led to red
-    leds[i] = CHSV(hue++, 255, 255);
-    // Show the leds
-    FastLED.show();
-    // now that we've shown the leds, reset the i'th led to black
-    // leds[i] = CRGB::Black;
-    fadeall();
-    // Wait a little bit before we loop around and do it again
-    delay(10);
-  };
-
+    // Now go in the other direction.
+    for(int i = (NUM_LEDS)-1; i >= 0; i--) {
+      // Set the i'th led to red
+      leds[i] = CHSV(hue++, 255, 255);
+      // Show the leds
+      FastLED.show();
+      // now that we've shown the leds, reset the i'th led to black
+      // leds[i] = CRGB::Black;
+      fadeall();
+      // Wait a little bit before we loop around and do it again
+      delay(1);
+    };
+}
 };
 
 void LEDArray::loop(){
@@ -112,10 +106,7 @@ void LEDArray::loop(){
         }
       break;
     }
-    noInterrupts();
-      FastLED.show();
-    interrupts();
-
+    FastLED.show();
   }
 }
 

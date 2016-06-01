@@ -1,7 +1,4 @@
 #include <Arduino.h>
-#include "Adafruit_MCP23017.h"
-#include "Zetaohm_AD5676/Zetaohm_AD5676.h"
-#include "Zetaohm_SAM2695/Zetaohm_SAM2695.h"
 
 #ifndef _global_h_
 #define _global_h_

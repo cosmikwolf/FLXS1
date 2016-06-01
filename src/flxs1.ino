@@ -17,8 +17,7 @@
 
 
 #define kSerialSpeed 115200
-#define kClockInterval 500
-
+#define kClockInterval 1000
 #define kMosiPin 11
 #define kSpiClockPin 13
 

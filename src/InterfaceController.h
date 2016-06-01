@@ -15,7 +15,6 @@ class InterfaceController {
     InterfaceController();
     void initialize(OutputController * outputControl);
     void loop();
-  private:
     InputModule buttonIo;
     DisplayModule display;
     LEDArray ledArray;
