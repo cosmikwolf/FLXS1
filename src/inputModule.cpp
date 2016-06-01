@@ -3,12 +3,13 @@
 
 Zetaohm_MAX7301 max7301();
 
+InputModule::InputModule(){};
 
-InputModule::InputModule(){
-};
+void InputModule::buttonSetup(OutputController * outputControl) {
+  Serial.println("button setup start");
 
-void InputModule::buttonSetup() {
-  Serial.println("button setup start");  delay(1);
+  Zetaohm_MAX7301 max7301;
+  Serial.println("button setup 2");  delay(1);
 
   max7301.begin(5);                      delay(1);
   max7301.gpioPinMode(INPUT_PULLUP);     delay(1);
@@ -40,7 +41,11 @@ void InputModule::buttonSetup() {
   max7301.init(25, 24);  // SW_MENU
   max7301.init(26, 23);  // SW_ALT
   max7301.init(27, 22);  // SW_SPARE
+  Serial.println("button setup 1");
+
+  this->outputControl = outputControl;
   Serial.println("button setup end");
+
 }
 
 void InputModule::buttonLoop(){
@@ -200,9 +205,8 @@ void InputModule::altButtonHandler(){
 
         case SW_STOP:
           if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-            for(int s = 0; s < sequenceCount; s++){
-              sam2695.allNotesOff(s);
-              mcp.digitalWrite(s+4, LOW);
+            for(uint8_t channel = 0; channel < sequenceCount; channel++){
+              outputControl->allNotesOff(channel);
             }
           }
           playing = false;
@@ -312,7 +316,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
         instrumentSelectValue = positive_modulo(sequence[selectedChannel].instrument + knobChange,128);
         if (sequence[selectedChannel].instrument != instrumentSelectValue){
           sequence[selectedChannel].instrument = instrumentSelectValue;
-          sam2695.programChange(0, selectedChannel, sequence[selectedChannel].instrument);
+          outputControl->samCommand(PROGRAM_CHANGE, selectedChannel, sequence[selectedChannel].instrument);
         }
         break;
 
@@ -320,7 +324,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
         instrumentSelectValue = positive_modulo(sequence[selectedChannel].volume + knobChange, 128);
         if (sequence[selectedChannel].volume != instrumentSelectValue ){
           sequence[selectedChannel].volume = instrumentSelectValue;
-          sam2695.setChannelVolume(selectedChannel, sequence[selectedChannel].volume);
+          outputControl->samCommand(SET_CHANNEL_VOLUME, selectedChannel, sequence[selectedChannel].volume);
         }
         break;
 
@@ -370,21 +374,21 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
       instrumentSelectValue = positive_modulo(sequence[selectedChannel].instrument + knobChange,128);
       if (sequence[selectedChannel].instrument != instrumentSelectValue){
         sequence[selectedChannel].instrument = instrumentSelectValue;
-        sam2695.programChange(0, selectedChannel, sequence[selectedChannel].instrument);
+        outputControl->samCommand(PROGRAM_CHANGE, selectedChannel, sequence[selectedChannel].instrument);
       }
       break;
       case 4:
       instrumentSelectValue = positive_modulo(sequence[selectedChannel].volume + knobChange, 128);
       if (sequence[selectedChannel].volume != instrumentSelectValue ){
         sequence[selectedChannel].volume = instrumentSelectValue;
-        sam2695.setChannelVolume(selectedChannel, sequence[selectedChannel].volume);
+        outputControl->samCommand(SET_CHANNEL_VOLUME, selectedChannel, sequence[selectedChannel].volume);
       }
       break;
       case 8:
       instrumentSelectValue = positive_modulo(sequence[selectedChannel].bank + knobChange, 128) ;
       if (sequence[selectedChannel].bank != instrumentSelectValue ){
         sequence[selectedChannel].bank = instrumentSelectValue;
-        sam2695.setChannelBank(selectedChannel, sequence[selectedChannel].bank);
+        outputControl->samCommand(SET_CHANNEL_VOLUME, selectedChannel, sequence[selectedChannel].bank);
       }
       break;
     }

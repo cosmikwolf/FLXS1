@@ -3,7 +3,137 @@
 
 
 extern "C" const unsigned char glcdfont[];
+
+/********************************* low level pin initialization */
+
+
+
+#if defined(__MK20DX128__) || defined(__MK20DX256__)
+	OLED_SSD1351::OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
+	{
+		_cs   = cspin;
+		_rs   = dcpin;
+		_rst  = rstpin;
+		_mosi = mosi;
+		_sclk = sclk;
+	}
+
+#elif defined(__MKL26Z64__)
+	OLED_SSD1351::OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
+	{
+		_cs   = cspin;
+		_rs   = dcpin;
+		_rst  = rstpin;
+		_mosi = mosi;
+		_sclk = sclk;
+		_useSPI1 = false;
+		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) _useSPI1 = true;
+	}
+
+#else
+	OLED_SSD1351::OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin)
+	{
+		_cs   = cspin;
+		_rs   = dcpin;
+		_rst  = rstpin;
+	}
+
+#endif
 /***********************************/
+void OLED_SSD1351::begin(void) {
+	_initError = 0b00000000;
+
+	setTextColor(WHITE);
+	_width = OLED_WIDTH;
+	_height = OLED_HEIGHT;
+	_wrap = true;
+	_textsize  = 1;
+	_font      = NULL;
+	_cursor_x = 0;
+	_cursor_y = 0;
+	setRotation(0);
+
+  #if defined(__AVR__)
+		SSD1351_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE3);//mode3
+		SPI.begin();
+		pinMode(_cs, OUTPUT);
+		pinMode(_rs, OUTPUT);
+		digitalWrite(_cs, HIGH);
+		digitalWrite(_rs, HIGH);
+	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+		SSD1351_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);//mode3
+		if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
+			SPI.setMOSI(_mosi);
+			SPI.setSCK(_sclk);
+		} else {
+			bitSet(_initError,0);
+			return;
+		}
+		SPI.begin();
+		if (SPI.pinIsChipSelect(_cs, _rs)) {
+			pcs_data = SPI.setCS(_cs);
+			pcs_command = pcs_data | SPI.setCS(_rs);
+		} else {
+			pcs_data = 0;
+			pcs_command = 0;
+			bitSet(_initError,1);
+			return;
+		}
+	#endif
+	if (_rst && (_initError == 0)) {
+		pinMode(_rst, OUTPUT);
+		digitalWrite(_rst, HIGH);
+		delay(100);
+		digitalWrite(_rst, LOW);
+		delay(100);
+		digitalWrite(_rst, HIGH);
+		delay(100);
+	}
+
+    // Initialization Sequence
+    setRegister(_CMD_COMMANDLOCK,0x12);  // set command lock
+    setRegister(_CMD_COMMANDLOCK,0xB1);  // set command lock
+    writeCommand(_CMD_DISPLAYOFF);  		// 0xAE
+    writeCommand(_CMD_CLOCKDIV);  		// 0xB3
+    writeCommand(0xF1);  						// 7:4 = Oscillator Frequency, 3:0 = CLK Div Ratio (A[3:0]+1 = 1..16)
+    setRegister(_CMD_MUXRATIO,0x7F);
+    setRegister(_CMD_SETREMAP,0x74);
+
+    writeCommand(_CMD_SETCOLUMN);
+    writeData(0x00);
+		writeData(0x60);//96 px
+
+    /*if (OLED_HEIGHT == 96) {
+  	} else {
+  	  writeData(0x7F);//127
+	  }*/
+    writeCommand(_CMD_SETROW);
+    writeData(0x00);
+    writeData(0x7F);
+    setRegister(_CMD_STARTLINE,0x00);
+    setRegister(_CMD_DISPLAYOFFSET,0x60); 	// 0xA2
+    setRegister(_CMD_SETGPIO,0x00);
+    setRegister(_CMD_FUNCTIONSELECT,0x01);// internal (diode drop)
+    writeCommand(_CMD_PRECHARGE);  		// 0xB1
+    writeCommand(0x32);
+    writeCommand(_CMD_VCOMH);  			// 0xBE
+    writeCommand(0x05);
+    writeCommand(_CMD_NORMALDISPLAY);  	// 0xA6
+    writeCommand(_CMD_CONTRASTABC);
+    writeData(0xC8);
+    writeData(0x80);
+    writeData(0xC8);
+    setRegister(_CMD_CONTRASTMASTER,0x0F);
+    writeCommand(_CMD_SETVSL );
+    writeData(0xA0);
+    writeData(0xB5);
+    writeData(0x55);
+    setRegister(_CMD_PRECHARGE2,0x01);
+    writeCommand(_CMD_DISPLAYON);		//--turn on oled panel
+	clearScreen();
+	goTo(0, 0);
+}
+
 
 
 void OLED_SSD1351::goTo(int x, int y) {
@@ -190,98 +320,6 @@ void OLED_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
 }
 
 
-void OLED_SSD1351::begin(void) {
-	_initError = 0b00000000;
-	setTextColor(WHITE);
-	_width = OLED_WIDTH;
-	_height = OLED_HEIGHT;
-	_wrap = true;
-	_textsize  = 1;
-	_font      = NULL;
-	_cursor_x = 0;
-	_cursor_y = 0;
-	setRotation(0);
-    #if defined(__AVR__)
-		SSD1351_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE3);//mode3
-		SPI.begin();
-		pinMode(_cs, OUTPUT);
-		pinMode(_rs, OUTPUT);
-		digitalWrite(_cs, HIGH);
-		digitalWrite(_rs, HIGH);
-	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-		SSD1351_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);//mode3
-		if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
-			SPI.setMOSI(_mosi);
-			SPI.setSCK(_sclk);
-		} else {
-			bitSet(_initError,0);
-			return;
-		}
-		SPI.begin();
-		if (SPI.pinIsChipSelect(_cs, _rs)) {
-			pcs_data = SPI.setCS(_cs);
-			pcs_command = pcs_data | SPI.setCS(_rs);
-		} else {
-			pcs_data = 0;
-			pcs_command = 0;
-			bitSet(_initError,1);
-			return;
-		}
-	#endif
-	if (_rst && (_initError == 0)) {
-		pinMode(_rst, OUTPUT);
-		digitalWrite(_rst, HIGH);
-		delay(500);
-		digitalWrite(_rst, LOW);
-		delay(500);
-		digitalWrite(_rst, HIGH);
-		delay(500);
-	}
-
-    // Initialization Sequence
-    setRegister(_CMD_COMMANDLOCK,0x12);  // set command lock
-    setRegister(_CMD_COMMANDLOCK,0xB1);  // set command lock
-    writeCommand(_CMD_DISPLAYOFF);  		// 0xAE
-    writeCommand(_CMD_CLOCKDIV);  		// 0xB3
-    writeCommand(0xF1);  						// 7:4 = Oscillator Frequency, 3:0 = CLK Div Ratio (A[3:0]+1 = 1..16)
-    setRegister(_CMD_MUXRATIO,0x7F);
-    setRegister(_CMD_SETREMAP,0x74);
-
-    writeCommand(_CMD_SETCOLUMN);
-    writeData(0x00);
-		writeData(0x60);//96 px
-
-    /*if (OLED_HEIGHT == 96) {
-  	} else {
-  	  writeData(0x7F);//127
-	  }*/
-    writeCommand(_CMD_SETROW);
-    writeData(0x00);
-    writeData(0x7F);
-    setRegister(_CMD_STARTLINE,0x00);
-    setRegister(_CMD_DISPLAYOFFSET,0x60); 	// 0xA2
-    setRegister(_CMD_SETGPIO,0x00);
-    setRegister(_CMD_FUNCTIONSELECT,0x01);// internal (diode drop)
-    writeCommand(_CMD_PRECHARGE);  		// 0xB1
-    writeCommand(0x32);
-    writeCommand(_CMD_VCOMH);  			// 0xBE
-    writeCommand(0x05);
-    writeCommand(_CMD_NORMALDISPLAY);  	// 0xA6
-    writeCommand(_CMD_CONTRASTABC);
-    writeData(0xC8);
-    writeData(0x80);
-    writeData(0xC8);
-    setRegister(_CMD_CONTRASTMASTER,0x0F);
-    writeCommand(_CMD_SETVSL );
-    writeData(0xA0);
-    writeData(0xB5);
-    writeData(0x55);
-    setRegister(_CMD_PRECHARGE2,0x01);
-    writeCommand(_CMD_DISPLAYON);		//--turn on oled panel
-	clearScreen();
-	goTo(0, 0);
-}
-
 void  OLED_SSD1351::invert(boolean v) {
 	if (v) {
 		writeCommand(_CMD_INVERTDISPLAY);
@@ -290,41 +328,6 @@ void  OLED_SSD1351::invert(boolean v) {
 	}
  }
 
-/********************************* low level pin initialization */
-
-
-
-#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	OLED_SSD1351::OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
-	{
-		_cs   = cspin;
-		_rs   = dcpin;
-		_rst  = rstpin;
-		_mosi = mosi;
-		_sclk = sclk;
-	}
-
-#elif defined(__MKL26Z64__)
-	OLED_SSD1351::OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
-	{
-		_cs   = cspin;
-		_rs   = dcpin;
-		_rst  = rstpin;
-		_mosi = mosi;
-		_sclk = sclk;
-		_useSPI1 = false;
-		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) _useSPI1 = true;
-	}
-
-#else
-	OLED_SSD1351::OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin)
-	{
-		_cs   = cspin;
-		_rs   = dcpin;
-		_rst  = rstpin;
-	}
-
-#endif
 
 
 void OLED_SSD1351::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1,uint16_t color)

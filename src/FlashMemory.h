@@ -5,13 +5,13 @@
 #include "global.h"
 #include "Sequencer.h"
 
-#ifndef _fileOps_h_
-#define _fileOps_h_
+#ifndef _FlashMemory_h_
+#define _FlashMemory_h_
 
-class fileOps
+class FlashMemory
 {
 public:
-  fileOps();
+  FlashMemory();
 
   void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant);
   void initialize();
@@ -27,6 +27,6 @@ public:
 
 };
 
-extern fileOps saveFile;
+extern FlashMemory saveFile;
 
 #endif

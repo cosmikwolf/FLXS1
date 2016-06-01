@@ -1,9 +1,7 @@
 #include <Arduino.h>
 #include "global.h"
 
-Zetaohm_SAM2695 sam2695;
-Zetaohm_AD5676 ad5676;
-Adafruit_MCP23017 mcp;
+//Zetaohm_SAM2695 sam2695;
 
 uint32_t tempoX100 = 12000;
 uint8_t stepMode = 0;
@@ -23,7 +21,7 @@ uint8_t currentPattern = 0;
 uint8_t queuePattern = 0;
 boolean playing = false;
 
-// masterClock
+// MasterClock
 boolean wasPlaying = false;
 boolean tempoBlip = false;
 uint8_t masterPulseCount = 24;

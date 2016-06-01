@@ -102,7 +102,7 @@ void midiClockPulseHandler(){
       lastBeatLength = beatLength;
 
     }
-    //masterClockFunc();
+    //MasterClockFunc();
   }
 }
 

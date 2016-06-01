@@ -5,12 +5,14 @@ uint8_t getNoteLED(uint8_t index){
   return index + notePage * 16;
 }
 */
-elapsedMicros pixelTimer;
+
 
 LEDArray::LEDArray(){};
 
 void LEDArray::initialize(){
+  Serial.println("Initializing LED Array");
   pinMode(0, OUTPUT);
+
   LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
 	LEDS.setBrightness(84);
@@ -21,6 +23,7 @@ void LEDArray::initialize(){
     // Set the i'th led to red
     leds[i] = CHSV(hue++, 255, 255);
     // Show the leds
+
     FastLED.show();
     // now that we've shown the leds, reset the i'th led to black
     // leds[i] = CRGB::Black;
@@ -28,7 +31,6 @@ void LEDArray::initialize(){
     // Wait a little bit before we loop around and do it again
     delay(10);
   }
-  Serial.print("x");
 
   // Now go in the other direction.
   for(int i = (NUM_LEDS)-1; i >= 0; i--) {

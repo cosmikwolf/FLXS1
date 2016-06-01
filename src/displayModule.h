@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <SPI.h>
 #include "OLED_SSD1351/OLED_SSD1351.h"
 #include "Sequencer.h"
 #include "global.h"
@@ -31,6 +32,7 @@
 class DisplayModule
 {
   public:
+    DisplayModule();
 
     int color = 0;
     uint32_t runcount;
@@ -42,9 +44,8 @@ class DisplayModule
     uint8_t highlight;
     uint8_t previouslySelectedChannel;
     OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
-    elapsedMicros displayTimer;
 
-    DisplayModule();
+    elapsedMicros displayTimer;
     void initialize();
     void displayLoop();
 
@@ -83,6 +84,5 @@ class DisplayModule
 
 };
 
-extern DisplayModule display;
 
 #endif

@@ -14,9 +14,9 @@ Adafruit_MCP23017 mcp;
 Zetaohm_AD5676 ad5676;
 elapsedMillis counter;
 
-IntervalTimer masterClock;
+IntervalTimer MasterClock;
 IntervalTimer gateClock;
-uint32_t masterClockInterval = 700;
+uint32_t MasterClockInterval = 700;
 uint32_t gateFuncInterval = 5000;
 boolean gateFunc;
 
@@ -26,12 +26,12 @@ void setup(){
   ad5676.begin(3,14);
   ad5676.softwareReset();
   //ad5676.internalReferenceEnable(true);
-  masterClock.begin(masterClockFunc,masterClockInterval);
+  MasterClock.begin(MasterClockFunc,MasterClockInterval);
   gateClock.begin(gateNeopixelFunc,gateFuncInterval);
 //pinMode(2, OUTPUT);
   pixels.begin();
   pixels.setBrightness(100);
-  SPI.usingInterrupt(masterClock);
+  SPI.usingInterrupt(MasterClock);
   mcp.begin(1);      // use default address 0
 
   mcp.pinMode(0, OUTPUT);
@@ -169,7 +169,7 @@ void gateNeopixelFunc(){
     gateFunc = true;
   }
 }
-void masterClockFunc(){
+void MasterClockFunc(){
   Serial.println("master clock func");
  float a = sin(micros()/50000.0)+1.0;
  uint16_t n = a * 32767;

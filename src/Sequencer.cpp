@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "Sequencer.h"
-
 Sequencer sequence[4];
+
 
 Sequencer::Sequencer() {
 
@@ -9,6 +9,7 @@ Sequencer::Sequencer() {
 
 void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100){
   // initialization routine that runs during setup
+	Serial.println("Initializing Sequencer Object");
 	this->channel = ch;
 	this->stepCount = stepCount;
   this->beatCount = beatCount;

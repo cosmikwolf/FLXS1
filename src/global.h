@@ -8,7 +8,6 @@
 
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		 	 7
-
 #define	SEQUENCE_MENU		 	  2
 #define TIMING_MENU 	  	 66
 #define INSTRUMENT_MENU 	 68
@@ -35,13 +34,6 @@
 #define	DEBUG_SCREEN			127
 #define DEBUG_PIN					 15
 #define SD_CS_PIN					  2
-#define OLED_DC						 10
-#define OLED_CS						  6
-#define OLED_RST					  9
-
-extern Zetaohm_SAM2695 sam2695;
-extern Zetaohm_AD5676 ad5676;
-extern Adafruit_MCP23017 mcp;
 
 extern uint32_t tempoX100;
 extern uint8_t stepMode;
@@ -55,15 +47,13 @@ extern uint8_t patternChannelSelector;
 
 extern boolean extClock;
 extern boolean debugBoolean;
-// fileops
+// FlashMemory
 extern uint8_t sequenceCount;
 extern uint8_t currentPattern;
 extern uint8_t queuePattern;
 extern boolean playing;
 
-// masterClock
-extern IntervalTimer masterClockTimer;
-extern uint32_t masterClockInterval;
+// MasterClock
 extern uint8_t masterPulseCount;
 extern boolean wasPlaying;
 extern boolean tempoBlip;

@@ -1,20 +1,17 @@
 #include <Arduino.h>
+#include "OutputController.h"
 #include "Sequencer.h"
 #include "midiModule.h"
 #include "global.h"
 
 // DAC Mapping for each channel:
-#ifndef _masterClock_h_
-#define _masterClock_h_
+#ifndef _MasterClock_h_
+#define _MasterClock_h_
 
-class masterClock {
+class MasterClock {
 
 public:
-  masterClock();
-  uint8_t gateMap[4]  = {4, 6, 5, 7};
-  uint8_t dacCvMap[4] = {0, 4, 2, 6};
-  uint8_t dacCcMap[4] = {1, 5, 3, 7};
-
+  void initialize(OutputController* outputControl);
   void changeTempo(uint32_t newTempoX100);
   void masterClockFunc(void);
   void internalClockTick();
@@ -22,6 +19,11 @@ public:
   void noteOffSwitch();
   void noteOnSwitch();
 
+  uint8_t gateMap[4];
+  uint8_t dacCvMap[4];
+  uint8_t dacCcMap[4];
+private:
+  OutputController* outputControl;
 };
 
 #endif

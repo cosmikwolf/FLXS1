@@ -95,6 +95,7 @@
 class OLED_SSD1351 : public Print {
  public:
 
+	 
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		OLED_SSD1351(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,uint8_t mosi=11,uint8_t sclk=13);
 	#elif defined(__MKL26Z64__)

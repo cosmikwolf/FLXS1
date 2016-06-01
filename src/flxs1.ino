@@ -4,16 +4,23 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <i2c_t3.h>
-#include "InputModule.h"
-#include "DisplayModule.h"
-#include "masterClock.h"
-#include "midiModule.h"
-#include "fileOps.h"
-#include "LEDArray.h"
-#include "Sequencer.h"
-#include "global.h"
 #include "TimeController.h"
+#include "Sequencer.h"
+
+#include "global.h"
+
+//#include "InputModule.h"
+//#include "DisplayModule.h"
+//#include "midiModule.h"
+//#include "FlashMemory.h"
+//#include "LEDArray.h"
+
+
+#define kSerialSpeed 115200
 #define kClockInterval 500
+
+#define kMosiPin 11
+#define kSpiClockPin 13
 
 /*
   Globals to refactor (in this file)
@@ -29,13 +36,22 @@
 */
 
 TimeController timeControl;
-masterClock clockMaster;
+IntervalTimer MasterClockTimer;
 
 void setup() {
-  IntervalTimer masterClockTimer;
+  Serial.begin(kSerialSpeed);
+  while (!Serial){
+      ;
+  };
+  Serial.println("Setup Start");
+  SPI.begin();
+	SPI.setMOSI(kMosiPin);
+	SPI.setSCK(kSpiClockPin);
+
   timeControl.initialize();
-	masterClockTimer.begin(masterLoop,kClockInterval);
-	SPI.usingInterrupt(masterClockTimer);
+	MasterClockTimer.begin(masterLoop,kClockInterval);
+	SPI.usingInterrupt(MasterClockTimer);
+  Serial.println("Setup Complete");
 }
 
 void loop() {
@@ -43,5 +59,5 @@ void loop() {
 }
 
 void masterLoop(){
-  clockMaster.masterClockFunc();
+  timeControl.masterClockHandler();
 }

@@ -1,14 +1,14 @@
 #include <Arduino.h>
-#include "fileOps.h"
+#include "FlashMemory.h"
 /*
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 */
-fileOps saveFile;
-fileOps::fileOps(){};
+FlashMemory saveFile;
+FlashMemory::FlashMemory(){};
 
-void fileOps::jsonTest(){
+void FlashMemory::jsonTest(){
   /*
     if (SD.exists("json.txt")) {
     Serial.println("json.txt exists. deleting...");
@@ -66,7 +66,7 @@ StaticJsonBuffer<1024> jsonBuffer;
 */
 }
 
-void fileOps::initialize(){
+void FlashMemory::initialize(){
 
   if (!SD.begin(SD_CS_PIN)){
     Serial.println("SD Card initialization failed!");
@@ -86,10 +86,10 @@ void fileOps::initialize(){
 
   loadPattern(0, 0b1111);
 
-
+  Serial.println("Flash Memory Initialization Complete");
 }
 
-void fileOps::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
+void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
 	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
 	if(saveFirst){
     for(int i=0; i < sequenceCount; i++){
@@ -107,7 +107,7 @@ void fileOps::changePattern(uint8_t pattern, uint8_t channelSelector, boolean sa
   }
 }
 
-void fileOps::deleteSaveFile(){
+void FlashMemory::deleteSaveFile(){
   SD.remove("data.txt");
   for(int i=0; i<16; i++){
     for(int n=0; n<sequenceCount; n++){
@@ -120,7 +120,7 @@ void fileOps::deleteSaveFile(){
 
 }
 
-void fileOps::saveSequenceJSON(Sequencer& sequence){
+void FlashMemory::saveSequenceJSON(Sequencer& sequence){
 //elaspedMicros jsonSaveTimer = 0;
   StaticJsonBuffer<16384> jsonBuffer;
 
@@ -161,7 +161,7 @@ void fileOps::saveSequenceJSON(Sequencer& sequence){
 
 }
 /*
-void fileOps::saveChannelPattern_JSON(uint8_t channel) {
+void FlashMemory::saveChannelPattern_JSON(uint8_t channel) {
     Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card as JSON FILE. time:\t" + String(micros()) );
 
     root.createNestedObject(String(sequence[channel].patternIndex).concat(String(channel));
@@ -188,7 +188,7 @@ void fileOps::saveChannelPattern_JSON(uint8_t channel) {
 }
 */
 
-void fileOps::saveChannelPattern(uint8_t channel) {
+void FlashMemory::saveChannelPattern(uint8_t channel) {
   Serial.println("Saving pattern " + String(sequence[channel].patternIndex) + " channel " + String(channel) + " to SD Card. time:\t" + String(micros()) );
  // for(int i=0; i < sequenceCount; i++){
  	  int index = int(
@@ -243,7 +243,7 @@ void fileOps::saveChannelPattern(uint8_t channel) {
 
 }
 
-void fileOps::loadPattern(uint8_t pattern, uint8_t channelSelector) {
+void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
   Serial.println("========= LOADING PATTERN: " + String(pattern));
   printPattern();
@@ -303,8 +303,8 @@ void fileOps::loadPattern(uint8_t pattern, uint8_t channelSelector) {
     }
     Serial.println("reading complete!");
 
-    sam2695.programChange(0, i, sequence[i].instrument);
-    sam2695.setChannelVolume(i, sequence[i].volume);
+    //sam2695.programChange(0, i, sequence[i].instrument);
+    //sam2695.setChannelVolume(i, sequence[i].volume);
 
     sequence[i].quantizeKey = 1;
     // if no steps are set, it is an empty sequence. initialize a new default sequence.
@@ -329,7 +329,7 @@ void fileOps::loadPattern(uint8_t pattern, uint8_t channelSelector) {
   printPattern();
 }
 
-void fileOps::printDirectory(File dir, int numTabs) {
+void FlashMemory::printDirectory(File dir, int numTabs) {
    while(true) {
 
      File entry =  dir.openNextFile();
@@ -354,7 +354,7 @@ void fileOps::printDirectory(File dir, int numTabs) {
    }
 }
 
-void fileOps::printPattern(){
+void FlashMemory::printPattern(){
   Serial.println("Printing Data for pattern: " + String(currentPattern));
   for(int i=0; i < sequenceCount; i++){
     Serial.print("sc:\t"+String(sequence[i].stepCount) +"\tbc:\t"+String(sequence[i].beatCount) +"\tqk:\t"+String(sequence[i].quantizeKey)+"\tinst:\t"+String(sequence[i].instrument)+"\tit:\t"+String(sequence[i].instType) + "\t");

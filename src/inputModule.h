@@ -2,10 +2,11 @@
 #include <SPI.h>
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 #include <Encoder.h>
+#include "OutputController.h"
 #include "DisplayModule.h"
 #include "Sequencer.h"
-#include "masterClock.h"
-#include "fileOps.h"
+#include "MasterClock.h"
+#include "FlashMemory.h"
 #include "GameOfLife.h"
 #include "global.h"
 
@@ -47,7 +48,11 @@ class InputModule
 {
 public:
   InputModule();
-  void buttonSetup();
+  Encoder knob = Encoder(ENCODER1LEFTPIN, ENCODER1RIGHTPIN);
+  Zetaohm_MAX7301 max7301;
+  OutputController* outputControl;
+
+  void buttonSetup(OutputController* outputControl);
   void buttonLoop();
   void patternSelectHandler();
   void channelMenuHandler();
@@ -60,9 +65,6 @@ public:
   void debugScreenInputHandler();
   void resetKnobValues();
   void changeState(uint8_t state);
-
-  Encoder knob = Encoder(ENCODER1LEFTPIN, ENCODER1RIGHTPIN);
-  Zetaohm_MAX7301 max7301;
 
   // Encoder vars
   int8_t knobRead = 0;

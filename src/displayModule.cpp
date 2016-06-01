@@ -5,13 +5,12 @@
 #include "../commonFonts/fonts/font_Arial.cpp"
 */
 //    coord_t   i, j;
-DisplayModule display;
-
+elapsedMicros displayTimer;
 DisplayModule::DisplayModule(){
 };
 
 void DisplayModule::initialize(){
-  displayTimer = 0;
+  Serial.println("Initializing Display");
   oled.begin();
   oled.fillScreen(BLACK);     delay(10);
   oled.fillScreen(RED);     delay(10);
@@ -52,6 +51,8 @@ void DisplayModule::initialize(){
   oled.invert(true);    delay(100);
   oled.invert(false);
   oled.fillScreen(BLUE);
+
+  Serial.println("Display Initialization Complete");
 }
 
 void DisplayModule::clearDisplay(){

@@ -4,31 +4,21 @@
 #include <Arduino.h>
 #include <Encoder.h>
 #include <Adafruit_MCP23017.h>
-
 #include "DisplayModule.h"
 #include "LEDArray.h"
-#include "Zetaohm_AD5676/Zetaohm_AD5676.h"
-#include "Zetaohm_SAM2695/Zetaohm_SAM2695.h"
 #include "InputModule.h"
-//#include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
-
+#include "OutputController.h"
 #include "global.h"
 
 class InterfaceController {
   public:
-    void initialize();
-    void displayLoop();
-    void inputLoop();
-    void ledLoop();
-
+    InterfaceController();
+    void initialize(OutputController * outputControl);
+    void loop();
   private:
-    Zetaohm_AD5676 *dac;
-    Zetaohm_SAM2695 *midiSam;
-    Adafruit_MCP23017 *gateIo;
-    InputModule *buttonIo;
-    Encoder *rotaryKnob;
-    DisplayModule *display;
-    LEDArray *ledArray;
+    InputModule buttonIo;
+    DisplayModule display;
+    LEDArray ledArray;
 };
 
 #endif
