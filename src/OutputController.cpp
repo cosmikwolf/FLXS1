@@ -3,9 +3,6 @@
 
 void OutputController::initialize(){
   Serial.println("Initializing SAM2695");
-  Zetaohm_SAM2695 sam2695;
-  Zetaohm_AD5676 ad5676;
-  Adafruit_MCP23017 mcp;
 
   // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
   sam2695.begin();

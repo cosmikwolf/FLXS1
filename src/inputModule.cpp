@@ -8,7 +8,8 @@ InputModule::InputModule(){};
 void InputModule::buttonSetup(OutputController * outputControl) {
   Serial.println("button setup start");
 
-  Zetaohm_MAX7301 max7301;
+  this->outputControl = outputControl;
+
   Serial.println("button setup 2");  delay(1);
 
   max7301.begin(5);                      delay(1);
@@ -43,7 +44,6 @@ void InputModule::buttonSetup(OutputController * outputControl) {
   max7301.init(27, 22);  // SW_SPARE
   Serial.println("button setup 1");
 
-  this->outputControl = outputControl;
   Serial.println("button setup end");
 
 }

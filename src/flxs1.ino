@@ -10,7 +10,7 @@
 #include "global.h"
 
 //#include "InputModule.h"
-//#include "DisplayModule.h"
+#include "DisplayModule.h"
 //#include "midiModule.h"
 //#include "FlashMemory.h"
 //#include "LEDArray.h"
@@ -21,28 +21,15 @@
 #define kMosiPin 11
 #define kSpiClockPin 13
 
-/*
-  Globals to refactor (in this file)
-  - display
-  - sequence
-  - sam2695
-  - tempoX100
-  - interface
-  - ad5676
-  - mcp
-  - saveFile
-  - leds
-*/
-
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
 
 void setup() {
   Serial.begin(kSerialSpeed);
-  while (!Serial){
-      ;
-  };
+  //waiting for serial to begin
+  delay(1500);
   Serial.println("Setup Start");
+  
   SPI.begin();
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);

@@ -21,6 +21,7 @@ public:
   void printDirectory(File dir, int numTabs);
   void printPattern();
   void saveSequenceJSON(Sequencer&);
+  void readSequenceJSON(Sequencer&);
   void jsonTest();
   File saveData;
   File jsonFile;

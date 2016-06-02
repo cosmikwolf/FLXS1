@@ -13,7 +13,7 @@ class MasterClock {
 public:
   void initialize(OutputController* outputControl);
   void changeTempo(uint32_t newTempoX100);
-  void masterClockFunc(void);
+  void masterClockFunc();
   void internalClockTick();
   void externalClockTick();
   void noteOffSwitch();

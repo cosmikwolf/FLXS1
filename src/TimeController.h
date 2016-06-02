@@ -4,9 +4,14 @@
 #include <Arduino.h>
 #include <Encoder.h>
 #include <Adafruit_MCP23017.h>
+#include <Encoder.h>
+
+#include "DisplayModule.h"
+#include "LEDArray.h"
+#include "InputModule.h"
+
 #include "MasterClock.h"
 #include "OutputController.h"
-#include "InterfaceController.h"
 #include "Sequencer.h"
 #include "global.h"
 
@@ -20,7 +25,9 @@ class TimeController {
   private:
     MasterClock clockMaster;
     OutputController outputControl;
-    InterfaceController interfaceControl;
+    InputModule buttonIo;
+    DisplayModule display;
+    LEDArray ledArray;
 };
 
 #endif

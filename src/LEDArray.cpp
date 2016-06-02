@@ -106,7 +106,9 @@ void LEDArray::loop(){
         }
       break;
     }
+    noInterrupts();
     FastLED.show();
+    interrupts();
   }
 }
 

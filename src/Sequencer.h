@@ -68,6 +68,7 @@ class Sequencer
 		};
 
 		struct StepUtil {
+			// data that is used in sequence playback, but does not need to be stored
 			uint16_t		beat;			// beat in which the note is triggered - recalculated each beat
 			uint32_t		offset;		    // note start time offset in mcs from the beat start - recalculated each beat
 			uint8_t			noteStatus;		// if note is playing or not

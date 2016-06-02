@@ -93,7 +93,7 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
 	if(saveFirst){
     for(int i=0; i < sequenceCount; i++){
-  		//saveChannelPattern(i);
+  		saveChannelPattern(i);
     }
     Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	}
@@ -124,12 +124,12 @@ void FlashMemory::saveSequenceJSON(Sequencer& sequence){
 //elaspedMicros jsonSaveTimer = 0;
   StaticJsonBuffer<16384> jsonBuffer;
 
-  SD.remove("json.txt");
-  // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
-  //StaticJsonBuffer<512> jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
 
-  //JsonArray& data = root.createNestedArray("data");
+  SD.remove("json.txt");
+  elapsedMillis flashTimer = 0;
+
+  // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
+  JsonObject& root = jsonBuffer.createObject();
 
   root["stepCount"]     = sequence.stepCount;
   root["beatCount"]     = sequence.beatCount;
@@ -155,9 +155,41 @@ void FlashMemory::saveSequenceJSON(Sequencer& sequence){
   }
 
   jsonFile = SD.open("json.txt", FILE_WRITE);
+  Serial.println("flash Timer before write: " + String(flashTimer) );
+
+
+
   root.prettyPrintTo(jsonFile);
   jsonFile.close();
+  Serial.println("flash Timer after write: " + String(flashTimer) );
+
 //  Serial.println(String(jsonSaveTimer))
+
+}
+
+void FlashMemory::readSequenceJSON(Sequencer& sequence){
+  StaticJsonBuffer<1024> jsonBuffer;
+
+    char* charBuffer;                              // Declare a pointer to your buffer.
+    jsonFile = SD.open("json.txt", FILE_READ);
+    if (jsonFile)
+    {
+        unsigned int fileSize = jsonFile.size();  // Get the file size.
+        charBuffer = (char*)malloc(fileSize + 1);  // Allocate memory for the file and a terminating null char.
+        jsonFile.read(charBuffer, fileSize);         // Read the file into the buffer.
+        charBuffer[fileSize] = '\0';               // Add the terminating null char.
+      //  Serial.println(charBuffer);                // Print the file to the serial monitor.
+        jsonFile.close();                         // Close the file.
+    }
+    // *** Use the buffer as needed here. ***
+    Serial.println("Sizeof charBuffer: " + String(sizeof(charBuffer)));
+    JsonObject& jsonReader = jsonBuffer.parseObject(charBuffer);
+    free(charBuffer);                              // Free the memory that was used by the buffer.
+
+    if (!jsonReader.success()) {
+      Serial.println("parseObject() failed");
+      return;
+    }
 
 }
 /*
