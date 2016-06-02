@@ -18,9 +18,9 @@ void TimeController::initialize() {
   sequence[2].initialize(2, 16, 4, (tempoX100/100));
   sequence[3].initialize(3, 16, 4, (tempoX100/100));
 
-	saveFile.saveSequenceJSON(sequence[0]);
-	saveFile.readSequenceJSON(sequence[0]);
-	
+	saveFile.saveSequenceJSON(sequence[0], 0 );
+	saveFile.readSequenceJSON(sequence[0], 0);
+
 }
 
 void TimeController::runLoopHandler() {

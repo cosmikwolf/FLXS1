@@ -120,15 +120,18 @@ void FlashMemory::deleteSaveFile(){
 
 }
 
-void FlashMemory::saveSequenceJSON(Sequencer& sequence){
-//elaspedMicros jsonSaveTimer = 0;
+//void FlashMemory::saveSequenceJSON(Sequencer& sequence, char *pattern ){
+void FlashMemory::saveSequenceJSON(Sequencer& sequence, uint8_t pattern){
+  //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
   StaticJsonBuffer<16384> jsonBuffer;
+  char* fileNameChar = new char[100];
+  strcpy(fileNameChar, pattern);
+  strcat(fileNameChar,".json");
 
-
-  SD.remove("json.txt");
+  SD.remove(fileNameChar);
   elapsedMillis flashTimer = 0;
 
-  // following ArduinoJSON serialize example: https://github.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
+  // following ArduinoJSON serialize example: https://githtub.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
   JsonObject& root = jsonBuffer.createObject();
 
   root["stepCount"]     = sequence.stepCount;
@@ -141,25 +144,27 @@ void FlashMemory::saveSequenceJSON(Sequencer& sequence){
   root["channel"]       = sequence.channel;
   root["patternIndex"]  = sequence.patternIndex;
 
+  Serial.println("flash Timer before array: " + String(flashTimer) );
   JsonArray& stepDataArray = root.createNestedArray("stepData");
 
   for (int i=0; i< 128; i++){
     JsonObject& stepDataObj = jsonBuffer.createObject();
-    stepDataObj["stepnum"] = i ;
-    stepDataObj["pitch"] = sequence.stepData[i].pitch ;
-    stepDataObj["gateLength"] = sequence.stepData[i].gateLength ;
-    stepDataObj["gateType"] = sequence.stepData[i].gateType ;
-    stepDataObj["velocity"] = sequence.stepData[i].velocity ;
-    stepDataObj["glide"] = sequence.stepData[i].glide ;
+    stepDataObj["i"] = i ;
+    stepDataObj["p"] = sequence.stepData[i].pitch ;
+    stepDataObj["gl"] = sequence.stepData[i].gateLength ;
+    stepDataObj["gt"] = sequence.stepData[i].gateType ;
+    stepDataObj["v"] = sequence.stepData[i].velocity ;
+    stepDataObj["g"] = sequence.stepData[i].glide ;
     stepDataArray.add(stepDataObj);
   }
 
-  jsonFile = SD.open("json.txt", FILE_WRITE);
+  Serial.println("flash Timer before file open: " + String(flashTimer) );
+  jsonFile = SD.open(fileNameChar, FILE_WRITE);
+  delete(fileNameChar);
   Serial.println("flash Timer before write: " + String(flashTimer) );
+  root.printTo(jsonFile);
+  Serial.println("fileSize: " + String(jsonFile.size()));
 
-
-
-  root.prettyPrintTo(jsonFile);
   jsonFile.close();
   Serial.println("flash Timer after write: " + String(flashTimer) );
 
@@ -167,28 +172,55 @@ void FlashMemory::saveSequenceJSON(Sequencer& sequence){
 
 }
 
-void FlashMemory::readSequenceJSON(Sequencer& sequence){
+void FlashMemory::readSequenceJSON(Sequencer& sequence, uint8_t pattern){
   StaticJsonBuffer<1024> jsonBuffer;
-
+    char* fileNameChar = new char[100];
+    strcpy(fileNameChar,pattern);
+    strcat(fileNameChar,".json");
+    Serial.print("filename char: ");
+    Serial.println(fileNameChar);
     char* charBuffer;                              // Declare a pointer to your buffer.
-    jsonFile = SD.open("json.txt", FILE_READ);
+    jsonFile = SD.open(fileNameChar, FILE_READ);
     if (jsonFile)
     {
         unsigned int fileSize = jsonFile.size();  // Get the file size.
         charBuffer = (char*)malloc(fileSize + 1);  // Allocate memory for the file and a terminating null char.
         jsonFile.read(charBuffer, fileSize);         // Read the file into the buffer.
         charBuffer[fileSize] = '\0';               // Add the terminating null char.
-      //  Serial.println(charBuffer);                // Print the file to the serial monitor.
+        //Serial.println(charBuffer);                // Print the file to the serial monitor.
         jsonFile.close();                         // Close the file.
     }
     // *** Use the buffer as needed here. ***
     Serial.println("Sizeof charBuffer: " + String(sizeof(charBuffer)));
     JsonObject& jsonReader = jsonBuffer.parseObject(charBuffer);
     free(charBuffer);                              // Free the memory that was used by the buffer.
-
+    delete(fileNameChar);
     if (!jsonReader.success()) {
       Serial.println("parseObject() failed");
       return;
+    }
+     sequence.stepCount    = jsonReader["stepCount"];
+     sequence.beatCount    = jsonReader["beatCount"];
+     sequence.quantizeKey  = jsonReader["quantizeKey"];
+     sequence.instrument   = jsonReader["instrument"];
+     sequence.instType     = jsonReader["instType"];
+     sequence.volume       = jsonReader["volume"];
+     sequence.bank         = jsonReader["bank"];
+     sequence.channel      = jsonReader["channel"];
+     sequence.patternIndex = jsonReader["patternIndex"];
+
+     JsonArray& stepDataArray = jsonReader["stepData"];
+
+    for (int i=0; i< 128; i++){
+       if (i != int(stepDataArray[i]["i"]) ) {
+         Serial.println("Step Data Index Mismatch Error");
+         return;
+       };
+       sequence.stepData[i].pitch  = stepDataArray[i]["p"];
+       sequence.stepData[i].gateLength  = stepDataArray[i]["gl"];
+       sequence.stepData[i].gateType  = stepDataArray[i]["gt"];
+       sequence.stepData[i].velocity  = stepDataArray[i]["v"];
+       sequence.stepData[i].glide  = stepDataArray[i]["g"];
     }
 
 }

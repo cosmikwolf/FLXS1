@@ -20,8 +20,8 @@ public:
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
   void printPattern();
-  void saveSequenceJSON(Sequencer&);
-  void readSequenceJSON(Sequencer&);
+  void saveSequenceJSON(Sequencer& sequence, uint8_t pattern);
+  void readSequenceJSON(Sequencer& sequence, uint8_t pattern);
   void jsonTest();
   File saveData;
   File jsonFile;
