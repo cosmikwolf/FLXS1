@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include "FlashMemory.h"
+#define FILE_EXISTS 0
+#define SAVEFILE_DOES_NOT_EXIST 1
+#define READ_JSON_ERROR 2
 /*
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
@@ -93,7 +96,8 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
 	if(saveFirst){
     for(int i=0; i < sequenceCount; i++){
-  		saveChannelPattern(i);
+  		//saveChannelPattern(i);
+      saveSequenceJSON(&sequence[i], i, currentPattern);
     }
     Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	}
@@ -108,121 +112,130 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 }
 
 void FlashMemory::deleteSaveFile(){
-  SD.remove("data.txt");
   for(int i=0; i<16; i++){
     for(int n=0; n<sequenceCount; n++){
       sequence[n].initNewSequence(i, n);
-      saveChannelPattern(n);
     }
+
   }
-
   loadPattern(0, 0b1111);
-
 }
 
 //void FlashMemory::saveSequenceJSON(Sequencer& sequence, char *pattern ){
-void FlashMemory::saveSequenceJSON(Sequencer& sequence, uint8_t pattern){
+void FlashMemory::saveSequenceJSON(Sequencer* sequence, uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
   StaticJsonBuffer<16384> jsonBuffer;
-  char* fileNameChar = new char[100];
-  strcpy(fileNameChar, pattern);
-  strcat(fileNameChar,".json");
+  char *fileNameChar = (char *) malloc(sizeof(char) * 12);
+  strcpy(fileNameChar, "p");
+  strcat(fileNameChar, String(pattern).c_str());
+  strcat(fileNameChar, "ch");
+  strcat(fileNameChar, String(channel).c_str());
+  strcat(fileNameChar,".jsn");
 
-  SD.remove(fileNameChar);
   elapsedMillis flashTimer = 0;
 
   // following ArduinoJSON serialize example: https://githtub.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
   JsonObject& root = jsonBuffer.createObject();
 
-  root["stepCount"]     = sequence.stepCount;
-  root["beatCount"]     = sequence.beatCount;
-  root["quantizeKey"]   = sequence.quantizeKey;
-  root["instrument"]    = sequence.instrument;
-  root["instType"]      = sequence.instType;
-  root["volume"]        = sequence.volume;
-  root["bank"]          = sequence.bank;
-  root["channel"]       = sequence.channel;
-  root["patternIndex"]  = sequence.patternIndex;
+  root["stepCount"]     = sequence->stepCount;
+  root["beatCount"]     = sequence->beatCount;
+  root["quantizeKey"]   = sequence->quantizeKey;
+  root["instrument"]    = sequence->instrument;
+  root["instType"]      = sequence->instType;
+  root["volume"]        = sequence->volume;
+  root["bank"]          = sequence->bank;
+  root["channel"]       = sequence->channel;
+  root["patternIndex"]  = sequence->patternIndex;
 
-  Serial.println("flash Timer before array: " + String(flashTimer) );
   JsonArray& stepDataArray = root.createNestedArray("stepData");
 
   for (int i=0; i< 128; i++){
     JsonObject& stepDataObj = jsonBuffer.createObject();
     stepDataObj["i"] = i ;
-    stepDataObj["p"] = sequence.stepData[i].pitch ;
-    stepDataObj["gl"] = sequence.stepData[i].gateLength ;
-    stepDataObj["gt"] = sequence.stepData[i].gateType ;
-    stepDataObj["v"] = sequence.stepData[i].velocity ;
-    stepDataObj["g"] = sequence.stepData[i].glide ;
+    stepDataObj["p"] = sequence->stepData[i].pitch ;
+    stepDataObj["gl"] = sequence->stepData[i].gateLength ;
+    stepDataObj["gt"] = sequence->stepData[i].gateType ;
+    stepDataObj["v"] = sequence->stepData[i].velocity ;
+    stepDataObj["g"] = sequence->stepData[i].glide ;
     stepDataArray.add(stepDataObj);
   }
 
-  Serial.println("flash Timer before file open: " + String(flashTimer) );
+  SD.remove(fileNameChar);
   jsonFile = SD.open(fileNameChar, FILE_WRITE);
-  delete(fileNameChar);
-  Serial.println("flash Timer before write: " + String(flashTimer) );
+  jsonFile.seek(0);
   root.printTo(jsonFile);
   Serial.println("fileSize: " + String(jsonFile.size()));
-
   jsonFile.close();
+  Serial.print("fileNameChar: ");
+  Serial.println(fileNameChar);
+
+  free(fileNameChar);
+
   Serial.println("flash Timer after write: " + String(flashTimer) );
 
 //  Serial.println(String(jsonSaveTimer))
 
 }
 
-void FlashMemory::readSequenceJSON(Sequencer& sequence, uint8_t pattern){
-  StaticJsonBuffer<1024> jsonBuffer;
-    char* fileNameChar = new char[100];
-    strcpy(fileNameChar,pattern);
-    strcat(fileNameChar,".json");
-    Serial.print("filename char: ");
-    Serial.println(fileNameChar);
+int FlashMemory::readSequenceJSON(Sequencer* sequence, uint8_t channel, uint8_t pattern){
+    char *fileNameChar = (char *) malloc(sizeof(char) * 12);
+    strcpy(fileNameChar, "P");
+    strcat(fileNameChar, String(pattern).c_str());
+    strcat(fileNameChar, "CH");
+    strcat(fileNameChar, String(channel).c_str());
+    strcat(fileNameChar,".JSN");
     char* charBuffer;                              // Declare a pointer to your buffer.
-    jsonFile = SD.open(fileNameChar, FILE_READ);
-    if (jsonFile)
-    {
-        unsigned int fileSize = jsonFile.size();  // Get the file size.
-        charBuffer = (char*)malloc(fileSize + 1);  // Allocate memory for the file and a terminating null char.
-        jsonFile.read(charBuffer, fileSize);         // Read the file into the buffer.
-        charBuffer[fileSize] = '\0';               // Add the terminating null char.
-        //Serial.println(charBuffer);                // Print the file to the serial monitor.
-        jsonFile.close();                         // Close the file.
-    }
-    // *** Use the buffer as needed here. ***
-    Serial.println("Sizeof charBuffer: " + String(sizeof(charBuffer)));
-    JsonObject& jsonReader = jsonBuffer.parseObject(charBuffer);
-    free(charBuffer);                              // Free the memory that was used by the buffer.
-    delete(fileNameChar);
-    if (!jsonReader.success()) {
-      Serial.println("parseObject() failed");
-      return;
-    }
-     sequence.stepCount    = jsonReader["stepCount"];
-     sequence.beatCount    = jsonReader["beatCount"];
-     sequence.quantizeKey  = jsonReader["quantizeKey"];
-     sequence.instrument   = jsonReader["instrument"];
-     sequence.instType     = jsonReader["instType"];
-     sequence.volume       = jsonReader["volume"];
-     sequence.bank         = jsonReader["bank"];
-     sequence.channel      = jsonReader["channel"];
-     sequence.patternIndex = jsonReader["patternIndex"];
+    if (!SD.exists(fileNameChar)){
+      Serial.println("save file " + String(fileNameChar) + "does not exist.");
+      return SAVEFILE_DOES_NOT_EXIST;
+    } else {
+      Serial.println("reading json file: " + String(fileNameChar));
+      StaticJsonBuffer<16384> jsonBuffer;
 
-     JsonArray& stepDataArray = jsonReader["stepData"];
+      jsonFile = SD.open((const char *)fileNameChar, FILE_READ);
+      if (jsonFile)
+      {
+          unsigned int fileSize = jsonFile.size();  // Get the file size.
+          charBuffer = (char*)malloc(fileSize + 1);  // Allocate memory for the file and a terminating null char.
+          jsonFile.read(charBuffer, fileSize);         // Read the file into the buffer.
+          charBuffer[fileSize] = '\0';               // Add the terminating null char.
+          //Serial.println(charBuffer);                // Print the file to the serial monitor.
+          jsonFile.close();                         // Close the file.
+      }
+      // *** Use the buffer as needed here. ***
+      JsonObject& jsonReader = jsonBuffer.parseObject(charBuffer);
+      free(charBuffer);                              // Free the memory that was used by the buffer.
+      free(fileNameChar);
+      if (!jsonReader.success()) {
+        Serial.println("parseObject() failed");
+        return READ_JSON_ERROR;
+      }
+       sequence->stepCount    = jsonReader["stepCount"];
+       sequence->beatCount    = jsonReader["beatCount"];
+       sequence->quantizeKey  = jsonReader["quantizeKey"];
+       sequence->instrument   = jsonReader["instrument"];
+       sequence->instType     = jsonReader["instType"];
+       sequence->volume       = jsonReader["volume"];
+       sequence->bank         = jsonReader["bank"];
+       sequence->channel      = jsonReader["channel"];
+       sequence->patternIndex = jsonReader["patternIndex"];
 
-    for (int i=0; i< 128; i++){
-       if (i != int(stepDataArray[i]["i"]) ) {
-         Serial.println("Step Data Index Mismatch Error");
-         return;
-       };
-       sequence.stepData[i].pitch  = stepDataArray[i]["p"];
-       sequence.stepData[i].gateLength  = stepDataArray[i]["gl"];
-       sequence.stepData[i].gateType  = stepDataArray[i]["gt"];
-       sequence.stepData[i].velocity  = stepDataArray[i]["v"];
-       sequence.stepData[i].glide  = stepDataArray[i]["g"];
+       JsonArray& stepDataArray = jsonReader["stepData"];
+
+      for (int i=0; i< 128; i++){
+         if (i != int(stepDataArray[i]["i"]) ) {
+           Serial.println("Step Data Index Mismatch Error");
+           return READ_JSON_ERROR;
+         };
+         sequence->stepData[i].pitch  = stepDataArray[i]["p"];
+         sequence->stepData[i].gateLength  = stepDataArray[i]["gl"];
+         sequence->stepData[i].gateType  = stepDataArray[i]["gt"];
+         sequence->stepData[i].velocity  = stepDataArray[i]["v"];
+         sequence->stepData[i].glide  = stepDataArray[i]["g"];
+      }
     }
-
+    Serial.println("JSON file read complete");
+    return FILE_EXISTS;
 }
 /*
 void FlashMemory::saveChannelPattern_JSON(uint8_t channel) {
@@ -311,7 +324,6 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
   Serial.println("========= LOADING PATTERN: " + String(pattern));
   printPattern();
-  saveData = SD.open("data.txt", FILE_READ);
 
 	for(int i=0; i < sequenceCount; i++){
 
@@ -320,73 +332,25 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
       continue; // if channel is not selected to be loaded, don't load the channel!
     } else {
       Serial.println("Loading channel " + String(i));
-    }
+    };
 
-    int index = int(
-    ( i  + pattern * sequenceCount )
-    * ( sizeof(sequence[0].stepData)
-      + sizeof(sequence[0].stepCount)
-      + sizeof(sequence[0].beatCount)
-      + sizeof(sequence[0].quantizeKey)
-      + sizeof(sequence[0].instrument)
-      + sizeof(sequence[0].instType)
-      + sizeof(sequence[0].volume)
-      + sizeof(sequence[0].bank)
-      + sizeof(sequence[0].channel)
-      + sizeof(sequence[0].patternIndex)
-    ));
+    int readJsonReturn = this->readSequenceJSON(&sequence[i], i, pattern);
 
-    Serial.println("seeking to index: " + String(index) + " for sequence " + String(i) + "\t\tfileSize: " + saveData.size());
-
-  //  Serial.println("stepData size: \t" + String(sizeof(sequence[i].stepData)) );
-  //  Serial.println("stepCount size: \t" + String(sizeof(sequence[i].stepCount)));
-  //  Serial.println("beatCount size: \t" + String(sizeof(sequence[i].beatCount)) );
-  //  Serial.println("quantizeKey size: \t" + String(sizeof(sequence[i].quantizeKey) ));
-  //  Serial.println("instrument size: \t" + String(sizeof(sequence[i].instrument) ));
-  //  Serial.println("instType size: \t" + String(sizeof(sequence[i].instType) ));
-
-    saveData.seek(index);
-    Serial.println("loading data");
-    saveData.read( (byte*)&sequence[i].stepData,    sizeof(sequence[i].stepData));
-    saveData.read( (byte*)&sequence[i].stepCount,   sizeof(sequence[i].stepCount));
-    saveData.read( (byte*)&sequence[i].beatCount,   sizeof(sequence[i].beatCount));
-    saveData.read( (byte*)&sequence[i].quantizeKey, sizeof(sequence[i].quantizeKey));
-    saveData.read( (byte*)&sequence[i].instrument,  sizeof(sequence[i].instrument));
-    saveData.read( (byte*)&sequence[i].instType,    sizeof(sequence[i].instType));
-    saveData.read( (byte*)&sequence[i].volume,      sizeof(sequence[i].volume));
-    saveData.read( (byte*)&sequence[i].bank,        sizeof(sequence[i].bank));
-    saveData.read( (byte*)&sequence[i].channel,     sizeof(sequence[i].channel));
-    saveData.read( (byte*)&sequence[i].patternIndex,       sizeof(sequence[i].patternIndex));
-
-    if (saveData.size() <= index){
-    //if (sequence[i].instType == 0 || saveData.size() <= index){ // original line, not sure why it checked instType?
+    if ( readJsonReturn == 1 )  {
       Serial.println("saveData not available, initializing sequence");
       sequence[i].initNewSequence(pattern, i);
-    } else {
-      Serial.println("saveData available, loading sequence --- instType: " + String(sequence[i].instType));
+    } else if (readJsonReturn == 2) {
+      Serial.println("READ JSON ERROR - info above");
     }
+
     Serial.println("reading complete!");
 
     //sam2695.programChange(0, i, sequence[i].instrument);
     //sam2695.setChannelVolume(i, sequence[i].volume);
 
     sequence[i].quantizeKey = 1;
-    // if no steps are set, it is an empty sequence. initialize a new default sequence.
-  // if (sequence[i].instType == 0 ) {
-  //   Serial.println("###### INITIALIZING NEW SEQUENCE ######");
-  //   sequence[i].initNewSequence();
-  // } else {
-  //   Serial.println("###### sequence already exists instType: " + String(sequence[i].instType));//
-  // }
-
-
   }
 
-  Serial.println("closing file handle");
-
-  saveData.close();
-
-  Serial.println("file handle closed");
   Serial.println("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
   currentPattern = pattern;
   Serial.println("Pattern " + String(pattern) + " loaded");
@@ -395,7 +359,6 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
 void FlashMemory::printDirectory(File dir, int numTabs) {
    while(true) {
-
      File entry =  dir.openNextFile();
      if (! entry) {
        // no more files
@@ -406,6 +369,9 @@ void FlashMemory::printDirectory(File dir, int numTabs) {
        Serial.print('\t');
      }
      Serial.print(entry.name());
+
+     String temp = String(entry.name());
+
      if (entry.isDirectory()) {
        Serial.println("/");
        printDirectory(entry, numTabs+1);
@@ -414,7 +380,9 @@ void FlashMemory::printDirectory(File dir, int numTabs) {
        Serial.print("\t\t");
        Serial.println(entry.size(), DEC);
      }
+
      entry.close();
+
    }
 }
 
@@ -426,5 +394,75 @@ void FlashMemory::printPattern(){
       Serial.print( String(sequence[i].stepData[n].pitch) + "\t" );
     }
     Serial.println("");
+  }
+}
+
+void FlashMemory::deleteAllFiles(){
+ File root= SD.open("/");
+ this->rm(root, "/");
+ root.close();
+
+}
+
+void FlashMemory::rm(File dir, String tempPath) {
+  int DeletedCount = 0;
+  int FolderDeleteCount = 0;
+  int FailCount = 0;
+  String rootpath = "/";
+
+
+
+  while(true) {
+    File entry =  dir.openNextFile();
+    String localPath;
+
+    Serial.println("");
+    if (entry) {
+      if ( entry.isDirectory() )
+      {
+        localPath = tempPath + entry.name() + rootpath + '\0';
+        char folderBuf[localPath.length()];
+        localPath.toCharArray(folderBuf, localPath.length() );
+        rm(entry, folderBuf);
+
+
+        if( SD.rmdir( folderBuf ) )
+        {
+          Serial.print("Deleted folder ");
+          Serial.println(folderBuf);
+          FolderDeleteCount++;
+        }
+        else
+        {
+          Serial.print("Unable to delete folder ");
+          Serial.println(folderBuf);
+          FailCount++;
+        }
+      }
+      else
+      {
+        localPath = tempPath + entry.name() + '\0';
+        char charBuf[localPath.length()];
+        localPath.toCharArray(charBuf, localPath.length() );
+
+        if( SD.remove( charBuf ) )
+        {
+          Serial.print("Deleted ");
+          Serial.println(localPath);
+          DeletedCount++;
+        }
+        else
+        {
+          Serial.print("Failed to delete ");
+          Serial.println(localPath);
+          FailCount++;
+        }
+
+      }
+    }
+    else {
+      // break out of recursion
+      break;
+    }
   }
 }

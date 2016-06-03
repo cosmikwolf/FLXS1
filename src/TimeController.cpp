@@ -17,10 +17,13 @@ void TimeController::initialize() {
   sequence[1].initialize(1, 16, 4, (tempoX100/100));
   sequence[2].initialize(2, 16, 4, (tempoX100/100));
   sequence[3].initialize(3, 16, 4, (tempoX100/100));
-
-	saveFile.saveSequenceJSON(sequence[0], 0 );
-	saveFile.readSequenceJSON(sequence[0], 0);
-
+/*
+	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
+	delay(200);
+	saveFile.readSequenceJSON(sequence[0], 0, 0);
+	File root = SD.open("/");
+  saveFile.printDirectory(root, 2);
+	*/
 }
 
 void TimeController::runLoopHandler() {

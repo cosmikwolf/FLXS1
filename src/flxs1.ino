@@ -29,7 +29,7 @@ void setup() {
   //waiting for serial to begin
   delay(1500);
   Serial.println("Setup Start");
-  
+
   SPI.begin();
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
@@ -38,6 +38,7 @@ void setup() {
 	MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
   Serial.println("Setup Complete");
+
 }
 
 void loop() {
