@@ -10,7 +10,7 @@ This file contains code that enables saving and loading of patterns. Changing th
 */
 FlashMemory::FlashMemory(){};
 
-void FlashMemory::initialize(Sequencer (*sequenceArray)[4]){
+void FlashMemory::initialize(Sequencer *sequenceArray){
   Serial.println("<<->> Initializing Flash Memory <<->>");
 
   this->sequenceArray = sequenceArray;
@@ -44,30 +44,27 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   // following ArduinoJSON serialize example: https://githtub.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
   JsonObject& root = jsonBuffer.createObject();
 
-  root["stepCount"]     = sequenceArray[channel]->stepCount;
-  root["beatCount"]     = sequenceArray[channel]->beatCount;
-  root["quantizeKey"]   = sequenceArray[channel]->quantizeKey;
-  root["instrument"]    = sequenceArray[channel]->instrument;
-  root["instType"]      = sequenceArray[channel]->instType;
-  root["volume"]        = sequenceArray[channel]->volume;
-  root["bank"]          = sequenceArray[channel]->bank;
-  root["channel"]       = sequenceArray[channel]->channel;
-  root["patternIndex"]  = sequenceArray[channel]->patternIndex;
+  root["stepCount"]     = sequenceArray[channel].stepCount;
+  root["beatCount"]     = sequenceArray[channel].beatCount;
+  root["quantizeKey"]   = sequenceArray[channel].quantizeKey;
+  root["instrument"]    = sequenceArray[channel].instrument;
+  root["instType"]      = sequenceArray[channel].instType;
+  root["volume"]        = sequenceArray[channel].volume;
+  root["bank"]          = sequenceArray[channel].bank;
+  root["channel"]       = sequenceArray[channel].channel;
+  root["patternIndex"]  = sequenceArray[channel].patternIndex;
 
   JsonArray& stepDataArray = root.createNestedArray("stepData");
   Serial.println("saveSequenceJson FreeMemory 2 : " + String(FreeRam2()));
 
-  for (int i=0; i< 1; i++){
-    Serial.println("saveSequenceJson FreeMemory 3 : " + String(FreeRam2()));
-
-  //for (int i=0; i< root["stepCount"]; i++){
+  for (int i=0; i< root["stepCount"]; i++){
     JsonObject& stepDataObj = jsonBuffer.createObject();
     stepDataObj["i"] = i ;
-    stepDataObj["p"] = sequenceArray[channel]->stepData[i].pitch ;
-    stepDataObj["gl"] = sequenceArray[channel]->stepData[i].gateLength ;
-    stepDataObj["gt"] = sequenceArray[channel]->stepData[i].gateType ;
-    stepDataObj["v"] = sequenceArray[channel]->stepData[i].velocity ;
-    stepDataObj["g"] = sequenceArray[channel]->stepData[i].glide ;
+    stepDataObj["p"] = sequenceArray[channel].stepData[i].pitch ;
+    stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
+    stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType ;
+    stepDataObj["v"] = sequenceArray[channel].stepData[i].velocity ;
+    stepDataObj["g"] = sequenceArray[channel].stepData[i].glide ;
     stepDataArray.add(stepDataObj);
   }
   Serial.println("saveSequenceJson FreeMemory 4 : " + String(FreeRam2()));
@@ -115,7 +112,7 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
         Serial.println("charBuffer Filesize: " + String(fileSize));
         char* charBuffer = (char*)malloc(fileSize + 10);  // Allocate memory for the file and a terminating null char.
         jsonFile.read(charBuffer, fileSize);         // Read the file into the buffer.
-        //charBuffer[fileSize] = '\0';               // Add the terminating null char.
+        charBuffer[fileSize] = '\0';               // Add the terminating null char.
         Serial.println(charBuffer);                // Print the file to the serial monitor.
         Serial.println("begin deserialize");
         this->deserialize(channel, charBuffer);
@@ -144,23 +141,22 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
   JsonObject& jsonReader = jsonBuffer.parseObject(json);
 Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
     Serial.println("JSON object Parsed");
-   sequenceArray[channel]->stepCount    = jsonReader["stepCount"];
-   sequenceArray[channel]->beatCount    = jsonReader["beatCount"];
-   sequenceArray[channel]->quantizeKey  = jsonReader["quantizeKey"];
-   sequenceArray[channel]->instrument   = jsonReader["instrument"];
-   sequenceArray[channel]->instType     = jsonReader["instType"];
-   sequenceArray[channel]->volume       = jsonReader["volume"];
-   sequenceArray[channel]->bank         = jsonReader["bank"];
-   sequenceArray[channel]->channel      = jsonReader["channel"];
-   sequenceArray[channel]->patternIndex = jsonReader["patternIndex"];
+   sequenceArray[channel].stepCount    = jsonReader["stepCount"];
+   sequenceArray[channel].beatCount    = jsonReader["beatCount"];
+   sequenceArray[channel].quantizeKey  = jsonReader["quantizeKey"];
+   sequenceArray[channel].instrument   = jsonReader["instrument"];
+   sequenceArray[channel].instType     = jsonReader["instType"];
+   sequenceArray[channel].volume       = jsonReader["volume"];
+   sequenceArray[channel].bank         = jsonReader["bank"];
+   sequenceArray[channel].channel      = jsonReader["channel"];
+   sequenceArray[channel].patternIndex = jsonReader["patternIndex"];
 
    JsonArray& stepDataArray = jsonReader["stepData"];
    Serial.println("Step Data Array Success: " + String(stepDataArray.success())) ;
 
     Serial.println("jsonArray declared");
 
-//    for (int i=0; i< jsonReader["stepCount"]; i++){
-   for (int i=0; i< 128; i++){
+    for (int i=0; i< jsonReader["stepCount"]; i++){
      if (i != int(stepDataArray[i]["i"]) ) {
        Serial.println("Step Data Index Mismatch Error");
      };
@@ -170,7 +166,7 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
      stepDataBuf.gateType  = stepDataArray[i]["gt"];
      stepDataBuf.velocity  = stepDataArray[i]["v"];
      stepDataBuf.glide  = stepDataArray[i]["g"];
-     sequenceArray[channel]->stepData[i] = stepDataBuf;
+     sequenceArray[channel].stepData[i] = stepDataBuf;
   }
 
   return jsonReader.success();
@@ -198,7 +194,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
     if ( readJsonReturn == SAVEFILE_DOES_NOT_EXIST )  {
       Serial.println("saveData not available, initializing sequence");
-      sequenceArray[i]->initNewSequence(pattern, i);
+      sequenceArray[i].initNewSequence(pattern, i);
       Serial.println("sequence initialized, saving sequence to JSON");
       saveSequenceJSON(i, pattern);
 
@@ -210,10 +206,10 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
     Serial.println("reading complete!");
 
-    //sam2695.programChange(0, i, sequenceArray[i]->instrument);
-    //sam2695.setChannelVolume(i, sequenceArray[i]->volume);
+    //sam2695.programChange(0, i, sequenceArray[i].instrument);
+    //sam2695.setChannelVolume(i, sequenceArray[i].volume);
 
-    sequenceArray[i]->quantizeKey = 1;
+    sequenceArray[i].quantizeKey = 1;
   }
 
   Serial.println("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
@@ -246,7 +242,7 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 void FlashMemory::deleteSaveFile(){
   for(int i=0; i<16; i++){
     for(int n=0; n<sequenceCount; n++){
-      sequenceArray[n]->initNewSequence(i, n);
+      sequenceArray[n].initNewSequence(i, n);
     }
   }
   loadPattern(0, 0b1111);
@@ -286,9 +282,9 @@ void FlashMemory::printDirectory(File dir, int numTabs) {
 void FlashMemory::printPattern(){
   Serial.println("Printing Data for pattern: " + String(currentPattern));
   for(int i=0; i < sequenceCount; i++){
-    Serial.print("sc:\t"+String(sequenceArray[i]->stepCount) +"\tbc:\t"+String(sequenceArray[i]->beatCount) +"\tqk:\t"+String(sequenceArray[i]->quantizeKey)+"\tinst:\t"+String(sequenceArray[i]->instrument)+"\tit:\t"+String(sequenceArray[i]->instType) + "\t");
+    Serial.print("sc:\t"+String(sequenceArray[i].stepCount) +"\tbc:\t"+String(sequenceArray[i].beatCount) +"\tqk:\t"+String(sequenceArray[i].quantizeKey)+"\tinst:\t"+String(sequenceArray[i].instrument)+"\tit:\t"+String(sequenceArray[i].instType) + "\t");
     for(int n=0; n<16; n++){
-      Serial.print( String(sequenceArray[i]->stepData[n].pitch) + "\t" );
+      Serial.print( String(sequenceArray[i].stepData[n].pitch) + "\t" );
     }
     Serial.println("");
   }

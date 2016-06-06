@@ -43,9 +43,9 @@ void LEDArray::initialize(Sequencer *sequenceArray){
 }
 };
 
-void LEDArray::loop(){
+void LEDArray::loop(uint16_t frequency){
 
-  if (pixelTimer > 30000){
+  if (pixelTimer > frequency){
     pixelTimer = 0;
 
     switch (currentState ){

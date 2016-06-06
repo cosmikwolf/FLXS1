@@ -14,7 +14,7 @@ public:
   FlashMemory();
 
   void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant);
-  void initialize(Sequencer (*sequenceArray)[4]);
+  void initialize(Sequencer *sequenceArray);
   void deleteSaveFile();
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
@@ -25,7 +25,7 @@ public:
   void rm(File dir, String tempPath);
   bool deserialize(uint8_t channel, char* json);
 private:
-  Sequencer (*sequenceArray)[4];
+  Sequencer *sequenceArray;
   File saveData;
   File jsonFile;
 

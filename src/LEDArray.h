@@ -15,7 +15,7 @@ class LEDArray
   public:
     LEDArray();
     void initialize(Sequencer *sequenceArray);
-    void loop();
+    void loop(uint16_t frequency);
     void fadeall();
 
   private:

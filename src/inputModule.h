@@ -53,9 +53,10 @@ public:
   Zetaohm_MAX7301 max7301;
   OutputController* outputControl;
 
-  void initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer (*sequenceArray)[4]);
+  void initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer *sequenceArray);
 
-  void buttonLoop();
+  void loop(uint16_t frequency);
+  
   void patternSelectHandler();
   void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
@@ -83,7 +84,7 @@ public:
   unsigned long matrixButtonTime;
 
 private:
-  Sequencer (*sequenceArray)[4];
+  Sequencer *sequenceArray;
   FlashMemory *saveFile;
   elapsedMicros inputTimer;
 

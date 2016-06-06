@@ -29,7 +29,6 @@ unsigned long beatLength = 60000000/(tempoX100/100);
 unsigned long lastTimer;
 elapsedMicros masterTempoTimer;
 elapsedMicros internalClockTimer;
-elapsedMicros inputTimer;
 elapsedMicros startTime;
 
 //midi

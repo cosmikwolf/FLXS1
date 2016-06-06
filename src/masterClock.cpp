@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "MasterClock.h"
 
-void MasterClock::initialize(OutputController * outputControl, Sequencer (*sequenceArray)[4]){
+void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray){
 	Serial.println("Initializing Master Clock");
 	this->sequenceArray = sequenceArray;
 	this->outputControl = outputControl;
@@ -13,7 +13,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
   for (int i = 0; i < sequenceCount; i++ ){
-    sequenceArray[i]->setTempo(tempoX100);
+    sequenceArray[i].setTempo(tempoX100);
   }
 }
 
@@ -66,9 +66,9 @@ void MasterClock::internalClockTick(){
     startTime = 0;
 
     for (int i=0; i< sequenceCount; i++){
-      sequenceArray[i]->clockStart(startTime);
-      sequenceArray[i]->beatPulse(beatLength, &life);
-      sequenceArray[i]->runSequence(&noteData[i], &life);
+      sequenceArray[i].clockStart(startTime);
+      sequenceArray[i].beatPulse(beatLength, &life);
+      sequenceArray[i].runSequence(&noteData[i], &life);
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
@@ -76,8 +76,8 @@ void MasterClock::internalClockTick(){
       //changePattern(queuePattern, true, true);
     }
     for (int i=0; i< sequenceCount; i++){
-      sequenceArray[i]->runSequence(&noteData[i], &life);
-      sequenceArray[i]->beatPulse(beatLength, &life);
+      sequenceArray[i].runSequence(&noteData[i], &life);
+      sequenceArray[i].beatPulse(beatLength, &life);
     }
     tempoBlip = !tempoBlip;
     internalClockTimer = 0;
@@ -85,7 +85,7 @@ void MasterClock::internalClockTick(){
        // Serial.print(" b5 ");
   }  else {
     for (int i=0; i< sequenceCount; i++){
-      sequenceArray[i]->runSequence(&noteData[i], &life);
+      sequenceArray[i].runSequence(&noteData[i], &life);
     }
   }
     debug("end internal clock tick");
@@ -96,7 +96,7 @@ void MasterClock::internalClockTick(){
 void MasterClock::externalClockTick(){
   // ext clock sync
   for (int i=0; i< sequenceCount; i++){
-    sequenceArray[i]->runSequence(&noteData[i], &life);
+    sequenceArray[i].runSequence(&noteData[i], &life);
   }
 }
 

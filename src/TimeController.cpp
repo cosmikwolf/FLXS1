@@ -1,6 +1,10 @@
 #include <Arduino.h>
 #include "TimeController.h"
 
+#define DISPLAY_FREQUENCY 10000
+#define INPUT_FREQUENCY 10000
+#define LED_FREQUENCY 30000
+
 TimeController::TimeController(){};
 
 void TimeController::initialize() {
@@ -13,12 +17,14 @@ void TimeController::initialize() {
 
 	outputControl.initialize();
 	ledArray.initialize(sequence);
-	display.initialize(&sequence);
-	buttonIo.initialize(&outputControl, &saveFile, &sequence);
-	clockMaster.initialize(&outputControl, &sequence);
-	saveFile.initialize(&sequence);
-	saveFile.loadPattern(0, 0b1111);
+	display.initialize(sequence);
+
+	buttonIo.initialize(&outputControl, &saveFile, sequence);
 	buttonIo.changeState(STEP_DISPLAY);
+	clockMaster.initialize(&outputControl, sequence);
+	saveFile.initialize(sequence);
+	saveFile.loadPattern(0, 0b1111);
+
 /*
 	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
 	delay(200);
@@ -29,9 +35,9 @@ void TimeController::initialize() {
 }
 
 void TimeController::runLoopHandler() {
-	ledArray.loop();
-//	buttonIo.buttonLoop();
-//	display.displayLoop();
+	ledArray.loop(LED_FREQUENCY);
+	buttonIo.loop(INPUT_FREQUENCY);
+	display.displayLoop(DISPLAY_FREQUENCY);
 }
 
 void TimeController::masterClockHandler(){
