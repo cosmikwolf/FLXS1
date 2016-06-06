@@ -14,11 +14,12 @@ class LEDArray
 {
   public:
     LEDArray();
-    void initialize();
+    void initialize(Sequencer *sequenceArray);
     void loop();
     void fadeall();
 
   private:
+    Sequencer *sequenceArray;
     elapsedMicros pixelTimer;
 
     CRGB leds[NUM_LEDS];

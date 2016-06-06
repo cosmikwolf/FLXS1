@@ -9,7 +9,7 @@
 #include "DisplayModule.h"
 #include "LEDArray.h"
 #include "InputModule.h"
-
+#include "FlashMemory.h"
 #include "MasterClock.h"
 #include "OutputController.h"
 #include "Sequencer.h"
@@ -28,6 +28,9 @@ class TimeController {
     InputModule buttonIo;
     DisplayModule display;
     LEDArray ledArray;
+    FlashMemory saveFile;
+
 };
+extern Sequencer sequence[4];
 
 #endif

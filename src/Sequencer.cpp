@@ -23,9 +23,9 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
   //  stepData[i].velocity = 127;
   // stepData[i].pitch = 24;
 	//};
-  beatLength = 60000000/(tempoX100/100);
-  calculateStepTimers();
-  monophonic = true;
+  this->beatLength = 60000000/(tempoX100/100);
+  this->calculateStepTimers();
+  this->monophonic = true;
 };
 
 
@@ -42,15 +42,15 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
   this->instType = 0;
 
   for(int n=0; n < 128; n++){
-    stepData[n].pitch      = 24;
-    stepData[n].gateLength = 1;
-    stepData[n].gateType   = 0;
-    stepData[n].velocity   = 64;
-    stepData[n].glide      = 0;
+    this->stepData[n].pitch      = 24;
+    this->stepData[n].gateLength = 1;
+    this->stepData[n].gateType   = 0;
+    this->stepData[n].velocity   = 64;
+    this->stepData[n].glide      = 0;
   }
 };
 
-void Sequencer::setInstType(boolean type){
+void Sequencer::setInstType(uint8_t type){
     this->instType = type;
 }
 

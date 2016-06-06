@@ -39,8 +39,8 @@ void midiStartContinueHandler(){
     masterPulseCount = 0;
     masterTempoTimer = 0;
     for (int i=0; i< sequenceCount; i++){
-      sequence[i].clockStart(startTime);
-      sequence[i].beatPulse(beatLength, &life);
+  //    sequence[i].clockStart(startTime);
+    //  sequence[i].beatPulse(beatLength, &life);
     }
 
     Serial.println("Midi Start / Continue");
@@ -95,7 +95,7 @@ void midiClockPulseHandler(){
       tempoBlip = !tempoBlip;
       blipTimer = 0;
       for (int i=0; i< sequenceCount; i++){
-        sequence[i].beatPulse(beatLength, &life);
+        //sequence[i].beatPulse(beatLength, &life);
       }
 
      // Serial.println("beatPulse - beatlength: " + String(int(beatLength)) + "\tbeatLengthJitter: " + String(int(lastBeatLength) - int(beatLength))+ "\tavgPulseLength: " + String(avgPulseLength) + "\tavgPulseJitter: " + String(avgPulseJitter));

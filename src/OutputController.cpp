@@ -33,9 +33,6 @@ void OutputController::initialize(){
   pinMode(DEBUG_PIN, OUTPUT);
   pinMode(4, OUTPUT);
 
-  Serial.println("Initializing Flash Memory");
-  // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
-  saveFile.initialize();
   Serial.println("Output Controller Initialization Complete");
 }
 

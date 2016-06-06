@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include "MasterClock.h"
 
-void MasterClock::initialize(OutputController* outputControl){
+void MasterClock::initialize(OutputController * outputControl, Sequencer (*sequenceArray)[4]){
 	Serial.println("Initializing Master Clock");
+	this->sequenceArray = sequenceArray;
 	this->outputControl = outputControl;
 	Serial.println("Master Clock Initialized");
 
@@ -12,17 +13,13 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
   for (int i = 0; i < sequenceCount; i++ ){
-    sequence[i].setTempo(tempoX100);
+    sequenceArray[i]->setTempo(tempoX100);
   }
 }
 
 void MasterClock::masterClockFunc(void){
  elapsedMicros loopTimer = 0;
 
-
-if (inputTimer > 10000){
-  inputTimer = 0;
-}
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 //  timerAvg = (lastTimer + 9*timerAvg) /10;
 //  lastMicros = micros();
@@ -51,7 +48,7 @@ if (inputTimer > 10000){
 //if (pixelTimer > 2000){
 //  pixelTimer = 0;
 //}
-  midiClockSyncFunc();
+//  midiClockSyncFunc();
 }
 
 
@@ -69,9 +66,9 @@ void MasterClock::internalClockTick(){
     startTime = 0;
 
     for (int i=0; i< sequenceCount; i++){
-      sequence[i].clockStart(startTime);
-      sequence[i].beatPulse(beatLength, &life);
-      sequence[i].runSequence(&noteData[i], &life);
+      sequenceArray[i]->clockStart(startTime);
+      sequenceArray[i]->beatPulse(beatLength, &life);
+      sequenceArray[i]->runSequence(&noteData[i], &life);
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
@@ -79,8 +76,8 @@ void MasterClock::internalClockTick(){
       //changePattern(queuePattern, true, true);
     }
     for (int i=0; i< sequenceCount; i++){
-      sequence[i].runSequence(&noteData[i], &life);
-      sequence[i].beatPulse(beatLength, &life);
+      sequenceArray[i]->runSequence(&noteData[i], &life);
+      sequenceArray[i]->beatPulse(beatLength, &life);
     }
     tempoBlip = !tempoBlip;
     internalClockTimer = 0;
@@ -88,7 +85,7 @@ void MasterClock::internalClockTick(){
        // Serial.print(" b5 ");
   }  else {
     for (int i=0; i< sequenceCount; i++){
-      sequence[i].runSequence(&noteData[i], &life);
+      sequenceArray[i]->runSequence(&noteData[i], &life);
     }
   }
     debug("end internal clock tick");
@@ -99,7 +96,7 @@ void MasterClock::internalClockTick(){
 void MasterClock::externalClockTick(){
   // ext clock sync
   for (int i=0; i< sequenceCount; i++){
-    sequence[i].runSequence(&noteData[i], &life);
+    sequenceArray[i]->runSequence(&noteData[i], &life);
   }
 }
 

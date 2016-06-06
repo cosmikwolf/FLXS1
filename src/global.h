@@ -58,7 +58,6 @@ extern unsigned long beatLength;
 extern unsigned long lastTimer;
 extern elapsedMicros masterTempoTimer;
 extern elapsedMicros internalClockTimer;
-extern elapsedMicros inputTimer;
 extern elapsedMicros startTime;
 
 //midi

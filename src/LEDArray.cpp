@@ -3,8 +3,10 @@
 
 LEDArray::LEDArray(){};
 
-void LEDArray::initialize(){
+void LEDArray::initialize(Sequencer *sequenceArray){
   Serial.println("Initializing LED Array");
+  this->sequenceArray = sequenceArray;
+
   pinMode(0, OUTPUT);
 
   LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
@@ -49,21 +51,21 @@ void LEDArray::loop(){
     switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
-          if (getNote(i) == sequence[selectedChannel].activeStep ){
+          if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
             leds[ledMapping[i]] = CRGB(255, 255, 255);
           } else if (getNote(i) == selectedStep) {
             leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
           } else {
-            if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
+            if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
               leds[ledMapping[i]] = CHSV(0,0,0);
             } else {
-              leds[ledMapping[i]] = CHSV(sequence[selectedChannel].getStepPitch(getNote(i)),255,255);
+              leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i)),255,255);
             }
           }
         }
         for (int i=0; i < 4; i++){
           if (selectedChannel == i) {
-            leds[ledMapping[i+16]] = CHSV((sequence[selectedChannel].patternIndex * 16) % 255,255,255);
+            leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
           } else {
             leds[ledMapping[i+16]] = CHSV(0,0,0);
           }
@@ -134,21 +136,21 @@ void ledLoop(){
     switch (currentState ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
-          if (getNote(i) == sequence[selectedChannel].activeStep ){
+          if (getNote(i) == sequenceArray[selectedChannel]->activeStep ){
             pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );
           } else if (getNote(i) == selectedStep) {
             pixels.setPixelColor(ledMapping[i], Wheel(int(millis()/3)%255) );
           } else {
-            if(sequence[selectedChannel].stepData[getNote(i)].gateType == 0){
+            if(sequenceArray[selectedChannel]->stepData[getNote(i)].gateType == 0){
               pixels.setPixelColor(ledMapping[i], pixels.Color(0,0,0));
             } else {
-              pixels.setPixelColor(ledMapping[i], Wheel( sequence[selectedChannel].getStepPitch(getNote(i)) ) );
+              pixels.setPixelColor(ledMapping[i], Wheel( sequenceArray[selectedChannel]->getStepPitch(getNote(i)) ) );
             }
           }
         }
         for (int i=0; i < 4; i++){
           if (selectedChannel == i) {
-            pixels.setPixelColor(ledMapping[i+16], Wheel((sequence[selectedChannel].patternIndex * 16) % 255));
+            pixels.setPixelColor(ledMapping[i+16], Wheel((sequenceArray[selectedChannel]->patternIndex * 16) % 255));
           } else {
             pixels.setPixelColor(ledMapping[i+16], pixels.Color(0,0,0));
           }

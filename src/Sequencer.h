@@ -10,21 +10,23 @@ class Sequencer
 		Sequencer();
 
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
+		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
+		void 		calculateStepTimers();
+		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
+		void 		clockStart(elapsedMicros startTime);
+		int  		positive_modulo(int i, int n);
+		void 		initNewSequence(uint8_t index, uint8_t ch);
+
 		void 		setTempo(uint32_t tempoX100);
 		void 		setStepPitch(uint8_t step, uint8_t pitch);
 		void 		setGateLength(uint8_t step, uint8_t length);
 		void 		setGateType(uint8_t step, uint8_t gate);
 		void 		setStepVelocity(uint8_t step, uint8_t velocity);
 		void 		setStepGlide(uint8_t step, uint8_t glideTime);
-		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
-		void 		calculateStepTimers();
-		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
-		void 		clockStart(elapsedMicros startTime);
-		int  		positive_modulo(int i, int n);
+
+		void 		setInstType(uint8_t type);
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
-		void 		initNewSequence(uint8_t index, uint8_t ch);
-		void 		setInstType(boolean type);
 
 		uint8_t  	quantizePitch(uint8_t note, uint32_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step);
@@ -57,15 +59,6 @@ class Sequencer
 		uint8_t	 channel;
 		uint8_t  patternIndex;
 
-		struct StepDatum {
-			// data that needs to be stored
-			uint8_t			pitch;		    // note pitch
-			uint8_t			gateLength;		// gate length
-			uint8_t 		gateType;		// gate type (hold, repeat, arpeggio)
-			uint8_t			velocity;	    // note velocity
-			uint8_t			glide;			// portamento time - to be implemented.
-			// utility variables - dont need to be saved.
-		};
 
 		struct StepUtil {
 			// data that is used in sequence playback, but does not need to be stored
@@ -78,8 +71,8 @@ class Sequencer
 			elapsedMicros	stepTimer;		// a timer to compare with lengthMcs to determine when to send noteOff.
 		};
 
-		StepDatum stepData[128];
-		StepUtil stepUtil[128];
+		StepDatum stepData[64];
+		StepUtil stepUtil[64];
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;
@@ -99,7 +92,6 @@ class Sequencer
 
 };
 
-extern Sequencer sequence[4];
 
 #endif
 

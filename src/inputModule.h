@@ -1,12 +1,13 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
+#define ENCODER_OPTIMIZE_INTERRUPTS
+
 #include <Encoder.h>
 #include "OutputController.h"
 #include "DisplayModule.h"
 #include "Sequencer.h"
 #include "MasterClock.h"
-#include "FlashMemory.h"
 #include "GameOfLife.h"
 #include "global.h"
 
@@ -48,11 +49,12 @@ class InputModule
 {
 public:
   InputModule();
-  Encoder knob = Encoder(ENCODER1LEFTPIN, ENCODER1RIGHTPIN);
+  Encoder knob;
   Zetaohm_MAX7301 max7301;
   OutputController* outputControl;
 
-  void buttonSetup(OutputController* outputControl);
+  void initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer (*sequenceArray)[4]);
+
   void buttonLoop();
   void patternSelectHandler();
   void channelMenuHandler();
@@ -67,11 +69,11 @@ public:
   void changeState(uint8_t state);
 
   // Encoder vars
-  int8_t knobRead = 0;
-  int8_t knobBuffer = 0;
-  int8_t knobPrevious = 0;
-  int8_t knobChange = 0;
-  int8_t menuSelector = 0;
+  int8_t knobRead;
+  int8_t knobBuffer;
+  int8_t knobPrevious;
+  int8_t knobChange;
+  int8_t menuSelector;
   int8_t instBuffer;
   int16_t stepModeBuffer;
 
@@ -79,6 +81,12 @@ public:
   unsigned long smallButtonLoopTime;
   unsigned long encoderButtonTime;
   unsigned long matrixButtonTime;
+
+private:
+  Sequencer (*sequenceArray)[4];
+  FlashMemory *saveFile;
+  elapsedMicros inputTimer;
+
 };
 
 #endif

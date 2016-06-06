@@ -15,6 +15,16 @@ typedef struct NoteDatum{
 	  uint32_t	sequenceTime;
 	} NoteDatum ;
 
+typedef	struct StepDatum {
+		// data that needs to be stored
+		uint8_t			pitch;		    // note pitch
+		uint8_t			gateLength;		// gate length
+		uint8_t 		gateType;		// gate type (hold, repeat, arpeggio)
+		uint8_t			velocity;	    // note velocity
+		uint8_t			glide;			// portamento time - to be implemented.
+		// utility variables - dont need to be saved.
+	}StepDatum;
+
 extern NoteDatum noteData[4];
 
 #endif

@@ -46,7 +46,7 @@ class DisplayModule
     OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
-    void initialize();
+    void initialize(Sequencer (*sequenceArray)[4]);
     void displayLoop();
 
     void clearDisplay();
@@ -65,6 +65,9 @@ class DisplayModule
     void timingMenuDisplay();
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
+private:
+
+    Sequencer (*sequenceArray)[4];
 
 
     const char* midiNotes[128] = {

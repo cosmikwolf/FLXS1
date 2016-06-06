@@ -9,8 +9,11 @@ elapsedMicros displayTimer;
 DisplayModule::DisplayModule(){
 };
 
-void DisplayModule::initialize(){
+void DisplayModule::initialize(Sequencer (*sequenceArray)[4]){
+
   Serial.println("Initializing Display");
+
+  this->sequenceArray = sequenceArray;
   oled.begin();
   oled.fillScreen(BLACK);     delay(10);
   oled.fillScreen(RED);     delay(10);
@@ -86,6 +89,7 @@ void DisplayModule::cleanupTextBuffers(){
 };
 
 void DisplayModule::displayLoop() {
+
   if( displayTimer > 10000){
 	  displayTimer = 0;
 
@@ -101,7 +105,7 @@ void DisplayModule::displayLoop() {
         channelMenuDisplay(buf);
       break;
       case STEP_DISPLAY:
-      //  if (sequence[selectedChannel].instType == 1){
+      //  if (sequenceArray[selectedChannel]->instType == 1){
        //   gameOfLifeDisplay();
       //  } else {
         stepDisplay(buf);
@@ -209,26 +213,27 @@ void DisplayModule::stepDisplay(char *buf){
   };
 
   displayElement[0] = strdup("step info");
-  displayElement[1] = strdup(midiNotes[sequence[selectedChannel].stepData[selectedStep].pitch]);
+  displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel]->stepData[selectedStep].pitch]);
 
-  if ( sequence[selectedChannel].stepData[selectedStep].gateType == 0 ){
+  if ( sequenceArray[selectedChannel]->stepData[selectedStep].gateType == 0 ){
     displayElement[2] = strdup("L: rest");
-  } else if (sequence[selectedChannel].stepData[selectedStep].gateLength == 0){
+  } else if (sequenceArray[selectedChannel]->stepData[selectedStep].gateLength == 0){
     displayElement[2] = strdup("L: pulse");
-  } else if (sequence[selectedChannel].stepData[selectedStep].gateLength == 1){
+  } else if (sequenceArray[selectedChannel]->stepData[selectedStep].gateLength == 1){
     displayElement[2] = strdup("L: 1 step");
   } else {
-    sprintf(buf, "L: %d steps", sequence[selectedChannel].stepData[selectedStep].gateLength);
+    sprintf(buf, "L: %d steps", sequenceArray[selectedChannel]->stepData[selectedStep].gateLength);
+    sprintf(buf, "L: %d steps", sequenceArray[selectedChannel]->stepData[selectedStep].gateLength);
     displayElement[2] = strdup(buf);
   }
 
-  sprintf(buf, "V: %d", sequence[selectedChannel].stepData[selectedStep].velocity);
+  sprintf(buf, "V: %d", sequenceArray[selectedChannel]->stepData[selectedStep].velocity);
   displayElement[3] = strdup(buf);
 
-  sprintf(buf, "%s", instrumentNames[sequence[selectedChannel].instrument]);
+  sprintf(buf, "%s", instrumentNames[sequenceArray[selectedChannel]->instrument]);
   displayElement[4] = strdup(buf);
 
-  sprintf(buf, "vol: %d", sequence[selectedChannel].volume);
+  sprintf(buf, "vol: %d", sequenceArray[selectedChannel]->volume);
   displayElement[5] = strdup(buf);
 
   displayElement[7] = strdup("TEMPO");
@@ -240,10 +245,10 @@ void DisplayModule::stepDisplay(char *buf){
     displayElement[6] = strdup(buf);
   };
 
-  sprintf(buf, "%d steps", sequence[selectedChannel].stepCount);
+  sprintf(buf, "%d steps", sequenceArray[selectedChannel]->stepCount);
   displayElement[8] = strdup(buf);
 
-  sprintf(buf, "/ %d beats", sequence[selectedChannel].beatCount);
+  sprintf(buf, "/ %d beats", sequenceArray[selectedChannel]->beatCount);
   displayElement[9] = strdup(buf);
 
   sprintf(buf, "stmd: %d", stepMode);
@@ -252,7 +257,7 @@ void DisplayModule::stepDisplay(char *buf){
   sprintf(buf, "steps: %d-%d", notePage*16 , (notePage+1)*16 );
   displayElement[11] = strdup(buf);
 
-  sprintf(buf, "ch/pt: %d/%d", selectedChannel , sequence[selectedChannel].patternIndex );
+  sprintf(buf, "ch/pt: %d/%d", selectedChannel , sequenceArray[selectedChannel]->patternIndex );
 
   renderOnce_StringBox(0,  highlight, previousHighlight, 0,   0, 64, 10, false, 1, background, foreground);
   renderOnce_StringBox(1,  highlight, previousHighlight, 0,  10, 64, 22, false, 2, background , foreground);
@@ -269,7 +274,7 @@ void DisplayModule::stepDisplay(char *buf){
   renderOnce_StringBox(12, highlight, previousHighlight, 0,  80, 64, 10, false, 1 ,background , foreground);
 
   //sprintf(buf, "state: %d", currentState);
-  //sprintf(buf, "chan: %d", sequence[selectedChannel].activeStep);
+  //sprintf(buf, "chan: %d", sequenceArray[selectedChannel]->activeStep);
   //sprintf(buf, "stmd: %d", stepMode);
   //sprintf(buf, "sqnc: %d", selectedChannel);
   //sprintf(buf, "step: %d", selectedStep);
@@ -367,7 +372,7 @@ void DisplayModule::gameOfLifeDisplay(){
   //
   //      color_t color;
   //
-  //      if (col == sequence[selectedChannel].activeStep) {
+  //      if (col == sequenceArray[selectedChannel]->activeStep) {
   //        if (life.grid[row][col] < 1){
   //          color = Yellow;
   //        } else {
@@ -457,11 +462,11 @@ void DisplayModule::instrumentSelectDisplay(){
   element =  "INSTRUMENT SELECT";
   gdispFillStringBox(   0, 31, 128 , 10, element, fontSm, Orange, Red, justifyCenter);
 
-  element = String(instrumentNames[sequence[selectedChannel].instrument]).c_str();
+  element = String(instrumentNames[sequenceArray[selectedChannel]->instrument]).c_str();
   gdispFillStringBox(   0, 41, 128 , 24, element, fontSm, Red, Orange, justifyCenter);
-  element = String("vol: " + String(sequence[selectedChannel].volume)).c_str();
+  element = String("vol: " + String(sequenceArray[selectedChannel]->volume)).c_str();
   gdispFillStringBox(   0, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
-  element = String("bank: " + String(sequence[selectedChannel].bank)).c_str();
+  element = String("bank: " + String(sequenceArray[selectedChannel]->bank)).c_str();
   gdispFillStringBox(   64, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
   */
 }
@@ -473,15 +478,15 @@ void DisplayModule::timingMenuDisplay(){
   element =  "TIMING SELECT";
   gdispFillStringBox(   0, 10, 128 , 20, element, fontMd, Orange, Purple, justifyCenter);
 
-  if (sequence[selectedChannel].stepCount > 1){
-    element =  String("play " + String(sequence[selectedChannel].stepCount) + " steps").c_str();
+  if (sequenceArray[selectedChannel]->stepCount > 1){
+    element =  String("play " + String(sequenceArray[selectedChannel]->stepCount) + " steps").c_str();
   } else {
     element =  String("play 1 step").c_str();
   }
   gdispFillStringBox(   0, 30, 128 , 10, element, fontSm, Orange, Purple, justifyCenter);
 
-  if (sequence[selectedChannel].stepCount > 1){
-    element =  String("over " + String(sequence[selectedChannel].beatCount) + " beats").c_str();
+  if (sequenceArray[selectedChannel]->stepCount > 1){
+    element =  String("over " + String(sequenceArray[selectedChannel]->beatCount) + " beats").c_str();
   } else {
     element =  String("over 1 beat").c_str();
   }
