@@ -1,19 +1,14 @@
 #include <Arduino.h>
 #include "FlashMemory.h"
+
 #define FILE_EXISTS 0
 #define SAVEFILE_DOES_NOT_EXIST 1
 #define READ_JSON_ERROR 2
-/*
-¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
-This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
-¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
-*/
+
 FlashMemory::FlashMemory(){};
 
 void FlashMemory::initialize(Sequencer *sequenceArray){
   Serial.println("<<->> Initializing Flash Memory <<->>");
-
-  this->sequenceArray = sequenceArray;
 
   if (!SD.begin(SD_CS_PIN)){
     Serial.println("SD Card initialization failed!");
@@ -21,11 +16,11 @@ void FlashMemory::initialize(Sequencer *sequenceArray){
   }
 
   this->deleteAllFiles();
+  this->sequenceArray = sequenceArray;
 
   Serial.println("<<->> Flash Memory Initialization Complete <<->>");
 }
 
-//void FlashMemory::saveSequenceJSON(Sequencer& sequence, char *pattern ){
 void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
   Serial.println("saveSequenceJson FreeMemory 1 : " + String(FreeRam2()));
@@ -86,8 +81,6 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   Serial.println("saveSequenceJson FreeMemory 5 : " + String(FreeRam2()));
 
   Serial.println("flash Timer after write: " + String(flashTimer) );
-
-//  Serial.println(String(jsonSaveTimer))
 
 }
 
