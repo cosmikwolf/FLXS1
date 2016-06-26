@@ -52,11 +52,12 @@ public:
   Encoder knob;
   Zetaohm_MAX7301 max7301;
   OutputController* outputControl;
+  MasterClock* clockMaster;
 
-  void initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer *sequenceArray);
+  void initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
 
   void loop(uint16_t frequency);
-  
+
   void patternSelectHandler();
   void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);

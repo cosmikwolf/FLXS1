@@ -14,12 +14,13 @@ knobChange = 0;;
 
 };
 
-void InputModule::initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer *sequenceArray){
+void InputModule::initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster){
   Serial.println("button setup start");
 
   this->saveFile = saveFile;
   this->sequenceArray = sequenceArray;
   this->outputControl = outputControl;
+  this->clockMaster= clockMaster;
 
   max7301.begin(5);                      delay(1);
   max7301.gpioPinMode(INPUT_PULLUP);     delay(1);
@@ -322,7 +323,7 @@ void InputModule::altButtonHandler(){
 ion `_times_r':
 timesr.c:(.text._times_r+0x2): undefined reference to `_times'
 */
-      // --->  clock.changeTempo(tempoX100);  <--
+       clockMaster->changeTempo(tempoX100);
         break;
 
         case 4:

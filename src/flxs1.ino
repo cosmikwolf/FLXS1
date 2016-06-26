@@ -15,7 +15,7 @@
 //#include "LEDArray.h"
 
 #define kSerialSpeed 115200
-#define kClockInterval 1000
+#define kClockInterval 500
 #define kMosiPin 11
 #define kSpiClockPin 13
 
@@ -36,7 +36,6 @@ void setup() {
 	MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
-
 }
 
 void loop() {

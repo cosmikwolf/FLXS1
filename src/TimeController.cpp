@@ -18,10 +18,10 @@ void TimeController::initialize() {
 	outputControl.initialize();
 	ledArray.initialize(sequence);
 	display.initialize(sequence);
-
-	buttonIo.initialize(&outputControl, &saveFile, sequence);
-	buttonIo.changeState(STEP_DISPLAY);
 	clockMaster.initialize(&outputControl, sequence);
+
+	buttonIo.initialize(&outputControl, &saveFile, sequence, &clockMaster);
+	buttonIo.changeState(STEP_DISPLAY);
 	saveFile.initialize(sequence);
 	saveFile.loadPattern(0, 0b1111);
 
