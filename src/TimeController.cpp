@@ -18,7 +18,7 @@ void TimeController::initialize() {
 	outputControl.initialize();
 	ledArray.initialize(sequence);
 	display.initialize(sequence);
-	clockMaster.initialize(&outputControl, sequence);
+	clockMaster.initialize(&outputControl, sequence, noteData);
 
 	buttonIo.initialize(&outputControl, &saveFile, sequence, &clockMaster);
 	buttonIo.changeState(STEP_DISPLAY);

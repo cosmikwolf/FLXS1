@@ -29,6 +29,7 @@ class TimeController {
     DisplayModule display;
     LEDArray ledArray;
     FlashMemory saveFile;
+    NoteDatum noteData[4];
 
 };
 extern Sequencer sequence[4];

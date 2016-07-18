@@ -258,10 +258,13 @@ void InputModule::altButtonHandler(){
         } else if (selectedStep == getNote(i) && stepMode == 1){
           stepMode = 2;
           knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocity - knobRead;
+        } else if (selectedStep == getNote(i) && stepMode == 2){
+          stepMode = 8;
+          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
         }else {
           stepMode = 0;
           selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep) - knobRead;
+          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
         }
       }
     }
@@ -273,20 +276,21 @@ void InputModule::altButtonHandler(){
       switch (stepMode) {
         case 0:
       // just change the note
-        if (knobRead + sequenceArray[selectedChannel].getStepPitch(selectedStep) < 0){
+        if (knobRead + sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) < 0){
           // you can turn off a note by turning the value to 0
           // turn off a note by setting gate type and pitch to 0
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = 0;
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, 0);
+          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
+          sequenceArray[selectedChannel].setStepPitch(selectedStep, 0, 0);
           knob.write(4);
         } else {
-          if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == 0){
+          if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
             // if a note is not active, turn it on and give it a length.
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = 1;
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
             sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
           }
           // and finally set the new step value!
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep) + knobChange, 127));
+          // monophonic so pitch[0] only
+          sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 127), 0);
 
         }
         break;
@@ -294,9 +298,9 @@ void InputModule::altButtonHandler(){
         case 1:
     // change the gate type
         if ((sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = 0;
+          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
         } else if(knobChange > 0) {
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = 1;
+          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
         }
 
         if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
@@ -343,11 +347,17 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
         break;
 
         case 6:
-        sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 129);
+        sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
         break;
 
         case 7:
         sequenceArray[selectedChannel].beatCount = positive_modulo(sequenceArray[selectedChannel].beatCount + knobChange, 129);
+        break;
+
+        case 8:
+
+        sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 3);
+
         break;
 
       }

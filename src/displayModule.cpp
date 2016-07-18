@@ -210,12 +210,14 @@ void DisplayModule::stepDisplay(char *buf){
     highlight = 8;
   } else if (stepMode == 7) {
     highlight = 9;
+  } else if (stepMode == 8) {
+    highlight = 4;
   };
 
   displayElement[0] = strdup("step info");
-  displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch]);
+  displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
 
-  if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == 0 ){
+  if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
     displayElement[2] = strdup("L: rest");
   } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0){
     displayElement[2] = strdup("L: pulse");
@@ -223,17 +225,24 @@ void DisplayModule::stepDisplay(char *buf){
     displayElement[2] = strdup("L: 1 step");
   } else {
     sprintf(buf, "L: %d steps", sequenceArray[selectedChannel].stepData[selectedStep].gateLength);
-    sprintf(buf, "L: %d steps", sequenceArray[selectedChannel].stepData[selectedStep].gateLength);
     displayElement[2] = strdup(buf);
   }
 
   sprintf(buf, "V: %d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
   displayElement[3] = strdup(buf);
 
-  sprintf(buf, "%s", instrumentNames[sequenceArray[selectedChannel].instrument]);
-  displayElement[4] = strdup(buf);
+  if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+    displayElement[4] = strdup("Rest");
+  } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_STEP){
+    displayElement[4] = strdup("Step");
+  } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > GATETYPE_STEP){
+    displayElement[4] = strdup("Arp");
+  }
 
-  sprintf(buf, "vol: %d", sequenceArray[selectedChannel].volume);
+  //sprintf(buf, "%s", instrumentNames[sequenceArray[selectedChannel].instrument]);
+  //displayElement[4] = strdup(buf);
+
+  //sprintf(buf, "vol: %d", sequenceArray[selectedChannel].volume);
   displayElement[5] = strdup(buf);
 
   displayElement[7] = strdup("TEMPO");

@@ -59,7 +59,7 @@ void LEDArray::loop(uint16_t frequency){
             if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
               leds[ledMapping[i]] = CHSV(0,0,0);
             } else {
-              leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i)),255,255);
+              leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0),255,255);
             }
           }
         }

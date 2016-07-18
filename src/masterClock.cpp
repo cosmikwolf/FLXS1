@@ -1,10 +1,11 @@
 #include <Arduino.h>
 #include "MasterClock.h"
 
-void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray){
+void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, NoteDatum *noteData){
 	Serial.println("Initializing Master Clock");
 	this->sequenceArray = sequenceArray;
 	this->outputControl = outputControl;
+	this->noteData = noteData;
 	Serial.println("Master Clock Initialized");
 
 };
@@ -37,7 +38,6 @@ void MasterClock::masterClockFunc(void){
     }
 
     noteOffSwitch();
-
     noteOnSwitch();
 
   }
@@ -69,6 +69,7 @@ void MasterClock::internalClockTick(){
       sequenceArray[i].clockStart(startTime);
       sequenceArray[i].beatPulse(beatLength, &life);
       sequenceArray[i].runSequence(&noteData[i], &life);
+
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
@@ -103,7 +104,7 @@ void MasterClock::externalClockTick(){
 void MasterClock::noteOffSwitch(){
   for (int i=0; i< sequenceCount; i++){
     if (noteData[i].noteOff == true){
-      for (int n=0; n< 16; n++){
+      for (int n=0; n< MAX_STEPS_PER_SEQUENCE; n++){
         if (!noteData[i].noteOffArray[n]){
           continue;
         }
@@ -114,14 +115,14 @@ void MasterClock::noteOffSwitch(){
 }
 
 void MasterClock::noteOnSwitch(){
-    debug( "\tbegin note on switch");
 
   for (int i=0; i< sequenceCount; i++){
     if (noteData[i].noteOn == true){
-      for (int n=0; n< 128; n++){
+      for (int n=0; n< MAX_STEPS_PER_SEQUENCE; n++){
         if (!noteData[i].noteOnArray[n]){
           continue;
         }
+
 				outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n] );
       }
     }

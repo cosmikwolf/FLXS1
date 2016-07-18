@@ -10,7 +10,7 @@
 class MasterClock {
 
 public:
-  void initialize(OutputController* outputControl, Sequencer *sequenceArray);
+  void initialize(OutputController* outputControl, Sequencer *sequenceArray, NoteDatum *noteData);
   void changeTempo(uint32_t newTempoX100);
   void masterClockFunc();
   void internalClockTick();
@@ -25,6 +25,7 @@ public:
 private:
   OutputController* outputControl;
   Sequencer *sequenceArray;
+  NoteDatum *noteData;
 };
 // https://isocpp.org/wiki/faq/pointers-to-members#fnptr-vs-memfnptr-types
 //typedef void (MasterClock::*MasterClockMemFn)();

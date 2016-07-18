@@ -20,7 +20,7 @@ void FlashMemory::initialize(Sequencer *sequenceArray){
     return;
   }
 
-  this->deleteAllFiles();
+  //this->deleteAllFiles();
 
   Serial.println("<<->> Flash Memory Initialization Complete <<->>");
 }
@@ -60,7 +60,10 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   for (int i=0; i< root["stepCount"]; i++){
     JsonObject& stepDataObj = jsonBuffer.createObject();
     stepDataObj["i"] = i ;
-    stepDataObj["p"] = sequenceArray[channel].stepData[i].pitch ;
+    stepDataObj["p0"] = sequenceArray[channel].stepData[i].pitch[0];
+    stepDataObj["p1"] = sequenceArray[channel].stepData[i].pitch[1];
+    stepDataObj["p2"] = sequenceArray[channel].stepData[i].pitch[2];
+    stepDataObj["p4"] = sequenceArray[channel].stepData[i].pitch[3];
     stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
     stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType ;
     stepDataObj["v"] = sequenceArray[channel].stepData[i].velocity ;
@@ -161,7 +164,10 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
        Serial.println("Step Data Index Mismatch Error");
      };
      StepDatum stepDataBuf;
-     stepDataBuf.pitch  = stepDataArray[i]["p"];
+     stepDataBuf.pitch[0]  = stepDataArray[i]["p0"];
+     stepDataBuf.pitch[1]  = stepDataArray[i]["p1"];
+     stepDataBuf.pitch[2]  = stepDataArray[i]["p2"];
+     stepDataBuf.pitch[3]  = stepDataArray[i]["p3"];
      stepDataBuf.gateLength  = stepDataArray[i]["gl"];
      stepDataBuf.gateType  = stepDataArray[i]["gt"];
      stepDataBuf.velocity  = stepDataArray[i]["v"];
@@ -284,7 +290,10 @@ void FlashMemory::printPattern(){
   for(int i=0; i < sequenceCount; i++){
     Serial.print("sc:\t"+String(sequenceArray[i].stepCount) +"\tbc:\t"+String(sequenceArray[i].beatCount) +"\tqk:\t"+String(sequenceArray[i].quantizeKey)+"\tinst:\t"+String(sequenceArray[i].instrument)+"\tit:\t"+String(sequenceArray[i].instType) + "\t");
     for(int n=0; n<16; n++){
-      Serial.print( String(sequenceArray[i].stepData[n].pitch) + "\t" );
+      Serial.print( String(sequenceArray[i].stepData[n].pitch[0]) + "\t" );
+      Serial.print( String(sequenceArray[i].stepData[n].pitch[1]) + "\t" );
+      Serial.print( String(sequenceArray[i].stepData[n].pitch[2]) + "\t" );
+      Serial.print( String(sequenceArray[i].stepData[n].pitch[3]) + "\t" );
     }
     Serial.println("");
   }
