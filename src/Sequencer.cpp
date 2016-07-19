@@ -204,13 +204,13 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 
 	switch (instType){
 		case 1:
-			// GAME OF LIFE MODE
-			sequenceModeGameOfLife(noteData, life);
-			break;
+		// GAME OF LIFE MODE
+		sequenceModeGameOfLife(noteData, life);
+		break;
 		case 0:
-			// NORMAL STEP MODE
-			sequenceModeStandardStep(noteData);
-			break;
+		// NORMAL STEP MODE
+		sequenceModeStandardStep(noteData);
+		break;
 	}
 }
 
@@ -257,105 +257,51 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 
 void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-		int arpCount = 3;
-		int arpLength = stepUtil[stepNum].noteTimerMcs / arpCount;
 
-		if((stepData[stepNum].gateType == GATETYPE_STEP ) ){
+		if (stepData[stepNum].gateType > GATETYPE_REST){
 
-			// set notes to be stopped, and marked as played.
-			if ( (stepUtil[stepNum].stepTimer > stepUtil[stepNum].noteTimerMcs) && (stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING) ){
-				// if the note is playing and has played out the gate length, end the note.
-				noteData->noteOff = true;
-				noteData->channel = channel;
-				noteData->noteOffStep = stepNum;
-				int n = 0;
-				for (int f=0; f<stepCount; f++){
-					if (noteData->noteOffArray[f] == NULL){
-						noteData->noteOffArray[f] = stepUtil[stepNum].notePlaying;
-						break;
-					}
-				}
-				stepUtil[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
+			int arpCount = stepData[stepNum].gateType;
+			int arpLength = stepUtil[stepNum].noteTimerMcs / arpCount;
+
+			if (sequenceTimer > stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs &&  stepUtil[stepNum].arpStatus != 0) {
+				stepUtil[stepNum].arpStatus = 0;
+				Serial.println("resetting arpStatus to 0");
 			}
 
-		} else if (stepData[stepNum].gateType == GATETYPE_ARP){
-			// set notes to be stopped, and marked as played.
-			for (int arpX = 0; arpX < arpCount; arpX++){
-				if ( (stepUtil[stepNum].stepTimer > arpLength*arpX) && (stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING) ){
-					// if the note is playing and has played out the gate length, end the note.
-					noteData->noteOff = true;
-					noteData->channel = channel;
-					noteData->noteOffStep = stepNum;
-					int n = 0;
-					for (int f=0; f<stepCount; f++){
-						if (noteData->noteOffArray[f] == NULL){
-							noteData->noteOffArray[f] = stepUtil[stepNum].notePlaying;
-							break;
-						}
-					}
-
-					if (stepUtil[stepNum].stepTimer > stepUtil[stepNum].noteTimerMcs){
-						stepUtil[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
-					} else {
-						stepUtil[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
-					}
-				}
+			if (stepUtil[stepNum].stepTimer > arpLength ) {
+				// note shut off if no new notes are being triggered
+				noteShutOff(noteData, stepNum);
 			}
-		}
 
-		// set notes to be played
-		if((stepData[stepNum].gateType == GATETYPE_STEP ) ){
-			// Got to figure out what this 15000 means and document it!
-			if ( sequenceTimer >= stepUtil[stepNum].offset ) {
-				if (stepUtil[stepNum].noteStatus == NOTPLAYING_NOTQUEUED)  {
+			// set notes to be played
+			// HERE IS WHERE I NEED TO FIGURE OUT ARP LOGIC!
+			if ( sequenceTimer >= (stepUtil[stepNum].offset + stepUtil[stepNum].arpStatus*arpLength) &&
+			     sequenceTimer < (stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs) ) {
+					//ensure all notes playing are ended before a new trigger.
+					noteShutOff(noteData, stepNum);
 
-					//shut off any other notes that might still be playing.
-					noteShutOff(noteData);
 					noteTrigger(noteData, stepNum, 0);
-					Serial.println("NoteData Trigger - " );
+
+					Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepUtil[stepNum].noteTimerMcs) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
+					Serial.println("Note on array:");
 					for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
 						Serial.print(noteData->noteOnArray[i]);
 						Serial.print(" ");
 					}
 					Serial.println("");
-
-
-				}
-			} else {
-				if (stepUtil[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-					stepUtil[stepNum].noteStatus = 0;
-				}
-			}
-		} else if (stepData[stepNum].gateType == GATETYPE_ARP){
-			// HERE IS WHERE I NEED TO FIGURE OUT ARP LOGIC!
-			for (int arpX = 0; arpX < arpCount; arpX++){
-				if ( sequenceTimer >= (stepUtil[stepNum].offset + arpX*arpLength ) ) {
-					if (stepUtil[stepNum].noteStatus == NOTPLAYING_NOTQUEUED)  {
-						//shut off any other notes that might still be playing.
-						noteShutOff(noteData);
-						noteTrigger(noteData, stepNum, 0);
-						Serial.println("NoteData Trigger - " );
-						for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
-							Serial.print(noteData->noteOnArray[i]);
-							Serial.print(" ");
-						}
-						Serial.println("");
-					}
-					break;
-				} else {
-					if (stepUtil[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-						stepUtil[stepNum].noteStatus = 0;
-					}
-				}
+					stepUtil[stepNum].arpStatus++;
 			}
 		}
 	}
 }
 
-void Sequencer::noteShutOff(NoteDatum *noteData){
+void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 	//shut off any other notes that might still be playing.
-	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-		if(stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING){
+
+		int arpCount = stepData[stepNum].gateType;
+		int arpLength = stepUtil[stepNum].noteTimerMcs / arpCount;
+
+		if( stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING ){
 			noteData->noteOff = true;
 			noteData->channel = channel;
 			noteData->noteOffStep = stepNum;
@@ -365,9 +311,18 @@ void Sequencer::noteShutOff(NoteDatum *noteData){
 					break;
 				}
 			}
-			stepUtil[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
+			Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepUtil[stepNum].noteTimerMcs) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
+
+			Serial.println("Note off array:");
+			for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
+				Serial.print(noteData->noteOffArray[i]);
+				Serial.print(" ");
+			}
+			Serial.println("");
+
+			stepUtil[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 		}
-	}
+
 }
 
 void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index){
@@ -378,7 +333,7 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index)
 	noteData->sequenceTime = sequenceTimer;
 	noteData->offset = stepUtil[stepNum].offset;
 	stepUtil[stepNum].stepTimer = 0;
-	stepUtil[stepNum].noteStatus = 1;
+	stepUtil[stepNum].noteStatus = CURRENTLY_PLAYING;
 
 	if (quantizeKey == 1){
 		stepUtil[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[index], aminor, 1);

@@ -300,7 +300,9 @@ void InputModule::altButtonHandler(){
         if ((sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
           sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
         } else if(knobChange > 0) {
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
+          if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
+          }
         }
 
         if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
@@ -356,7 +358,7 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
 
         case 8:
 
-        sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 3);
+        sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 36);
 
         break;
 

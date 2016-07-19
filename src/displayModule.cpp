@@ -235,8 +235,9 @@ void DisplayModule::stepDisplay(char *buf){
     displayElement[4] = strdup("Rest");
   } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_STEP){
     displayElement[4] = strdup("Step");
-  } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > GATETYPE_STEP){
-    displayElement[4] = strdup("Arp");
+  } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > GATETYPE_STEP ){
+    sprintf(buf, "Arp %d", sequenceArray[selectedChannel].stepData[selectedStep].gateType);
+    displayElement[4] = strdup(buf);
   }
 
   //sprintf(buf, "%s", instrumentNames[sequenceArray[selectedChannel].instrument]);

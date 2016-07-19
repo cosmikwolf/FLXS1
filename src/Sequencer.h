@@ -19,7 +19,7 @@ class Sequencer
 		void  	clearNoteData(NoteDatum *noteData);
 		void 		incrementActiveStep();
 		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index);
-		void    noteShutOff(NoteDatum *noteData);
+		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum);
 
 		void 		calculateStepTimers();
 		void 		beatPulse(uint32_t beatLength, GameOfLife *life);

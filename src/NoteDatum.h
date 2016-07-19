@@ -50,6 +50,7 @@ typedef	struct StepUtil {
 	uint16_t		beat;			// beat in which the note is triggered - recalculated each beat
 	uint32_t		offset;		    // note start time offset in mcs from the beat start - recalculated each beat
 	uint8_t			noteStatus;		// if note is playing or not
+	uint8_t			arpStatus;		// if note is playing or not
 	uint8_t			notePlaying;	// stores the note that is played so it can be turned off.
 	uint32_t		lengthMcs;	    // length timer for step in microseconds.
 	uint32_t		noteTimerMcs;
