@@ -1,13 +1,13 @@
 #include "Arduino.h"
 #include "Sequencer.h"
 
-// stepStatus indicates the status of the next note
+// noteStatus indicates the status of the next note
 // 0 indicates not playing, not queued
 // 1 indicates the note is currently playing
 // 2 indicates the note is currently queued.
 // 3 indicates that the note is currently playing and currently queued
 // 4 indicates that the note has been played this iteration
-// stepData[activeStep].stepStatus = stepData[activeStep].pitch;
+// stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
 
 Sequencer sequence[4];
@@ -37,9 +37,10 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	for (int i=0; i<MAX_STEPS_PER_SEQUENCE; i++){
 		stepUtil[i].beat = 0;
 		stepUtil[i].offset = 0;
-		stepUtil[i].stepStatus = NOTPLAYING_NOTQUEUED;
+		stepUtil[i].noteStatus = NOTPLAYING_NOTQUEUED;
 		stepUtil[i].notePlaying = 0;
-		stepUtil[i].stepOffTime = 0;
+		stepUtil[i].lengthMcs = 0;
+		stepUtil[i].noteTimerMcs = 0;
 		stepUtil[i].stepTimer = 0;
 	}
 
@@ -116,25 +117,25 @@ void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 }
 
 void Sequencer::calculateStepTimers(){
-	uint32_t stepOffTimeCounter = 0;
+	uint32_t noteTimerMcsCounter = 0;
 	stepLength = beatLength*beatCount/stepCount;
 
 	// Serial.println(" stepCount: " + String(stepCount) + " stepLength: " + String(stepLength) + " beatLength: " + String(beatLength) + " tempo: " + String(tempo));
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 
-		stepUtil[stepNum].stepOffTime = (stepData[stepNum].gateLength*stepLength);
-		stepUtil[stepNum].beat = floor(stepOffTimeCounter / beatLength);
+		stepUtil[stepNum].noteTimerMcs = (stepData[stepNum].gateLength*stepLength);
+		stepUtil[stepNum].beat = floor(noteTimerMcsCounter / beatLength);
 		stepUtil[stepNum].offset = stepNum*stepLength;
-		stepOffTimeCounter = stepOffTimeCounter + stepUtil[stepNum].stepOffTime;
+		noteTimerMcsCounter = noteTimerMcsCounter + stepUtil[stepNum].noteTimerMcs;
 		/*
 		Serial.println( String(channel) + " " + String(stepNum) + " " +
-		"ntm: " + String(stepData[stepNum].stepOffTime) +
+		"ntm: " + String(stepData[stepNum].noteTimerMcs) +
 		"\tbt: " + String(stepData[stepNum].beat) +
 		"\toff: " + String(stepData[stepNum].offset)  +
 		"\tgaL: " + String(stepData[stepNum].gateLength) +
 		"\tgaT: " + String(stepData[stepNum].gateType) +
 		"\tptch: " + String(stepData[stepNum].pitch) +
-		"\tOC: " + String(stepOffTimeCounter)
+		"\tOC: " + String(noteTimerMcsCounter)
 	);
 	*/
 
@@ -172,8 +173,8 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 		for(int i = 0; i < stepCount; i++){
 			// reset the note status for notes that have been played.
 			// leave notes that have not been turned off yet.
-			//  if (stepData[i].stepStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-			//    stepData[i].stepStatus = 0;
+			//  if (stepData[i].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
+			//    stepData[i].noteStatus = 0;
 			//  }
 		}
 		activeStep = 0;
@@ -185,7 +186,7 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 		// the offset value. This means that runSequence needs to run at least once before
 		// it can reset the note statuses. For the first note, that means it wont ever reset
 		// so we must reset it manually here.
-		stepUtil[0].stepStatus = NOTPLAYING_NOTQUEUED;
+		stepUtil[0].noteStatus = NOTPLAYING_NOTQUEUED;
 	}
 
 	if(instType == 1 && channel == 0){
@@ -260,9 +261,9 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 		if (stepData[stepNum].gateType > GATETYPE_REST){
 
 			int arpCount = stepData[stepNum].gateType;
-			int arpLength = stepUtil[stepNum].stepOffTime / arpCount;
+			int arpLength = stepUtil[stepNum].noteTimerMcs / arpCount;
 
-			if (sequenceTimer > stepUtil[stepNum].offset + stepUtil[stepNum].stepOffTime &&  stepUtil[stepNum].arpStatus != 0) {
+			if (sequenceTimer > stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs &&  stepUtil[stepNum].arpStatus != 0) {
 				stepUtil[stepNum].arpStatus = 0;
 				Serial.println("resetting arpStatus to 0");
 			}
@@ -275,13 +276,14 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 			// set notes to be played
 			// HERE IS WHERE I NEED TO FIGURE OUT ARP LOGIC!
 			if ( sequenceTimer >= (stepUtil[stepNum].offset + stepUtil[stepNum].arpStatus*arpLength) &&
-			     sequenceTimer < (stepUtil[stepNum].offset + stepUtil[stepNum].stepOffTime) ) {
+			     sequenceTimer < (stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs) ) {
 					//ensure all notes playing are ended before a new trigger.
+					noteShutOff(noteData, stepNum);
 
 					noteTrigger(noteData, stepNum, 0);
 
-					//Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " stepTimer: " + String(stepUtil[stepNum].stepOffTime) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
-					//Serial.println("Note on array:");
+					Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepUtil[stepNum].noteTimerMcs) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
+					Serial.println("Note on array:");
 					for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
 						Serial.print(noteData->noteOnArray[i]);
 						Serial.print(" ");
@@ -297,9 +299,9 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 	//shut off any other notes that might still be playing.
 
 		int arpCount = stepData[stepNum].gateType;
-		int arpLength = stepUtil[stepNum].stepOffTime / arpCount;
+		int arpLength = stepUtil[stepNum].noteTimerMcs / arpCount;
 
-		if( stepUtil[stepNum].stepStatus == CURRENTLY_PLAYING ){
+		if( stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING ){
 			noteData->noteOff = true;
 			noteData->channel = channel;
 			noteData->noteOffStep = stepNum;
@@ -309,29 +311,29 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 					break;
 				}
 			}
-			//Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " stepTimer: " + String(stepUtil[stepNum].stepOffTime) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
+			Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepUtil[stepNum].noteTimerMcs) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
 
-			//Serial.println("Note off array:");
+			Serial.println("Note off array:");
 			for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
 				Serial.print(noteData->noteOffArray[i]);
 				Serial.print(" ");
 			}
 			Serial.println("");
 
-			stepUtil[stepNum].stepStatus = NOTPLAYING_NOTQUEUED;
+			stepUtil[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 		}
 
 }
 
 void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index){
-	// note trigger determines what pitches to be played.
 	noteData->noteOn = true;
 	noteData->channel = channel;
 	noteData->noteOnStep = stepNum;
+	noteData->triggerTime = micros();
+	noteData->sequenceTime = sequenceTimer;
 	noteData->offset = stepUtil[stepNum].offset;
-
 	stepUtil[stepNum].stepTimer = 0;
-	stepUtil[stepNum].stepStatus = CURRENTLY_PLAYING;
+	stepUtil[stepNum].noteStatus = CURRENTLY_PLAYING;
 
 	if (quantizeKey == 1){
 		stepUtil[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[index], aminor, 1);
@@ -396,7 +398,7 @@ void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
 
 		// Serial.println("activeCellCount: " + String(activeCellCount));
 		for (int stepNum = 0; stepNum < stepCount; stepNum++){
-			if(stepUtil[stepNum].stepStatus == CURRENTLY_PLAYING){
+			if(stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING){
 				noteData->noteOff = true;
 				noteData->channel = channel;
 				noteData->noteOffStep = stepNum;
@@ -406,7 +408,7 @@ void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
 						break;
 					}
 				}
-				stepUtil[stepNum].stepStatus = 0;
+				stepUtil[stepNum].noteStatus = 0;
 			}
 		}
 
@@ -424,7 +426,7 @@ void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
 		} else {
 			stepUtil[lifeCellToPlay].notePlaying = activeCellValues[lifeCellToPlay];
 		}
-		stepUtil[lifeCellToPlay].stepStatus = 1;
+		stepUtil[lifeCellToPlay].noteStatus = 1;
 		noteData->noteOnArray[lifeCellToPlay] = stepUtil[lifeCellToPlay].notePlaying;
 		noteData->noteVelArray[lifeCellToPlay] = stepData[lifeCellToPlay].velocity;
 		lifeCellsPlayed++;
