@@ -3,15 +3,15 @@
 #ifndef NoteDatum_h
 #define NoteDatum_h
 
-// noteStatus indicates the status of the next note
-// stepData[activeStep].noteStatus = stepData[activeStep].pitch;
+// stepStatus indicates the status of the next note
+// stepData[activeStep].stepStatus = stepData[activeStep].pitch;
 #define NOTPLAYING_NOTQUEUED 								0   // 0 indicates not playing, not queued
 #define CURRENTLY_PLAYING 									1		// 1 indicates the note is currently playing
 #define CURRENTLY_QUEUED 										2   // 2 indicates the note is currently queued.
 #define CURRENTLY_PLAYING_AND_QUEUED				3   // 3 indicates that the note is currently playing and currently queued
 #define NOTE_HAS_BEEN_PLAYED_THIS_ITERATION	4   // 4 indicates that the note has been played this iteration
 #define CURRENTLY_ARPEGGIATING							5   // 4 indicates that the note has been played this iteration
-#define CURRENT_ARP_OFFSET									63	// difference between notestatus value and the current Arpeggiation note
+#define CURRENT_ARP_OFFSET									63	// difference between stepStatus value and the current Arpeggiation note
 #define MAX_STEPS_PER_SEQUENCE							64
 
 #define GATETYPE_REST				0
@@ -22,16 +22,17 @@
 
 typedef struct NoteDatum {
 	bool   noteOn;             // is a note going to play?
-	bool   noteOff;            // does a note need to be shut off?
+	uint8_t   noteOnStep;         // step number that originated the noteOn message.
 	uint8_t   noteOnArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
 	uint8_t   noteVelArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
-	uint8_t   noteOffArray[MAX_STEPS_PER_SEQUENCE];  // contains all notes that need to be stopped
 	uint8_t   channel;            // sequence channel (0-3)
-	uint8_t   noteOnStep;         // step number that originated the noteOn message.
-	uint8_t   noteOffStep;        // step number that originated the noteOff message.
-  uint32_t  gateLengthMcs;      // how long the note is
-//	uint32_t	offset;             // the offset from the start of the sequence until the beginning of the gate
-	uint32_t	sequenceTime;       // what time the sequence was triggered.
+	uint32_t  gateLengthMcs;      // how long the note is
+	uint32_t	offset;             // the offset from the start of the sequence until the beginning of the gate
+//	uint32_t	sequenceTime;       // what time the sequence was triggered.
+
+	bool   				noteOff;            // does a note need to be shut off?
+	uint8_t   		noteOffStep;        // step number that originated the noteOff message.
+  uint8_t   		noteOffArray[MAX_STEPS_PER_SEQUENCE];  // contains all notes that need to be stopped
 } NoteDatum;
 
 typedef	struct StepDatum {
@@ -48,12 +49,15 @@ typedef	struct StepUtil {
 	// data that is used in sequence playback, but does not need to be stored
 	uint16_t		beat;			// beat in which the note is triggered - recalculated each beat
 	uint32_t		offset;		    // note start time offset in mcs from the beat start - recalculated each beat
-	uint8_t			noteStatus;		// if note is playing or not
-	uint8_t			arpStatus;		// if note is playing or not
+
+	uint8_t			arpStatus;		// if note is playing or not. Value indicates arp number.
 	uint8_t			notePlaying;	// stores the note that is played so it can be turned off.
-	uint32_t		lengthMcs;	    // length timer for step in microseconds.
-	uint32_t		noteTimerMcs;
-	elapsedMicros	stepTimer;		// a timer to compare with lengthMcs to determine when to send noteOff.
+
+	uint8_t				stepStatus;		// if note is playing or not
+	uint32_t			stepOffTime;		// time  when the note should be stopped.
+	elapsedMillis	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
+
+
 } StepUtil;
 
 #endif

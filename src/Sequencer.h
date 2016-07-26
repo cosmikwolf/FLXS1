@@ -47,7 +47,7 @@ class Sequencer
 		uint32_t 	tempoX100;
 		boolean  	tempoPulse;
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
-		uint32_t 	stepLength;
+		uint32_t 	stepLength;		// length of each step in mcs
 		int16_t 	sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
 		uint32_t 	aminor = 0b101011010101;
 		uint8_t		lifeCellToPlay;
