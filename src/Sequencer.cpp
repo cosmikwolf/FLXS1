@@ -240,6 +240,7 @@ void Sequencer::incrementActiveStep(){
 		}
 	}
 }
+
 void Sequencer::clearNoteData(NoteDatum *noteData){
 	noteData->noteOff = false;
 	noteData->noteOn = false;
@@ -257,29 +258,30 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 
 void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-
 		if (stepData[stepNum].gateType > GATETYPE_REST){
 
 			int arpCount = stepData[stepNum].gateType;
 			int arpLength = stepUtil[stepNum].noteTimerMcs / arpCount;
 
-			if (sequenceTimer > stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs &&  stepUtil[stepNum].arpStatus != 0) {
+			if (sequenceTimer >= stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs) {
 				stepUtil[stepNum].arpStatus = 0;
-				Serial.println("resetting arpStatus to 0");
 			}
 
-			if (stepUtil[stepNum].stepTimer > arpLength ) {
+			if (stepUtil[stepNum].stepTimer > arpLength - 1500 ) {
+        // 1500 is a 1.5ms buffer for each note to make sure each note is shut off in time.
 				// note shut off if no new notes are being triggered
 				noteShutOff(noteData, stepNum);
 			}
 
 			// set notes to be played
 			// HERE IS WHERE I NEED TO FIGURE OUT ARP LOGIC!
-			if ( sequenceTimer >= (stepUtil[stepNum].offset + stepUtil[stepNum].arpStatus*arpLength) &&
-			     sequenceTimer < (stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs) ) {
-					//ensure all notes playing are ended before a new trigger.
-					noteShutOff(noteData, stepNum);
+			// if ( sequenceTimer >= (stepUtil[stepNum].offset + stepUtil[stepNum].arpStatus*arpLength) &&
+			//     sequenceTimer < (stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs) ) {
 
+      if ( sequenceTimer > stepUtil[stepNum].offset + stepUtil[stepNum].arpStatus*arpLength
+        && sequenceTimer < (stepUtil[stepNum].offset + stepUtil[stepNum].noteTimerMcs)){
+					//ensure all notes playing are ended before a new trigger.
+					//noteShutOff(noteData, stepNum);
 					noteTrigger(noteData, stepNum, 0);
 
 					Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepUtil[stepNum].noteTimerMcs) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
@@ -289,7 +291,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 						Serial.print(" ");
 					}
 					Serial.println("");
-					stepUtil[stepNum].arpStatus++;
+
+          stepUtil[stepNum].arpStatus++;
 			}
 		}
 	}
@@ -311,6 +314,7 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 					break;
 				}
 			}
+      /*
 			Serial.println("arplength: " + String(arpLength) + " arpcount: " + String(arpCount) + " arpStatus: " + String(stepUtil[stepNum].arpStatus) + " offset: " + String(stepUtil[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepUtil[stepNum].noteTimerMcs) + " stepTimer: " + String(stepUtil[stepNum].stepTimer));
 
 			Serial.println("Note off array:");
@@ -319,7 +323,7 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 				Serial.print(" ");
 			}
 			Serial.println("");
-
+*/
 			stepUtil[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 		}
 
@@ -329,9 +333,8 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index)
 	noteData->noteOn = true;
 	noteData->channel = channel;
 	noteData->noteOnStep = stepNum;
-	noteData->triggerTime = micros();
-	noteData->sequenceTime = sequenceTimer;
-	noteData->offset = stepUtil[stepNum].offset;
+	//noteData->sequenceTime = sequenceTimer;
+	//noteData->offset = stepUtil[stepNum].offset;
 	stepUtil[stepNum].stepTimer = 0;
 	stepUtil[stepNum].noteStatus = CURRENTLY_PLAYING;
 

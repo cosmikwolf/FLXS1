@@ -12,7 +12,6 @@
 #define NOTE_HAS_BEEN_PLAYED_THIS_ITERATION	4   // 4 indicates that the note has been played this iteration
 #define CURRENTLY_ARPEGGIATING							5   // 4 indicates that the note has been played this iteration
 #define CURRENT_ARP_OFFSET									63	// difference between notestatus value and the current Arpeggiation note
-
 #define MAX_STEPS_PER_SEQUENCE							64
 
 #define GATETYPE_REST				0
@@ -30,9 +29,9 @@ typedef struct NoteDatum {
 	uint8_t   channel;            // sequence channel (0-3)
 	uint8_t   noteOnStep;         // step number that originated the noteOn message.
 	uint8_t   noteOffStep;        // step number that originated the noteOff message.
-	uint32_t	triggerTime;
-	uint32_t	offset;
-	uint32_t	sequenceTime;
+  uint32_t  gateLengthMcs;      // how long the note is
+//	uint32_t	offset;             // the offset from the start of the sequence until the beginning of the gate
+	uint32_t	sequenceTime;       // what time the sequence was triggered.
 } NoteDatum;
 
 typedef	struct StepDatum {
