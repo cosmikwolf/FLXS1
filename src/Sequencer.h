@@ -69,7 +69,6 @@ class Sequencer
 		uint8_t  patternIndex;
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
-		StepUtil stepUtil[MAX_STEPS_PER_SEQUENCE];
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;

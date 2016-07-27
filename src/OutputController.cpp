@@ -38,7 +38,7 @@ void OutputController::initialize(){
 
 void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
-  Serial.println("Note on ch:"  + String(channel) + " nt: " + String(note) );
+//  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,13716, 58504 ) );
   MIDI.sendNoteOn(note, velocity, channel);
   sam2695.noteOn(channel, note, velocity);
@@ -47,6 +47,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity){
 }
 
 void OutputController::noteOff(uint8_t channel, uint8_t note){
+//  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
   mcp.digitalWrite(gateMap[channel], LOW);
   MIDI.sendNoteOff(note, 64, channel);
   sam2695.noteOff(channel, note);
