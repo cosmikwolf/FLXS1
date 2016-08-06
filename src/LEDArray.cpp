@@ -7,7 +7,7 @@ void LEDArray::initialize(Sequencer *sequenceArray){
   Serial.println("Initializing LED Array");
   this->sequenceArray = sequenceArray;
 
-  pinMode(0, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
 
   LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);

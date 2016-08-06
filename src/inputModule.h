@@ -45,16 +45,17 @@
 #define ENCODER1LEFTPIN 17
 #define ENCODER1RIGHTPIN 16
 #define MAX7301PIN  5
+
 class InputModule
 {
 public:
   InputModule();
   Encoder knob;
-  Zetaohm_MAX7301 max7301;
+  Zetaohm_MAX7301* midplaneGPIO;
   OutputController* outputControl;
   MasterClock* clockMaster;
 
-  void initialize(OutputController* outputControl, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
+  void initialize(OutputController* outputControl, Zetaohm_MAX7301* max7301, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
 
   void loop(uint16_t frequency);
 
@@ -67,6 +68,8 @@ public:
   void instrumentSelectInputHandler();
   void timingMenuInputHandler();
   void debugScreenInputHandler();
+  void calibrationMenuHandler();
+
   void resetKnobValues();
   void changeState(uint8_t state);
 
@@ -78,6 +81,7 @@ public:
   int8_t menuSelector;
   int8_t instBuffer;
   int16_t stepModeBuffer;
+
 
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;

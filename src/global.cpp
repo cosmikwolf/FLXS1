@@ -38,6 +38,7 @@ elapsedMicros pulseTimer;
 boolean firstRun = false;
 unsigned long lastBeatLength;
 
+uint16_t calibrationBuffer = 0;
 
 void debug(const char* text){
 	if (debugBoolean == 1){

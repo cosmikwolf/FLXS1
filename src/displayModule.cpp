@@ -23,7 +23,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray){
   oled.fillScreen(BLUE);      delay(10);
   oled.fillScreen(NAVY);      delay(10);
   oled.fillScreen(PURPLE);      delay(10);
-  oled.fillScreen(RED);     delay(10);
+  oled.fillScreen(RED);        delay(10);
   oled.fillScreen(ORANGE);      delay(10);
   oled.fillScreen(YELLOW);      delay(10);
   oled.fillScreen(GREEN);     delay(10);
@@ -61,7 +61,6 @@ void DisplayModule::initialize(Sequencer *sequenceArray){
 void DisplayModule::clearDisplay(){
   oled.clearScreen();
 //  oled.fillScreen(BLUE);
-
 }
 
 void DisplayModule::freeDisplayCache(){
@@ -99,11 +98,12 @@ void DisplayModule::displayLoop(uint16_t frequency) {
        freeDisplayCache();
        oled.clearScreen();
     }
-
     switch(currentState) {
+
       case CHANNEL_MENU:
         channelMenuDisplay(buf);
       break;
+
       case STEP_DISPLAY:
       //  if (sequenceArray[selectedChannel].instType == 1){
        //   gameOfLifeDisplay();
@@ -111,21 +111,29 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         stepDisplay(buf);
       //  }
       break;
+
       case PATTERN_SELECT:
         patternSelectDisplay();
       break;
+
       case SEQUENCE_MENU:
         sequenceMenuDisplay();
       break;
+
       case INSTRUMENT_MENU:
         instrumentSelectDisplay();
       break;
+
       case TIMING_MENU:
         timingMenuDisplay();
       break;
 
       case DELETE_MENU:
         deleteMenuDisplay();
+      break;
+
+      case CALIBRATION_MENU:
+        calibrationMenuDisplay();
       break;
       /*
       case DEBUG_SCREEN:
@@ -179,43 +187,54 @@ void DisplayModule::stepDisplay(char *buf){
     case 0:
       foreground = RED;
       background = BLACK;
-
-    break;
+      break;
     case 1:
       foreground = GREEN;
       background = BLUE;
-    break;
+      break;
     case 2:
       foreground = PINK;
       background = PURPLE;
-    break;
+      break;
     case 3:
       foreground = ORANGE;
       background = NAVY;
-    break;
+      break;
   }
-  if (stepMode == 0) {
-    highlight = 1;
-  } else if (stepMode == 1){
-    highlight = 2;
-  } else if (stepMode == 2) {
-    highlight = 3;
-  } else if (stepMode == 3) {
-    highlight = 6;
-  } else if (stepMode == 4) {
-    highlight = 4;
-  } else if (stepMode == 5) {
-    highlight = 5;
-  } else if (stepMode == 6) {
-    highlight = 8;
-  } else if (stepMode == 7) {
-    highlight = 9;
-  } else if (stepMode == 8) {
-    highlight = 4;
-  };
+
+  switch (stepMode) {
+    case STEPMODE_PITCH0:
+      highlight = 1;    break;
+    case STEPMODE_GATELENGTH:
+      highlight = 2;    break;
+    case STEPMODE_VELOCITY:
+      highlight = 3;    break;
+    case STEPMODE_TEMPO:
+      highlight = 6;    break;
+    case STEPMODE_STEPCOUNT:
+      highlight = 8;    break;
+    case STEPMODE_BEATCOUNT:
+      highlight = 9;    break;
+    case STEPMODE_GATETYPE:
+      highlight = 4;    break;
+    case STEPMODE_PITCH1:
+      highlight = 13;   break;
+    case STEPMODE_PITCH2:
+      highlight = 14;   break;
+    case STEPMODE_PITCH3:
+      highlight = 15;   break;
+    case STEPMODE_GLIDE:
+      highlight = 16;   break;
+
+  }
 
   displayElement[0] = strdup("step info");
   displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
+  displayElement[13] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0] + sequenceArray[selectedChannel].stepData[selectedStep].pitch[1]]);
+  displayElement[14] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0] + sequenceArray[selectedChannel].stepData[selectedStep].pitch[2]]);
+  displayElement[15] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0] + sequenceArray[selectedChannel].stepData[selectedStep].pitch[3]]);
+
+
 
   if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
     displayElement[2] = strdup("L: rest");
@@ -240,11 +259,17 @@ void DisplayModule::stepDisplay(char *buf){
     displayElement[4] = strdup(buf);
   }
 
+  if (sequenceArray[selectedChannel].stepData[selectedStep].glide == 0) {
+    sprintf(buf, "Glide off");
+  } else {
+    sprintf(buf, "Glide %d", sequenceArray[selectedChannel].stepData[selectedStep].glide);
+  }
+  displayElement[16] = strdup(buf);
+
   //sprintf(buf, "%s", instrumentNames[sequenceArray[selectedChannel].instrument]);
   //displayElement[4] = strdup(buf);
 
   //sprintf(buf, "vol: %d", sequenceArray[selectedChannel].volume);
-  displayElement[5] = strdup(buf);
 
   displayElement[7] = strdup("TEMPO");
 
@@ -264,24 +289,37 @@ void DisplayModule::stepDisplay(char *buf){
   sprintf(buf, "stmd: %d", stepMode);
   displayElement[10] = strdup(buf);
 
-  sprintf(buf, "steps: %d-%d", notePage*16 , (notePage+1)*16 );
+  sprintf(buf, "pg: %d-%d", notePage*16 , (notePage+1)*16 );
   displayElement[11] = strdup(buf);
 
   sprintf(buf, "ch/pt: %d/%d", selectedChannel , sequenceArray[selectedChannel].patternIndex );
+  displayElement[12] = strdup(buf);
 
+// PITCH INFO
   renderOnce_StringBox(0,  highlight, previousHighlight, 0,   0, 64, 10, false, 1, background, foreground);
-  renderOnce_StringBox(1,  highlight, previousHighlight, 0,  10, 64, 22, false, 2, background , foreground);
-  renderOnce_StringBox(2,  highlight, previousHighlight, 0,  32, 64, 10, false, 1, background , foreground);
-  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  42, 64, 10, false, 1 ,background , foreground);
-  renderOnce_StringBox(4,  highlight, previousHighlight, 0,  50, 64, 10, false, 1 ,background , foreground);
-  renderOnce_StringBox(5,  highlight, previousHighlight, 0,  60, 64, 10, false, 1 ,background , foreground);
-  renderOnce_StringBox(6,  highlight, previousHighlight, 64, 10, 64, 24, false, 1 ,BLACK , WHITE);
-  renderOnce_StringBox(7,  highlight, previousHighlight, 64,  0, 64, 10, false, 1 ,BLACK , WHITE);
-  renderOnce_StringBox(8,  highlight, previousHighlight, 64, 34, 64, 10, false, 0 ,BLACK , WHITE);
-  renderOnce_StringBox(9,  highlight, previousHighlight, 64, 44, 64, 10, false, 0 ,BLACK , WHITE);
-  renderOnce_StringBox(10, highlight, previousHighlight, 64, 60, 64, 10, false, 1 ,BLACK , WHITE);
-  renderOnce_StringBox(11, highlight, previousHighlight, 0,  70, 64, 10, false, 1 ,background , foreground);
-  renderOnce_StringBox(12, highlight, previousHighlight, 0,  80, 64, 10, false, 1 ,background , foreground);
+  renderOnce_StringBox(1,  highlight, previousHighlight, 0,  10, 64, 22, false, 3, background , foreground);
+  renderOnce_StringBox(13, highlight, previousHighlight, 80,  0, 64, 10, false, 0 ,background , foreground);
+  renderOnce_StringBox(14, highlight, previousHighlight, 80,  10, 64, 10, false, 0 ,background , foreground);
+  renderOnce_StringBox(15, highlight, previousHighlight, 80,  20, 64, 10, false, 0 ,background , foreground);
+
+  renderOnce_StringBox(2,  highlight, previousHighlight, 0,  46, 64, 10, false, 1, background , foreground);
+  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  56, 64, 10, false, 1 ,background , foreground);
+  renderOnce_StringBox(4,  highlight, previousHighlight, 0,  66, 64, 10, false, 1 ,background , foreground);
+  renderOnce_StringBox(16,  highlight, previousHighlight, 0,  76, 64, 10, false, 1 ,background , foreground);
+
+  //renderOnce_StringBox(5,  highlight, previousHighlight, 0,  60, 64, 10, false, 1 ,background , foreground);   // UNUSED
+
+  renderOnce_StringBox(11, highlight, previousHighlight, 0,  86, 64, 10, false, 1 ,background , foreground);
+  renderOnce_StringBox(12, highlight, previousHighlight, 0,  96, 64, 10, false, 1 ,background , foreground);
+
+
+
+  renderOnce_StringBox(7,  highlight, previousHighlight, 64, 46, 64, 10, false, 1 ,BLACK , WHITE);
+  renderOnce_StringBox(6,  highlight, previousHighlight, 64, 56, 64, 24, false, 1 ,BLACK , WHITE);
+  renderOnce_StringBox(8,  highlight, previousHighlight, 64, 66, 64, 10, false, 0 ,BLACK , WHITE);
+  renderOnce_StringBox(9,  highlight, previousHighlight, 64, 76, 64, 10, false, 0 ,BLACK , WHITE);
+  renderOnce_StringBox(10, highlight, previousHighlight, 64, 86, 64, 10, false, 1 ,BLACK , WHITE);
+
 
   //sprintf(buf, "state: %d", currentState);
   //sprintf(buf, "chan: %d", sequenceArray[selectedChannel].activeStep);
@@ -365,6 +403,21 @@ void DisplayModule::patternSelectDisplay(){
   renderOnce_StringBox(16, highlight, previousHighlight, 0, 0, 128 , 16, false, 1, BLACK, PINK);
 
 }
+
+void DisplayModule::calibrationMenuDisplay(){
+  uint8_t previousHighlight = highlight;
+  highlight = currentPattern;
+
+  displayElement[0] = strdup("Calibration Menu");
+
+  sprintf(buf, "DAC Value: %d", calibrationBuffer);
+  displayElement[1] = strdup(buf);
+
+  renderOnce_StringBox(0, highlight, previousHighlight,  0, 16, 32 , 20, false, 1, BLACK, RED);
+  renderOnce_StringBox(1, highlight, previousHighlight, 0, 32, 32 , 20, false, 1, BLACK, GREEN);
+
+}
+
 
 void DisplayModule::globalMenuDisplay(){
   /*

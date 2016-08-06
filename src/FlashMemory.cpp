@@ -63,7 +63,7 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["p0"] = sequenceArray[channel].stepData[i].pitch[0];
     stepDataObj["p1"] = sequenceArray[channel].stepData[i].pitch[1];
     stepDataObj["p2"] = sequenceArray[channel].stepData[i].pitch[2];
-    stepDataObj["p4"] = sequenceArray[channel].stepData[i].pitch[3];
+    stepDataObj["p3"] = sequenceArray[channel].stepData[i].pitch[3];
     stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
     stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType ;
     stepDataObj["v"] = sequenceArray[channel].stepData[i].velocity ;

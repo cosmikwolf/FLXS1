@@ -18,7 +18,7 @@ class Sequencer
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
 		void 		incrementActiveStep();
-		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index);
+		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum);
 		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum);
 
 		void 		calculateStepTimers();

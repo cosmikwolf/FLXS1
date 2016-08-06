@@ -5,6 +5,7 @@
 #include <Encoder.h>
 #include <Adafruit_MCP23017.h>
 #include <Encoder.h>
+#include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 
 #include "DisplayModule.h"
 #include "LEDArray.h"
@@ -30,7 +31,8 @@ class TimeController {
     LEDArray ledArray;
     FlashMemory saveFile;
     NoteDatum noteData[4];
-
+    Zetaohm_MAX7301 midplaneGPIO;
+    Zetaohm_MAX7301 backplaneGPIO;
 };
 extern Sequencer sequence[4];
 

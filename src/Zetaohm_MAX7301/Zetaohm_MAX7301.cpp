@@ -1,10 +1,14 @@
 #include "Zetaohm_MAX7301.h"
 #include <SPI.h>//this chip needs SPI
 
+uint8_t portConfig[7] = {0,0,0,0,0,0,0};
+
+
 Zetaohm_MAX7301::Zetaohm_MAX7301(){
 }
 
-void Zetaohm_MAX7301::begin(const uint8_t csPin, uint32_t spispeed, bool protocolInitOverride) {
+void Zetaohm_MAX7301::begin(uint8_t csPin) {
+  Serial.println("=======initializing max7301 cspin: " + String(csPin));
   _spiTransactionsSpeed = 36000000;
   _cs = csPin;
   //	postSetup(csPin);
@@ -23,6 +27,68 @@ void Zetaohm_MAX7301::begin(const uint8_t csPin, uint32_t spispeed, bool protoco
 	writeByte(0x04, 0x01);
 }
 
+void Zetaohm_MAX7301::initPort(uint8_t index, uint8_t port, uint16_t mode) {
+  uint8_t setting = 0;
+  uint8_t offset = port-4*floor(port/4);
+  uint8_t portConfigIndex = floor(port/4);
+
+  switch(mode){
+    case INPUT:
+      setting = 0b10;
+      break;
+    case OUTPUT:
+      setting = 0b01;
+      break;
+    default: //input pullup
+      setting = 0b11;
+      break;
+  }
+  indexMap[index] = port;
+
+  portConfig[portConfigIndex] &= uint8_t(~(0x3 << offset*2) ) ;   // clear existing setting
+  portConfig[portConfigIndex] |= setting << offset*2;        // set mode at correct offset
+
+  Serial.println("Port Config Index: " + String(portConfigIndex) + "\tsetting: " + String(setting) + "\tvalue: " + String(portConfig[portConfigIndex], HEX) + "\toffset: " + String(offset) + "\tclear: 0b" + String(uint8_t(~(0x3 << offset*2) ), BIN) + "\tassignment: 0x" + String(setting << offset, HEX));
+
+
+};
+
+void Zetaohm_MAX7301::updateGpioPinModes(){
+  Serial.println("==== Setting GPIO Pinmodes ====");
+  for (int i=0; i<7; i++){
+    writeByte(0x09 + i, portConfig[i]);
+    Serial.print("Address: 0x");
+    Serial.print(0x09 + i, HEX);
+    Serial.print("\tConfig:");
+    Serial.println(portConfig[i], HEX);
+  }
+
+/*	if(mode == INPUT){
+  		writeByte(0x09, 0xAA);
+  		writeByte(0x0A, 0xAA);
+  		writeByte(0x0B, 0xAA);
+  		writeByte(0x0C, 0xAA);
+  		writeByte(0x0D, 0xAA);
+  		writeByte(0x0E, 0xAA);
+  		writeByte(0x0F, 0xAA);
+	} else if (mode == OUTPUT) {
+  		writeByte(0x09, 0x55);
+  		writeByte(0x0A, 0x55);
+  		writeByte(0x0B, 0x55);
+  		writeByte(0x0C, 0x55);
+  		writeByte(0x0D, 0x55);
+  		writeByte(0x0E, 0x55);
+  		writeByte(0x0F, 0x55);
+	} else { // INPUT_PULLUP
+  		writeByte(0x09, 0xFF);
+  		writeByte(0x0A, 0xFF);
+  		writeByte(0x0B, 0xFF);
+  		writeByte(0x0C, 0xFF);
+  		writeByte(0x0D, 0xFF);
+  		writeByte(0x0E, 0xFF);
+  		writeByte(0x0F, 0xFF);
+	}*/
+}
 
 void Zetaohm_MAX7301::setSPIspeed(uint32_t spispeed){
 	_spiTransactionsSpeed = spispeed;
@@ -66,33 +132,7 @@ void Zetaohm_MAX7301::writeByte(byte addr, byte data){
 	endTransaction();
 }
 
-void Zetaohm_MAX7301::gpioPinMode(uint16_t mode){
-	if(mode == INPUT){
-  		writeByte(0x09, 0xAA);
-  		writeByte(0x0A, 0xAA);
-  		writeByte(0x0B, 0xAA);
-  		writeByte(0x0C, 0xAA);
-  		writeByte(0x0D, 0xAA);
-  		writeByte(0x0E, 0xAA);
-  		writeByte(0x0F, 0xAA);
-	} else if (mode == OUTPUT) {
-  		writeByte(0x09, 0x55);
-  		writeByte(0x0A, 0x55);
-  		writeByte(0x0B, 0x55);
-  		writeByte(0x0C, 0x55);
-  		writeByte(0x0D, 0x55);
-  		writeByte(0x0E, 0x55);
-  		writeByte(0x0F, 0x55);
-	} else { // INPUT_PULLUP
-  		writeByte(0x09, 0xFF);
-  		writeByte(0x0A, 0xFF);
-  		writeByte(0x0B, 0xFF);
-  		writeByte(0x0C, 0xFF);
-  		writeByte(0x0D, 0xFF);
-  		writeByte(0x0E, 0xFF);
-  		writeByte(0x0F, 0xFF);
-	}
-}
+
 
 void Zetaohm_MAX7301::update(){
 	// load the 32 bit integer with the status of all buttons.
@@ -108,20 +148,21 @@ void Zetaohm_MAX7301::update(){
 		fellBuffer = (inputBuffer & ~previousState) | fellBuffer;
 		roseBuffer = (~inputBuffer & previousState) | roseBuffer;
 		if (previousState != inputBuffer){
-			Serial.println("debounce timer: " + String(debounceTimer) );
+		//	Serial.println("debounce timer: " + String(debounceTimer) );
 			debounceTimer = 0;
 		}
 	}
-
 };
 
-void Zetaohm_MAX7301::init(uint8_t index, uint8_t pin) {
-	indexMap[index] = pin;
-};
+
+void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
+    writeByte(0x24 + indexMap[index], value);
+}
 
 bool Zetaohm_MAX7301::fell(uint8_t index){
 	if ( fellBuffer & (1 << indexMap[index]) ) {
 		fellBuffer = fellBuffer & ~(1 << indexMap[index]) ;
+    Serial.println("Button Press index: " + String(index) + "\tindexMap: " + String(indexMap[index]));
 		return true;
 	} else {
 		return false;

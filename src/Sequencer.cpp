@@ -9,6 +9,7 @@
 // 4 indicates that the note has been played this iteration
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
+#define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
 
 Sequencer sequence[4];
 
@@ -64,9 +65,12 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 	this->instType = 0;
 
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
-		for (int i=0; i<4; i++){
-			this->stepData[n].pitch[i]   = 24;
+		this->stepData[n].pitch[0]   = 24;
+
+		for (int i=1; i<4; i++){
+			this->stepData[n].pitch[i] = 0;
 		}
+
 		this->stepData[n].gateLength = 1;
 		this->stepData[n].gateType   = 0;
 		this->stepData[n].velocity   = 67;
@@ -85,7 +89,7 @@ void Sequencer::setTempo(uint32_t tempoX100){
 }
 
 void Sequencer::setStepPitch(uint8_t step, uint8_t pitch, uint8_t index){
-	stepData[step].pitch[0] = pitch;
+	stepData[step].pitch[index] = pitch;
 };
 
 void Sequencer::setGateLength(uint8_t step, uint8_t length){
@@ -241,54 +245,31 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 }
 
 void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
+	// sequenceModeStandardStep determines if any notes should be triggered this loop.
+	// This means that this loop is responsible for all timing calculations and triggering notes
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-
+	// iterate through all steps to determine if they need to have action taken.
 		if (stepData[stepNum].gateType > GATETYPE_REST){
-
+			// if the gateType is not rest, some action should be taken
 			if (stepData[stepNum].stepTimer > stepData[stepNum].stepOffTime && stepData[stepNum].arpStatus != 0) {
-				//once the step is complete, the arpeggio status should be reset so it is ready for the next beat
+				//reset arpeggio status so arpeggio can start fresh on next trigger
 				stepData[stepNum].arpStatus = 0;
 			}
 
-			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() - 5000 ) {
-				// note shut off if no new notes are being triggered
+			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() - NOTE_LENGTH_BUFFER ) {
+				// shut off notes that should stop playing.
 				noteShutOff(noteData, stepNum);
 			}
 
-			// set notes to be played
-			// HERE IS WHERE I NEED TO FIGURE OUT ARP LOGIC!
-			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength()) &&
-			     sequenceTimer < (stepData[stepNum].offset + stepData[stepNum].stepOffTime) ) {
-					//ensure all notes playing are ended before a new trigger.
-				//	noteShutOff(noteData, stepNum);
-
-					noteTrigger(noteData, stepNum, 0);
-
-					//Serial.println("}ON{ TRIG: arplength: " + String(stepData[stepNum].arpLength()) + "\tarpcount: " + String(stepData[stepNum].arpCount()) + "\tarpStatus: " + String(stepData[stepNum].arpStatus) + "\toffset: " + String(stepData[stepNum].offset) + "\ttimer:" + String(sequenceTimer) + "\tstepTimer: " + String(stepData[stepNum].stepTimer) +"\tstepOffTime: " + String(stepData[stepNum].stepOffTime) + "\t\t---+---\t" + String(stepNum) + " -> " + String(stepData[stepNum].arpStatus));
-
-					Serial.println(
-					"--+--" + String(stepNum) + " -> " + String(stepData[stepNum].arpStatus) +
-					"\tsequenceTimer: " + String(sequenceTimer) +
-					"\tnoteEnd: " + String(stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength()) +
-					"\tstepEnd: " + String(stepData[stepNum].offset + stepData[stepNum].stepOffTime)
-				);
-
-			/*		Serial.print("\tNote on array:  ");
-					for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
-						if (noteData->noteOnArray[i] != 0){
-							Serial.print(noteData->noteOnArray[i]);
-							Serial.print(" ");
-						}
-					}
-					Serial.println("");
-					*/
-					stepData[stepNum].arpStatus++;
+			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength()) && sequenceTimer < (stepData[stepNum].offset + stepData[stepNum].stepOffTime) ) {
+				noteTrigger(noteData, stepNum);
+				stepData[stepNum].arpStatus++;
 			}
 		}
 	}
 }
 
-void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index){
+void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum){
 	// sets pitch of notes to be played.
 	noteData->noteOn = true;
 	noteData->channel = channel;
@@ -300,11 +281,20 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, uint8_t index)
 	}
 	stepData[stepNum].noteStatus = CURRENTLY_PLAYING;
 
-	if (quantizeKey == 1){
-		stepData[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[index], aminor, 1);
+	uint8_t index = stepData[stepNum].arpStatus % 4;
+	int8_t playPitch;
+
+	if (index == 0) {
+		playPitch = stepData[stepNum].pitch[0];
 	} else {
-		stepData[stepNum].notePlaying = stepData[stepNum].pitch[index];
+		playPitch = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[index] ;
 	}
+
+	//if (quantizeKey == 1){
+	//	stepData[stepNum].notePlaying = quantizePitch(playPitch, aminor, 1);
+	//} else {
+		stepData[stepNum].notePlaying = playPitch;
+	//}
 
 	for (int i=0; i< stepCount; i++){
 		// since there could be up to stepCount steps being triggered in a single noteOnArray,

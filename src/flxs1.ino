@@ -35,6 +35,7 @@ void setup() {
   timeControl.initialize();
 	MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
+
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 }
 

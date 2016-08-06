@@ -122,11 +122,8 @@ void MasterClock::noteOnSwitch(){
         if (!noteData[i].noteOnArray[n]){
           continue;
         }
-
 				outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n] );
       }
     }
   }
-      debug("end note on switch");
-
 }

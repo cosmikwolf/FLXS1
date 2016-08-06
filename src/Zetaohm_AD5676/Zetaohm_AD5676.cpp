@@ -121,7 +121,7 @@ void Zetaohm_AD5676::setVoltage( uint8_t dac, uint16_t output )
   SPI.transfer(buffer, 3 );  //  FRAME 1 COMMAND BYTE - Command + DAC Address (C3 C2 C1 C0 A3 A2 A1 A0)
 
   digitalWriteFast(_cs_pin, HIGH);  // End transmission, bring SYNC line high
-  digitalWriteFast(_cs_pin, LOW);  // Begin transmission, bring SYNC line low
+/*  digitalWriteFast(_cs_pin, LOW);  // Begin transmission, bring SYNC line low
 
   buffer[0] = (0x03 << 4) + dac;
   buffer[1] = output / 256;
@@ -131,7 +131,7 @@ void Zetaohm_AD5676::setVoltage( uint8_t dac, uint16_t output )
   SPI.transfer(buffer, 3 );  //  FRAME 1 COMMAND BYTE - Command + DAC Address (C3 C2 C1 C0 A3 A2 A1 A0)
 
   digitalWriteFast(_cs_pin, HIGH);  // End transmission, bring SYNC line high
-
+*/
   endTransaction();
 
  //     digitalWrite(_ldac_pin, HIGH);
