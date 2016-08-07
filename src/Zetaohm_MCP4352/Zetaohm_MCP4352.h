@@ -16,7 +16,6 @@ public:
   void initialize(uint8_t csPin);
   void setResistance(uint8_t port, uint8_t value);
   uint8_t readResistance(uint8_t port);
-
   uint16_t 	readAddress(byte addr);
   void			writeByte(byte addr, byte data);
 

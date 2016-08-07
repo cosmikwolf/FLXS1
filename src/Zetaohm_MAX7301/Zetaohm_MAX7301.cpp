@@ -34,15 +34,16 @@ void Zetaohm_MAX7301::initPort(uint8_t index, uint8_t port, uint16_t mode) {
 
   switch(mode){
     case INPUT:
-      setting = 0b10;
+      setting = 0x2;
       break;
     case OUTPUT:
-      setting = 0b01;
+      setting = 0x1;
       break;
     default: //input pullup
-      setting = 0b11;
+      setting = 0x3;
       break;
   }
+
   indexMap[index] = port;
 
   portConfig[portConfigIndex] &= uint8_t(~(0x3 << offset*2) ) ;   // clear existing setting
@@ -117,6 +118,7 @@ uint16_t Zetaohm_MAX7301::readAddress(byte addr){
 }
 
 void Zetaohm_MAX7301::writeByte(byte addr, byte data){
+  waitFifoEmpty();
 	startTransaction();
 	digitalWriteFast(_cs, LOW);
 	SPI.transfer(addr & 0x7F);

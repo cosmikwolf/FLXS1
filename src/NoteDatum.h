@@ -26,6 +26,7 @@ typedef struct NoteDatum {
 	bool   noteOff;            // does a note need to be shut off?
 	uint8_t   noteOnArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
 	uint8_t   noteVelArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
+	uint8_t   noteGlideArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
 	uint8_t   noteOffArray[MAX_STEPS_PER_SEQUENCE];  // contains all notes that need to be stopped
 	uint8_t   channel;            // sequence channel (0-3)
 	uint8_t   noteOnStep;         // step number that originated the noteOn message.

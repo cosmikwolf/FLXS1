@@ -236,6 +236,7 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 	for(int i = 0; i < stepCount; i++){
 		noteData->noteOnArray[i] = NULL;
 		noteData->noteVelArray[i] = NULL;
+		noteData->noteGlideArray[i] = NULL;
 		noteData->noteOffArray[i] = NULL;
 	}
 
@@ -302,6 +303,7 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum){
 		if (noteData->noteOnArray[i] == NULL){
 			noteData->noteOnArray[i] = stepData[stepNum].notePlaying;
 			noteData->noteVelArray[i] = stepData[stepNum].velocity;
+			noteData->noteGlideArray[i] = stepData[stepNum].glide;
 			break;
 		}
 	}
