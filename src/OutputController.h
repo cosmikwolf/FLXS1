@@ -34,6 +34,7 @@ public:
   void samCommand(uint8_t command, uint8_t channel,uint8_t value);
   void dacTestLoop();
   void calibrationRoutine();
+  void inputLoopTest();
 
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
@@ -54,10 +55,11 @@ private:
 
   // rheoMap contains corresponding rheostate to the dacCcMap and dacCvMap entries.
 
-  uint8_t slewSwitchMap[8] = { 9,10,11,12,13,14,15,16 };
+  //uint8_t slewSwitchMap[8] = {9,10,11,12,13,14,15,16 };
+  uint8_t slewSwitchMap[8] = {9 , 10, 16, 14, 13, 15, 11, 12};
 
   uint8_t rheoMap[8] = {
-    0x00 | 3, // 0
+    0x00 | 3, // 0  // dacchannel
     0x00 | 1, // 1
     0x10 | 2, // 2
     0x10 | 1, // 3

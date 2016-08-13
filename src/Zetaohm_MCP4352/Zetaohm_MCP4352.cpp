@@ -7,7 +7,7 @@ Zetaohm_MCP4352::Zetaohm_MCP4352(){
 
 void Zetaohm_MCP4352::initialize(uint8_t csPin){
   _cs = csPin;
-  MCP4352_SPI = SPISettings(4000000, MSBFIRST, SPI_MODE0);//mode3
+  MCP4352_SPI = SPISettings(10000000, MSBFIRST, SPI_MODE0);//mode3
 
   SPI.begin();
 

@@ -52,10 +52,11 @@ public:
   InputModule();
   Encoder knob;
   Zetaohm_MAX7301* midplaneGPIO;
+  Zetaohm_MAX7301* backplaneGPIO;
   OutputController* outputControl;
   MasterClock* clockMaster;
 
-  void initialize(OutputController* outputControl, Zetaohm_MAX7301* max7301, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
+  void initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
 
   void loop(uint16_t frequency);
 
@@ -81,7 +82,6 @@ public:
   int8_t menuSelector;
   int8_t instBuffer;
   int16_t stepModeBuffer;
-
 
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;

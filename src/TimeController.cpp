@@ -23,13 +23,13 @@ void TimeController::initialize() {
 
 	clockMaster.initialize(&outputControl, sequence, noteData);
 
-	buttonIo.initialize(&outputControl, &midplaneGPIO, &saveFile, sequence, &clockMaster);
+	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequence, &clockMaster);
 	buttonIo.changeState(STEP_DISPLAY);
 
 	saveFile.initialize(sequence);
 	saveFile.loadPattern(0, 0b1111);
 
-  /*
+/*
 	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
 	delay(200);
 	saveFile.readSequenceJSON(sequence[0], 0, 0);
@@ -42,7 +42,7 @@ void TimeController::runLoopHandler() {
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
 	display.displayLoop(DISPLAY_FREQUENCY);
-
+	outputControl.inputLoopTest();
 }
 
 void TimeController::masterClockHandler(){

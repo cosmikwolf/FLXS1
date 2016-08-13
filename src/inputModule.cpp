@@ -14,7 +14,7 @@ knobChange = 0;;
 
 };
 
-void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster){
+void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster){
   Serial.println("button setup start");
 
   this->saveFile = saveFile;
@@ -22,6 +22,7 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   this->outputControl = outputControl;
   this->clockMaster= clockMaster;
   this->midplaneGPIO= midplaneGPIO;
+  this->backplaneGPIO= backplaneGPIO;
 
   midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
 
@@ -68,6 +69,7 @@ void InputModule::loop(uint16_t frequency){
     knobChange = knobRead - knobPrevious;
 
     midplaneGPIO->update();
+
 
     //we always want the alt (non matrix) buttons to behave the same way
     altButtonHandler();

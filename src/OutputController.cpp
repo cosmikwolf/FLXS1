@@ -19,11 +19,16 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO){
   backplaneGPIO->initPort(2,9, OUTPUT); // gate out ch 3
   backplaneGPIO->initPort(3,5, OUTPUT); // gate out ch 4
 
-  backplaneGPIO->initPort(4,1, OUTPUT); // Gate in 1
-  backplaneGPIO->initPort(5,7, OUTPUT); // Gate input 2
-  backplaneGPIO->initPort(6,11, OUTPUT); // Gate input 3
-  backplaneGPIO->initPort(7,26, OUTPUT); // Gate input 4
-
+  backplaneGPIO->initPort(4,10, INPUT); // Gate in 1
+  backplaneGPIO->initPort(5,7, INPUT); // Gate input 2
+  backplaneGPIO->initPort(6,11, INPUT); // Gate input 3
+  backplaneGPIO->initPort(7,12, INPUT); // Gate input 4
+/*
+10  P14  10
+11  P11   7
+12  P15  11
+13  P16  12
+*/
   backplaneGPIO->initPort(8,27, OUTPUT); // latch reset
 
   backplaneGPIO->initPort(9,18, OUTPUT); // slew cap ctrl
@@ -37,8 +42,8 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO){
 
   backplaneGPIO->initPort(17, 2, OUTPUT);
   backplaneGPIO->initPort(18, 6, OUTPUT);
-  backplaneGPIO->initPort(19, 10, OUTPUT);
-  backplaneGPIO->initPort(20, 12, OUTPUT);
+  backplaneGPIO->initPort(19, 1, OUTPUT);
+  backplaneGPIO->initPort(20, 26, OUTPUT);
   backplaneGPIO->initPort(21, 13, OUTPUT);
   backplaneGPIO->initPort(22, 14, OUTPUT);
   backplaneGPIO->initPort(23, 15, OUTPUT);
@@ -55,33 +60,33 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO){
   backplaneGPIO->digitalWrite(1, 0);
   backplaneGPIO->digitalWrite(2, 0);
   backplaneGPIO->digitalWrite(3, 0);
-  backplaneGPIO->digitalWrite(8, 1);
-  backplaneGPIO->digitalWrite(4, 1);
-  backplaneGPIO->digitalWrite(5, 1);
-  backplaneGPIO->digitalWrite(6, 1);
-  backplaneGPIO->digitalWrite(7, 1);
-  backplaneGPIO->digitalWrite(8, 1);
-  backplaneGPIO->digitalWrite(9, 1);
-  backplaneGPIO->digitalWrite(10, 1);
-  backplaneGPIO->digitalWrite(11, 1);
-  backplaneGPIO->digitalWrite(12, 1);
-  backplaneGPIO->digitalWrite(13, 1);
-  backplaneGPIO->digitalWrite(18, 1);
-  backplaneGPIO->digitalWrite(14, 1);
-  backplaneGPIO->digitalWrite(15, 1);
-  backplaneGPIO->digitalWrite(16, 1);
-  backplaneGPIO->digitalWrite(17, 1);
-  backplaneGPIO->digitalWrite(18, 1);
-  backplaneGPIO->digitalWrite(19, 1);
-  backplaneGPIO->digitalWrite(20, 1);
-  backplaneGPIO->digitalWrite(21, 1);
-  backplaneGPIO->digitalWrite(22, 1);
-  backplaneGPIO->digitalWrite(23, 1);
-  backplaneGPIO->digitalWrite(28, 1);
-  backplaneGPIO->digitalWrite(24, 1);
-  backplaneGPIO->digitalWrite(25, 1);
-  backplaneGPIO->digitalWrite(26, 1);
-  backplaneGPIO->digitalWrite(27, 1);
+  backplaneGPIO->digitalWrite(8, 0);
+  backplaneGPIO->digitalWrite(4, 0);
+  backplaneGPIO->digitalWrite(5, 0);
+  backplaneGPIO->digitalWrite(6, 0);
+  backplaneGPIO->digitalWrite(7, 0);
+  backplaneGPIO->digitalWrite(8, 0);
+  backplaneGPIO->digitalWrite(9, 0);
+  backplaneGPIO->digitalWrite(10, 0);
+  backplaneGPIO->digitalWrite(11, 0);
+  backplaneGPIO->digitalWrite(12, 0);
+  backplaneGPIO->digitalWrite(13, 0);
+  backplaneGPIO->digitalWrite(18, 0);
+  backplaneGPIO->digitalWrite(14, 0);
+  backplaneGPIO->digitalWrite(15, 0);
+  backplaneGPIO->digitalWrite(16, 0);
+  backplaneGPIO->digitalWrite(17, 0);
+  backplaneGPIO->digitalWrite(18, 0);
+  backplaneGPIO->digitalWrite(19, 0);
+  backplaneGPIO->digitalWrite(20, 0);
+  backplaneGPIO->digitalWrite(21, 0);
+  backplaneGPIO->digitalWrite(22, 0);
+  backplaneGPIO->digitalWrite(23, 0);
+  backplaneGPIO->digitalWrite(28, 0);
+  backplaneGPIO->digitalWrite(24, 0);
+  backplaneGPIO->digitalWrite(25, 0);
+  backplaneGPIO->digitalWrite(26, 0);
+  backplaneGPIO->digitalWrite(27, 0);
 
 
    Serial.println("Initializing DAC");
@@ -133,6 +138,25 @@ void OutputController::dacTestLoop(){
   }
 }
 
+void OutputController::inputLoopTest(){
+  backplaneGPIO->update();
+  bool trig = false;
+  for (int i =0; i<28; i++){
+    if (backplaneGPIO->fell(i)){
+      Serial.println("*+_*+_*+*+_*+_*+*+*+_*  Backplane input fell: " + String(i));
+      trig = true;
+    }
+  }
+
+  if (trig) {
+Serial.println("CV1: " + String(analogRead(22)) + "\tCV2: " + String(analogRead(21)) + "\tCV3: " + String(analogRead(20)) + "\tCV4: " + String(analogRead(23)));
+
+}
+  backplaneGPIO->digitalWrite(8, 1);
+  delay(1);
+  backplaneGPIO->digitalWrite(8, 0);
+}
+
 void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
@@ -146,7 +170,8 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   Serial.println("begin note on");
 
   if (glide > 0) {
-    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);           // turn on switch with cap to ground, enable slew
+
+    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), LOW);           // turn on switch with cap to ground, enable slew
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
       mcp4352_1.setResistance(outputMap(channel, CVRHEO), map(glide, 0,127,0,255) );        // set digipot to correct resistance, set slew rate
@@ -154,29 +179,32 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
       mcp4352_2.setResistance(outputMap(channel, CVRHEO), map(glide, 0,127,0,255));           // set digipot to correct resistance, set slew rate
     }
 
-      Serial.println("setting glide to " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) );
+
+      Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
 
   } else {
 
-    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), LOW);        // shut off swich with cap to ground, disable slew
+    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
-      mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to correct resistance, set slew rate
+  //    mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to correct resistance, set slew rate
     } else {
-      mcp4352_2.setResistance(outputMap(channel, CVRHEO), 0);           // set digipot to correct resistance, set slew rate
+  //    mcp4352_2.setResistance(outputMap(channel, CVRHEO), 0);           // set digipot to correct resistance, set slew rate
     }
 
+    Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
+
   }
-  delayMicroseconds(2);
 
   ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
   MIDI.sendNoteOn(note, velocity, channel);                                   // send midi note out
   sam2695.noteOn(channel, note, velocity);                                    // set note on sound chip
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
-  delayMicroseconds(10);
 
   backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
+
+
   Serial.println("end note on");
 };
 
@@ -199,28 +227,30 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
       break;
 
     case RHEOCHANNELCV:
-      return rheoMap[dacCvMap[channel]] & 0x10 >> 1;
+      return rheoMap[dacCvMap[channel]] >> 4;
       break;
 
     case RHEOCHANNELCC:
-      return rheoMap[dacCcMap[channel]] & 0x10 >> 1;
+      return rheoMap[dacCcMap[channel]] >> 4;
       break;
 
     case CVRHEO:
-      return rheoMap[dacCvMap[channel]] & 0x01;
+      return rheoMap[dacCvMap[channel]] & 0x0F;
       break;
 
     case CCRHEO:
-      return rheoMap[dacCcMap[channel]] & 0x01;
+      return rheoMap[dacCcMap[channel]] & 0x0F;
       break;
   }
 };
 
 void OutputController::noteOff(uint8_t channel, uint8_t note){
 //  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
+
   backplaneGPIO->digitalWrite(channel, LOW);
   MIDI.sendNoteOff(note, 64, channel);
   sam2695.noteOff(channel, note);
+
 }
 
 void OutputController::allNotesOff(uint8_t channel){
