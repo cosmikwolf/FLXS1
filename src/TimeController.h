@@ -19,7 +19,7 @@
 class TimeController {
   public:
     TimeController();
-    void initialize();
+    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData);
     void runLoopHandler();
     void masterClockHandler();
 
@@ -30,9 +30,11 @@ class TimeController {
     DisplayModule display;
     LEDArray ledArray;
     FlashMemory saveFile;
-    NoteDatum noteData[4];
     Zetaohm_MAX7301 midplaneGPIO;
     Zetaohm_MAX7301 backplaneGPIO;
+    MidiModule *midiControl;
+    midi::MidiInterface<HardwareSerial>* serialMidi;
+
 };
 extern Sequencer sequence[4];
 

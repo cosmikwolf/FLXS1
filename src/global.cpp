@@ -30,6 +30,7 @@ unsigned long lastTimer;
 elapsedMicros masterTempoTimer;
 elapsedMicros internalClockTimer;
 elapsedMicros startTime;
+uint16_t calibrationBuffer = 0;
 
 //midi
 elapsedMicros blipTimer;
@@ -38,7 +39,9 @@ elapsedMicros pulseTimer;
 boolean firstRun = false;
 unsigned long lastBeatLength;
 
-uint16_t calibrationBuffer = 0;
+
+
+
 
 void debug(const char* text){
 	if (debugBoolean == 1){

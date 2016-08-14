@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <MIDI.h>
+
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 #include "Zetaohm_AD5676/Zetaohm_AD5676.h"
 #include "Zetaohm_SAM2695/Zetaohm_SAM2695.h"
@@ -27,7 +28,7 @@
 
 class OutputController {
 public:
-  void initialize(Zetaohm_MAX7301* backplaneGPIO);
+  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi);
   void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide);
   void noteOff(uint8_t channel, uint8_t note);
   void allNotesOff(uint8_t channel);
@@ -45,6 +46,7 @@ private:
   Zetaohm_MCP4352 mcp4352_2;
 
   Zetaohm_MAX7301* backplaneGPIO;
+  midi::MidiInterface<HardwareSerial>* serialMidi;
 
   uint8_t gateMap[4]  = {0,1,2,3};
   uint8_t dacCvMap[4] = {7,0,5,3};

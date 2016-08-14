@@ -1,7 +1,11 @@
 #include <Arduino.h>
 #include "OutputController.h"
 
-void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO){
+void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi){
+  Serial.println("Initializing MIDI");
+
+  this->serialMidi = serialMidi;
+
   Serial.println("Initializing SAM2695");
 
   // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
@@ -11,6 +15,7 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO){
   sam2695.programChange(0, 2, 128);       // give our two channels different voices
   sam2695.programChange(0, 3, 29);
   // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
+
   Serial.println("initializing gate outputs");
   this->backplaneGPIO = backplaneGPIO;
   backplaneGPIO->begin(BACKPLANE_MAX7301_CS_PIN);
@@ -117,8 +122,7 @@ for (int i=0; i<4; i++){
   Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
 }
 
-  Serial.println("Initializing MIDI");
-  midiSetup();
+
 
   Serial.println("Setting up debug pin");
   pinMode(DEBUG_PIN, OUTPUT);
@@ -143,7 +147,7 @@ void OutputController::inputLoopTest(){
   bool trig = false;
   for (int i =0; i<28; i++){
     if (backplaneGPIO->fell(i)){
-      Serial.println("*+_*+_*+*+_*+_*+*+*+_*  Backplane input fell: " + String(i));
+    //  Serial.println("*+_*+_*+*+_*+_*+*+*+_*  Backplane input fell: " + String(i));
       trig = true;
     }
   }
@@ -167,7 +171,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 -5v - 17210
 -10v  1540
 */
-  Serial.println("begin note on");
+  //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
 
   if (glide > 0) {
 
@@ -180,24 +184,24 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
     }
 
 
-      Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
+    //  Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
 
   } else {
 
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
-  //    mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to correct resistance, set slew rate
+      mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to 0
     } else {
-  //    mcp4352_2.setResistance(outputMap(channel, CVRHEO), 0);           // set digipot to correct resistance, set slew rate
+      mcp4352_2.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to 0
     }
 
-    Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
+    //Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
 
   }
 
   ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
-  MIDI.sendNoteOn(note, velocity, channel);                                   // send midi note out
+  serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   sam2695.noteOn(channel, note, velocity);                                    // set note on sound chip
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
@@ -248,7 +252,7 @@ void OutputController::noteOff(uint8_t channel, uint8_t note){
 //  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
 
   backplaneGPIO->digitalWrite(channel, LOW);
-  MIDI.sendNoteOff(note, 64, channel);
+  serialMidi->sendNoteOff(note, 64, channel);
   sam2695.noteOff(channel, note);
 
 }

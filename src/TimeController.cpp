@@ -1,14 +1,20 @@
 #include <Arduino.h>
 #include "TimeController.h"
+#include "midiModule.h"
 
 #define DISPLAY_FREQUENCY 10000
 #define INPUT_FREQUENCY 10000
 #define LED_FREQUENCY 30000
 
+
 TimeController::TimeController(){};
 
-void TimeController::initialize() {
+void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData) {
+
+
 	Serial.println("Initializing TimeController");
+
+	this->serialMidi = serialMidi;
 
 	sequence[0].initialize(0, 16, 4, (tempoX100/100));
   sequence[1].initialize(1, 16, 4, (tempoX100/100));
@@ -19,9 +25,9 @@ void TimeController::initialize() {
 
 	display.initialize(sequence);
 
-	outputControl.initialize(&backplaneGPIO);
+	outputControl.initialize(&backplaneGPIO, serialMidi);
 
-	clockMaster.initialize(&outputControl, sequence, noteData);
+	clockMaster.initialize(&outputControl, sequence, noteData, serialMidi, midiControl);
 
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequence, &clockMaster);
 	buttonIo.changeState(STEP_DISPLAY);
@@ -42,7 +48,6 @@ void TimeController::runLoopHandler() {
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
 	display.displayLoop(DISPLAY_FREQUENCY);
-	outputControl.inputLoopTest();
 }
 
 void TimeController::masterClockHandler(){

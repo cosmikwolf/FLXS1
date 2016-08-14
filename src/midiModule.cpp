@@ -1,26 +1,33 @@
 #include <Arduino.h>
+
 #include "midiModule.h"
-
-void midiSetup(){
-  MIDI.begin(MIDI_CHANNEL_OMNI);
-
-  MIDI.setHandleClock(midiClockPulseHandler);
-  MIDI.setHandleNoteOn(midiNoteOnHandler);
-  MIDI.setHandleNoteOff(midiNoteOffHandler);
-  MIDI.setHandleStart(midiStartContinueHandler);
-  MIDI.setHandleContinue(midiStartContinueHandler);
-  MIDI.setHandleStop(midiStopHandler);
+void MidiModule::midiSetup(midi::MidiInterface<HardwareSerial>* serialMidi, Sequencer *sequenceArray, NoteDatum *noteData){
+  serialMidi->begin(MIDI_CHANNEL_OMNI);
+  this->sequenceArray = sequenceArray;
+  this->serialMidi = serialMidi;
+  this->noteData = noteData;
+//  serialMidi->setHandleNoteOn( midiNoteOnHandler );
+//  serialMidi->setHandleNoteOff( midiNoteOffHandler );
+//  serialMidi->setHandleStart( midiStartContinueHandler );
+//  serialMidi->setHandleContinue( midiStartContinueHandler );
+//  serialMidi->setHandleStop(midiStopHandler);
 }
 
-void midiStopHandler(){
+void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi){
+  noInterrupts();
+  serialMidi->read();
+  interrupts();
+}
+
+void MidiModule::midiStopHandler(){
   playing = 0;
 }
 
-void midiNoteOffHandler(byte channel, byte note, byte velocity){
+void MidiModule::midiNoteOffHandler(byte channel, byte note, byte velocity){
   Serial.println(String("Note Off: ch=") + channel + ", note=" + note + ", velocity=" + velocity);
 }
 
-void midiNoteOnHandler(byte channel, byte note, byte velocity){
+void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
   if (velocity > 0) {
     Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
   } else {
@@ -28,7 +35,7 @@ void midiNoteOnHandler(byte channel, byte note, byte velocity){
   }
 }
 
-void midiStartContinueHandler(){
+void MidiModule::midiStartContinueHandler(){
   if (extClock == true) {
     testTimer = 0;
     playing = 1;
@@ -39,8 +46,8 @@ void midiStartContinueHandler(){
     masterPulseCount = 0;
     masterTempoTimer = 0;
     for (int i=0; i< sequenceCount; i++){
-  //    sequence[i].clockStart(startTime);
-    //  sequence[i].beatPulse(beatLength, &life);
+  //    sequenceArray[i].clockStart(startTime);
+    //  sequenceArray[i].beatPulse(beatLength, &life);
     }
 
     Serial.println("Midi Start / Continue");
@@ -49,7 +56,7 @@ void midiStartContinueHandler(){
   }
 }
 
-void midiClockPulseHandler(){
+void MidiModule::midiClockPulseHandler(){
 
   if (extClock == true) {
     /*
@@ -95,19 +102,13 @@ void midiClockPulseHandler(){
       tempoBlip = !tempoBlip;
       blipTimer = 0;
       for (int i=0; i< sequenceCount; i++){
-        //sequence[i].beatPulse(beatLength, &life);
+        sequenceArray[i].beatPulse(beatLength, &life);
       }
-
-     // Serial.println("beatPulse - beatlength: " + String(int(beatLength)) + "\tbeatLengthJitter: " + String(int(lastBeatLength) - int(beatLength))+ "\tavgPulseLength: " + String(avgPulseLength) + "\tavgPulseJitter: " + String(avgPulseJitter));
+Serial.println("beatPulse - beatlength: " + String(beatLength ));
+  //    Serial.println("beatPulse - beatlength: " + String(int(beatLength)) + "\tbeatLengthJitter: " + String(int(lastBeatLength) - int(beatLength))+ "\tavgPulseLength: " + String(avgPulseLength) + "\tavgPulseJitter: " + String(avgPulseJitter));
       lastBeatLength = beatLength;
 
     }
     //MasterClockFunc();
   }
-}
-
-void midiClockSyncFunc(){
-  noInterrupts();
-  MIDI.read();
-  interrupts();
 }

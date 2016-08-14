@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "MasterClock.h"
 
-void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, NoteDatum *noteData){
+void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, NoteDatum *noteData, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl){
 	Serial.println("Initializing Master Clock");
 	this->sequenceArray = sequenceArray;
 	this->outputControl = outputControl;
 	this->noteData = noteData;
+	this->serialMidi = serialMidi;
+	this->midiControl = midiControl;
 	Serial.println("Master Clock Initialized");
 
 };
@@ -28,6 +30,7 @@ void MasterClock::masterClockFunc(void){
 //  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
 //  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
 //  lastAvgInterval = avgInterval;
+	midiControl->midiClockSyncFunc(serialMidi);
 
   if(playing){
 
@@ -45,10 +48,6 @@ void MasterClock::masterClockFunc(void){
   wasPlaying = playing;
   lastTimer = loopTimer;
 
-//if (pixelTimer > 2000){
-//  pixelTimer = 0;
-//}
-//  midiClockSyncFunc();
 }
 
 
@@ -96,9 +95,23 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::externalClockTick(){
   // ext clock sync
-  for (int i=0; i< sequenceCount; i++){
-    sequenceArray[i].runSequence(&noteData[i], &life);
-  }
+	if (wasPlaying == false){
+				// if playing has just re-started, the master tempo timer and the master beat count must be reset
+	 // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
+		masterTempoTimer = 0;
+		masterPulseCount = 0;
+		startTime = 0;
+
+		for (int i=0; i< sequenceCount; i++){
+			sequenceArray[i].clockStart(startTime);
+			sequenceArray[i].beatPulse(beatLength, &life);
+			sequenceArray[i].runSequence(&noteData[i], &life);
+		}
+	} else {
+	  for (int i=0; i< sequenceCount; i++){
+	    sequenceArray[i].runSequence(&noteData[i], &life);
+	  }
+	}
 }
 
 void MasterClock::noteOffSwitch(){
