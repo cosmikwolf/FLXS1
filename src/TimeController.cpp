@@ -9,30 +9,31 @@
 
 TimeController::TimeController(){};
 
-void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData) {
+void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray) {
 
 
 	Serial.println("Initializing TimeController");
 
 	this->serialMidi = serialMidi;
+  this->sequencerArray = sequencerArray;
 
-	sequence[0].initialize(0, 16, 4, (tempoX100/100));
-  sequence[1].initialize(1, 16, 4, (tempoX100/100));
-  sequence[2].initialize(2, 16, 4, (tempoX100/100));
-  sequence[3].initialize(3, 16, 4, (tempoX100/100));
+	sequencerArray[0].initialize(0, 16, 4, (tempoX100/100));
+  sequencerArray[1].initialize(1, 16, 4, (tempoX100/100));
+  sequencerArray[2].initialize(2, 16, 4, (tempoX100/100));
+  sequencerArray[3].initialize(3, 16, 4, (tempoX100/100));
 
-	ledArray.initialize(sequence);
+	ledArray.initialize(sequencerArray);
 
-	display.initialize(sequence);
+	display.initialize(sequencerArray);
 
 	outputControl.initialize(&backplaneGPIO, serialMidi);
 
-	clockMaster.initialize(&outputControl, sequence, noteData, serialMidi, midiControl);
+	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
-	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequence, &clockMaster);
+	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
 	buttonIo.changeState(STEP_DISPLAY);
 
-	saveFile.initialize(sequence);
+	saveFile.initialize(sequencerArray);
 	saveFile.loadPattern(0, 0b1111);
 
 /*

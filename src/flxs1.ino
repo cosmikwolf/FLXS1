@@ -3,13 +3,12 @@
 ********************************** */
 #include <Arduino.h>
 #include <SPI.h>
-#include <i2c_t3.h>
+//#include <i2c_t3.h>
 #include "TimeController.h"
 #include "Sequencer.h"
 #include "midiModule.h"
 #include "global.h"
-
-#include "DisplayModule.h"
+//#include "DisplayModule.h"
 
 #define kSerialSpeed 115200
 #define kClockInterval 1000
@@ -20,6 +19,7 @@ TimeController timeControl;
 IntervalTimer MasterClockTimer;
 MidiModule midiControl;
 NoteDatum noteData[4];
+Sequencer sequencerArray[4];
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
@@ -34,7 +34,7 @@ void setup() {
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
 
-  midiControl.midiSetup(&serialMidi, sequence, noteData);
+  midiControl.midiSetup(&serialMidi, sequencerArray, noteData);
 
 	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
   serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
@@ -43,7 +43,8 @@ void setup() {
   serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
   serialMidi.setHandleStop(midiStopHandlerWrapper);
 
-  timeControl.initialize(&serialMidi, &midiControl, noteData);
+  timeControl.initialize(&serialMidi, &midiControl, noteData, sequencerArray);
+
 	MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
 

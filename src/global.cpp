@@ -14,8 +14,7 @@ uint8_t selectedStep;
 uint8_t patternChannelSelector = 0b1111;
 
 boolean extClock = false;
-boolean debugBoolean = 0;
-
+boolean debugBoolean = false;
 uint8_t sequenceCount = 4;
 uint8_t currentPattern = 0;
 uint8_t queuePattern = 0;
@@ -47,7 +46,6 @@ void debug(const char* text){
 	if (debugBoolean == 1){
 		Serial.println(text);
 	}
-
 }
 
 int positive_modulo(int i, int n) {

@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 #include <Encoder.h>
-#include <Adafruit_MCP23017.h>
-#include <Encoder.h>
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 
 #include "DisplayModule.h"
@@ -19,7 +17,7 @@
 class TimeController {
   public:
     TimeController();
-    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData);
+    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray);
     void runLoopHandler();
     void masterClockHandler();
 
@@ -34,8 +32,8 @@ class TimeController {
     Zetaohm_MAX7301 backplaneGPIO;
     MidiModule *midiControl;
     midi::MidiInterface<HardwareSerial>* serialMidi;
-
+    Sequencer *sequencerArray;
 };
-extern Sequencer sequence[4];
+//extern Sequencer sequence[4];
 
 #endif
