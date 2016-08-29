@@ -44,8 +44,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 		stepData[i].stepTimer = 0;
 	}
 
-
-
 	this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
 	this->monophonic = true;
@@ -220,6 +218,11 @@ void Sequencer::incrementActiveStep(){
 
 		if (activeStep < stepCount -1 ){
 			activeStep++;
+
+			if (channel == 0) {
+				Serial.println("activeStep: " + String(activeStep));
+			}
+
 			if (instType == 1){
 				stepData[activeStep].stepTimer = 0;
 				lifeCellToPlay = 0;
@@ -262,7 +265,23 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				noteShutOff(noteData, stepNum);
 			}
 
-			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength()) && sequenceTimer < (stepData[stepNum].offset + stepData[stepNum].stepOffTime) ) {
+			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength()) && sequenceTimer < (stepData[stepNum].offset + stepData[stepNum].stepOffTime - (stepData[stepNum].arpLength()/2)) ) {
+
+				Serial.println("Triggering Note - stepNum: " + String(stepNum)  +
+					+ "\tarpStatus: " + String(stepData[stepNum].arpStatus)
+					+ "\tsequenceTimer: " + String(sequenceTimer)
+					+ "\tlt: " + String(stepData[stepNum].offset + stepData[stepNum].stepOffTime)
+					+ "\tgteq: " + String(stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength())
+					+ "\toffset: " + String(stepData[stepNum].offset)
+					+ "\tstepoff: " + String(stepData[stepNum].stepOffTime)
+					+ "\tarpLength: " + String(stepData[stepNum].arpLength())
+					+ "\tstpLength: " + String(stepLength)
+					+ "\tbeatLength: " + String(beatLength)
+					+ "\tbeatCount:" + String(beatCount)
+					+ "\tstepCount:" + String(stepCount)
+				);
+
+
 				noteTrigger(noteData, stepNum);
 				stepData[stepNum].arpStatus++;
 			}

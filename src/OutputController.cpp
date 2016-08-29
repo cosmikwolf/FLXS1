@@ -171,7 +171,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 -5v - 17210
 -10v  1540
 */
-  //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
+  //Serial3.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
 
   if (glide > 0) {
 
@@ -209,7 +209,6 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
 
 
-  Serial.println("end note on");
 };
 
 uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){

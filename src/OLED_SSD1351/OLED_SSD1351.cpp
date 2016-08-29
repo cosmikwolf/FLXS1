@@ -54,14 +54,14 @@ void OLED_SSD1351::begin(void) {
 	setRotation(0);
 
   #if defined(__AVR__)
-		SSD1351_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE3);//mode3
+		SSD1351_SPI = SPISettings(4000000, MSBFIRST, SPI_MODE3);//mode3
 		SPI.begin();
 		pinMode(_cs, OUTPUT);
 		pinMode(_rs, OUTPUT);
 		digitalWrite(_cs, HIGH);
 		digitalWrite(_rs, HIGH);
 	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-		SSD1351_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);//mode3
+		SSD1351_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);//mode3
 		if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
 			SPI.setMOSI(_mosi);
 			SPI.setSCK(_sclk);

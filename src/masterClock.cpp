@@ -79,7 +79,6 @@ void MasterClock::internalClockTick(){
       sequenceArray[i].runSequence(&noteData[i], &life);
       sequenceArray[i].beatPulse(beatLength, &life);
     }
-    tempoBlip = !tempoBlip;
     internalClockTimer = 0;
 
        // Serial.print(" b5 ");
@@ -95,23 +94,10 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::externalClockTick(){
   // ext clock sync
-	if (wasPlaying == false){
-				// if playing has just re-started, the master tempo timer and the master beat count must be reset
-	 // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
-		masterTempoTimer = 0;
-		masterPulseCount = 0;
-		startTime = 0;
 
-		for (int i=0; i< sequenceCount; i++){
-			sequenceArray[i].clockStart(startTime);
-			sequenceArray[i].beatPulse(beatLength, &life);
-			sequenceArray[i].runSequence(&noteData[i], &life);
-		}
-	} else {
 	  for (int i=0; i< sequenceCount; i++){
 	    sequenceArray[i].runSequence(&noteData[i], &life);
 	  }
-	}
 }
 
 void MasterClock::noteOffSwitch(){

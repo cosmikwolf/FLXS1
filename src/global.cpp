@@ -22,7 +22,6 @@ boolean playing = false;
 
 // MasterClock
 boolean wasPlaying = false;
-boolean tempoBlip = false;
 uint8_t masterPulseCount = 24;
 unsigned long beatLength = 60000000/(tempoX100/100);
 unsigned long lastTimer;
@@ -34,9 +33,6 @@ uint16_t calibrationBuffer = 0;
 //midi
 elapsedMicros blipTimer;
 elapsedMicros testTimer;
-elapsedMicros pulseTimer;
-boolean firstRun = false;
-unsigned long lastBeatLength;
 
 
 

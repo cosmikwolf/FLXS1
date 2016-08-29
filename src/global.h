@@ -52,6 +52,13 @@
 #define BACKPLANE_MAX7301_CS_PIN 3
 #define AD5676_CSPIN              2
 
+// MIDI Messages:
+# define MIDI_CLOCK   248
+# define MIDI_START   250
+# define MIDI_CONTINE   251
+# define MIDI_STOP   252
+
+
 extern uint32_t tempoX100;
 extern uint8_t stepMode;
 extern uint8_t notePage;
@@ -73,7 +80,6 @@ extern boolean playing;
 // MasterClock
 extern uint8_t masterPulseCount;
 extern boolean wasPlaying;
-extern boolean tempoBlip;
 extern unsigned long beatLength;
 extern unsigned long lastTimer;
 extern elapsedMicros masterTempoTimer;
@@ -81,11 +87,8 @@ extern elapsedMicros internalClockTimer;
 extern elapsedMicros startTime;
 
 //midi
-extern elapsedMicros blipTimer;
 extern elapsedMicros testTimer;
-extern elapsedMicros pulseTimer;
 extern boolean firstRun;
-extern unsigned long lastBeatLength;
 
 extern uint16_t calibrationBuffer;
 

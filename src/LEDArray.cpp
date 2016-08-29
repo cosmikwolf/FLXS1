@@ -11,7 +11,7 @@ void LEDArray::initialize(Sequencer *sequenceArray){
 
   LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
-	LEDS.setBrightness(84);
+	LEDS.setBrightness(100);
 
   static uint8_t hue = 0;
   for(int m=0; m<10; m++ ) {
