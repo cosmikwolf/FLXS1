@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#line 1 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
 /* **********************************
 *** ZETAOHM FLXS1 MUSIC SEQUENCER ***
 ********************************** */
@@ -31,6 +33,27 @@ elapsedMillis noteFreqTimer;
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, serialMidi);
 
+void setup();
+
+void loop();
+
+
+void usbNoteOff();
+
+void usbNoteOn(byte channel, byte note, byte velocity);
+void masterLoop();
+void midiClockPulseHandlerWrapper();
+
+void midiNoteOnHandlerWrapper(byte channel, byte note, byte velocity);
+
+void midiNoteOffHandlerWrapper(byte channel, byte note, byte velocity);
+
+void midiStartContinueHandlerWrapper();
+
+void midiStopHandlerWrapper();
+
+void usbMidiRealTimeMessageHandler(byte realtimebyte);
+#line 34 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
 void setup() {
   AudioMemory(30);
   notefreq.begin(.15);

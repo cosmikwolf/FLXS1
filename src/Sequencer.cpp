@@ -11,7 +11,6 @@
 
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
 
-Sequencer sequence[4];
 
 
 Sequencer::Sequencer() {
