@@ -15,7 +15,7 @@ uint8_t patternChannelSelector = 0b1111;
 
 boolean extClock = false;
 boolean debugBoolean = false;
-uint8_t sequenceCount = 4;
+uint8_t sequenceCount = 4	;
 uint8_t currentPattern = 0;
 uint8_t queuePattern = 0;
 boolean playing = false;
