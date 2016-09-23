@@ -24,6 +24,8 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   backplaneGPIO->initPort(2,9, OUTPUT); // gate out ch 3
   backplaneGPIO->initPort(3,5, OUTPUT); // gate out ch 4
 
+  backplaneGPIO->initPort(17, 6, OUTPUT); // clock output
+
   backplaneGPIO->initPort(4,10, INPUT); // Gate in 1
   backplaneGPIO->initPort(5,7, INPUT); // Gate input 2
   backplaneGPIO->initPort(6,11, INPUT); // Gate input 3
@@ -45,8 +47,7 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   backplaneGPIO->initPort(15,3, OUTPUT); // slew cap ctrl
   backplaneGPIO->initPort(16,24, OUTPUT); // slew cap ctrl
 
-  backplaneGPIO->initPort(17, 2, OUTPUT);
-  backplaneGPIO->initPort(18, 6, OUTPUT);
+  backplaneGPIO->initPort(18, 2, OUTPUT);
   backplaneGPIO->initPort(19, 1, OUTPUT);
   backplaneGPIO->initPort(20, 26, OUTPUT);
   backplaneGPIO->initPort(21, 13, OUTPUT);
@@ -122,6 +123,10 @@ for (int i=0; i<4; i++){
   Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
 }
 
+for (int i=0; i<4; i++){
+  backplaneGPIO->digitalWrite(outputMap(i, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
+  backplaneGPIO->digitalWrite(outputMap(i, SLEWSWITCHCC), HIGH);        // shut off swich with cap to ground, disable slew
+}
 
 
   Serial.println("Setting up debug pin");
@@ -132,13 +137,14 @@ for (int i=0; i<4; i++){
 }
 
 void OutputController::dacTestLoop(){
+  int voltage = 65535*(sin(millis()/100.0)+1)/2;
   for (int i=0; i<8; i++){
-    ad5676.setVoltage(i, 65000 );
-    delay(1);
-    ad5676.setVoltage(i, 32000 );
-    delay(2);
-    ad5676.setVoltage(i, 0 );
-    delay(2);
+    Serial.println("setting voltage for dac:" + String(i) +" to: " + String(voltage));
+
+    ad5676.setVoltage(i, voltage );
+    ad5676.setVoltage(i, voltage );
+    delayMicroseconds(1);
+    //ad5676.setVoltage(i, 65535sin(millis()/2) );
   }
 }
 
@@ -249,7 +255,6 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 void OutputController::noteOff(uint8_t channel, uint8_t note){
 //  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
-
   backplaneGPIO->digitalWrite(channel, LOW);
   serialMidi->sendNoteOff(note, 64, channel);
   sam2695.noteOff(channel, note);
@@ -261,20 +266,11 @@ void OutputController::allNotesOff(uint8_t channel){
     backplaneGPIO->digitalWrite(channel, LOW);
 }
 
-void OutputController::samCommand(uint8_t command, uint8_t channel, uint8_t value){
-  switch(command){
-    case PROGRAM_CHANGE:
-      sam2695.programChange(0, channel, value);
-    break;
-
-    case SET_CHANNEL_VOLUME:
-      sam2695.setChannelVolume(channel, value);
-    break;
-
-    case SET_CHANNEL_BANK:
-      sam2695.setChannelBank(channel, value);
-    break;
-  }
+void OutputController::setClockOutput(bool value){
+    backplaneGPIO->digitalWrite(17, value);
+    if (value == HIGH){
+      clockOutputTimer = 0;
+    } 
 }
 
 void OutputController::calibrationRoutine(){

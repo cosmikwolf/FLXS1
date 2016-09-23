@@ -259,7 +259,7 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				stepData[stepNum].arpStatus = 0;
 			}
 
-			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() - NOTE_LENGTH_BUFFER ) {
+			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() * 8/10 ) {
 				// shut off notes that should stop playing.
 				noteShutOff(noteData, stepNum);
 			}

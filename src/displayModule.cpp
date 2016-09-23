@@ -100,17 +100,19 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     }
     switch(currentState) {
 
-      case CHANNEL_MENU:
-        channelMenuDisplay(buf);
+      case CHANNEL_PITCH_MODE:
+        channelPitchMenuDisplay(buf);
+      break;
+      case CHANNEL_GATE_MODE:
+        channelGateMenuDisplay(buf);
+      break;
+      case CHANNEL_ENVELOPE_MODE:
+        channelEnvelopeMenuDisplay(buf);
+      break;
+      case CHANNEL_STEP_MODE:
+        channelStepMenuDisplay(buf);
       break;
 
-      case STEP_DISPLAY:
-      //  if (sequenceArray[selectedChannel].instType == 1){
-       //   gameOfLifeDisplay();
-      //  } else {
-        stepDisplay(buf);
-      //  }
-      break;
 
       case PATTERN_SELECT:
         patternSelectDisplay();
@@ -176,7 +178,7 @@ void DisplayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8
   }
 }
 
-void DisplayModule::stepDisplay(char *buf){
+void DisplayModule::channelPitchMenuDisplay(char *buf){
 
   //  char *buf = new char[51]; // sprintf buffer
   uint8_t previousHighlight = highlight;
@@ -336,7 +338,7 @@ void DisplayModule::stepDisplay(char *buf){
   //  cleanupTextBuffers(buf, 13);
 };
 
-void DisplayModule::channelMenuDisplay(char *buf) {
+void DisplayModule::sequenceMenuDisplay(){
 
   uint8_t previousHighlight = highlight;
   //uint16_t foreground, background;
@@ -360,6 +362,25 @@ void DisplayModule::channelMenuDisplay(char *buf) {
   sprintf(buf, "step: %d", selectedStep);
 
 }
+
+void DisplayModule::channelGateMenuDisplay(char *buf) {
+  uint8_t previousHighlight = highlight;
+  displayElement[0] = strdup("CHANNEL GATE MENU");
+  renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  WHITE, RED);
+}
+
+void DisplayModule::channelEnvelopeMenuDisplay(char *buf) {
+  uint8_t previousHighlight = highlight;
+  displayElement[0] = strdup("CHANNEL ENVELOPE MENU");
+  renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  WHITE, RED);
+}
+
+void DisplayModule::channelStepMenuDisplay(char *buf) {
+  uint8_t previousHighlight = highlight;
+  displayElement[0] = strdup("CHANNEL STEP MENU");
+  renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  WHITE, RED);
+}
+
 
 void DisplayModule::patternSelectDisplay(){
 
@@ -507,16 +528,6 @@ void DisplayModule::deleteMenuDisplay(){
   */
 };
 
-void DisplayModule::sequenceMenuDisplay(){
-  /*
-  const char* element;
-
-  element =  "INST";
-  gdispFillStringBox(   0, 0, 32 , 24, element, fontSm, Orange, Red, justifyCenter);
-  element =  "TIME";
-  gdispFillStringBox(  32, 0, 32 , 24, element, fontSm, Red, Orange, justifyCenter);
-  */
-}
 
 void DisplayModule::instrumentSelectDisplay(){
   /*

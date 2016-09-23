@@ -77,14 +77,26 @@ void InputModule::loop(uint16_t frequency){
     // now to handle the rest of the buttons.
     switch (currentState) {
       case STEP_DISPLAY:
-      stepModeMatrixHandler();
+      channelPitchModeInputHandler();
       break;
       case SEQUENCE_MENU:
       sequencerMenuHandler();
       break;
 
-      case CHANNEL_MENU:
-      channelMenuHandler();
+      case CHANNEL_PITCH_MODE:
+        channelPitchModeInputHandler();
+      break;
+
+      case CHANNEL_GATE_MODE:
+        channelGateModeInputHandler();
+      break;
+
+      case CHANNEL_ENVELOPE_MODE:
+        channelEnvelopeModeInputHandler();
+      break;
+
+      case CHANNEL_STEP_MODE:
+        channelStepModeInputHandler();
       break;
 
       case PATTERN_SELECT:
@@ -119,25 +131,25 @@ void InputModule::patternSelectHandler(){
       saveFile->changePattern(i, patternChannelSelector,  true, true);
 
       delay(10);
-      changeState(STEP_DISPLAY);
+      changeState(CHANNEL_PITCH_MODE);
     }
   }
 }
 
-void InputModule::channelMenuHandler(){
+void InputModule::sequencerMenuHandler(){
   if (midplaneGPIO->fell(0)){
     sequenceArray[selectedChannel].initNewSequence(sequenceArray[selectedChannel].patternIndex, selectedChannel);
-      changeState(STEP_DISPLAY);
+      changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(4)){
     for (int i=0; i < 4; i++){
       sequenceArray[i].initNewSequence(sequenceArray[i].patternIndex, i);
     }
-      changeState(STEP_DISPLAY);
+      changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(8)){
     saveFile->deleteSaveFile();
-    changeState(STEP_DISPLAY);
+    changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(12)){
     if (sequenceArray[selectedChannel].instType == 0){
@@ -148,26 +160,53 @@ void InputModule::channelMenuHandler(){
     } else {
       sequenceArray[selectedChannel].setInstType(0);
     }
-    changeState(STEP_DISPLAY);
+    changeState(CHANNEL_PITCH_MODE);
   } else if (midplaneGPIO->fell(3)){
     extClock = !extClock;
-        changeState(STEP_DISPLAY);
+        changeState(CHANNEL_PITCH_MODE);
 
   }
 }
 
 void InputModule::channelButtonHandler(uint8_t channel){
   uint8_t previous = patternChannelSelector;
-  if (currentState == PATTERN_SELECT) {
-    patternChannelSelector =  patternChannelSelector ^ (1 << channel);
-    if (patternChannelSelector == 0) {
-      patternChannelSelector = previous;
-    }
-  } else {
-    selectedChannel = channel;
-    changeState(STEP_DISPLAY);
-    resetKnobValues();
 
+  resetKnobValues();
+  if (currentState != PATTERN_SELECT){
+    if (selectedChannel != channel){
+      selectedChannel = channel;
+      return;
+    }
+  }
+
+  switch (currentState){
+    case PATTERN_SELECT:
+      patternChannelSelector =  patternChannelSelector ^ (1 << channel);
+      if (patternChannelSelector == 0) {
+        patternChannelSelector = previous;
+      }
+    break;
+
+    case CHANNEL_PITCH_MODE:
+      changeState(CHANNEL_GATE_MODE);
+    break;
+
+    case CHANNEL_GATE_MODE:
+      changeState(CHANNEL_ENVELOPE_MODE);
+    break;
+
+    case CHANNEL_ENVELOPE_MODE:
+      changeState(CHANNEL_STEP_MODE);
+    break;
+
+    case CHANNEL_STEP_MODE:
+      changeState(CHANNEL_PITCH_MODE);
+    break;
+
+
+    default:
+      changeState(CHANNEL_PITCH_MODE);
+    break;
   }
 }
 
@@ -194,7 +233,7 @@ void InputModule::altButtonHandler(){
 
         case SW_MENU:
           if(currentState == PATTERN_SELECT){
-            changeState(STEP_DISPLAY);
+            changeState(CHANNEL_PITCH_MODE);
           } else {
             changeState(PATTERN_SELECT);
           }
@@ -209,13 +248,13 @@ void InputModule::altButtonHandler(){
           }
 
           if( currentState != STEP_DISPLAY){
-            changeState(STEP_DISPLAY);
+            changeState(CHANNEL_PITCH_MODE);
           }
 
         break;
 
         case SW_SPARE:
-          changeState(CHANNEL_MENU);
+          changeState(SEQUENCE_MENU);
         break;
         case SW_PGDN:
           notePage = positive_modulo(notePage - 1, 4);
@@ -252,7 +291,7 @@ void InputModule::altButtonHandler(){
   }
 
 
-  void InputModule::stepModeMatrixHandler(){
+  void InputModule::channelPitchModeInputHandler(){
   //  saveTimer = 0;
   // selectedStep == getNote(i) means that the user pressed the button that is selected.
     uint8_t instrumentSelectValue;
@@ -375,7 +414,6 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
         instrumentSelectValue = positive_modulo(sequenceArray[selectedChannel].instrument + knobChange,128);
         if (sequenceArray[selectedChannel].instrument != instrumentSelectValue){
           sequenceArray[selectedChannel].instrument = instrumentSelectValue;
-          outputControl->samCommand(PROGRAM_CHANGE, selectedChannel, sequenceArray[selectedChannel].instrument);
         }
         break;
 
@@ -383,7 +421,6 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
         instrumentSelectValue = positive_modulo(sequenceArray[selectedChannel].volume + knobChange, 128);
         if (sequenceArray[selectedChannel].volume != instrumentSelectValue ){
           sequenceArray[selectedChannel].volume = instrumentSelectValue;
-          outputControl->samCommand(SET_CHANNEL_VOLUME, selectedChannel, sequenceArray[selectedChannel].volume);
         }
         break;
 
@@ -410,26 +447,20 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
     }
 };
 
+void InputModule::channelGateModeInputHandler(){
+
+};
+
+void InputModule::channelEnvelopeModeInputHandler(){
+
+};
+
+void InputModule::channelStepModeInputHandler(){
+
+};
 
 
-
-  void InputModule::sequencerMenuHandler(){
-    for (int i=0; i < 16; i++){
-      if (midplaneGPIO->fell(i)){
-        switch (i) {
-          case 0:
-          changeState(INSTRUMENT_MENU);
-          break;
-          case 1:
-          changeState(TIMING_MENU);
-          break;
-
-        }
-      }
-    }
-  }
-
-  void InputModule::instrumentSelectInputHandler() {
+void InputModule::instrumentSelectInputHandler() {
 
     for (int i=0; i < 16; i++){
       if (midplaneGPIO->fell(i)){
@@ -444,21 +475,18 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
       instrumentSelectValue = positive_modulo(sequenceArray[selectedChannel].instrument + knobChange,128);
       if (sequenceArray[selectedChannel].instrument != instrumentSelectValue){
         sequenceArray[selectedChannel].instrument = instrumentSelectValue;
-        outputControl->samCommand(PROGRAM_CHANGE, selectedChannel, sequenceArray[selectedChannel].instrument);
       }
       break;
       case 4:
       instrumentSelectValue = positive_modulo(sequenceArray[selectedChannel].volume + knobChange, 128);
       if (sequenceArray[selectedChannel].volume != instrumentSelectValue ){
         sequenceArray[selectedChannel].volume = instrumentSelectValue;
-        outputControl->samCommand(SET_CHANNEL_VOLUME, selectedChannel, sequenceArray[selectedChannel].volume);
       }
       break;
       case 8:
       instrumentSelectValue = positive_modulo(sequenceArray[selectedChannel].bank + knobChange, 128) ;
       if (sequenceArray[selectedChannel].bank != instrumentSelectValue ){
         sequenceArray[selectedChannel].bank = instrumentSelectValue;
-        outputControl->samCommand(SET_CHANNEL_VOLUME, selectedChannel, sequenceArray[selectedChannel].bank);
       }
       break;
     }

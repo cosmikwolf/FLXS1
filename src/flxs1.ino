@@ -3,7 +3,7 @@
 ********************************** */
 #include <Arduino.h>
 #include <SPI.h>
-#include <i2c_t3.h>
+#include <Wire.h>
 #include <Audio.h>
 
 #include "TimeController.h"
@@ -14,7 +14,7 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kClockInterval 250
+#define kClockInterval 500
 #define kMosiPin 11
 #define kSpiClockPin 13
 
@@ -33,7 +33,7 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, serialMidi);
 
 void setup() {
   AudioMemory(30);
-  notefreq.begin(.15);
+//  notefreq.begin(.15);
 
   Serial.begin(kSerialSpeed);
   Serial3.begin(115200);
@@ -45,7 +45,7 @@ void setup() {
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
 
-  midiControl.midiSetup(&serialMidi, sequence, noteData);
+  //midiControl.midiSetup(&serialMidi, sequence, noteData);
 
 //	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
 //  serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
@@ -55,13 +55,13 @@ void setup() {
 //  serialMidi.setHandleStop(midiStopHandlerWrapper);
 
   //usbMIDI.setHandleNoteOff(OnNoteOff)
-  usbMIDI.setHandleNoteOn(usbNoteOn);
+  //usbMIDI.setHandleNoteOn(usbNoteOn);
   //usbMIDI.setHandleVelocityChange(OnVelocityChange)
   //usbMIDI.setHandleControlChange(OnControlChange)
   //usbMIDI.setHandleProgramChange(OnProgramChange)
   //usbMIDI.setHandleAfterTouch(OnAfterTouch)
   //usbMIDI.setHandlePitchChange(OnPitchChange)
-  usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
+  //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence);
 	MasterClockTimer.begin(masterLoop,kClockInterval);

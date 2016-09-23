@@ -26,8 +26,11 @@
 #define GLOBAL_FILE         	 94
 #define TEMPO_MENU          	 95
 #define PATTERN_SELECT      	 96
-#define	CHANNEL_MENU		       97
-#define	DELETE_MENU			    	 98
+#define	CHANNEL_PITCH_MODE     97
+#define	CHANNEL_GATE_MODE		   98
+#define	CHANNEL_ENVELOPE_MODE	 99
+#define	CHANNEL_STEP_MODE		   100
+#define	DELETE_MENU			    	 101
 #define	DEBUG_SCREEN		    	127
 #define	CALIBRATION_MENU		  126
 
@@ -49,7 +52,7 @@
 #define SD_CS_PIN				    	  15
 #define LED_PIN                 5
 #define MIDPLANE_MAX7301_CS_PIN  0
-#define BACKPLANE_MAX7301_CS_PIN 3
+#define BACKPLANE_MAX7301_CS_PIN 33
 #define AD5676_CSPIN              2
 
 // MIDI Messages:

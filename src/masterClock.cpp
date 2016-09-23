@@ -45,6 +45,9 @@ void MasterClock::masterClockFunc(void){
 
   }
 
+	if (outputControl->clockOutputTimer > 2) {
+		outputControl->setClockOutput(LOW);
+	}
   wasPlaying = playing;
   lastTimer = loopTimer;
 
@@ -64,11 +67,12 @@ void MasterClock::internalClockTick(){
     internalClockTimer = 0;
     startTime = 0;
 
+		outputControl->setClockOutput(HIGH);
+
     for (int i=0; i< sequenceCount; i++){
       sequenceArray[i].clockStart(startTime);
       sequenceArray[i].beatPulse(beatLength, &life);
       sequenceArray[i].runSequence(&noteData[i], &life);
-
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
@@ -79,6 +83,7 @@ void MasterClock::internalClockTick(){
       sequenceArray[i].runSequence(&noteData[i], &life);
       sequenceArray[i].beatPulse(beatLength, &life);
     }
+		outputControl->setClockOutput(HIGH);
     internalClockTimer = 0;
 
        // Serial.print(" b5 ");

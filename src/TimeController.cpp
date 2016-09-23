@@ -31,7 +31,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
-	buttonIo.changeState(STEP_DISPLAY);
+	buttonIo.changeState(CHANNEL_PITCH_MODE);
 
 	saveFile.initialize(sequencerArray);
 	saveFile.loadPattern(0, 0b1111);
@@ -49,6 +49,8 @@ void TimeController::runLoopHandler() {
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
 	display.displayLoop(DISPLAY_FREQUENCY);
+//	outputControl.dacTestLoop();
+
 }
 
 void TimeController::masterClockHandler(){

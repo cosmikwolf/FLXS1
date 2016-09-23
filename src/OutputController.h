@@ -32,11 +32,12 @@ public:
   void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide);
   void noteOff(uint8_t channel, uint8_t note);
   void allNotesOff(uint8_t channel);
-  void samCommand(uint8_t command, uint8_t channel,uint8_t value);
+  void setClockOutput(bool value);
   void dacTestLoop();
   void calibrationRoutine();
   void inputLoopTest();
 
+  elapsedMillis clockOutputTimer;
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
 private:

@@ -61,10 +61,17 @@ public:
   void loop(uint16_t frequency);
 
   void patternSelectHandler();
-  void channelMenuHandler();
+  //void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
   void altButtonHandler();
   void stepModeMatrixHandler();
+
+  void channelPitchModeInputHandler();
+  void channelGateModeInputHandler();
+  void channelEnvelopeModeInputHandler();
+  void channelStepModeInputHandler();
+
+
   void sequencerMenuHandler();
   void instrumentSelectInputHandler();
   void timingMenuInputHandler();
