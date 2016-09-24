@@ -1,6 +1,7 @@
 /* **********************************
 *** ZETAOHM FLXS1 MUSIC SEQUENCER ***
 ********************************** */
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -24,7 +25,7 @@ IntervalTimer MasterClockTimer;
 MidiModule midiControl;
 NoteDatum noteData[4];
 Sequencer sequence[4];
-AudioInputAnalog              adc(A7);
+AudioInputAnalog              adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;
 AudioConnection               patchCord2(adc, 0 , notefreq, 0);
 elapsedMillis noteFreqTimer;
@@ -33,7 +34,7 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, serialMidi);
 
 void setup() {
   AudioMemory(30);
-//  notefreq.begin(.15);
+  notefreq.begin(.15);
 
   Serial.begin(kSerialSpeed);
   Serial3.begin(115200);
@@ -68,19 +69,24 @@ void setup() {
 	SPI.usingInterrupt(MasterClockTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
+
+  pinMode(3, OUTPUT);
+  pinMode(24,OUTPUT);
+  digitalWrite(3, HIGH);
+  digitalWrite(24, HIGH);
 }
 
 void loop() {
   timeControl.runLoopHandler();
-/*  if (noteFreqTimer > 10000){
-    if (notefreq.available()) {
-        float note = notefreq.read();
-        float prob = notefreq.probability();
-        Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
-    }
-    noteFreqTimer = 0;
-  }
-  */
+//  if (noteFreqTimer > 10000){
+//    if (notefreq.available()) {
+//        float note = notefreq.read();
+//        float prob = notefreq.probability();
+//        Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
+//    }
+//    noteFreqTimer = 0;
+//  }
+
 }
 
 
