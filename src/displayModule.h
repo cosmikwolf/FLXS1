@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include "OLED_SSD1351/OLED_SSD1351.h"
+#include <SSD_13XX.h>
+#include "_fonts/unborn_small.c"
+#include "_fonts/orbitron14.c"
+
 #include "Sequencer.h"
 #include "global.h"
 
@@ -43,7 +46,7 @@ class DisplayModule
 
     uint8_t highlight;
     uint8_t previouslySelectedChannel;
-    OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
+    SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
     void initialize(Sequencer *sequenceArray);

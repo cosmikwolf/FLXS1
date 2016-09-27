@@ -65,7 +65,7 @@ void InputModule::loop(uint16_t frequency){
   if (inputTimer > frequency){
     inputTimer = 0;
     knobPrevious = knobRead;
-    knobRead = knob.read()/-4  ;
+    knobRead = knob.read()/-2  ;
     knobChange = knobRead - knobPrevious;
 
     midplaneGPIO->update();
@@ -448,6 +448,60 @@ timesr.c:(.text._times_r+0x2): undefined reference to `_times'
 };
 
 void InputModule::channelGateModeInputHandler(){
+
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+
+      if (selectedStep == getNote(i)){
+        switch(stepMode){
+          case STEPMODE_GATETYPE:
+            stepMode = STEPMODE_ARPTYPE;
+            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpType - knobRead;
+          break;
+
+          case STEPMODE_ARPTYPE:
+            stepMode = STEPMODE_ARPNUMER;
+            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpeedNumerator - knobRead;
+          break;
+
+          case STEPMODE_ARPNUMER:
+            stepMode = STEPMODE_ARPDENOM;
+            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpeedDenominator - knobRead;
+          break;
+
+          case STEPMODE_ARPDENOM:
+            stepMode = STEPMODE_GATETYPE;
+            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
+          break;
+        }
+      } else {
+        stepMode = STEPMODE_GATETYPE;
+        selectedStep = getNote(i);
+        knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
+      }
+    }
+  }
+
+  if (knobChange){
+    //knobPrev = knobRead;
+    switch (stepMode) {
+      case STEPMODE_GATETYPE:
+      sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 4);
+
+      break;
+      case STEPMODE_ARPTYPE:
+      sequenceArray[selectedChannel].stepData[selectedStep].arpType=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 64);
+      break;
+      case STEPMODE_ARPNUMER:
+      sequenceArray[selectedChannel].stepData[selectedStep].arpSpeedNumerator=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpeedNumerator + knobChange, 4);
+      break;
+      case STEPMODE_ARPDENOM:
+      sequenceArray[selectedChannel].stepData[selectedStep].arpSpeedDenominator=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpeedDenominator + knobChange, 32);
+      break;
+    }
+  }
+
+
 
 };
 

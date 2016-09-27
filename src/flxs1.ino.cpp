@@ -1,6 +1,9 @@
-/* **********************************
-*** ZETAOHM FLXS1 MUSIC SEQUENCER ***
-********************************** */
+# 1 "/var/folders/hn/ch6s89_14b1fvg7y7pb4qlyr0000gn/T/tmpJ_YC_7"
+#include <Arduino.h>
+# 1 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
+
+
+
 
 #include <Arduino.h>
 #include <Audio.h>
@@ -25,19 +28,31 @@ IntervalTimer MasterClockTimer;
 MidiModule midiControl;
 NoteDatum noteData[4];
 Sequencer sequence[4];
-AudioInputAnalog              adc(A14);
-AudioAnalyzeNoteFrequency     notefreq;
-AudioConnection               patchCord0(adc, 0 , notefreq, 0);
+AudioInputAnalog adc(A14);
+AudioAnalyzeNoteFrequency notefreq;
+AudioConnection patchCord0(adc, 0 , notefreq, 0);
 elapsedMillis noteFreqTimer;
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, serialMidi);
 
 uint8_t masterLooptime;
 elapsedMicros masterLoopTimer;
-
+void setup();
+void loop();
+void printHeapStats();
+void usbNoteOff();
+void usbNoteOn(byte channel, byte note, byte velocity);
+void masterLoop();
+void midiClockPulseHandlerWrapper();
+void midiNoteOnHandlerWrapper(byte channel, byte note, byte velocity);
+void midiNoteOffHandlerWrapper(byte channel, byte note, byte velocity);
+void midiStartContinueHandlerWrapper();
+void midiStopHandlerWrapper();
+void usbMidiRealTimeMessageHandler(byte realtimebyte);
+#line 38 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
 void setup() {
   Serial.begin(9600);
-  //waiting for serial to begin
+
   delay(1500);
 
   printHeapStats();
@@ -47,35 +62,19 @@ void setup() {
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
   SPI.begin();
-	SPI.setMOSI(kMosiPin);
-	SPI.setSCK(kSpiClockPin);
+ SPI.setMOSI(kMosiPin);
+ SPI.setSCK(kSpiClockPin);
 
   midiControl.midiSetup(&serialMidi, sequence, noteData);
-
-//	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
-//  serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
-//  serialMidi.setHandleNoteOff( midiNoteOffHandlerWrapper );
-//  serialMidi.setHandleStart( midiStartContinueHandlerWrapper );
-//  serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
-//  serialMidi.setHandleStop(midiStopHandlerWrapper);
-
-  //usbMIDI.setHandleNoteOff(OnNoteOff)
-  //usbMIDI.setHandleNoteOn(usbNoteOn);
-  //usbMIDI.setHandleVelocityChange(OnVelocityChange)
-  //usbMIDI.setHandleControlChange(OnControlChange)
-  //usbMIDI.setHandleProgramChange(OnProgramChange)
-  //usbMIDI.setHandleAfterTouch(OnAfterTouch)
-  //usbMIDI.setHandlePitchChange(OnPitchChange)
-  //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
-
+# 71 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence);
-	MasterClockTimer.begin(masterLoop,kClockInterval);
-	SPI.usingInterrupt(MasterClockTimer);
+ MasterClockTimer.begin(masterLoop,kClockInterval);
+ SPI.usingInterrupt(MasterClockTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
-  pinMode(31, OUTPUT); // debug pin - EXT_TX - exp pin 5
-  pinMode(26, OUTPUT); // debug pin - EXT_RX - exp pin 6
+  pinMode(31, OUTPUT);
+  pinMode(26, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(24,OUTPUT);
   digitalWrite(3, LOW);
@@ -88,19 +87,7 @@ void loop() {
   digitalWriteFast(26, HIGH);
   timeControl.runLoopHandler();
   digitalWriteFast(26, LOW);
-
-/*  if (!playing){
-    if (notefreq.available()) {
-    //  Serial
-        float note = notefreq.read();
-        float prob = notefreq.probability();
-        Serial.println("Note: "+ String(note) + " | Probability: " + String(prob) + " mem use max: " + String(AudioMemoryUsageMax()));
-    }
-  }
-  //if (noteFreqTimer > 10000){
-    //noteFreqTimer = 0;
-//  }
-*/
+# 104 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
 }
 
 void printHeapStats()
@@ -113,7 +100,7 @@ void printHeapStats()
 }
 
 void usbNoteOff(){
-//  Serial.println("note off!:\t" + String(note));
+
 }
 
 void usbNoteOn(byte channel, byte note, byte velocity){
@@ -121,8 +108,8 @@ void usbNoteOn(byte channel, byte note, byte velocity){
   playing = !playing;
 }
 
-// global wrapper to create pointer to ClockMaster member function
-// https://isocpp.org/wiki/faq/pointers-to-members
+
+
 void masterLoop(){
   digitalWriteFast(31, HIGH);
   usbMIDI.read();
@@ -130,8 +117,8 @@ void masterLoop(){
   digitalWriteFast(31, LOW);
 }
 
-// global wrappers to create pointers to MidiModule member functions
-// https://isocpp.org/wiki/faq/pointers-to-members
+
+
 void midiClockPulseHandlerWrapper(){
   midiControl.midiClockPulseHandler();
 }
@@ -157,18 +144,5 @@ void usbMidiRealTimeMessageHandler(byte realtimebyte) {
   if (realtimebyte == 248) {
     midiControl.midiClockPulseHandler();
   };
-  //switch(realtimebyte){
-  //  case MIDI_CLOCK:
-  //    midiControl.midiClockPulseHandler();
-  //    break;
-  //  case MIDI_START:
-  //    midiControl.midiStartContinueHandler();
-  //    break;
-  //  case MIDI_CONTINE:
-  //    midiControl.midiStartContinueHandler();
-  //    break;
-  //  case MIDI_STOP:
-  //    midiControl.midiStopHandler();
-  //    break;
-  //}
+# 174 "/Users/tenkai/Desktop/Projects/flxs1/src/flxs1.ino"
 }

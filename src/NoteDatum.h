@@ -37,8 +37,15 @@ typedef struct NoteDatum {
 typedef	struct StepDatum {
 	// data that needs to be stored
 	int8_t			pitch[4];		    // note pitch
-	uint8_t			gateLength;		// gate length
 	uint8_t 		gateType;		// gate type (hold, repeat, arpeggio)
+
+	uint8_t			gateLength;		// gate length becomes arpCount if
+	uint8_t 		arpCount;		// # of arpeggiations for this step
+	uint8_t 		arpType;		// off, up, down, up & down etc
+	uint8_t 		arpOctave;		// off, up, down, up & down etc
+	uint8_t 		arpSpeedNumerator;	// MSB - X   LSB - Y  length: X/Y beats
+	uint8_t 		arpSpeedDenominator;	// MSB - X   LSB - Y  length: X/Y beats
+
 	uint8_t			velocity;	    // note velocity
 	uint8_t			glide;			// portamento time - to be implemented.
 
@@ -51,14 +58,19 @@ typedef	struct StepDatum {
 	uint8_t				stepStatus;		// if note is playing or not
 	uint32_t			stepOffTime;		// time  when the note should be stopped.
 	elapsedMicros	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
+/*
+	uint8_t arpSpeedNumerator(){
+		return arpSpeed >> 4;
+	}
 
+	uint8_t arpSpeedDenominator(){
+		return arpSpeed && 0xF;
+	}
+*/
 	uint32_t	arpLength() {
 		return stepOffTime / gateType;
 	}
 
-	uint8_t arpCount() {
-		return gateType;
-	}
 } StepDatum;
 
 

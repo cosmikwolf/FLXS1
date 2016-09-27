@@ -20,7 +20,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	sequencerArray[0].initialize(0, 16, 4, (tempoX100/100));
   sequencerArray[1].initialize(1, 16, 4, (tempoX100/100));
   sequencerArray[2].initialize(2, 16, 4, (tempoX100/100));
-  sequencerArray[3].initialize(3, 16, 4, (tempoX100/100));
+	sequencerArray[3].initialize(3, 16, 4, (tempoX100/100));
 
 	ledArray.initialize(sequencerArray);
 
