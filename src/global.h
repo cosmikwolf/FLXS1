@@ -7,8 +7,8 @@
 #define STEP_DISPLAY		     	 7
 #define	SEQUENCE_MENU		     	  2
 #define TIMING_MENU 	      	 66
-#define INSTRUMENT_MENU     	 68
 #define GENERATIVE_MENU     	 71
+#define GLOBAL_MENU            68
 #define SEQUENCE_TRAN       	 67
 #define SEQUENCE_NAME       	 65
 #define SEQUENCE_QUAN       	 69
@@ -31,22 +31,36 @@
 #define	CHANNEL_ENVELOPE_MODE	 99
 #define	CHANNEL_STEP_MODE		   100
 #define	DELETE_MENU			    	 101
-#define	DEBUG_SCREEN		    	127
-#define	CALIBRATION_MENU		  126
+#define	DEBUG_SCREEN		       127
+#define	CALIBRATION_MENU		   126
 
+//PITCH PAGE STEPMODES
 #define STEPMODE_PITCH0       0
-#define STEPMODE_PITCH1       9
-#define STEPMODE_PITCH2       10
-#define STEPMODE_PITCH3       11
-#define STEPMODE_GATELENGTH   1
-#define STEPMODE_VELOCITY     2
-#define STEPMODE_GATETYPE     8
-#define STEPMODE_GLIDE        12
-#define STEPMODE_TEMPO        3
-#define STEPMODE_STEPCOUNT    6
-#define STEPMODE_BEATCOUNT    7
+#define STEPMODE_PITCH1       1
+#define STEPMODE_PITCH2       2
+#define STEPMODE_PITCH3       3
+#define STEPMODE_CHORD        4
+#define STEPMODE_GLIDE        5
+#define STEPMODE_STEPCOUNT    7
+#define STEPMODE_BEATCOUNT    8
+#define STEPMODE_GATE         9
 
+//ARP PAGE STEP MODES
+#define STEPMODE_GATELENGTH   10
+#define STEPMODE_GATETYPE     11
+#define STEPMODE_ARPTYPE      12
+#define STEPMODE_ARPSPEED     13
+#define STEPMODE_ARPOCTAVE    14
+#define STEPMODE_ARPCOUNT     15
 
+//ENVELOPE PAGE STEP MODES
+#define STEPMODE_VELOCITY     16
+
+//STEP PAGE STEP MODES:
+#define STEPMODE_QUANTIZEKEY     17
+#define STEPMODE_QUANTIZESCALE   18
+
+#define STEPMODE_TEMPO          6
 
 #define DEBUG_PIN				    	 127
 #define SD_CS_PIN				    	  15
@@ -56,10 +70,29 @@
 #define AD5676_CSPIN              2
 
 // MIDI Messages:
-# define MIDI_CLOCK   248
-# define MIDI_START   250
-# define MIDI_CONTINE   251
-# define MIDI_STOP   252
+#define MIDI_CLOCK   248
+#define MIDI_START   250
+#define MIDI_CONTINE   251
+#define MIDI_STOP   252
+
+
+//these 12 bit INTs define chromatic scales
+//the bit position indicates scale degree
+
+#define CHROMATIC         0b111111111111
+#define MAJOR             0b101011010101
+#define MINOR             0b101101010101
+#define MAJORMINOR        0b101111010101
+#define PENTATONIC_MAJOR  0b101001010100
+#define PENTATONIC_MINOR  0b100101010010
+#define PENTATONIC_BLUES  0b100101010010
+#define IONIAN            0b101011010101
+#define AEOLIAN           0b101101011010
+#define DORIAN            0b101101010110
+#define MIXOLYDIAN        0b101011010110
+#define PHRYGIAN          0b110101011010
+#define LYDIAN            0b101010110101
+#define LOCRIAN           0b110101101010
 
 
 extern uint32_t tempoX100;
@@ -79,7 +112,7 @@ extern uint8_t sequenceCount;
 extern uint8_t currentPattern;
 extern uint8_t queuePattern;
 extern boolean playing;
-
+extern uint8_t chordArray[27][3];
 // MasterClock
 extern uint8_t masterPulseCount;
 extern boolean wasPlaying;

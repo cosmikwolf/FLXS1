@@ -109,12 +109,12 @@ void LEDArray::loop(uint16_t frequency){
         for (int i=0; i < 4; i++){
           leds.setPixelColor(ledChannelButtons[i], 255,255,255, 255);
 
-/*          if( patternChannelSelector & (1<<i) ){
-          //  leds[ledMapping[i+16]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
+          if( patternChannelSelector & (1<<i) ){
+            leds.setPixelColor(ledChannelButtons[i], 255,255,255, 255);
           } else {
-          //  leds[ledMapping[i+16]] = CHSV(0,0,0);
+            leds.setPixelColor(ledChannelButtons[i], 0,255,127, 0);
           }
-          */
+
         }
       break;
     }

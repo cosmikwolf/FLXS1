@@ -39,11 +39,11 @@
 #define SW_M3    22
 #define SW_PGDN  23
 #define SW_PGUP  24
-#define SW_MENU  25
-#define SW_ALT   26
-#define SW_SPARE   27
-#define ENCODER1LEFTPIN 17
-#define ENCODER1RIGHTPIN 16
+#define SW_PATTERN  25
+#define SW_MENU   26
+#define SW_SHIFT   27
+#define ENCODER1LEFTPIN 16
+#define ENCODER1RIGHTPIN 17
 #define MAX7301PIN  5
 
 class InputModule
@@ -72,8 +72,10 @@ public:
   void channelStepModeInputHandler();
 
 
-  void sequencerMenuHandler();
-  void instrumentSelectInputHandler();
+  void sequenceMenuHandler();
+  void globalMenuHandler();
+  void tempoMenuHandler();
+
   void timingMenuInputHandler();
   void debugScreenInputHandler();
   void calibrationMenuHandler();
@@ -94,6 +96,7 @@ public:
   unsigned long smallButtonLoopTime;
   unsigned long encoderButtonTime;
   unsigned long matrixButtonTime;
+
 
 private:
   Sequencer *sequenceArray;

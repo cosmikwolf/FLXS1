@@ -6,16 +6,6 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
 
   this->serialMidi = serialMidi;
 
-  Serial.println("Initializing SAM2695");
-
-  // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
-  sam2695.begin();
-  sam2695.programChange(0, 0, 38);       // give our two channels different voices
-  sam2695.programChange(0, 1, 30);
-  sam2695.programChange(0, 2, 128);       // give our two channels different voices
-  sam2695.programChange(0, 3, 29);
-  // PUT STUFF LIKE THIS INSIDE CONSTRUCTORS
-
   Serial.println("initializing gate outputs");
   this->backplaneGPIO = backplaneGPIO;
   backplaneGPIO->begin(BACKPLANE_MAX7301_CS_PIN);
@@ -167,7 +157,7 @@ Serial.println("CV1: " + String(analogRead(22)) + "\tCV2: " + String(analogRead(
   backplaneGPIO->digitalWrite(8, 0);
 }
 
-void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide){
+void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide, bool gate){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -208,11 +198,12 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
   ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
   serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
-  sam2695.noteOn(channel, note, velocity);                                    // set note on sound chip
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
 
-  backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
+  if (gate){
+    backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
+  }
 
 
 };
@@ -253,16 +244,17 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
   }
 };
 
+
+
+
 void OutputController::noteOff(uint8_t channel, uint8_t note){
 //  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
   backplaneGPIO->digitalWrite(channel, LOW);
   serialMidi->sendNoteOff(note, 64, channel);
-  sam2695.noteOff(channel, note);
 
 }
 
 void OutputController::allNotesOff(uint8_t channel){
-    sam2695.allNotesOff(channel);
     backplaneGPIO->digitalWrite(channel, LOW);
 }
 
@@ -270,7 +262,7 @@ void OutputController::setClockOutput(bool value){
     backplaneGPIO->digitalWrite(17, value);
     if (value == HIGH){
       clockOutputTimer = 0;
-    } 
+    }
 }
 
 void OutputController::calibrationRoutine(){

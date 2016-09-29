@@ -2,6 +2,7 @@
 #define _Sequencer_h_
 
 #include "NoteDatum.h"
+#include "global.h"
 #include "GameOfLife.h"
 
 class Sequencer
@@ -34,22 +35,22 @@ class Sequencer
 		void 		setStepVelocity(uint8_t step, uint8_t velocity);
 		void 		setStepGlide(uint8_t step, uint8_t glideTime);
 
-		void 		setInstType(uint8_t type);
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
+		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 
-		uint8_t  	quantizePitch(uint8_t note, uint32_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		boolean  	monophonic;
 		uint8_t  	beatTracker;		// keeps track of how long the sequence has been playing
 		uint8_t	 	activeStep;
     uint32_t 	beatLength;
+		uint32_t 	stepLength;		// length of each step in mcs
+		
 		uint32_t 	tempoX100;
 		boolean  	tempoPulse;
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
-		uint32_t 	stepLength;		// length of each step in mcs
 		int16_t 	sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
-		uint32_t 	aminor = 0b101011010101;
+
 		uint8_t		lifeCellToPlay;
 		uint8_t		lifeCellsPlayed;
 
@@ -61,8 +62,7 @@ class Sequencer
 		uint8_t  stepCount;  		// sequence length in 1/16th notes]
 		uint16_t beatCount;
 		uint8_t	 quantizeKey;
-		uint16_t instrument;
-		uint8_t	 instType;
+		uint8_t	 quantizeScale;
 		uint8_t  volume;
 		uint8_t  bank;
 		uint8_t	 channel;

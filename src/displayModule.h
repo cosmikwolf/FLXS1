@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include "OLED_SSD1351/OLED_SSD1351.h"
 #include "Sequencer.h"
 #include "global.h"
 
@@ -23,7 +22,7 @@
 #define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
 #define PINK            0xF81F
 
-#define MAX_DISPLAY_ELEMENTS 17
+#define MAX_DISPLAY_ELEMENTS 20
 
 #define LCD_DC        10//out (SSD1351/sharp refresh todo) OK
 #define LCD_CS        6//out (SSD1351/sharp) OK
@@ -60,14 +59,17 @@ class DisplayModule
     void channelEnvelopeMenuDisplay(char *buf);
     void channelStepMenuDisplay(char *buf);
 
+    void sequenceMenuDisplay();
     void globalMenuDisplay();
+    void tempoMenuDisplay();
+
     void gameOfLifeDisplay();
     void deleteMenuDisplay();
     void cleanupTextBuffers();
-    void sequenceMenuDisplay();
     void instrumentSelectDisplay();
     void timingMenuDisplay();
     void calibrationMenuDisplay();
+    uint16_t foreground, background;
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 private:

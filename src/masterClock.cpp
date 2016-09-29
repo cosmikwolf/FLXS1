@@ -67,6 +67,16 @@ void MasterClock::internalClockTick(){
     internalClockTimer = 0;
     startTime = 0;
 
+
+		for (int i=0; i<4; i++){
+ 		// outputControl->allNotesOff(i);
+ 		// noteData[i].noteOn = false;
+ 		// noteData[i].noteOff = false;
+ 		 for (int n=0; n<MAX_STEPS_PER_SEQUENCE; n++){
+ 		  // 	noteData[i].noteOffArray[n] = NULL;
+ 			//	noteData[i].noteOnArray[n] = NULL;
+ 		 }
+ 	 }
 		outputControl->setClockOutput(HIGH);
 
     for (int i=0; i< sequenceCount; i++){
@@ -126,7 +136,7 @@ void MasterClock::noteOnSwitch(){
         if (!noteData[i].noteOnArray[n]){
           continue;
         }
-				outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n], noteData[i].noteGlideArray[n] );
+				outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n], noteData[i].noteGlideArray[n], noteData[i].noteGateArray[n] );
       }
     }
   }

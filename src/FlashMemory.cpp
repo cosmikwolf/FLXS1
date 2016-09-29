@@ -47,8 +47,7 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   root["stepCount"]     = sequenceArray[channel].stepCount;
   root["beatCount"]     = sequenceArray[channel].beatCount;
   root["quantizeKey"]   = sequenceArray[channel].quantizeKey;
-  root["instrument"]    = sequenceArray[channel].instrument;
-  root["instType"]      = sequenceArray[channel].instType;
+  root["quantizeScale"] = sequenceArray[channel].quantizeScale;
   root["volume"]        = sequenceArray[channel].volume;
   root["bank"]          = sequenceArray[channel].bank;
   root["channel"]       = sequenceArray[channel].channel;
@@ -64,8 +63,13 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["p1"] = sequenceArray[channel].stepData[i].pitch[1];
     stepDataObj["p2"] = sequenceArray[channel].stepData[i].pitch[2];
     stepDataObj["p3"] = sequenceArray[channel].stepData[i].pitch[3];
-    stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
+    stepDataObj["ch"] = sequenceArray[channel].stepData[i].chord ;
     stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType ;
+    stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
+    stepDataObj["ac"] = sequenceArray[channel].stepData[i].arpCount;
+    stepDataObj["at"] = sequenceArray[channel].stepData[i].arpType;
+    stepDataObj["ao"] = sequenceArray[channel].stepData[i].arpOctave;
+    stepDataObj["as"] = sequenceArray[channel].stepData[i].arpSpeed;
     stepDataObj["v"] = sequenceArray[channel].stepData[i].velocity ;
     stepDataObj["g"] = sequenceArray[channel].stepData[i].glide ;
     stepDataArray.add(stepDataObj);
@@ -147,8 +151,7 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
    sequenceArray[channel].stepCount    = jsonReader["stepCount"];
    sequenceArray[channel].beatCount    = jsonReader["beatCount"];
    sequenceArray[channel].quantizeKey  = jsonReader["quantizeKey"];
-   sequenceArray[channel].instrument   = jsonReader["instrument"];
-   sequenceArray[channel].instType     = jsonReader["instType"];
+   sequenceArray[channel].quantizeScale = jsonReader["quantizeScale"];
    sequenceArray[channel].volume       = jsonReader["volume"];
    sequenceArray[channel].bank         = jsonReader["bank"];
    sequenceArray[channel].channel      = jsonReader["channel"];
@@ -164,14 +167,21 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
        Serial.println("Step Data Index Mismatch Error");
      };
      StepDatum stepDataBuf;
-     stepDataBuf.pitch[0]  = stepDataArray[i]["p0"];
-     stepDataBuf.pitch[1]  = stepDataArray[i]["p1"];
-     stepDataBuf.pitch[2]  = stepDataArray[i]["p2"];
-     stepDataBuf.pitch[3]  = stepDataArray[i]["p3"];
+
+     stepDataBuf.pitch[0]    = stepDataArray[i]["p0"];
+     stepDataBuf.pitch[1]    = stepDataArray[i]["p1"];
+     stepDataBuf.pitch[2]    = stepDataArray[i]["p2"];
+     stepDataBuf.pitch[3]    = stepDataArray[i]["p3"];
+     stepDataBuf.chord       = stepDataArray[i]["ch"];
+     stepDataBuf.gateType    = stepDataArray[i]["gt"];
      stepDataBuf.gateLength  = stepDataArray[i]["gl"];
-     stepDataBuf.gateType  = stepDataArray[i]["gt"];
-     stepDataBuf.velocity  = stepDataArray[i]["v"];
-     stepDataBuf.glide  = stepDataArray[i]["g"];
+     stepDataBuf.arpCount    = stepDataArray[i]["ac"];
+     stepDataBuf.arpType     = stepDataArray[i]["at"];
+     stepDataBuf.arpOctave   = stepDataArray[i]["ao"];
+     stepDataBuf.arpSpeed    = stepDataArray[i]["as"];
+     stepDataBuf.velocity    = stepDataArray[i]["v"] ;
+     stepDataBuf.glide       = stepDataArray[i]["g"] ;
+
      sequenceArray[channel].stepData[i] = stepDataBuf;
   }
 
@@ -215,7 +225,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
     //sam2695.programChange(0, i, sequenceArray[i].instrument);
     //sam2695.setChannelVolume(i, sequenceArray[i].volume);
 
-    sequenceArray[i].quantizeKey = 1;
+    //sequenceArray[i].quantizeKey = 1;
   }
 
   Serial.println("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
@@ -246,11 +256,12 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 }
 
 void FlashMemory::deleteSaveFile(){
-  for(int i=0; i<16; i++){
-    for(int n=0; n<sequenceCount; n++){
-      sequenceArray[n].initNewSequence(i, n);
-    }
-  }
+  this->deleteAllFiles();
+//  for(int i=0; i<16; i++){
+//    for(int n=0; n<sequenceCount; n++){
+//      sequenceArray[n].initNewSequence(i, n);
+//    }
+//  }
   loadPattern(0, 0b1111);
 }
 
@@ -288,7 +299,7 @@ void FlashMemory::printDirectory(File dir, int numTabs) {
 void FlashMemory::printPattern(){
   Serial.println("Printing Data for pattern: " + String(currentPattern));
   for(int i=0; i < sequenceCount; i++){
-    Serial.print("sc:\t"+String(sequenceArray[i].stepCount) +"\tbc:\t"+String(sequenceArray[i].beatCount) +"\tqk:\t"+String(sequenceArray[i].quantizeKey)+"\tinst:\t"+String(sequenceArray[i].instrument)+"\tit:\t"+String(sequenceArray[i].instType) + "\t");
+    Serial.print("sc:\t"+String(sequenceArray[i].stepCount) +"\tbc:\t"+String(sequenceArray[i].beatCount) +"\tqk:\t"+String(sequenceArray[i].quantizeKey)+"\t");
     for(int n=0; n<16; n++){
       Serial.print( String(sequenceArray[i].stepData[n].pitch[0]) + "\t" );
       Serial.print( String(sequenceArray[i].stepData[n].pitch[1]) + "\t" );

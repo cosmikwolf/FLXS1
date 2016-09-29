@@ -6,7 +6,6 @@
 
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 #include "Zetaohm_AD5676/Zetaohm_AD5676.h"
-#include "Zetaohm_SAM2695/Zetaohm_SAM2695.h"
 #include "Zetaohm_MCP4352/Zetaohm_MCP4352.h"
 #include "FlashMemory.h"
 #include "midiModule.h"
@@ -29,7 +28,7 @@
 class OutputController {
 public:
   void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi);
-  void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide);
+  void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide, bool gate);
   void noteOff(uint8_t channel, uint8_t note);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
@@ -41,7 +40,6 @@ public:
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
 private:
-  Zetaohm_SAM2695 sam2695;
   Zetaohm_AD5676 ad5676;
   Zetaohm_MCP4352 mcp4352_1;
   Zetaohm_MCP4352 mcp4352_2;

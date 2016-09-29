@@ -3,19 +3,19 @@
 ********************************** */
 
 #include <Arduino.h>
-#include <SPI.h>
-#include <Wire.h>
 #include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <malloc.h>
 
 #include "TimeController.h"
 #include "Sequencer.h"
 #include "midiModule.h"
 #include "global.h"
-
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kClockInterval 500
+#define kClockInterval 600 
 #define kMosiPin 11
 #define kSpiClockPin 13
 
@@ -27,26 +27,30 @@ NoteDatum noteData[4];
 Sequencer sequence[4];
 AudioInputAnalog              adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;
-AudioConnection               patchCord2(adc, 0 , notefreq, 0);
+AudioConnection               patchCord0(adc, 0 , notefreq, 0);
 elapsedMillis noteFreqTimer;
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, serialMidi);
 
-void setup() {
-  AudioMemory(30);
-  notefreq.begin(.15);
+uint8_t masterLooptime;
+elapsedMicros masterLoopTimer;
 
-  Serial.begin(kSerialSpeed);
-  Serial3.begin(115200);
+void setup() {
+  Serial.begin(9600);
   //waiting for serial to begin
   delay(1500);
+
+  printHeapStats();
+  AudioMemory(27);
+  notefreq.begin(.15);
+
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
   SPI.begin();
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
 
-  //midiControl.midiSetup(&serialMidi, sequence, noteData);
+  midiControl.midiSetup(&serialMidi, sequence, noteData);
 
 //	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
 //  serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
@@ -70,25 +74,43 @@ void setup() {
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
+  pinMode(31, OUTPUT); // debug pin - EXT_TX - exp pin 5
+  pinMode(26, OUTPUT); // debug pin - EXT_RX - exp pin 6
   pinMode(3, OUTPUT);
   pinMode(24,OUTPUT);
-  digitalWrite(3, HIGH);
-  digitalWrite(24, HIGH);
+  digitalWrite(3, LOW);
+  digitalWrite(24, LOW);
+  printHeapStats();
+  Serial.println("Freeram: " + String(FreeRam2()));
 }
 
 void loop() {
+  digitalWriteFast(26, HIGH);
   timeControl.runLoopHandler();
-//  if (noteFreqTimer > 10000){
-//    if (notefreq.available()) {
-//        float note = notefreq.read();
-//        float prob = notefreq.probability();
-//        Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
-//    }
-//    noteFreqTimer = 0;
-//  }
+  digitalWriteFast(26, LOW);
 
+/*  if (!playing){
+    if (notefreq.available()) {
+    //  Serial
+        float note = notefreq.read();
+        float prob = notefreq.probability();
+        Serial.println("Note: "+ String(note) + " | Probability: " + String(prob) + " mem use max: " + String(AudioMemoryUsageMax()));
+    }
+  }
+  //if (noteFreqTimer > 10000){
+    //noteFreqTimer = 0;
+//  }
+*/
 }
 
+void printHeapStats()
+{
+  Serial.print("                  arena: ");Serial.println(mallinfo().arena);
+  Serial.print("  total allocated space: ");Serial.println(mallinfo().uordblks);
+  Serial.print("  total non-inuse space: ");Serial.println(mallinfo().fordblks);
+  Serial.print("   top releasable space: ");Serial.println(mallinfo().keepcost);
+  Serial.println("");
+}
 
 void usbNoteOff(){
 //  Serial.println("note off!:\t" + String(note));
@@ -102,8 +124,10 @@ void usbNoteOn(byte channel, byte note, byte velocity){
 // global wrapper to create pointer to ClockMaster member function
 // https://isocpp.org/wiki/faq/pointers-to-members
 void masterLoop(){
+  digitalWriteFast(31, HIGH);
   usbMIDI.read();
   timeControl.masterClockHandler();
+  digitalWriteFast(31, LOW);
 }
 
 // global wrappers to create pointers to MidiModule member functions

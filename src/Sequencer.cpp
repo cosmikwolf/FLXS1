@@ -25,8 +25,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->beatCount = beatCount;
 	this->tempoX100 = tempoX100;
 	this->sequenceTimer = 0;
-	this->instrument = 38;
-	this->instType = 0;
 	this->volume = 100;
 	//for (int i=0; i < stepCount; i++){
 	// stepData[i].gateLength = 1;
@@ -50,16 +48,14 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 
 
 void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
-	this->stepCount = stepCount;
+	this->stepCount = 16;
 	this->beatCount = 4;
-	this->quantizeKey = 1;
-	this->instrument = 0;
+	this->quantizeKey = 0;
+	this->quantizeScale = 0;
 	this->volume = 100;
 	this->bank = 0;
 	this->patternIndex = index;
 	this->channel = ch;
-	this->instType = 2; //initialized regular instrument
-	this->instType = 0;
 
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
 		this->stepData[n].pitch[0]   = 24;
@@ -67,17 +63,18 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		for (int i=1; i<4; i++){
 			this->stepData[n].pitch[i] = 0;
 		}
-
-		this->stepData[n].gateLength = 1;
-		this->stepData[n].gateType   = 0;
-		this->stepData[n].velocity   = 67;
-		this->stepData[n].glide      = 0;
+		this->stepData[n].chord	   		=	 0;
+		this->stepData[n].gateType		=	 0;
+		this->stepData[n].gateLength	=	 1;
+		this->stepData[n].arpCount		=	 1;
+		this->stepData[n].arpType			=	 0;
+		this->stepData[n].arpOctave		=  1;
+		this->stepData[n].arpSpeed		=  16;
+		this->stepData[n].velocity		=  67;
+		this->stepData[n].glide				=  0;
 	}
 };
 
-void Sequencer::setInstType(uint8_t type){
-	this->instType = type;
-}
 
 void Sequencer::setTempo(uint32_t tempoX100){
 	this->tempoX100 = tempoX100;
@@ -87,6 +84,7 @@ void Sequencer::setTempo(uint32_t tempoX100){
 
 void Sequencer::setStepPitch(uint8_t step, uint8_t pitch, uint8_t index){
 	stepData[step].pitch[index] = pitch;
+	Serial.println("step: " + String(step) + " pitch: " + String(pitch) + " index: " + String(index) + " set pitch: " + String(stepData[step].pitch[index]));
 };
 
 void Sequencer::setGateLength(uint8_t step, uint8_t length){
@@ -174,11 +172,6 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 		stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 	}
 
-	if(instType == 1 && channel == 0){
-
-		life->lifeIterate(life->grid);
-
-	}
 
 };
 
@@ -187,16 +180,8 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 	clearNoteData(noteData);
 	incrementActiveStep();
 
-	switch (instType){
-		case 1:
-		// GAME OF LIFE MODE
-		sequenceModeGameOfLife(noteData, life);
-		break;
-		case 0:
-		// NORMAL STEP MODE
-		sequenceModeStandardStep(noteData);
-		break;
-	}
+	sequenceModeStandardStep(noteData);
+
 }
 
 void Sequencer::incrementActiveStep(){
@@ -219,14 +204,14 @@ void Sequencer::incrementActiveStep(){
 			activeStep++;
 
 			if (channel == 0) {
-				Serial.println("activeStep: " + String(activeStep));
+	//			Serial.println("activeStep: " + String(activeStep));
 			}
 
-			if (instType == 1){
+		/*	if (instType == 1){
 				stepData[activeStep].stepTimer = 0;
 				lifeCellToPlay = 0;
 				lifeCellsPlayed = 0;
-			}
+			}*/
 		}
 	}
 }
@@ -259,14 +244,14 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				stepData[stepNum].arpStatus = 0;
 			}
 
-			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() * 8/10 ) {
+			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() -10000 ) {
 				// shut off notes that should stop playing.
 				noteShutOff(noteData, stepNum);
 			}
 
 			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength()) && sequenceTimer < (stepData[stepNum].offset + stepData[stepNum].stepOffTime - (stepData[stepNum].arpLength()/2)) ) {
 
-				Serial.println("Triggering Note - stepNum: " + String(stepNum)  +
+		/*		Serial.println("Triggering Note - stepNum: " + String(stepNum)  +
 					+ "\tarpStatus: " + String(stepData[stepNum].arpStatus)
 					+ "\tsequenceTimer: " + String(sequenceTimer)
 					+ "\tlt: " + String(stepData[stepNum].offset + stepData[stepNum].stepOffTime)
@@ -279,7 +264,7 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 					+ "\tbeatCount:" + String(beatCount)
 					+ "\tstepCount:" + String(stepCount)
 				);
-
+		 */
 
 				noteTrigger(noteData, stepNum);
 				stepData[stepNum].arpStatus++;
@@ -298,27 +283,123 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum){
 		//only reset the step timer if it is the first trigger of the arpeggio
 		stepData[stepNum].stepTimer = 0;
 	}
+
 	stepData[stepNum].noteStatus = CURRENTLY_PLAYING;
 
-	uint8_t index = stepData[stepNum].arpStatus % 4;
-	int8_t playPitch;
+	//fill an array with the pitches of the step
+	uint8_t pitchArray[22];
+	pitchArray[0] = stepData[stepNum].pitch[0];
+	pitchArray[1] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[1];
+	pitchArray[2] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2];
+	pitchArray[3] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3];
 
-	if (index == 0) {
-		playPitch = stepData[stepNum].pitch[0];
-	} else {
-		playPitch = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[index] ;
+	//figure out how many steps are nil (255)
+	uint8_t arpSteps = 4;
+	for(int i=1; i<4; i++){
+		if(stepData[stepNum].pitch[i] == 255){
+			arpSteps = arpSteps - 1;
+		}
+	}
+
+	//fill up the rest of the array with octave up pitches
+	for (int i = arpSteps; i< 5 * arpSteps; i++){
+		pitchArray[i] = pitchArray[i-arpSteps]+12;
+	}
+
+	if (stepData[stepNum].arpOctave > 0){
+		arpSteps = stepData[stepNum].arpOctave * arpSteps;
+	}
+
+	uint8_t index;
+
+	int8_t playPitch; 	//pitch that will be triggered in this loop
+
+
+	switch (stepData[stepNum].arpType){
+		case ARPTYPE_UP:
+			index = stepData[stepNum].arpStatus % arpSteps;
+			playPitch = pitchArray[index];
+		break;
+
+		case ARPTYPE_DN:
+			index = arpSteps - stepData[stepNum].arpStatus % arpSteps;
+			playPitch = pitchArray[index];
+		break;
+
+		case ARPTYPE_UPDN1:
+			// repeating top and bottom note
+			if (stepData[stepNum].arpStatus/arpSteps % 2){
+				index = stepData[stepNum].arpStatus % arpSteps;
+			} else {
+				index = arpSteps - stepData[stepNum].arpStatus % arpSteps;
+			}
+
+			playPitch = pitchArray[index];
+		break;
+
+		case ARPTYPE_UPDN2: // no repeat of top and bottom note
+	//arpsteps:           4
+	//index:              0 1 2 3 2 1 0 1 2 3
+	//arpStatus:          0 1 2 3 4 5 6 7 8 9
+	//arpStatus/arpSteps: 0 0 0 0 1 1 1 1 2 2
+	//arpstatus%arpSteps: 0 1 2 3 0 1 2 3 0 1
+	//                    0 0 0 0 1 1 1
+	//										0 0 0 1 1 1 0 0 0 1 1 1
+	//up:                 0 1 2 3 0 1 2 3 0 1 2 3
+	//down:      			  3 2 1 0 3 2 1 0 3 2
+
+			if (stepData[stepNum].arpStatus/(arpSteps-1) % 2){
+				index = stepData[stepNum].arpStatus % arpSteps;
+			} else {
+				index = arpSteps - stepData[stepNum].arpStatus % (arpSteps-1);
+			}
+			playPitch = pitchArray[index];
+		break;
+
+		case ARPTYPE_RNDM: // no repeat of top and bottom note
+			index = random(0,arpSteps);
+			playPitch = pitchArray[index];
+		break;
+
+		default:
+			playPitch = pitchArray[0];
+		break;
 	}
 
 	//if (quantizeKey == 1){
 	//	stepData[stepNum].notePlaying = quantizePitch(playPitch, aminor, 1);
-	//} else {
+	if (quantizeScale > 0){
+		stepData[stepNum].notePlaying = quantizePitch(playPitch, quantizeKey, quantizeScale, 1);
+	} else {
 		stepData[stepNum].notePlaying = playPitch;
-	//}
+	}
+
+
+	bool gateTrig;
+
+	if (stepData[stepNum].gateType == 0) {
+		//no gate
+		gateTrig = false;
+	} else if (stepData[stepNum].gateType == 1){
+		//gate is on / retrigger
+		gateTrig = true;
+	} else if (stepData[stepNum].gateType == 2){
+		if (stepData[stepNum].arpStatus == 0){
+			gateTrig = true;
+		} else {
+			gateTrig = false;
+		}
+	} else {
+		gateTrig = true; // for hold. logic needs to be in note Off section
+	}
+
+
 
 	for (int i=0; i< stepCount; i++){
 		// since there could be up to stepCount steps being triggered in a single noteOnArray,
 		// need to find the first NULL entry. After setting it, break.
 		if (noteData->noteOnArray[i] == NULL){
+			noteData->noteGateArray[i] = gateTrig;
 			noteData->noteOnArray[i] = stepData[stepNum].notePlaying;
 			noteData->noteVelArray[i] = stepData[stepNum].velocity;
 			noteData->noteGlideArray[i] = stepData[stepNum].glide;
@@ -427,8 +508,8 @@ void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
 		//noteData->triggerTime = micros();
 		//noteData->sequenceTime = sequenceTimer;
 
-		if (quantizeKey == 1){
-			stepData[lifeCellToPlay].notePlaying = quantizePitch(activeCellValues[lifeCellToPlay], aminor, 1);
+		if (quantizeScale > 0){
+			stepData[lifeCellToPlay].notePlaying = quantizePitch(activeCellValues[lifeCellToPlay], quantizeKey, quantizeScale, 1);
 			// Serial.println("quantized note: " + String(stepData[stepNum].pitch) + " -> " + String(stepData[stepNum].notePlaying));
 		} else {
 			stepData[lifeCellToPlay].notePlaying = activeCellValues[lifeCellToPlay];
@@ -442,9 +523,37 @@ void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
 
 }
 
-uint8_t Sequencer::quantizePitch(uint8_t note, uint32_t scale, bool direction){
+uint8_t Sequencer::quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction){
+
 	uint8_t count = 0;
-	while ( (0b100000000000 >> (note % 12) ) & ~scale ) {
+	uint16_t scaleExpanded;
+
+	switch(scale){
+		case 1: scaleExpanded = CHROMATIC         ; break;
+		case 2: scaleExpanded = MAJOR             ; break;
+		case 3: scaleExpanded = MINOR             ; break;
+		case 4: scaleExpanded = MAJORMINOR        ; break;
+		case 5: scaleExpanded = PENTATONIC_MAJOR  ; break;
+		case 6: scaleExpanded = PENTATONIC_MINOR  ; break;
+		case 7: scaleExpanded = PENTATONIC_BLUES  ; break;
+		case 8: scaleExpanded = IONIAN            ; break;
+		case 9: scaleExpanded = AEOLIAN           ; break;
+		case 10: scaleExpanded = DORIAN           ; break;
+		case 11: scaleExpanded = MIXOLYDIAN       ; break;
+		case 12: scaleExpanded = PHRYGIAN         ; break;
+		case 13: scaleExpanded = LYDIAN           ; break;
+		case 14: scaleExpanded = LOCRIAN          ; break;
+		default: scaleExpanded = CHROMATIC				; break;
+	}
+
+	//Serial.println("Original Scale:\t" + String(scaleExpanded, BIN) );
+	for (int i=0; i< key; i++){
+		//bitwise rotation - 11 bits rotate to the right. Do it once for each scale degree
+		scaleExpanded = (scaleExpanded >> 1) | ((0b01 & scaleExpanded) << 11);
+	}
+	//Serial.println("Shifted to " + String(quantizeKey) + "\t" + String(scaleExpanded, BIN) );
+
+	while ( (0b100000000000 >> (note % 12) ) & ~scaleExpanded ) {
 		if (direction){
 			note += 1;
 		} else {
