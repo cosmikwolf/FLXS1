@@ -39,7 +39,7 @@ static const uint8_t CMD_SCROLL_OFF 		= 0x9E;//SSD1351
 static const uint8_t CMD_SCROLL_ON  		= 0x9F;//SSD1351
 static const uint8_t CMD_STARTLINE 			= 0xA1;//SSD1351
 static const uint8_t CMD_DISPLAYALLON 		= 0xA5;//SSD1351
-static const uint8_t CMD_DISPLAYALLOFF 		= 0xA4;//SSD1351
+static const uint8_t CMD_DISPLAYALLOFF 		= 0xA6;//SSD1351
 //static const uint8_t CMD_DINVOF  			= 0x20;//Display Inversion OFF
 //static const uint8_t CMD_PHASEPERIOD 		= 0x12;
 //static const uint8_t CMD_CONTRASTA 			= 0x81;
@@ -67,11 +67,11 @@ static const uint8_t CMD_SLEEPOFF   		= 0xAF;//SSD1351
 //static const uint8_t CMD_VSSTADRS	= 0x37;//Vertical Scrolling Start address				_CMD_VSCLLSA
 
 /*
-----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------	 
 REMAP 01 1 1 0 1 0 0
 7,6) 00:256colors 								*01:65K  						10:256k
 5)	 0:disable com split						*1:enable com split
-4)	 0:Scan from up to down 					1:Scan from bottom to up
+4)	 0:Scan from up to down 					1:Scan from bottom to up 
 3)	 reserved
 2)	 0:RGB										1:GBR										RGB
 1)	 0:RAM Column 0 ~ 127 maps to Col0~Col127	1:RAM Column 0 ~ 127 maps to Col127~Col0 (Column Address Remap)

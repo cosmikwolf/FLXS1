@@ -31,24 +31,21 @@
 #define	CHANNEL_ENVELOPE_MODE	 99
 #define	CHANNEL_STEP_MODE		   100
 #define	DELETE_MENU			    	 101
-#define	DEBUG_SCREEN		       127
-#define	CALIBRATION_MENU		   126
+#define	DEBUG_SCREEN		    	127
+#define	CALIBRATION_MENU		  126
 
 #define STEPMODE_PITCH0       0
 #define STEPMODE_PITCH1       9
 #define STEPMODE_PITCH2       10
 #define STEPMODE_PITCH3       11
+#define STEPMODE_GATELENGTH   1
 #define STEPMODE_VELOCITY     2
+#define STEPMODE_GATETYPE     8
 #define STEPMODE_GLIDE        12
 #define STEPMODE_TEMPO        3
 #define STEPMODE_STEPCOUNT    6
 #define STEPMODE_BEATCOUNT    7
 
-#define STEPMODE_GATELENGTH   1
-#define STEPMODE_GATETYPE     8
-#define STEPMODE_ARPTYPE      13
-#define STEPMODE_ARPSPEED     14
-#define STEPMODE_ARPOCTAVE     15
 
 
 #define DEBUG_PIN				    	 127
