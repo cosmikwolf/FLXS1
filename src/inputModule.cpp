@@ -107,6 +107,10 @@ void InputModule::loop(uint16_t frequency){
       patternSelectHandler();
       break;
 
+      case TEMPO_MENU:
+        tempoMenuHandler();
+      break;
+
       case TIMING_MENU:
       timingMenuInputHandler();
       break;
@@ -133,6 +137,12 @@ void InputModule::patternSelectHandler(){
       delay(10);
       changeState(CHANNEL_PITCH_MODE);
     }
+  }
+}
+
+void InputModule::tempoMenuHandler(){
+  if (midplaneGPIO->fell(3)){
+    extClock = !extClock;
   }
 }
 
@@ -179,7 +189,6 @@ void InputModule::globalMenuHandler(){
   } else if (midplaneGPIO->fell(3)){
     extClock = !extClock;
         changeState(CHANNEL_PITCH_MODE);
-
   }
 }
 
@@ -284,6 +293,7 @@ void InputModule::altButtonHandler(){
         case SW_PGDN:
           if (midplaneGPIO->pressed(SW_SHIFT)){
             changeState(TEMPO_MENU );
+            stepMode = STEPMODE_TEMPO;
           } else {
             notePage = positive_modulo(notePage - 1, 4);
           }

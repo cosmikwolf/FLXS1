@@ -2,6 +2,9 @@
 #include <SPI.h>
 #include "Sequencer.h"
 #include "global.h"
+#include <SSD_13XX.h>
+#include "_fonts/unborn_small.c"
+#include "_fonts/orbitron14.c"
 
 #ifndef _display_h_
 #define _display_h_
@@ -42,7 +45,7 @@ class DisplayModule
 
     uint8_t highlight;
     uint8_t previouslySelectedChannel;
-    OLED_SSD1351 oled = OLED_SSD1351(LCD_CS, LCD_DC, LCD_RST);
+    SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
     void initialize(Sequencer *sequenceArray);

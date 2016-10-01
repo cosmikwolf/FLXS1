@@ -69,12 +69,12 @@ void MasterClock::internalClockTick(){
 
 
 		for (int i=0; i<4; i++){
- 		// outputControl->allNotesOff(i);
- 		// noteData[i].noteOn = false;
- 		// noteData[i].noteOff = false;
+ 		 outputControl->allNotesOff(i);
+ 		 noteData[i].noteOn = false;
+ 		 noteData[i].noteOff = false;
  		 for (int n=0; n<MAX_STEPS_PER_SEQUENCE; n++){
- 		  // 	noteData[i].noteOffArray[n] = NULL;
- 			//	noteData[i].noteOnArray[n] = NULL;
+ 		   	noteData[i].noteOffArray[n] = NULL;
+ 				noteData[i].noteOnArray[n] = NULL;
  		 }
  	 }
 		outputControl->setClockOutput(HIGH);

@@ -3,10 +3,8 @@
 #include "midiModule.h"
 
 
-void MidiModule::midiSetup(midi::MidiInterface<HardwareSerial>* serialMidi, Sequencer *sequenceArray, NoteDatum *noteData){
-  serialMidi->begin(MIDI_CHANNEL_OMNI);
+void MidiModule::midiSetup( Sequencer *sequenceArray, NoteDatum *noteData){
   this->sequenceArray = sequenceArray;
-  this->serialMidi = serialMidi;
   this->noteData = noteData;
 
   beatPulseIndex = 0;

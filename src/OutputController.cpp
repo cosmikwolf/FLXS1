@@ -186,6 +186,8 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
 
+    ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
+
     if (outputMap(channel, RHEOCHANNELCV) == 0){
       mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to 0
     } else {
@@ -196,10 +198,11 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
   }
 
-  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
   serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
+  delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
   ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
+  delayMicroseconds(5);
 
   if (gate){
     backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage

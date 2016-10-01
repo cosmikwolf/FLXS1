@@ -10,7 +10,7 @@
 		_SPI_MULTITRANSFER
 		Spi burst multy byte transfer support (experimental)
 	*/
-	
+
 	#if defined(ESP8266)
 		#define _smCharType	uint8_t
 		#if defined(SPI_HAS_TRANSACTION)
@@ -20,7 +20,7 @@
 	#elif defined(__AVR__)
 		#include <avr/io.h>
 		#include <avr/pgmspace.h>
-		#define _FORCE_PROGMEM__	
+		#define _FORCE_PROGMEM__
 		#define _smCharType	unsigned char //uint8_t
 		#if defined(SPI_HAS_TRANSACTION)
 			static const uint32_t _common_max_SPI_speed 	= 8000000;
@@ -28,7 +28,7 @@
 		#define _SPI_MULTITRANSFER	//enable burst multy byte transfer
 	#elif defined(__SAM3X8E__)
 		#include <include/pio.h>
-		//#define _FORCE_PROGMEM__	
+		//#define _FORCE_PROGMEM__
 		//#define PROGMEM
 		//#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 		//#define pgm_read_word(addr) (*(const unsigned short *)(addr))
@@ -43,7 +43,7 @@
 		//#include <avr/pgmspace.h>
 		//#define _FORCE_PROGMEM__
 		#define _smCharType	unsigned char
-		static const uint32_t _common_max_SPI_speed 		= 30000000;
+		static const uint32_t _common_max_SPI_speed 		= 12000000;
 		#if !defined(__MKL26Z64__)
 			#define _SPI_MULTITRANSFER	//enable burst multy byte transfer
 		#endif

@@ -11,7 +11,7 @@
 
 class MidiModule {
 public:
-  void midiSetup(midi::MidiInterface<HardwareSerial>* serialMidi, Sequencer *sequenceArray, NoteDatum *noteData);
+  void midiSetup(Sequencer *sequenceArray, NoteDatum *noteData);
   void midiStopHandler();
   void midiNoteOffHandler(byte channel, byte note, byte velocity);
   void midiNoteOnHandler(byte channel, byte note, byte velocity);
@@ -23,9 +23,8 @@ private:
   uint8_t beatPulseIndex; //keeps track of which midi clock pulse the beat comes on.
   elapsedMicros pulseTimer;
   boolean firstRun;
-  
+
   Sequencer *sequenceArray;
-  midi::MidiInterface<HardwareSerial>* serialMidi;
   NoteDatum *noteData;
 };
 #endif

@@ -550,8 +550,19 @@ void DisplayModule::sequenceMenuDisplay(){
 void DisplayModule::tempoMenuDisplay(){
   uint8_t previousHighlight = highlight;
 
+  highlight = 1;
+
   displayElement[0] = strdup("TEMPO MENU");
   renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  background, foreground);
+
+  if (extClock) {
+    displayElement[1] = strdup("MIDI");
+  } else {
+    sprintf(buf, "%d bpm", int(tempoX100/100) );
+    displayElement[1] = strdup(buf);
+  };
+
+  renderOnce_StringBox(1, highlight, previousHighlight,  0,  0, 128, 16, false, 0,  background, foreground);
 
 }
 

@@ -15,7 +15,7 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kClockInterval 600 
+#define kClockInterval 600
 #define kMosiPin 11
 #define kSpiClockPin 13
 
@@ -30,19 +30,19 @@ AudioAnalyzeNoteFrequency     notefreq;
 AudioConnection               patchCord0(adc, 0 , notefreq, 0);
 elapsedMillis noteFreqTimer;
 
-MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, serialMidi);
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
 uint8_t masterLooptime;
 elapsedMicros masterLoopTimer;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(kSerialSpeed);
   //waiting for serial to begin
   delay(1500);
 
   printHeapStats();
-  AudioMemory(27);
-  notefreq.begin(.15);
+  //AudioMemory(27);
+  //notefreq.begin(.15);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
@@ -50,14 +50,16 @@ void setup() {
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
 
-  midiControl.midiSetup(&serialMidi, sequence, noteData);
+  serialMidi.begin(MIDI_CHANNEL_OMNI);
 
-//	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
-//  serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
-//  serialMidi.setHandleNoteOff( midiNoteOffHandlerWrapper );
-//  serialMidi.setHandleStart( midiStartContinueHandlerWrapper );
-//  serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
-//  serialMidi.setHandleStop(midiStopHandlerWrapper);
+  midiControl.midiSetup(sequence, noteData);
+
+	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
+  serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
+  serialMidi.setHandleNoteOff( midiNoteOffHandlerWrapper );
+  serialMidi.setHandleStart( midiStartContinueHandlerWrapper );
+  serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
+  serialMidi.setHandleStop(midiStopHandlerWrapper);
 
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
