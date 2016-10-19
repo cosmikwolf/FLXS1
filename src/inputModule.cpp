@@ -67,9 +67,7 @@ void InputModule::loop(uint16_t frequency){
     knobPrevious = knobRead;
     knobRead = knob.read()/-2  ;
     knobChange = knobRead - knobPrevious;
-
     midplaneGPIO->update();
-
 
     //we always want the alt (non matrix) buttons to behave the same way
     altButtonHandler();
@@ -141,9 +139,30 @@ void InputModule::patternSelectHandler(){
 }
 
 void InputModule::tempoMenuHandler(){
-  if (midplaneGPIO->fell(3)){
-    extClock = !extClock;
+
+  if(knobChange){
+    switch (stepMode){
+      case STEPMODE_TEMPO:
+        if (tempoX100 > 100100) {
+          tempoX100 = 100100;
+        }
+        tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
+        if(tempoX100 == 0){
+          tempoX100 = 100;
+        }
+        clockMaster->changeTempo(tempoX100);
+      break;
+
+      case STEPMODE_EXTCLOCK:
+        if (knobChange > 0){
+          extClock = 1;
+        } else {
+          extClock = 0;
+        }
+      break;
+    }
   }
+
 }
 
 void InputModule::sequenceMenuHandler(){
@@ -192,6 +211,13 @@ void InputModule::globalMenuHandler(){
   }
 }
 
+void InputModule::channelButtonShiftHandler(uint8_t channel){
+  if (selectedChannel != channel){
+    selectedChannel = channel;
+  }
+  changeState(CHANNEL_TUNER_MODE);
+};
+
 void InputModule::channelButtonHandler(uint8_t channel){
   uint8_t previous = patternChannelSelector;
 
@@ -216,7 +242,7 @@ void InputModule::channelButtonHandler(uint8_t channel){
     break;
 
     case CHANNEL_GATE_MODE:
-      changeState(CHANNEL_ENVELOPE_MODE);
+      changeState(CHANNEL_PITCH_MODE);
     break;
 
     case CHANNEL_ENVELOPE_MODE:
@@ -240,19 +266,35 @@ void InputModule::altButtonHandler(){
       switch (i){
         // left row bottom up
         case SW_M0:
-          channelButtonHandler(0);
+          if (midplaneGPIO->pressed(SW_SHIFT)){
+            channelButtonShiftHandler(0);
+          } else {
+            channelButtonHandler(0);
+          }
         break;
 
         case SW_M1:
-          channelButtonHandler(1);
+          if (midplaneGPIO->pressed(SW_SHIFT)){
+            channelButtonShiftHandler(1);
+          } else {
+            channelButtonHandler(1);
+          }
         break;
 
         case SW_M2:
-          channelButtonHandler(2);
+          if (midplaneGPIO->pressed(SW_SHIFT)){
+            channelButtonShiftHandler(2);
+          } else {
+            channelButtonHandler(2);
+          }
         break;
 
         case SW_M3:
-          channelButtonHandler(3);
+          if (midplaneGPIO->pressed(SW_SHIFT)){
+            channelButtonShiftHandler(3);
+          } else {
+            channelButtonHandler(3);
+          }
         break;
 
         case SW_PATTERN:
@@ -291,9 +333,18 @@ void InputModule::altButtonHandler(){
         break;
 
         case SW_PGDN:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            changeState(TEMPO_MENU );
+          if (stepMode == STEPMODE_TEMPO){
+            stepMode = STEPMODE_EXTCLOCK;
+            break;
+          } else if (stepMode == STEPMODE_EXTCLOCK){
             stepMode = STEPMODE_TEMPO;
+            break;
+          }
+
+          if (midplaneGPIO->pressed(SW_SHIFT)){
+            changeState(TEMPO_MENU);
+            stepMode = STEPMODE_TEMPO;
+            knobBuffer = tempoX100 - knobRead;
           } else {
             notePage = positive_modulo(notePage - 1, 4);
           }
@@ -340,6 +391,48 @@ void InputModule::altButtonHandler(){
   // selectedStep == getNote(i) means that the user pressed the button that is selected.
     uint8_t chrd;
 
+    for (int i=0; i < 16; i++){
+      if (midplaneGPIO->fell(i)){
+        if(selectedStep == getNote(i)){
+          // if currentstep is already selected, change stepMode
+          stepMode++;
+          switch( stepModeOrder[CHANNEL_PITCH_MODE_ORDER][stepMode] ){
+            case STEPMODE_GATELENGTH:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateLength - knobRead;
+              break;
+            case STEPMODE_CHORD:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].chord - knobRead;
+              break;
+            case STEPMODE_GLIDE:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].glide - knobRead;
+              break;
+            case STEPMODE_PITCH1:
+              knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 1) - knobRead;
+              break;
+            case STEPMODE_PITCH2:
+              knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 2) - knobRead;
+              break;
+            case STEPMODE_PITCH3:
+              knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) - knobRead;
+              break;
+            case STEPMODE_TEMPO:
+              knobBuffer = tempoX100 - knobRead;
+              break;
+            case STEPMODE_STEPCOUNT:
+              knobBuffer = sequenceArray[selectedChannel].stepCount - knobRead;
+              break;
+            case STEPMODE_BEATCOUNT:
+              knobBuffer =  sequenceArray[selectedChannel].beatCount - knobRead;
+              break;
+          }
+        } else {
+          stepMode = STEPMODE_PITCH0;
+          selectedStep = getNote(i);
+          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
+        }
+      }
+    }
+/*
     for (int i=0; i < 16; i++){
       if (midplaneGPIO->fell(i)){
         if(selectedStep == getNote(i) && stepMode == STEPMODE_PITCH0){
@@ -389,11 +482,15 @@ void InputModule::altButtonHandler(){
         }
       }
     }
-
-
+*/
   //  if (knobRead != knobPrev) {
     if (knobChange){
       //knobPrev = knobRead;
+
+      if (midplaneGPIO->pressed(selectedStep%16) ){
+
+      }
+
       switch (stepMode) {
         case STEPMODE_PITCH0:
       // just change the note
@@ -458,15 +555,16 @@ void InputModule::altButtonHandler(){
         break;
 
         case STEPMODE_TEMPO:
-        if (tempoX100 > 100100) {
-          tempoX100 = 100100;
-        }
-        tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
-        if(tempoX100 == 0){
-          tempoX100 = 100;
-        }
-        clockMaster->changeTempo(tempoX100);
+          if (tempoX100 > 100100) {
+            tempoX100 = 100100;
+          }
+          tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
+          if(tempoX100 == 0){
+            tempoX100 = 100;
+          }
+          clockMaster->changeTempo(tempoX100);
         break;
+
         case STEPMODE_STEPCOUNT:
           sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
 

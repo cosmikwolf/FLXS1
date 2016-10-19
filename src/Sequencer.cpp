@@ -118,11 +118,13 @@ void Sequencer::calculateStepTimers(){
 	uint32_t stepOffTimeCounter = 0;
 	stepLength = beatLength*beatCount/stepCount;
 
+	//beatOffset
+	//stepLength = beatLength/stepDivider*stepCount;
+
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 		stepData[stepNum].stepOffTime = stepData[stepNum].gateLength*stepLength;
 		stepData[stepNum].beat = floor(stepOffTimeCounter / beatLength);
 		stepOffTimeCounter = stepOffTimeCounter + stepData[stepNum].stepOffTime;
-
 		stepData[stepNum].offset = stepNum*stepLength;
 	}
 
@@ -137,7 +139,6 @@ void Sequencer::clockStart(elapsedMicros startTime){
 void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 	// this is sent every 24 pulses received from midi clock
 	// and also when a play or continue command is received.
-
 	this->beatLength = beatLength;
 	calculateStepTimers();
 	beatTimer = 0;
@@ -145,41 +146,15 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 
 	if(firstBeat){
 		activeStep = 0;
-		beatTracker = 0;
 		firstBeat = false;
-	} else {
-		//beatTracker= positive_modulo(beatTracker + 1, beatCount);
-		beatTracker = (beatTracker + 1) % beatCount;
 	}
-
-	if (beatTracker == 0) {
-		for(int i = 0; i < stepCount; i++){
-			// reset the note status for notes that have been played.
-			// leave notes that have not been turned off yet.
-			//  if (stepData[i].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-			//    stepData[i].noteStatus = 0;
-			//  }
-		}
-		activeStep = 0;
-		if(channel == 1){
-			// Serial.println("Resetting Sequence Timer " + String(sequenceTimer));
-		}
-		sequenceTimer = 0;
-		// We are resetting the note status when the sequenceTimer is no longer larger than
-		// the offset value. This means that runSequence needs to run at least once before
-		// it can reset the note statuses. For the first note, that means it wont ever reset
-		// so we must reset it manually here.
-		stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
-	}
-
-
+	
 };
 
 void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 
 	clearNoteData(noteData);
 	incrementActiveStep();
-
 	sequenceModeStandardStep(noteData);
 
 }
@@ -187,7 +162,6 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 void Sequencer::incrementActiveStep(){
 	// increment active step taking avg jitter into account
 	int32_t sequenceTimerInt = sequenceTimer;
-
 	int sequenceAvgJitter = 0;
 	for(int i = 0; i < 3; i++){
 		sequenceAvgJitter += sequenceJitter[i];
@@ -200,18 +174,11 @@ void Sequencer::incrementActiveStep(){
 		}
 		sequenceJitter[0] = sequenceTimerInt - (activeStep+1)*stepLength;
 
-		if (activeStep < stepCount -1 ){
-			activeStep++;
-
-			if (channel == 0) {
-	//			Serial.println("activeStep: " + String(activeStep));
-			}
-
-		/*	if (instType == 1){
-				stepData[activeStep].stepTimer = 0;
-				lifeCellToPlay = 0;
-				lifeCellsPlayed = 0;
-			}*/
+		activeStep++;
+		if (activeStep >= stepCount ) {
+			activeStep = 0;
+			sequenceTimer = 0;
+			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 		}
 	}
 }

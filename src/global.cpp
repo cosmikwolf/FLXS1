@@ -12,6 +12,8 @@ uint8_t previousState = 0;      // Display module + LED moduleextern
 uint8_t selectedChannel = 0;
 uint8_t selectedStep;
 uint8_t patternChannelSelector = 0b1111;
+float   probability;
+float   frequency;
 
 boolean extClock = false;
 boolean debugBoolean = false;
@@ -33,6 +35,12 @@ uint16_t calibrationBuffer = 0;
 //midi
 elapsedMicros blipTimer;
 elapsedMicros testTimer;
+
+uint8_t stepModeOrder[1][MAX_STEPMODE_COUNT] = {
+  {
+    STEPMODE_PITCH0,
+    STEPMODE_CHORD} // CHANNEL_PITCH_MODE_ORDER  0
+};
 
 
 uint8_t chordArray[27][3] = {
@@ -78,6 +86,7 @@ int positive_modulo(int i, int n) {
 uint8_t getNote(uint8_t index){
 	return index + notePage * 16;
 }
+
 
 uint32_t FreeRam2(){ // for Teensy 3.0
 	uint32_t stackTop;

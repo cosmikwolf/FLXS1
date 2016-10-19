@@ -33,6 +33,7 @@ class TimeController {
     MidiModule *midiControl;
     midi::MidiInterface<HardwareSerial>* serialMidi;
     Sequencer *sequencerArray;
+
 };
 //extern Sequencer sequence[4];
 

@@ -63,6 +63,7 @@ public:
   void patternSelectHandler();
   //void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
+  void channelButtonShiftHandler(uint8_t channel);
   void altButtonHandler();
   void stepModeMatrixHandler();
 
@@ -83,6 +84,7 @@ public:
   void resetKnobValues();
   void changeState(uint8_t state);
 
+
   // Encoder vars
   int8_t knobRead;
   int8_t knobBuffer;
@@ -102,7 +104,6 @@ private:
   Sequencer *sequenceArray;
   FlashMemory *saveFile;
   elapsedMicros inputTimer;
-
 };
 
 #endif

@@ -7,9 +7,9 @@
 #define LED_FREQUENCY 30000
 
 
-TimeController::TimeController(){};
+TimeController::TimeController(){ };
 
-void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray) {
+void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray ) {
 
 
 	Serial.println("Initializing TimeController");

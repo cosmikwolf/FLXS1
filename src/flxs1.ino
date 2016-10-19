@@ -41,8 +41,9 @@ void setup() {
   delay(1500);
 
   printHeapStats();
-  //AudioMemory(27);
-  //notefreq.begin(.15);
+
+  AudioMemory(25);
+  notefreq.begin(.15);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
@@ -84,25 +85,30 @@ void setup() {
   digitalWrite(24, LOW);
   printHeapStats();
   Serial.println("Freeram: " + String(FreeRam2()));
+
+  pinMode(1,OUTPUT);
+  digitalWrite(1, HIGH);
+
 }
 
 void loop() {
-  digitalWriteFast(26, HIGH);
+  //digitalWriteFast(26, HIGH);
   timeControl.runLoopHandler();
-  digitalWriteFast(26, LOW);
+  //digitalWriteFast(26, LOW);
 
 /*  if (!playing){
     if (notefreq.available()) {
     //  Serial
-        float note = notefreq.read();
-        float prob = notefreq.probability();
-        Serial.println("Note: "+ String(note) + " | Probability: " + String(prob) + " mem use max: " + String(AudioMemoryUsageMax()));
+              frequency = notefreq.read();
+              probability = notefreq.probability();
+        //      Serial.println("Note: "+ String(frequency) + " | Probability: " + String(probability) + " mem use max: " + String(AudioMemoryUsageMax()));
     }
   }
+  */
   //if (noteFreqTimer > 10000){
     //noteFreqTimer = 0;
 //  }
-*/
+
 }
 
 void printHeapStats()

@@ -25,7 +25,7 @@
 #define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
 #define PINK            0xF81F
 
-#define MAX_DISPLAY_ELEMENTS 20
+#define MAX_DISPLAY_ELEMENTS 22
 
 #define LCD_DC        10//out (SSD1351/sharp refresh todo) OK
 #define LCD_CS        6//out (SSD1351/sharp) OK
@@ -62,6 +62,8 @@ class DisplayModule
     void channelEnvelopeMenuDisplay(char *buf);
     void channelStepMenuDisplay(char *buf);
 
+    void channelTunerDisplay(char *buf);
+
     void sequenceMenuDisplay();
     void globalMenuDisplay();
     void tempoMenuDisplay();
@@ -75,10 +77,25 @@ class DisplayModule
     uint16_t foreground, background;
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
+    //void renderOnce_StringBox(Element element);
 private:
 
     Sequencer *sequenceArray;
 
+    struct element {
+      uint8_t index;
+      uint8_t highlight;
+      uint8_t previousHighlight;
+      int16_t x;
+      int16_t y;
+      int16_t w;
+      int16_t h;
+      bool border;
+      uint8_t textSize;
+      uint16_t color;
+      uint16_t bgColor;
+    };
+    typedef struct element Element;
 
     const char* midiNotes[128] = {
     "C -2","C#-2","D -2","D#-2","E -2","F -2","F#-2","G -2","G#-2","A -2","A#-2","B -2",

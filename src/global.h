@@ -30,6 +30,7 @@
 #define	CHANNEL_GATE_MODE		   98
 #define	CHANNEL_ENVELOPE_MODE	 99
 #define	CHANNEL_STEP_MODE		   100
+#define	CHANNEL_TUNER_MODE		 102
 #define	DELETE_MENU			    	 101
 #define	DEBUG_SCREEN		       127
 #define	CALIBRATION_MENU		   126
@@ -61,6 +62,14 @@
 #define STEPMODE_QUANTIZESCALE   18
 
 #define STEPMODE_TEMPO          6
+#define STEPMODE_EXTCLOCK       7
+
+// for stepmode order
+#define MAX_STEPMODE_COUNT 10
+#define CHANNEL_PITCH_MODE_ORDER  0
+#define CHANNEL_GATE_MODE_ORDER   1
+#define CHANNEL_TUNER_MODE_ORDER  2
+
 
 #define DEBUG_PIN				    	 127
 #define SD_CS_PIN				    	  15
@@ -101,6 +110,9 @@ extern uint8_t notePage;
 extern uint8_t currentState;       // Display module + LED module
 extern uint8_t previousState;      // Display module + LED moduleextern
 
+extern float   probability;
+extern float   frequency;
+
 extern uint8_t selectedChannel;
 extern uint8_t selectedStep;
 extern uint8_t patternChannelSelector;
@@ -113,6 +125,9 @@ extern uint8_t currentPattern;
 extern uint8_t queuePattern;
 extern boolean playing;
 extern uint8_t chordArray[27][3];
+
+extern uint8_t stepModeOrder[][MAX_STEPMODE_COUNT];
+
 // MasterClock
 extern uint8_t masterPulseCount;
 extern boolean wasPlaying;

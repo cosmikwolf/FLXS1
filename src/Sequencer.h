@@ -41,15 +41,14 @@ class Sequencer
 
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		boolean  	monophonic;
-		uint8_t  	beatTracker;		// keeps track of how long the sequence has been playing
 		uint8_t	 	activeStep;
     uint32_t 	beatLength;
 		uint32_t 	stepLength;		// length of each step in mcs
-		
+
 		uint32_t 	tempoX100;
 		boolean  	tempoPulse;
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
-		int16_t 	sequenceJitter[10] = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
+		int16_t 	sequenceJitter[9];
 
 		uint8_t		lifeCellToPlay;
 		uint8_t		lifeCellsPlayed;
