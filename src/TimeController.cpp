@@ -34,8 +34,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	buttonIo.changeState(CHANNEL_PITCH_MODE);
 
 	saveFile.initialize(sequencerArray);
-	saveFile.loadPattern(0, 0b1111);
-
+	//saveFile.loadPattern(0, 0b1111);
+	saveFile.deleteSaveFile();
 /*
 	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
 	delay(200);

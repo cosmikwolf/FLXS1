@@ -427,7 +427,7 @@ void InputModule::altButtonHandler(){
             case STEPMODE_ARPTYPE:
               knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpType - knobRead;
               break;
-            case STEPMODE_BEATDIV:
+            case STEPMODE_ARPSPEED:
               knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpeed - knobRead;
               break;
             case STEPMODE_ARPOCTAVE:
@@ -550,11 +550,11 @@ void InputModule::channelGateModeInputHandler(){
           break;
 
           case STEPMODE_ARPTYPE:
-            stepMode = STEPMODE_BEATDIV;
+            stepMode = STEPMODE_ARPSPEED;
             knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpeed - knobRead;
           break;
 
-          case STEPMODE_BEATDIV:
+          case STEPMODE_ARPSPEED:
             stepMode = STEPMODE_ARPOCTAVE;
             knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpOctave - knobRead;
           break;
@@ -592,7 +592,7 @@ void InputModule::channelGateModeInputHandler(){
       case STEPMODE_ARPTYPE:
       sequenceArray[selectedChannel].stepData[selectedStep].arpType=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 6);
       break;
-      case STEPMODE_BEATDIV:
+      case STEPMODE_ARPSPEED:
       sequenceArray[selectedChannel].stepData[selectedStep].arpSpeed=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpeed + knobChange, 129) ;
       break;
       case STEPMODE_ARPOCTAVE:

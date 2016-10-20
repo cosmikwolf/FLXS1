@@ -332,7 +332,7 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   displayElement[19] = strdup(buf);
 
   displayElement[20] = strdup("oct:");
-  sprintf(buf, "%d oct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
+  sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
   displayElement[21] = strdup(buf);
 
   sprintf(buf, "stpmd:%d", stepMode);

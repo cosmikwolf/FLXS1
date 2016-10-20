@@ -42,7 +42,7 @@
 #define STEPMODE_GATETYPE     3
 #define STEPMODE_GLIDE        4
 #define STEPMODE_ARPTYPE      5
-#define STEPMODE_BEATDIV      6
+#define STEPMODE_ARPSPEED      6
 #define STEPMODE_ARPOCTAVE    7
 #define STEPMODE_STEPCOUNT    8
 #define STEPMODE_BEATCOUNT    9
@@ -55,7 +55,7 @@
 //#define STEPMODE_GATELENGTH   10
 //#define STEPMODE_GATETYPE     11
 //#define STEPMODE_ARPTYPE      12
-//#define STEPMODE_BEATDIV     13
+//#define STEPMODE_ARPSPEED     13
 //#define STEPMODE_ARPOCTAVE    14
 #define STEPMODE_ARPCOUNT     15
 

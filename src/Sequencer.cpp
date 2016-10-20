@@ -25,7 +25,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->beatCount = beatCount;
 	this->tempoX100 = tempoX100;
 	this->sequenceTimer = 0;
-	this->volume = 100;
 	//for (int i=0; i < stepCount; i++){
 	// stepData[i].gateLength = 1;
 	//  stepData[i].velocity = 127;
@@ -33,7 +32,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	//};
 
 	for (int i=0; i<MAX_STEPS_PER_SEQUENCE; i++){
-		stepData[i].beat = 0;
 		stepData[i].offset = 0;
 		stepData[i].noteStatus = NOTPLAYING_NOTQUEUED;
 		stepData[i].notePlaying = 0;
@@ -52,8 +50,6 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 	this->beatCount = 4;
 	this->quantizeKey = 0;
 	this->quantizeScale = 0;
-	this->volume = 100;
-	this->bank = 0;
 	this->patternIndex = index;
 	this->channel = ch;
 
@@ -123,7 +119,7 @@ void Sequencer::calculateStepTimers(){
 
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 		stepData[stepNum].stepOffTime = stepData[stepNum].gateLength*stepLength;
-		stepData[stepNum].beat = floor(stepOffTimeCounter / beatLength);
+		//stepData[stepNum].beat = floor(stepOffTimeCounter / beatLength);
 		stepOffTimeCounter = stepOffTimeCounter + stepData[stepNum].stepOffTime;
 		stepData[stepNum].offset = stepNum*stepLength;
 	}
@@ -148,7 +144,7 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 		activeStep = 0;
 		firstBeat = false;
 	}
-	
+
 };
 
 void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
@@ -162,17 +158,8 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 void Sequencer::incrementActiveStep(){
 	// increment active step taking avg jitter into account
 	int32_t sequenceTimerInt = sequenceTimer;
-	int sequenceAvgJitter = 0;
-	for(int i = 0; i < 3; i++){
-		sequenceAvgJitter += sequenceJitter[i];
-	}
-	sequenceAvgJitter = sequenceAvgJitter / 3;
 
-	if(sequenceTimerInt > (activeStep+1)*stepLength - sequenceAvgJitter/2 ){
-		for(int i = 3; i > 1; i--){
-			sequenceJitter[i] = sequenceJitter[i-1];
-		}
-		sequenceJitter[0] = sequenceTimerInt - (activeStep+1)*stepLength;
+	if(sequenceTimerInt > (activeStep+1)*stepLength ){
 
 		activeStep++;
 		if (activeStep >= stepCount ) {

@@ -48,8 +48,6 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   root["beatCount"]     = sequenceArray[channel].beatCount;
   root["quantizeKey"]   = sequenceArray[channel].quantizeKey;
   root["quantizeScale"] = sequenceArray[channel].quantizeScale;
-  root["volume"]        = sequenceArray[channel].volume;
-  root["bank"]          = sequenceArray[channel].bank;
   root["channel"]       = sequenceArray[channel].channel;
   root["patternIndex"]  = sequenceArray[channel].patternIndex;
 
@@ -152,8 +150,6 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
    sequenceArray[channel].beatCount    = jsonReader["beatCount"];
    sequenceArray[channel].quantizeKey  = jsonReader["quantizeKey"];
    sequenceArray[channel].quantizeScale = jsonReader["quantizeScale"];
-   sequenceArray[channel].volume       = jsonReader["volume"];
-   sequenceArray[channel].bank         = jsonReader["bank"];
    sequenceArray[channel].channel      = jsonReader["channel"];
    sequenceArray[channel].patternIndex = jsonReader["patternIndex"];
 
