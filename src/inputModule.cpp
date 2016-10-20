@@ -387,7 +387,6 @@ void InputModule::altButtonHandler(){
 
 
   void InputModule::channelPitchModeInputHandler(){
-  //  saveTimer = 0;
   // selectedStep == getNote(i) means that the user pressed the button that is selected.
     uint8_t chrd;
 
@@ -395,10 +394,14 @@ void InputModule::altButtonHandler(){
       if (midplaneGPIO->fell(i)){
         if(selectedStep == getNote(i)){
           // if currentstep is already selected, change stepMode
-          stepMode++;
-          switch( stepModeOrder[CHANNEL_PITCH_MODE_ORDER][stepMode] ){
+          stepMode = (stepMode + 1) % 10;
+
+          switch( stepMode ){
             case STEPMODE_GATELENGTH:
               knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateLength - knobRead;
+              break;
+            case STEPMODE_GATETYPE:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
               break;
             case STEPMODE_CHORD:
               knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].chord - knobRead;
@@ -415,178 +418,121 @@ void InputModule::altButtonHandler(){
             case STEPMODE_PITCH3:
               knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) - knobRead;
               break;
-            case STEPMODE_TEMPO:
-              knobBuffer = tempoX100 - knobRead;
-              break;
             case STEPMODE_STEPCOUNT:
               knobBuffer = sequenceArray[selectedChannel].stepCount - knobRead;
               break;
             case STEPMODE_BEATCOUNT:
               knobBuffer =  sequenceArray[selectedChannel].beatCount - knobRead;
               break;
+            case STEPMODE_ARPTYPE:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpType - knobRead;
+              break;
+            case STEPMODE_BEATDIV:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpeed - knobRead;
+              break;
+            case STEPMODE_ARPOCTAVE:
+              knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpOctave - knobRead;
+              break;
           }
         } else {
-          stepMode = STEPMODE_PITCH0;
+          stepMode = 0;
           selectedStep = getNote(i);
           knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
         }
       }
     }
-/*
-    for (int i=0; i < 16; i++){
-      if (midplaneGPIO->fell(i)){
-        if(selectedStep == getNote(i) && stepMode == STEPMODE_PITCH0){
-          stepMode = STEPMODE_GATELENGTH; // change the step length
-          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateLength - knobRead;
-         // stepModeBuffer = sequenceArray[selectedChannel].stepData[i].gateLength;
-    //    } else if (selectedStep == i && stepMode != 0){
-    //      stepMode = positive_modulo(stepMode + 1, 3); // change the step length
-    //   //   knob1.write(0);
-    //   //   stepModeBuffer = sequenceArray[selectedChannel].stepData[i].gateType;
-    //      knobBuffer = sequenceArray[selectedChannel].stepData[i].gateType - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_GATELENGTH){
-          stepMode = STEPMODE_CHORD;
-          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].chord - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_CHORD){
-          stepMode = STEPMODE_GLIDE;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].glide - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_GLIDE) {
-          stepMode = STEPMODE_PITCH1;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 1) - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_PITCH1) {
-          stepMode = STEPMODE_PITCH2;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 2) - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_PITCH2) {
-          stepMode = STEPMODE_PITCH3;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_PITCH3) {
-          stepMode = STEPMODE_TEMPO;
-          selectedStep = getNote(i);
-          knobBuffer = tempoX100 - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_TEMPO) {
-          stepMode = STEPMODE_STEPCOUNT;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].stepCount - knobRead;
-        } else if (selectedStep == getNote(i) && stepMode == STEPMODE_STEPCOUNT) {
-          stepMode = STEPMODE_BEATCOUNT;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].beatCount - knobRead;
-        } else {
-          stepMode = STEPMODE_PITCH0;
-          selectedStep = getNote(i);
-          knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
-        }
-      }
-    }
-*/
-  //  if (knobRead != knobPrev) {
+
     if (knobChange){
       //knobPrev = knobRead;
 
       if (midplaneGPIO->pressed(selectedStep%16) ){
+        stepMode = (stepMode + knobChange) % 10;
+      } else {
 
-      }
-
-      switch (stepMode) {
-        case STEPMODE_PITCH0:
-      // just change the note
-        if (knobRead + sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) < 0){
-          // you can turn off a note by turning the value to 0
-          // turn off a note by setting gate type and pitch to 0
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, 0, 0);
-          knob.write(4);
-        } else {
-          if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-            // if a note is not active, turn it on and give it a length.
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
-            sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
+        switch (stepMode) {
+          case STEPMODE_PITCH0:
+        // just change the note
+          if (knobRead + sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) < 0){
+            // you can turn off a note by turning the value to 0
+            // turn off a note by setting gate type and pitch to 0
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, 0, 0);
+            knob.write(4);
+          } else {
+            if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+              // if a note is not active, turn it on and give it a length.
+              sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
+              sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
+            }
+            // and finally set the new step value!
+            // monophonic so pitch[0] only
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 127), 0);
           }
-          // and finally set the new step value!
-          // monophonic so pitch[0] only
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 127), 0);
+          break;
+
+          case STEPMODE_PITCH1:
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 1) + knobChange, 1), 72);
+          break;
+
+          case STEPMODE_PITCH2:
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 2) + knobChange, 2), 72);
+          break;
+
+          case STEPMODE_PITCH3:
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) + knobChange, 3), 72);
+          break;
+
+          case STEPMODE_CHORD:
+            chrd = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].chord + knobChange, 27);
+            sequenceArray[selectedChannel].stepData[selectedStep].chord = chrd;
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][0],1);
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][1],2);
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][2],3);
+          break;
+
+          case STEPMODE_GATELENGTH:
+      // change the gate type
+          if ((sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
+          } else if(knobChange > 0) {
+            if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+              sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
+            }
+          }
+
+          if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
+            sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 127);
+          }
+
+          break;
+
+          case STEPMODE_STEPCOUNT:
+            sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
+
+            if (sequenceArray[selectedChannel].stepCount == 0) {
+              sequenceArray[selectedChannel].stepCount = 64;
+            }
+            break;
+
+          case STEPMODE_BEATCOUNT:
+            sequenceArray[selectedChannel].beatCount = positive_modulo(sequenceArray[selectedChannel].beatCount + knobChange, 129);
+            if (sequenceArray[selectedChannel].beatCount < 1){
+              sequenceArray[selectedChannel].beatCount = 1;
+            }
+            break;
+
+          case STEPMODE_GATETYPE:
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 4);
+            break;
+
+          case STEPMODE_GLIDE:
+            sequenceArray[selectedChannel].stepData[selectedStep].glide =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].glide + knobChange, 128);
+            break;
+
+          case STEPMODE_ARPTYPE:
+            sequenceArray[selectedChannel].stepData[selectedStep].arpType = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 6);
+          break;
         }
-        break;
-
-        case STEPMODE_PITCH1:
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 1) + knobChange, 1), 72);
-        break;
-
-        case STEPMODE_PITCH2:
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 2) + knobChange, 2), 72);
-        break;
-
-        case STEPMODE_PITCH3:
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 3) + knobChange, 3), 72);
-        break;
-
-        case STEPMODE_CHORD:
-          chrd = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].chord + knobChange, 27);
-          sequenceArray[selectedChannel].stepData[selectedStep].chord = chrd;
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][0],1);
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][1],2);
-          sequenceArray[selectedChannel].setStepPitch(selectedStep, chordArray[chrd][2],3);
-
-        break;
-
-        case STEPMODE_GATELENGTH:
-    // change the gate type
-        if ((sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
-        } else if(knobChange > 0) {
-          if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
-          }
-        }
-
-        if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
-          sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 127);
-        }
-
-        break;
-
-        case STEPMODE_VELOCITY:
-      // change length of gate
-        sequenceArray[selectedChannel].stepData[selectedStep].velocity = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].velocity + knobChange, 128 );
-        break;
-
-        case STEPMODE_TEMPO:
-          if (tempoX100 > 100100) {
-            tempoX100 = 100100;
-          }
-          tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
-          if(tempoX100 == 0){
-            tempoX100 = 100;
-          }
-          clockMaster->changeTempo(tempoX100);
-        break;
-
-        case STEPMODE_STEPCOUNT:
-          sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
-
-          if (sequenceArray[selectedChannel].stepCount == 0) {
-            sequenceArray[selectedChannel].stepCount = 64;
-          }
-          break;
-
-        case STEPMODE_BEATCOUNT:
-          sequenceArray[selectedChannel].beatCount = positive_modulo(sequenceArray[selectedChannel].beatCount + knobChange, 129);
-          if (sequenceArray[selectedChannel].beatCount < 1){
-            sequenceArray[selectedChannel].beatCount = 1;
-          }
-          break;
-
-        case STEPMODE_GATETYPE:
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 64);
-          break;
-
-        case STEPMODE_GLIDE:
-          sequenceArray[selectedChannel].stepData[selectedStep].glide =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].glide + knobChange, 128);
-          break;
       }
     }
 };
@@ -604,11 +550,11 @@ void InputModule::channelGateModeInputHandler(){
           break;
 
           case STEPMODE_ARPTYPE:
-            stepMode = STEPMODE_ARPSPEED;
+            stepMode = STEPMODE_BEATDIV;
             knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpeed - knobRead;
           break;
 
-          case STEPMODE_ARPSPEED:
+          case STEPMODE_BEATDIV:
             stepMode = STEPMODE_ARPOCTAVE;
             knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpOctave - knobRead;
           break;
@@ -646,7 +592,7 @@ void InputModule::channelGateModeInputHandler(){
       case STEPMODE_ARPTYPE:
       sequenceArray[selectedChannel].stepData[selectedStep].arpType=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 6);
       break;
-      case STEPMODE_ARPSPEED:
+      case STEPMODE_BEATDIV:
       sequenceArray[selectedChannel].stepData[selectedStep].arpSpeed=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpeed + knobChange, 129) ;
       break;
       case STEPMODE_ARPOCTAVE:

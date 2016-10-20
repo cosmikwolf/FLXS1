@@ -24,8 +24,9 @@
 #define ORANGE          0xFD20      /* 255, 165,   0 */
 #define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
 #define PINK            0xF81F
+#define DARKPURPLE 0x48B3
 
-#define MAX_DISPLAY_ELEMENTS 22
+#define MAX_DISPLAY_ELEMENTS 30
 
 #define LCD_DC        10//out (SSD1351/sharp refresh todo) OK
 #define LCD_CS        6//out (SSD1351/sharp) OK

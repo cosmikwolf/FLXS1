@@ -36,12 +36,6 @@ uint16_t calibrationBuffer = 0;
 elapsedMicros blipTimer;
 elapsedMicros testTimer;
 
-uint8_t stepModeOrder[1][MAX_STEPMODE_COUNT] = {
-  {
-    STEPMODE_PITCH0,
-    STEPMODE_CHORD} // CHANNEL_PITCH_MODE_ORDER  0
-};
-
 
 uint8_t chordArray[27][3] = {
 {255,255,255},

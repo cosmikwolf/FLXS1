@@ -2,7 +2,6 @@
 #include "DisplayModule.h"
 
 //custom colors
-#define DARKPURPLE 0x48B3
 /*#include "../commonFonts/fonts/font_ArialBold.cpp"
 #include "../commonFonts/fonts/font_Arial.cpp"
 */
@@ -217,8 +216,6 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   uint8_t previousHighlight = highlight;
   //oled.setFont(Arial_8);
 
-
-
   switch (stepMode) {
     case STEPMODE_PITCH0:
       highlight = 1;    break;
@@ -231,7 +228,13 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     case STEPMODE_BEATCOUNT:
       highlight = 9;    break;
     case STEPMODE_GATETYPE:
-      highlight = 4;    break;
+      highlight = 15;    break;
+    case STEPMODE_ARPTYPE:
+      highlight = 17;   break;
+    case STEPMODE_ARPSPEED:
+      highlight = 19;   break;
+    case STEPMODE_ARPOCTAVE:
+      highlight = 21;   break;
     case STEPMODE_PITCH1:
       highlight = 2;   break;
     case STEPMODE_PITCH2:
@@ -240,7 +243,6 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
       highlight = 4;   break;
     case STEPMODE_GLIDE:
       highlight = 8;   break;
-
   }
 
   displayElement[0] = strdup("pitch set");
@@ -316,11 +318,11 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   displayElement[8] = strdup(buf);
 
   displayElement[14] = strdup("Gate\nTrig:");
-  char *gateTypeArray[] = { "off", "on", "1-shot","hold" };
+  char *gateTypeArray[] = { "off", "on", "1hit","hold" };
   displayElement[15] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType]);
 
   displayElement[16] = strdup("arp:");
-  char *arpTypeArray[] = { "off","up","dn","up+dn1","up+dn2","rndm" };
+  char *arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
   displayElement[17] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
   char *beatDivArray[] = { "1/1", "3/4", "2/3", "3/5", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9", "1/10", "1/11", "1/12", "1/16", "1/24", "1/32", "1/48", "1/64", "1/72", "1/96", "1/128", "1/256", "1/512" };
@@ -333,7 +335,8 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   sprintf(buf, "%d oct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
   displayElement[21] = strdup(buf);
 
-
+  sprintf(buf, "stpmd:%d", stepMode);
+  displayElement[22] = strdup(buf);
 
   //sprintf(buf, "%s", instrumentNames[sequenceArray[selectedChannel].instrument]);
   //displayElement[4] = strdup(buf);
@@ -370,18 +373,19 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   renderOnce_StringBox(14,  highlight, previousHighlight, 0,  55, 26, 16, false, 1, background , foreground);
   renderOnce_StringBox(15,  highlight, previousHighlight, 26, 55, 38, 16, false, 2 ,background , foreground);
 
-  renderOnce_StringBox(16,  highlight, previousHighlight, 0,  72, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(17,  highlight, previousHighlight, 26, 72, 38, 16, false, 2 ,background , foreground);
+  renderOnce_StringBox(13,  highlight, previousHighlight, 0, 72, 26, 16, false, 1, background , foreground);
+  renderOnce_StringBox(8,  highlight, previousHighlight,  26,  72, 38, 16, false, 2, background , foreground);
 
-// col 2
-  renderOnce_StringBox(13,  highlight, previousHighlight, 64, 25, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(8,  highlight, previousHighlight, 90,  25, 38, 16, false, 2, background , foreground);
 
-  renderOnce_StringBox(18,  highlight, previousHighlight, 64,  39, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(19,  highlight, previousHighlight, 90,  39, 38, 16, false, 2 ,background , foreground);
+  // col 2
+  renderOnce_StringBox(16,  highlight, previousHighlight, 64,  39, 26, 16, false, 1, background , foreground);
+  renderOnce_StringBox(17,  highlight, previousHighlight, 90, 39, 38, 16, false, 2 ,background , foreground);
 
-  renderOnce_StringBox(20,  highlight, previousHighlight,64,  55, 26, 8, false, 1, background , foreground);
-  renderOnce_StringBox(21,  highlight, previousHighlight, 90, 55, 38, 16, false, 2 ,background , foreground);
+  renderOnce_StringBox(18,  highlight, previousHighlight, 64,  55, 26, 16, false, 1, background , foreground);
+  renderOnce_StringBox(19,  highlight, previousHighlight, 90,  55, 38, 16, false, 2 ,background , foreground);
+
+  renderOnce_StringBox(20,  highlight, previousHighlight,64,  72, 26, 8, false, 1, background , foreground);
+  renderOnce_StringBox(21,  highlight, previousHighlight, 90, 72, 38, 16, false, 2 ,background , foreground);
 
 
 //renderOnce_StringBox(5,  highlight, previousHighlight, 0,  60, 64, 10, false, 1 ,background , foreground);   // UNUSED
@@ -390,6 +394,9 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   renderOnce_StringBox(11, highlight, previousHighlight, 72, 8, 80, 8, false, 1 ,background , foreground);
   renderOnce_StringBox(12,  highlight, previousHighlight,90, 8, 16, 10, false, 0 ,background , foreground);
   renderOnce_StringBox(9,  highlight, previousHighlight, 106, 8, 8, 10, false, 0 ,background , foreground);
+
+
+ renderOnce_StringBox(22,  highlight, previousHighlight, 0, 88, 64, 8, false, 0 ,background , foreground);
 
 
   //sprintf(buf, "state: %d", currentState);
