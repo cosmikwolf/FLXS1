@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Encoder.h>
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
+#include <ADC.h>
 
 #include "DisplayModule.h"
 #include "LEDArray.h"
@@ -17,7 +18,7 @@
 class TimeController {
   public:
     TimeController();
-    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray);
+    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc);
     void runLoopHandler();
     void masterClockHandler();
 
@@ -33,6 +34,7 @@ class TimeController {
     MidiModule *midiControl;
     midi::MidiInterface<HardwareSerial>* serialMidi;
     Sequencer *sequencerArray;
+    ADC *adc;
 
 };
 //extern Sequencer sequence[4];

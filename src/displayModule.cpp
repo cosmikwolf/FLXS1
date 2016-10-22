@@ -195,10 +195,14 @@ void DisplayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8
       oled.setCursor(x+1, y-1);
       oled.setFont(&unborn_small);
       oled.setTextScale(textSize);
-    } else {
-      oled.setCursor(x+1, y-(textSize*2));
+    } else if( textSize == 3){
+      oled.setCursor(x+1, y-4);
       oled.setFont(&Font);
       oled.setTextScale(textSize-2, textSize-1);
+    } else {
+      oled.setCursor(x+1, y );
+      oled.setFont(&unborn_small);
+      oled.setTextScale(1,2);
     }
 
     oled.setTextColor(color1);
@@ -208,6 +212,7 @@ void DisplayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8
     }
   }
 }
+
 
 void DisplayModule::channelPitchMenuDisplay(char *buf){
 
@@ -231,8 +236,10 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
       highlight = 15;    break;
     case STEPMODE_ARPTYPE:
       highlight = 17;   break;
-    case STEPMODE_ARPSPEED:
+    case STEPMODE_ARPSPEEDNUM:
       highlight = 19;   break;
+    case STEPMODE_ARPSPEEDDEN:
+      highlight = 25;   break;
     case STEPMODE_ARPOCTAVE:
       highlight = 21;   break;
     case STEPMODE_PITCH1:
@@ -245,7 +252,6 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
       highlight = 8;   break;
   }
 
-  displayElement[0] = strdup("pitch set");
   displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
 
   if (sequenceArray[selectedChannel].stepData[selectedStep].pitch[1] == 255){
@@ -266,14 +272,24 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     displayElement[4] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0] + sequenceArray[selectedChannel].stepData[selectedStep].pitch[3]]);
   }
 
-  displayElement[5] = strdup("Gate\nTime:");
-  if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-    displayElement[6] = strdup("RST");
-  } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0){
-    displayElement[6] = strdup("TRG");
+  if (sequenceArray[selectedChannel].stepData[selectedStep].arpType == 0 ){
+    displayElement[5] = strdup("Gate\nTime:");
+    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
+      displayElement[6] = strdup("RST");
+    } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0){
+      displayElement[6] = strdup("TRG");
+    } else {
+      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].gateLength);
+      displayElement[6] = strdup(buf);
+    }
   } else {
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].gateLength);
-    displayElement[6] = strdup(buf);
+    displayElement[5] = strdup("Arp\nTime:");
+    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
+      displayElement[6] = strdup("RST");
+    } else {
+      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].arpCount);
+      displayElement[6] = strdup(buf);
+    }
   }
 
   char *chordSelectionArray[] = {
@@ -321,17 +337,22 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   char *gateTypeArray[] = { "off", "on", "1hit","hold" };
   displayElement[15] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType]);
 
-  displayElement[16] = strdup("arp:");
+  displayElement[16] = strdup("arp");
+  displayElement[0]  = strdup("typ:");
   char *arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
   displayElement[17] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
   char *beatDivArray[] = { "1/1", "3/4", "2/3", "3/5", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9", "1/10", "1/11", "1/12", "1/16", "1/24", "1/32", "1/48", "1/64", "1/72", "1/96", "1/128", "1/256", "1/512" };
 
-  displayElement[18] = strdup("Beat\rDiv:");
-  sprintf(buf, "1/%d", sequenceArray[selectedChannel].stepData[selectedStep].arpSpeed);
+  displayElement[18] = strdup("arp");
+  displayElement[23] = strdup("spd:");
+  sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
   displayElement[19] = strdup(buf);
+  sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
+  displayElement[25] = strdup(buf);
 
-  displayElement[20] = strdup("oct:");
+  displayElement[20] = strdup("arp");
+  displayElement[24] = strdup("oct:");
   sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
   displayElement[21] = strdup(buf);
 
@@ -342,14 +363,15 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   //displayElement[4] = strdup(buf);
 
   //sprintf(buf, "vol: %d", sequenceArray[selectedChannel].volume);
+  displayElement[26] = strdup("Step Info:");
 
-  sprintf(buf, "%d/", sequenceArray[selectedChannel].stepCount, sequenceArray[selectedChannel].beatCount);
+  sprintf(buf, "last: %d", sequenceArray[selectedChannel].stepCount, sequenceArray[selectedChannel].beatCount);
   displayElement[12] = strdup(buf);
 
-  sprintf(buf, "%d", sequenceArray[selectedChannel].beatCount);
+  sprintf(buf, "lngt: 1/%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
   displayElement[9] = strdup(buf);
 
-  sprintf(buf, "pg: %d-%d", notePage*16 , (notePage+1)*16 );
+  sprintf(buf, "%d-%d", notePage*16 , (notePage+1)*16 );
   displayElement[10] = strdup(buf);
 
   sprintf(buf, "%d:%d", selectedChannel , sequenceArray[selectedChannel].patternIndex );
@@ -371,6 +393,7 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   renderOnce_StringBox(6,  highlight, previousHighlight, 26,  39, 38, 16, false, 2, background , foreground);
 
   renderOnce_StringBox(14,  highlight, previousHighlight, 0,  55, 26, 16, false, 1, background , foreground);
+
   renderOnce_StringBox(15,  highlight, previousHighlight, 26, 55, 38, 16, false, 2 ,background , foreground);
 
   renderOnce_StringBox(13,  highlight, previousHighlight, 0, 72, 26, 16, false, 1, background , foreground);
@@ -378,22 +401,28 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
 
 
   // col 2
-  renderOnce_StringBox(16,  highlight, previousHighlight, 64,  39, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(17,  highlight, previousHighlight, 90, 39, 38, 16, false, 2 ,background , foreground);
+  renderOnce_StringBox(16,  highlight, previousHighlight, 64,  39, 26, 8, false, 1, background , foreground);
+  renderOnce_StringBox(0,  highlight, previousHighlight, 64,  47, 26, 16, false, 1, background , foreground);
+  renderOnce_StringBox(17,  highlight, previousHighlight, 84, 39, 44, 16, false, 2 ,background , foreground);
 
-  renderOnce_StringBox(18,  highlight, previousHighlight, 64,  55, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(19,  highlight, previousHighlight, 90,  55, 38, 16, false, 2 ,background , foreground);
+  renderOnce_StringBox(18,  highlight, previousHighlight, 64,  55, 26, 8, false, 1, background , foreground);
+  renderOnce_StringBox(23,  highlight, previousHighlight, 64,  63, 26, 16, false, 1, background , foreground);
+  renderOnce_StringBox(19,  highlight, previousHighlight, 84,  55, 22, 16, false, 2 ,background , foreground);
+  renderOnce_StringBox(25,  highlight, previousHighlight, 106,  55, 22, 16, false, 2 ,background , foreground);
 
   renderOnce_StringBox(20,  highlight, previousHighlight,64,  72, 26, 8, false, 1, background , foreground);
-  renderOnce_StringBox(21,  highlight, previousHighlight, 90, 72, 38, 16, false, 2 ,background , foreground);
+  renderOnce_StringBox(24,  highlight, previousHighlight,64,  80, 26, 8, false, 1, background , foreground);
+  renderOnce_StringBox(21,  highlight, previousHighlight, 84, 72, 44, 16, false, 2 ,background , foreground);
 
 
 //renderOnce_StringBox(5,  highlight, previousHighlight, 0,  60, 64, 10, false, 1 ,background , foreground);   // UNUSED
 
-  renderOnce_StringBox(10, highlight, previousHighlight, 72, 0, 48, 8, false, 1 ,background , foreground);
-  renderOnce_StringBox(11, highlight, previousHighlight, 72, 8, 80, 8, false, 1 ,background , foreground);
-  renderOnce_StringBox(12,  highlight, previousHighlight,90, 8, 16, 10, false, 0 ,background , foreground);
-  renderOnce_StringBox(9,  highlight, previousHighlight, 106, 8, 8, 10, false, 0 ,background , foreground);
+  renderOnce_StringBox(10, highlight, previousHighlight, 72, 0, 28, 8, false, 1 ,background , foreground);
+  renderOnce_StringBox(11, highlight, previousHighlight, 100, 0, 28, 8, false, 1 ,background , foreground);
+
+  renderOnce_StringBox(26,  highlight, previousHighlight,72, 8, 56, 8, false, 0 ,background , foreground);
+  renderOnce_StringBox(12,  highlight, previousHighlight,72, 16, 56, 8, false, 0 ,background , foreground);
+  renderOnce_StringBox(9,  highlight, previousHighlight, 72, 24, 56, 8, false, 0 ,background , foreground);
 
 
  renderOnce_StringBox(22,  highlight, previousHighlight, 0, 88, 64, 8, false, 0 ,background , foreground);
@@ -429,7 +458,7 @@ void DisplayModule::channelGateMenuDisplay(char *buf) {
   char *beatDivArray[] = { "1/1", "3/4", "2/3", "3/5", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9", "1/10", "1/11", "1/12", "1/16", "1/24", "1/32", "1/48", "1/64", "1/72", "1/96", "1/128", "1/256", "1/512" };
 
   displayElement[5] = strdup("beat divide:");
-  sprintf(buf, "1/%d", sequenceArray[selectedChannel].stepData[selectedStep].arpSpeed);
+  sprintf(buf, "1/%d", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
   displayElement[6] = strdup(buf);
 
   displayElement[7] = strdup("octave:");
@@ -447,9 +476,9 @@ void DisplayModule::channelGateMenuDisplay(char *buf) {
     case STEPMODE_ARPTYPE:
       highlight = 4;
     break;
-    case STEPMODE_ARPSPEED:
-      highlight = 6;
-    break;
+    //case STEPMODE_ARPSPEED:
+    //  highlight = 6;
+    //break;
     case STEPMODE_ARPOCTAVE:
       highlight = 8;
     break;
@@ -586,7 +615,7 @@ void DisplayModule::sequenceMenuDisplay(){
   }
 
   displayElement[0] = strdup("SEQUENCE MENU");
-  renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  background, foreground);
+  renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  BLACK, WHITE);
 
   displayElement[1] = strdup("Scale Quantization:");
   char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
@@ -595,9 +624,9 @@ void DisplayModule::sequenceMenuDisplay(){
   displayElement[2] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
   displayElement[3] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
 
-  renderOnce_StringBox(1,  highlight, previousHighlight, 0,  16, 128, 8, false, 0, background, foreground);
-  renderOnce_StringBox(2,  highlight, previousHighlight, 0,  24, 128, 15, false, 2, background, foreground);
-  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  36, 128, 15, false, 2, background, foreground);
+  renderOnce_StringBox(1,  highlight, previousHighlight, 0,  16, 128, 8, false, 0, BLACK, WHITE);
+  renderOnce_StringBox(2,  highlight, previousHighlight, 0,  24, 128, 15, false, 2, BLACK, WHITE);
+  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  36, 128, 15, false, 2, BLACK, WHITE);
 }
 
 

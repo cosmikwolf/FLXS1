@@ -9,14 +9,14 @@
 
 TimeController::TimeController(){ };
 
-void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray ) {
+void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc) {
 
 
 	Serial.println("Initializing TimeController");
 
 	this->serialMidi = serialMidi;
   this->sequencerArray = sequencerArray;
-
+	this->adc = adc;
 	sequencerArray[0].initialize(0, 16, 4, (tempoX100/100));
   sequencerArray[1].initialize(1, 16, 4, (tempoX100/100));
   sequencerArray[2].initialize(2, 16, 4, (tempoX100/100));
@@ -26,7 +26,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	display.initialize(sequencerArray);
 
-	outputControl.initialize(&backplaneGPIO, serialMidi);
+	outputControl.initialize(&backplaneGPIO, serialMidi, adc);
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
@@ -34,8 +34,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	buttonIo.changeState(CHANNEL_PITCH_MODE);
 
 	saveFile.initialize(sequencerArray);
-	//saveFile.loadPattern(0, 0b1111);
-	saveFile.deleteSaveFile();
+	saveFile.loadPattern(0, 0b1111);
+	//saveFile.deleteSaveFile();
 /*
 	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
 	delay(200);

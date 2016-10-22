@@ -51,10 +51,11 @@ typedef	struct StepDatum {
 	uint8_t 		arpCount;		// # of arpeggiations for this step
 	uint8_t 		arpType;		// off, up, down, up & down etc
 	uint8_t 		arpOctave;		// off, up, down, up & down etc
-	uint8_t 		arpSpeed;	// MSB - X   LSB - Y  length: X/Y beats
+	uint8_t 		arpSpdNum;	//
+	uint8_t 		arpSpdDen;	//
 	uint8_t			velocity;	    // note velocity
 	uint8_t			glide;			// portamento time - to be implemented.
-
+	uint8_t			beatDiv;
 	// utility variables - dont need to be saved.
 	//uint16_t			beat;			// beat in which the note is triggered - recalculated each beat
 	uint32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
@@ -62,21 +63,31 @@ typedef	struct StepDatum {
 	uint8_t				arpStatus;		// if note is playing or not. Value indicates arp number.
 	uint8_t				notePlaying;	// stores the note that is played so it can be turned off.
 	uint8_t				stepStatus;		// if note is playing or not
-	uint32_t			stepOffTime;	// time  when the note should be stopped.
+	uint32_t			stepOffTime;	// timer value when the note should be stopped.
 	elapsedMicros	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
-/*
-	uint8_t arpSpeedNumerator(){
-		return arpSpeed >> 4;
-	}
 
-	uint8_t arpSpeedDenominator(){
-		return arpSpeed && 0xF;
-	}
+/*
+	uint8_t 		arpSpeedNumerator(){
+
+	};
+
+	uint8_t 		arpSpeedNumerator(uint8_t numerator){
+		arpSpeed &= 0b00001111;
+		arpSpeed |= (numerator & 0b1111 ) << 4
+	};
+
+	uint8_t 		arpSpeedDenominator(){
+
+	};
+
+	uint8_t 		arpSpeedDenominator(uint8_t denominator){
+	};
 */
+
 	uint32_t	arpLength() {
 		//return stepOffTime / gateType;
 		if(arpType != 0){
-			return stepOffTime / arpCount;
+			return stepOffTime / arpSpdDen;
 		} else {
 			return stepOffTime;
 		}

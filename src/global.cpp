@@ -36,7 +36,6 @@ uint16_t calibrationBuffer = 0;
 elapsedMicros blipTimer;
 elapsedMicros testTimer;
 
-
 uint8_t chordArray[27][3] = {
 {255,255,255},
 {4,7,255},

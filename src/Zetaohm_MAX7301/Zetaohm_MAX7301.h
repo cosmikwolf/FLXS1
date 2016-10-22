@@ -19,6 +19,7 @@ public:
 	void 			updateGpioPinModes();					//OUTPUT=all out,INPUT=all in,0xxxx=you choose
 	uint16_t 	readAddress(byte addr);
 	void			digitalWrite(uint8_t index, bool value);
+	bool			digitalRead(uint8_t index);
 	void			setSPIspeed(uint32_t spispeed);//for SPI trans0actions
 	void			writeByte(byte addr, byte data);
 	void			update();								// update the input buffer

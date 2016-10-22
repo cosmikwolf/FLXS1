@@ -161,6 +161,13 @@ void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
     writeByte(0x24 + indexMap[index], value);
 }
 
+bool Zetaohm_MAX7301::digitalRead(uint8_t index){
+    uint16_t temp =  readAddress(0x24 + indexMap[index]);
+    Serial.println("READING " + String(index));
+    Serial.println(temp, BIN);
+    return 1;
+}
+
 bool Zetaohm_MAX7301::fell(uint8_t index){
 	if ( fellBuffer & (1 << indexMap[index]) ) {
 		fellBuffer = fellBuffer & ~(1 << indexMap[index]) ;

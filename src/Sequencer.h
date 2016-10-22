@@ -62,10 +62,9 @@ class Sequencer
 		uint16_t beatCount;
 		uint8_t	 quantizeKey;
 		uint8_t	 quantizeScale;
-		uint8_t  volume;
-		uint8_t  bank;
-		uint8_t	 channel;
 		uint8_t  patternIndex;
+		uint8_t	 channel;
+		uint8_t  inputAttenuvert;
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 

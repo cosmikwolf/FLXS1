@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include "OutputController.h"
 
-void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi){
+void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc){
   Serial.println("Initializing MIDI");
 
   this->serialMidi = serialMidi;
-
+  this->adc = adc;
   Serial.println("initializing gate outputs");
   this->backplaneGPIO = backplaneGPIO;
   backplaneGPIO->begin(BACKPLANE_MAX7301_CS_PIN);
@@ -37,11 +37,13 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   backplaneGPIO->initPort(15,3, OUTPUT); // slew cap ctrl
   backplaneGPIO->initPort(16,24, OUTPUT); // slew cap ctrl
 
+  backplaneGPIO->initPort(22, 14, INPUT_PULLUP); //Encoder Switch
+
   backplaneGPIO->initPort(18, 2, OUTPUT);
+
   backplaneGPIO->initPort(19, 1, OUTPUT);
   backplaneGPIO->initPort(20, 26, OUTPUT);
   backplaneGPIO->initPort(21, 13, OUTPUT);
-  backplaneGPIO->initPort(22, 14, OUTPUT);
   backplaneGPIO->initPort(23, 15, OUTPUT);
   backplaneGPIO->initPort(24, 16, OUTPUT);
   backplaneGPIO->initPort(25, 17, OUTPUT);
@@ -52,37 +54,37 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   backplaneGPIO->updateGpioPinModes(); // send GPIO pin modes to chip
 
 
-  backplaneGPIO->digitalWrite(0, 0);
-  backplaneGPIO->digitalWrite(1, 0);
-  backplaneGPIO->digitalWrite(2, 0);
-  backplaneGPIO->digitalWrite(3, 0);
-  backplaneGPIO->digitalWrite(8, 0);
-  backplaneGPIO->digitalWrite(4, 0);
-  backplaneGPIO->digitalWrite(5, 0);
-  backplaneGPIO->digitalWrite(6, 0);
-  backplaneGPIO->digitalWrite(7, 0);
-  backplaneGPIO->digitalWrite(8, 0);
-  backplaneGPIO->digitalWrite(9, 0);
-  backplaneGPIO->digitalWrite(10, 0);
-  backplaneGPIO->digitalWrite(11, 0);
-  backplaneGPIO->digitalWrite(12, 0);
-  backplaneGPIO->digitalWrite(13, 0);
-  backplaneGPIO->digitalWrite(18, 0);
-  backplaneGPIO->digitalWrite(14, 0);
-  backplaneGPIO->digitalWrite(15, 0);
-  backplaneGPIO->digitalWrite(16, 0);
-  backplaneGPIO->digitalWrite(17, 0);
-  backplaneGPIO->digitalWrite(18, 0);
-  backplaneGPIO->digitalWrite(19, 0);
-  backplaneGPIO->digitalWrite(20, 0);
-  backplaneGPIO->digitalWrite(21, 0);
-  backplaneGPIO->digitalWrite(22, 0);
-  backplaneGPIO->digitalWrite(23, 0);
-  backplaneGPIO->digitalWrite(28, 0);
-  backplaneGPIO->digitalWrite(24, 0);
-  backplaneGPIO->digitalWrite(25, 0);
-  backplaneGPIO->digitalWrite(26, 0);
-  backplaneGPIO->digitalWrite(27, 0);
+  //backplaneGPIO->digitalWrite(0, 0);
+  //backplaneGPIO->digitalWrite(1, 0);
+  //backplaneGPIO->digitalWrite(2, 0);
+  //backplaneGPIO->digitalWrite(3, 0);
+  //backplaneGPIO->digitalWrite(8, 0);
+  //backplaneGPIO->digitalWrite(4, 0);
+  //backplaneGPIO->digitalWrite(5, 0);
+  //backplaneGPIO->digitalWrite(6, 0);
+  //backplaneGPIO->digitalWrite(7, 0);
+  //backplaneGPIO->digitalWrite(8, 0);
+  //backplaneGPIO->digitalWrite(9, 0);
+  //backplaneGPIO->digitalWrite(10, 0);
+  //backplaneGPIO->digitalWrite(11, 0);
+  //backplaneGPIO->digitalWrite(12, 0);
+  //backplaneGPIO->digitalWrite(13, 0);
+  //backplaneGPIO->digitalWrite(18, 0);
+  //backplaneGPIO->digitalWrite(14, 0);
+  //backplaneGPIO->digitalWrite(15, 0);
+  //backplaneGPIO->digitalWrite(16, 0);
+  //backplaneGPIO->digitalWrite(17, 0);
+  //backplaneGPIO->digitalWrite(18, 0);
+  //backplaneGPIO->digitalWrite(19, 0);
+  //backplaneGPIO->digitalWrite(20, 0);
+  //backplaneGPIO->digitalWrite(21, 0);
+  //backplaneGPIO->digitalWrite(22, 0);
+  //backplaneGPIO->digitalWrite(23, 0);
+  //backplaneGPIO->digitalWrite(28, 0);
+  //backplaneGPIO->digitalWrite(24, 0);
+  //backplaneGPIO->digitalWrite(25, 0);
+  //backplaneGPIO->digitalWrite(26, 0);
+  //backplaneGPIO->digitalWrite(27, 0);
 
 
    Serial.println("Initializing DAC");
@@ -124,6 +126,11 @@ for (int i=0; i<4; i++){
   pinMode(4, OUTPUT);
 
   Serial.println("Output Controller Initialization Complete");
+
+  backplaneGPIO->update();
+  for (int i=0; i<28; i++){
+    Serial.println("Reading port: " + String(i) + "\t" + String(backplaneGPIO->readAddress(i)));
+  }
 }
 
 void OutputController::dacTestLoop(){
@@ -197,11 +204,25 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
     //Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
 
   }
+  int offset = 0;
+switch (channel){
+  case 1:
+  offset = map(adc->analogRead(A12, ADC_1), 0, 1023, 60, -60) ;
+  Serial.println("ch1 offset: "+ String(offset));
+  break;
+  case 2:
+  offset = map(adc->analogRead(A13, ADC_1), 0, 1023, 60, -60) ;
+
+  break;
+  case 3:
+  offset = map(adc->analogRead(A10, ADC_1), 0, 1023, 60, -60) ;
+  break;
+}
 
   serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel],  map(note, 0,127,32896, 64240 ) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
   delayMicroseconds(5);
 
   if (gate){
@@ -210,6 +231,13 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
 
 };
+
+uint8_t OutputController::analogInputTranspose(uint8_t note){
+
+  uint16_t input = analogRead(22);
+
+  return (note + map(input, 0, 1023, 0, 127) );
+}
 
 uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
   switch(mapType){

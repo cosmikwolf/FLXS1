@@ -7,7 +7,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <malloc.h>
-
+#include <ADC.h>
 #include "TimeController.h"
 #include "Sequencer.h"
 #include "midiModule.h"
@@ -25,10 +25,12 @@ IntervalTimer MasterClockTimer;
 MidiModule midiControl;
 NoteDatum noteData[4];
 Sequencer sequence[4];
-AudioInputAnalog              adc(A14);
+AudioInputAnalog              audio_adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;
-AudioConnection               patchCord0(adc, 0 , notefreq, 0);
+AudioConnection               patchCord0(audio_adc, 0 , notefreq, 0);
 elapsedMillis noteFreqTimer;
+
+ADC *adc = new ADC(); // adc object
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
@@ -42,8 +44,8 @@ void setup() {
 
   printHeapStats();
 
-  AudioMemory(25);
-  notefreq.begin(.15);
+  //AudioMemory(25);
+  //notefreq.begin(.15);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
@@ -71,7 +73,7 @@ void setup() {
   //usbMIDI.setHandlePitchChange(OnPitchChange)
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
-  timeControl.initialize(&serialMidi, &midiControl, noteData, sequence);
+  timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
 	MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
 
@@ -89,13 +91,31 @@ void setup() {
   pinMode(1,OUTPUT);
   digitalWrite(1, HIGH);
 
+  adc->enableInterrupts(ADC_0);
+
+
+  pinMode(A11, INPUT);
+  pinMode(A12, INPUT);
+  pinMode(A13, INPUT);
+  pinMode(A10, INPUT);
+
+
+//  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
+  // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
+  //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
+  delay(100);
+
 }
 
 void loop() {
   //digitalWriteFast(26, HIGH);
   timeControl.runLoopHandler();
-  //digitalWriteFast(26, LOW);
 
+  //digitalWriteFast(26, LOW);
+/*  if (millis()%1000 == 0){
+    Serial.println("1:\t" + String(adc->analogRead(A11, ADC_0)) + "\t2:\t" + String(adc->analogRead(A12, ADC_1)) + "\t3:\t" + String(adc->analogRead(A13, ADC_1)) + "\t4:\t" + String(adc->analogRead(A10, ADC_1)));
+  };
+*/
 /*  if (!playing){
     if (notefreq.available()) {
     //  Serial
