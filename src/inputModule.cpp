@@ -87,8 +87,8 @@ void InputModule::loop(uint16_t frequency){
         channelPitchModeInputHandler();
       break;
 
-      case CHANNEL_GATE_MODE:
-        channelGateModeInputHandler();
+      case CHANNEL_VELOCITY_MODE:
+        channelVelocityModeInputHandler();
       break;
 
       case CHANNEL_ENVELOPE_MODE:
@@ -241,10 +241,11 @@ void InputModule::channelButtonHandler(uint8_t channel){
     break;
 
     case CHANNEL_PITCH_MODE:
-      changeState(CHANNEL_GATE_MODE);
+      changeState(CHANNEL_VELOCITY_MODE);
+      stepMode = STEPMODE_VELOCITY;
     break;
 
-    case CHANNEL_GATE_MODE:
+    case CHANNEL_VELOCITY_MODE:
       changeState(CHANNEL_PITCH_MODE);
     break;
 
@@ -533,7 +534,7 @@ void InputModule::altButtonHandler(){
 
           case STEPMODE_BEATCOUNT:
 
-            for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
+            for (int i =0; i < MAX_STEPS_PER_SEQUENCE; i++ ){
               sequenceArray[selectedChannel].stepData[i].beatDiv = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange, 16);
             }
 
@@ -576,16 +577,16 @@ void InputModule::altButtonHandler(){
     }
 };
 
-void InputModule::channelGateModeInputHandler(){
+void InputModule::channelVelocityModeInputHandler(){
 
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
 
       if (selectedStep == getNote(i)){
         switch(stepMode){
-          case STEPMODE_GATETYPE:
-            stepMode = STEPMODE_ARPTYPE;
-            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpType - knobRead;
+          case STEPMODE_VELOCITY:
+            stepMode = STEPMODE_VELOCITY;
+            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocity - knobRead;
           break;
 
       //    case STEPMODE_ARPTYPE:
@@ -625,8 +626,8 @@ void InputModule::channelGateModeInputHandler(){
   if (knobChange){
     //knobPrev = knobRead;
     switch (stepMode) {
-      case STEPMODE_GATETYPE:
-      sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 4);
+      case STEPMODE_VELOCITY:
+      sequenceArray[selectedChannel].stepData[selectedStep].velocity =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].velocity + knobChange, 127);
       break;
       case STEPMODE_ARPTYPE:
       sequenceArray[selectedChannel].stepData[selectedStep].arpType=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 6);

@@ -196,14 +196,15 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 
 			uint32_t trigLength;
 
-			if (stepData[stepNum].arpType != 0 ){
-				trigLength = (beatLength/stepData[stepNum].beatDiv)*stepData[stepNum].arpSpdNum/stepData[stepNum].arpSpdDen;
-			} else {
+	//	if (stepData[stepNum].arpType != 0 ){
+	//			trigLength = (beatLength/stepData[stepNum].beatDiv)*stepData[stepNum].arpSpdNum/stepData[stepNum].arpSpdDen;
+	//		} else {
 				trigLength = stepData[stepNum].gateLength*beatLength/stepData[stepNum].beatDiv;
-			};
+	//		};
 
-			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
-				// shut off notes that should stop playing.
+//			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
+      if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() -10000 ) {
+  			// shut off notes that should stop playing.
 				noteShutOff(noteData, stepNum);
 			}
 
@@ -395,6 +396,7 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 	noteData->noteOnStep = 0;
 	noteData->noteOffStep = 0;
 }
+
 void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 	//shut off any other notes that might still be playing.
 
@@ -412,8 +414,8 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 
 	//		Serial.print("-off- TRIG\t ");
 	/*		Serial.println("stepData[stepNum].arpLength(): " + String(stepData[stepNum].arpLength()) + " arpcount: " + String(stepData[stepNum].arpCount()) + " arpStatus: " + String(stepData[stepNum].arpStatus) + " offset: " + String(stepData[stepNum].offset) + " timer:" + String(sequenceTimer) + " noteTimer: " + String(stepData[stepNum].stepOffTime) + " stepTimer: " + String(stepData[stepNum].stepTimer));
-*/
-/*
+  */
+  /*
 			Serial.print("Notes off:\t");
 			for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++) {
 				if (noteData->noteOnArray[i] != 0){
@@ -422,7 +424,7 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
 				}
 			}
 			Serial.println("");
-*/
+  */
 			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 		}
 

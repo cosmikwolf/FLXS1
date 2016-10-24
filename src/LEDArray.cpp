@@ -72,7 +72,7 @@ void LEDArray::loop(uint16_t frequency){
       case CHANNEL_PITCH_MODE:
         channelPitchModeLEDHandler();
       break;
-      case CHANNEL_GATE_MODE:
+      case CHANNEL_VELOCITY_MODE:
         channelGateModeLEDHandler();
       break;
       case CHANNEL_ENVELOPE_MODE:

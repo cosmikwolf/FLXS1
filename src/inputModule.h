@@ -68,7 +68,7 @@ public:
   void stepModeMatrixHandler();
 
   void channelPitchModeInputHandler();
-  void channelGateModeInputHandler();
+  void channelVelocityModeInputHandler();
   void channelEnvelopeModeInputHandler();
   void channelStepModeInputHandler();
 

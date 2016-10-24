@@ -117,8 +117,8 @@ void DisplayModule::displayLoop(uint16_t frequency) {
       case CHANNEL_PITCH_MODE:
         channelPitchMenuDisplay(buf);
       break;
-      case CHANNEL_GATE_MODE:
-        channelGateMenuDisplay(buf);
+      case CHANNEL_VELOCITY_MODE:
+        channelVelocityMenuDisplay(buf);
       break;
       case CHANNEL_ENVELOPE_MODE:
         channelEnvelopeMenuDisplay(buf);
@@ -443,13 +443,14 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   //  cleanupTextBuffers(buf, 13);
 };
 
-void DisplayModule::channelGateMenuDisplay(char *buf) {
+void DisplayModule::channelVelocityMenuDisplay(char *buf) {
   uint8_t previousHighlight = highlight;
 
-  displayElement[0] = strdup("_-*^*-_ arp set _-*^*-_");
-  displayElement[1] = strdup("gate trig:");
-  char *gateTypeArray[] = { "off", "on", "1-shot","hold" };
-  displayElement[2] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType]);
+  displayElement[0] = strdup("_-*^*-_ Velocity _-*^*-_");
+  displayElement[1] = strdup("velocity level:");
+//  char *gateTypeArray[] = { "off", "on", "1-shot","hold" };
+  sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
+  displayElement[2] = strdup(buf);
 
   displayElement[3] = strdup("type:");
   char *arpTypeArray[] = { "off","up","dn","up+dn1","up+dn2","rndm" };
@@ -470,7 +471,7 @@ void DisplayModule::channelGateMenuDisplay(char *buf) {
   displayElement[10] = strdup(buf);
 
   switch (stepMode) {
-    case STEPMODE_GATETYPE:
+    case STEPMODE_VELOCITY:
       highlight = 2;
     break;
     case STEPMODE_ARPTYPE:
@@ -490,21 +491,21 @@ void DisplayModule::channelGateMenuDisplay(char *buf) {
 
 //Title - arp set
   renderOnce_StringBox(0,  highlight, previousHighlight, 0 , 90, 128 , 6, false, 1,  background, foreground);
-//gate type
+//velocity
   renderOnce_StringBox(1,  highlight, previousHighlight, 0,  0, 128, 10, false, 0, background, foreground);
   renderOnce_StringBox(2,  highlight, previousHighlight, 0,  6, 128, 15, false, 2, background, foreground);
 //arp type
-  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  23, 64, 10, false, 0, background, foreground);
-  renderOnce_StringBox(4,  highlight, previousHighlight, 0,  29, 64, 15, false, 2, background, foreground);
-//arp speed
-  renderOnce_StringBox(5,  highlight, previousHighlight, 0,  46, 64, 10, false, 0, background, foreground);
-  renderOnce_StringBox(6,  highlight, previousHighlight, 0,  52, 64, 15, false, 2, background, foreground);
-//arp octave
-  renderOnce_StringBox(7,  highlight, previousHighlight, 64,  23, 64, 10, false, 0, background, foreground);
-  renderOnce_StringBox(8,  highlight, previousHighlight, 64,  29, 64, 15, false, 2, background, foreground);
-  //arp count
-  renderOnce_StringBox(9,  highlight, previousHighlight, 64,  46, 64, 10, false, 0, background, foreground);
-  renderOnce_StringBox(10,  highlight, previousHighlight, 64,  52, 64, 15, false, 2, background, foreground);
+//  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  23, 64, 10, false, 0, background, foreground);
+//  renderOnce_StringBox(4,  highlight, previousHighlight, 0,  29, 64, 15, false, 2, background, foreground);
+////arp speed
+//  renderOnce_StringBox(5,  highlight, previousHighlight, 0,  46, 64, 10, false, 0, background, foreground);
+//  renderOnce_StringBox(6,  highlight, previousHighlight, 0,  52, 64, 15, false, 2, background, foreground);
+////arp octave
+//  renderOnce_StringBox(7,  highlight, previousHighlight, 64,  23, 64, 10, false, 0, background, foreground);
+//  renderOnce_StringBox(8,  highlight, previousHighlight, 64,  29, 64, 15, false, 2, background, foreground);
+//  //arp count
+//  renderOnce_StringBox(9,  highlight, previousHighlight, 64,  46, 64, 10, false, 0, background, foreground);
+//  renderOnce_StringBox(10,  highlight, previousHighlight, 64,  52, 64, 15, false, 2, background, foreground);
 
 }
 
