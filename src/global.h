@@ -35,6 +35,7 @@
 #define	DEBUG_SCREEN		       127
 #define	CALIBRATION_MENU		   126
 
+
 //PITCH PAGE STEPMODES
 #define STEPMODE_PITCH0       0
 #define STEPMODE_CHORD        1
@@ -61,7 +62,7 @@
 #define STEPMODE_ARPCOUNT     15
 
 //ENVELOPE PAGE STEP MODES
-#define STEPMODE_VELOCITY    0 
+#define STEPMODE_VELOCITY    0
 
 //STEP PAGE STEP MODES:
 #define STEPMODE_QUANTIZEKEY     17
@@ -109,6 +110,8 @@
 #define LYDIAN            0b101010110101
 #define LOCRIAN           0b110101101010
 
+#define POSITIVE 1
+#define NEGATIVE 0
 
 extern uint32_t tempoX100;
 extern uint8_t stepMode;
@@ -151,6 +154,8 @@ extern uint16_t calibrationBuffer;
 
 void debug(const char* text);
 int positive_modulo(int i, int n);
+int modulo_minimum(int i, int n, int minimum);
+int min_max(int value, int min, int max);
 uint8_t getNote(uint8_t index);
 uint32_t FreeRam2();
 

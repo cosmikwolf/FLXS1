@@ -29,8 +29,8 @@
 #define ARPTYPE_RNDM	5
 
 typedef struct NoteDatum {
-	bool   noteOn;             // is a note going to play?
-	bool   noteOff;            // does a note need to be shut off?
+	bool      noteOn;             // is a note going to play?
+	bool      noteOff;            // does a note need to be shut off?
 	uint8_t   noteOnArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
 	bool      noteGateArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
 	uint8_t   noteVelArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
@@ -57,14 +57,14 @@ typedef	struct StepDatum {
 	uint8_t			glide;			// portamento time - to be implemented.
 	uint8_t			beatDiv;
 	// utility variables - dont need to be saved.
-	//uint16_t			beat;			// beat in which the note is triggered - recalculated each beat
-	uint32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
 	uint8_t				noteStatus;		// if note is playing or not
 	uint8_t				arpStatus;		// if note is playing or not. Value indicates arp number.
 	uint8_t				notePlaying;	// stores the note that is played so it can be turned off.
 	uint8_t				stepStatus;		// if note is playing or not
-	uint32_t			stepOffTime;	// timer value when the note should be stopped.
-	elapsedMicros	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
+	//uint32_t			stepOffTime;	// timer value when the note should be stopped.
+
+	uint32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
+  elapsedMicros	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
 
 /*
 	uint8_t 		arpSpeedNumerator(){
@@ -83,7 +83,7 @@ typedef	struct StepDatum {
 	uint8_t 		arpSpeedDenominator(uint8_t denominator){
 	};
 */
-
+/*
 	uint32_t	arpLength() {
 		//return stepOffTime / gateType;
 		if(arpType != 0){
@@ -91,7 +91,7 @@ typedef	struct StepDatum {
 		} else {
 			return stepOffTime;
 		}
-	}
+	}*/
 
 } StepDatum;
 

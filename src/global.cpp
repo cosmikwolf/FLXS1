@@ -76,23 +76,42 @@ int positive_modulo(int i, int n) {
 	return (i % n + n) % n;
 }
 
+int modulo_minimum(int i, int n, int minimum){
+	int mod = (i % n + n) % n;
+	if (mod < minimum){
+		return minimum;
+	} else {
+		return mod;
+	}
+}
+
+int min_max(int value, int min, int max){
+	if (value < min){
+		return min;
+	} else if( value > max){
+		return max;
+	} else {
+		return value;
+	}
+}
+
 uint8_t getNote(uint8_t index){
 	return index + notePage * 16;
 }
 
 
 uint32_t FreeRam2(){ // for Teensy 3.0
-	uint32_t stackTop;
-	uint32_t heapTop;
+//	uint32_t stackTop;
+//	uint32_t heapTop;
 
-    // current position of the stack.
-	stackTop = (uint32_t) &stackTop;
+//    // current position of the stack.
+//	stackTop = (uint32_t) &stackTop;
 
-    // current position of heap.
-	void* hTop = malloc(1);
-	heapTop = (uint32_t) hTop;
-	free(hTop);
+//    // current position of heap.
+//	void* hTop = malloc(1);
+//	heapTop = (uint32_t) hTop;
+//	free(hTop);
 
-    // The difference is the free, available ram.
-	return stackTop - heapTop;
+//    // The difference is the free, available ram.
+//	return stackTop - heapTop;
 }

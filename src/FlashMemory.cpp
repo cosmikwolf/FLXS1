@@ -28,7 +28,6 @@ void FlashMemory::initialize(Sequencer *sequenceArray){
 //void FlashMemory::saveSequenceJSON(Sequencer& sequence, char *pattern ){
 void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
-  Serial.println("saveSequenceJson FreeMemory 1 : " + String(FreeRam2()));
 
   StaticJsonBuffer<16384> jsonBuffer;
 
@@ -52,7 +51,6 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   root["patternIndex"]  = sequenceArray[channel].patternIndex;
 
   JsonArray& stepDataArray = root.createNestedArray("stepData");
-  Serial.println("saveSequenceJson FreeMemory 2 : " + String(FreeRam2()));
 
   for (int i=0; i< root["stepCount"]; i++){
     JsonObject& stepDataObj = jsonBuffer.createObject();
@@ -74,7 +72,6 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["g"] = sequenceArray[channel].stepData[i].glide ;
     stepDataArray.add(stepDataObj);
   }
-  Serial.println("saveSequenceJson FreeMemory 4 : " + String(FreeRam2()));
 
   if (SD.exists(fileNameChar)){
     SD.remove(fileNameChar);
@@ -90,7 +87,6 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   Serial.println(fileNameChar);
 
   free(fileNameChar);
-  Serial.println("saveSequenceJson FreeMemory 5 : " + String(FreeRam2()));
 
   Serial.println("flash Timer after write: " + String(flashTimer) );
 
@@ -142,7 +138,6 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
 
 bool FlashMemory::deserialize(uint8_t channel, char* json){
   StaticJsonBuffer<16384> jsonBuffer;
-  Serial.println("deserialize FreeRam 1: " + String(FreeRam2()));
 
     Serial.println("jsonBuffer allocated");
   JsonObject& jsonReader = jsonBuffer.parseObject(json);
@@ -177,8 +172,8 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
      stepDataBuf.arpCount    = stepDataArray[i]["ac"];
      stepDataBuf.arpType     = stepDataArray[i]["at"];
      stepDataBuf.arpOctave   = stepDataArray[i]["ao"];
-     stepDataBuf.arpSpdNum   = stepDataArray[i]["ad"];
-     stepDataBuf.arpSpdDen   = stepDataArray[i]["an"];
+     stepDataBuf.arpSpdNum   = stepDataArray[i]["an"];
+     stepDataBuf.arpSpdDen   = stepDataArray[i]["ad"];
      stepDataBuf.velocity    = stepDataArray[i]["v"] ;
      stepDataBuf.glide       = stepDataArray[i]["g"] ;
 
@@ -194,7 +189,6 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 //  printPattern();
 
 	for(int i=0; i < sequenceCount; i++){
-    Serial.println("loadpattern FreeRam 1 : " + String(FreeRam2()));
 
     if ( !(channelSelector & (1 << i) ) ){
       Serial.println("skipping loading channel " + String(i));
@@ -204,7 +198,6 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
     };
 
     Serial.println("About to run readJsonReturn for channel: " + String(i));
-    Serial.println("loadpattern FreeRam 2: " + String(FreeRam2()));
 
     int readJsonReturn = this->readSequenceJSON(i, pattern);
 

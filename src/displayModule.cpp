@@ -272,24 +272,12 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     displayElement[4] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0] + sequenceArray[selectedChannel].stepData[selectedStep].pitch[3]]);
   }
 
-  if (sequenceArray[selectedChannel].stepData[selectedStep].arpType == 0 ){
-    displayElement[5] = strdup("Gate\nTime:");
-    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-      displayElement[6] = strdup("RST");
-    } else if (sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0){
-      displayElement[6] = strdup("TRG");
-    } else {
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].gateLength);
-      displayElement[6] = strdup(buf);
-    }
+  displayElement[5] = strdup("Gate\nTime:");
+  if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
+    displayElement[6] = strdup("RST");
   } else {
-    displayElement[5] = strdup("Arp\nTime:");
-    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-      displayElement[6] = strdup("RST");
-    } else {
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].arpCount);
-      displayElement[6] = strdup(buf);
-    }
+    sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
+    displayElement[6] = strdup(buf);
   }
 
   char *chordSelectionArray[] = {

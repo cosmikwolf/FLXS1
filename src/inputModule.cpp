@@ -396,7 +396,7 @@ void InputModule::altButtonHandler(){
   void InputModule::channelPitchModeInputHandler(){
   // selectedStep == getNote(i) means that the user pressed the button that is selected.
     uint8_t chrd;
-
+    uint8_t newBeatDiv;
     for (int i=0; i < 16; i++){
       if (midplaneGPIO->fell(i)){
         if(selectedStep == getNote(i)){
@@ -478,7 +478,7 @@ void InputModule::altButtonHandler(){
             }
             // and finally set the new step value!
             // monophonic so pitch[0] only
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, positive_modulo(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 127), 0);
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,127), 0);
           }
           break;
 
@@ -504,7 +504,6 @@ void InputModule::altButtonHandler(){
 
           case STEPMODE_GATELENGTH:
       // change the gate type
-            if (sequenceArray[selectedChannel].stepData[selectedStep].arpType == 0){
               if ((sequenceArray[selectedChannel].stepData[selectedStep].gateLength == 0) && (knobChange < 0)  ) {
                 sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
               } else if(knobChange > 0) {
@@ -513,14 +512,8 @@ void InputModule::altButtonHandler(){
                 }
               }
               if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
-                sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 127);
+                sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 0, 255);
               }
-            } else {
-              sequenceArray[selectedChannel].stepData[selectedStep].arpCount=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpCount + knobChange, 129);
-              if (sequenceArray[selectedChannel].stepData[selectedStep].arpCount == 0){
-                sequenceArray[selectedChannel].stepData[selectedStep].arpCount = 1;
-              }
-            }
 
           break;
 
@@ -533,40 +526,38 @@ void InputModule::altButtonHandler(){
             break;
 
           case STEPMODE_BEATCOUNT:
+            newBeatDiv = min_max(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange,1, 16);
 
-            for (int i =0; i < MAX_STEPS_PER_SEQUENCE; i++ ){
-              sequenceArray[selectedChannel].stepData[i].beatDiv = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange, 16);
-            }
-
-            if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv < 1){
-              for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
+            for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
+              if (newBeatDiv < 1){
                 sequenceArray[selectedChannel].stepData[i].beatDiv = 1;
+              } else {
+                sequenceArray[selectedChannel].stepData[i].beatDiv = newBeatDiv;
               }
             }
-
             break;
 
           case STEPMODE_GATETYPE:
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 4);
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 0, 4);
             break;
 
           case STEPMODE_GLIDE:
-            sequenceArray[selectedChannel].stepData[selectedStep].glide =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].glide + knobChange, 128);
+            sequenceArray[selectedChannel].stepData[selectedStep].glide =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].glide + knobChange, 0, 128);
             break;
 
           case STEPMODE_ARPTYPE:
-            sequenceArray[selectedChannel].stepData[selectedStep].arpType = positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 6);
+            sequenceArray[selectedChannel].stepData[selectedStep].arpType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 0, 6);
           break;
 
           case STEPMODE_ARPSPEEDNUM:
-          sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum + knobChange, 16) ;
+          sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum = min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum + knobChange, 1, 16) ;
           break;
           case STEPMODE_ARPSPEEDDEN:
-          sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen + knobChange, 129) ;
+          sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen = min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen + knobChange, 1, 64);
           break;
 
           case STEPMODE_ARPOCTAVE:
-          sequenceArray[selectedChannel].stepData[selectedStep].arpOctave=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpOctave + knobChange, 5);
+          sequenceArray[selectedChannel].stepData[selectedStep].arpOctave=  min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpOctave + knobChange, 1, 5);
           break;
 
           case STEPMODE_ARPCOUNT:

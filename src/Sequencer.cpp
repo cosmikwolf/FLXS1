@@ -35,7 +35,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 		stepData[i].offset = 0;
 		stepData[i].noteStatus = NOTPLAYING_NOTQUEUED;
 		stepData[i].notePlaying = 0;
-		stepData[i].stepOffTime = 0;
 		stepData[i].stepTimer = 0;
 	}
 
@@ -148,15 +147,8 @@ void Sequencer::calculateStepTimers(){
 	//beatOffset
 	//stepLength = beatLength/stepDivider*stepCount;
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-		if (stepData[stepNum].arpType == 0){ // for non arpeggiated notes, use gateLength
-			stepData[stepNum].stepOffTime = stepData[stepNum].gateLength*beatLength/stepData[stepNum].beatDiv;
-			stepData[stepNum].offset = accumulatedOffset;
-			accumulatedOffset += beatLength/stepData[stepNum].beatDiv;
-		} else {// for arpeggiated notes, use arpCount and arpLength
-			stepData[stepNum].stepOffTime =  beatLength*stepData[stepNum].arpCount*stepData[stepNum].arpSpdNum/(stepData[stepNum].arpSpdDen*stepData[stepNum].beatDiv);
-			stepData[stepNum].offset = accumulatedOffset;
-			accumulatedOffset+=beatLength/stepData[stepNum].beatDiv;
-		}
+		stepData[stepNum].offset = accumulatedOffset;
+		accumulatedOffset += beatLength/stepData[stepNum].beatDiv;
 	}
 }
 
@@ -189,27 +181,29 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	// iterate through all steps to determine if they need to have action taken.
 		if (stepData[stepNum].gateType > GATETYPE_REST){
 			// if the gateType is not rest, some action should be taken
-			if (stepData[stepNum].stepTimer > stepData[stepNum].stepOffTime && stepData[stepNum].arpStatus != 0) {
+			uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
+			uint32_t trigLength;
+
+			if (stepData[stepNum].stepTimer > stepOffTime && stepData[stepNum].arpStatus != 0) {
 				//reset arpeggio status so arpeggio can start fresh on next trigger
 				stepData[stepNum].arpStatus = 0;
 			}
 
-			uint32_t trigLength;
-
-	//	if (stepData[stepNum].arpType != 0 ){
-	//			trigLength = (beatLength/stepData[stepNum].beatDiv)*stepData[stepNum].arpSpdNum/stepData[stepNum].arpSpdDen;
-	//		} else {
-				trigLength = stepData[stepNum].gateLength*beatLength/stepData[stepNum].beatDiv;
-	//		};
+			if (stepData[stepNum].arpType != 0 ){
+				trigLength = (beatLength*stepData[stepNum].arpSpdNum)/(stepData[stepNum].beatDiv*stepData[stepNum].arpSpdDen);
+			} else {
+				trigLength = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
+			};
 
 //			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
-      if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * stepData[stepNum].arpLength() -10000 ) {
+      if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - trigLength/10  || stepData[stepNum].stepTimer > stepOffTime) {
   			// shut off notes that should stop playing.
 				noteShutOff(noteData, stepNum);
 			}
 
-			if ( ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) )&& sequenceTimer < (stepData[stepNum].offset + stepData[stepNum].stepOffTime - trigLength/3)) {
-
+			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
+			   if ( sequenceTimer < (stepData[stepNum].offset + stepOffTime - 500 )) {
+					 // 1000us buffer is so that a note doesn't get retriggered after it gets shut off for the last time.
 /*
 				 sequenceTimer <-- starts at the beginning of the sequence
 				 stepData[stepNum].offset <-- time index when step should start. offset from beginning
@@ -226,7 +220,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				noteTrigger(noteData, stepNum);
 				stepData[stepNum].arpStatus++;
 
-		/*		Serial.println("Triggering Note - stepNum: " + String(stepNum)  +
+		 /*
+				Serial.println("First Condition Met - stepNum: " + String(stepNum)  +
 					+ "\tarpStatus: " + String(stepData[stepNum].arpStatus)
 					+ "\tsequenceTimer: " + String(sequenceTimer)
 					+ "\tlt: " + String(stepData[stepNum].offset + stepData[stepNum].stepOffTime)
@@ -235,13 +230,16 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 					+ "\tstepoff: " + String(stepData[stepNum].stepOffTime)
 					+ "\tarpLength: " + String(stepData[stepNum].arpLength())
 					+ "\tstpLength: " + String(stepLength)
+					+ "\tgateLength: " + String(stepData[stepNum].gateLength)
 					+ "\tbeatLength: " + String(beatLength)
-					+ "\tbeatCount:" + String(beatCount)
+					+ "\tbeatDiv:" + String(stepData[stepNum].beatDiv)
 					+ "\tstepCount:" + String(stepCount)
+					+ "\ttrigLength:" + String(trigLength)
 				);
 		 */
 
 			}
+		}
 		}
 	}
 }
