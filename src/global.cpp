@@ -26,7 +26,6 @@ boolean playing = false;
 boolean wasPlaying = false;
 uint8_t masterPulseCount = 24;
 unsigned long beatLength = 60000000/(tempoX100/100);
-unsigned long lastTimer;
 elapsedMicros masterTempoTimer;
 elapsedMicros internalClockTimer;
 elapsedMicros startTime;

@@ -538,7 +538,7 @@ void InputModule::altButtonHandler(){
             break;
 
           case STEPMODE_GATETYPE:
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 0, 4);
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateType + knobChange, 0, 3);
             break;
 
           case STEPMODE_GLIDE:
@@ -559,9 +559,7 @@ void InputModule::altButtonHandler(){
           case STEPMODE_ARPOCTAVE:
           sequenceArray[selectedChannel].stepData[selectedStep].arpOctave=  min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpOctave + knobChange, 1, 5);
           break;
-
-          case STEPMODE_ARPCOUNT:
-          break;
+;
 
         }
       }
@@ -574,42 +572,20 @@ void InputModule::channelVelocityModeInputHandler(){
     if (midplaneGPIO->fell(i)){
 
       if (selectedStep == getNote(i)){
-        switch(stepMode){
-          case STEPMODE_VELOCITY:
-            stepMode = STEPMODE_VELOCITY;
-            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocity - knobRead;
-          break;
-
-      //    case STEPMODE_ARPTYPE:
-      //      stepMode = STEPMODE_ARPSPEED;
-      //      knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpSpdDen - knobRead;
-      //    break;
-
-      //    case STEPMODE_ARPSPEED:
-      //      stepMode = STEPMODE_ARPOCTAVE;
-      //      knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpOctave - knobRead;
-      //    break;
-
-          case STEPMODE_ARPOCTAVE:
-            stepMode = STEPMODE_ARPCOUNT;
-            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].arpCount - knobRead;
-          break;
-
-          case STEPMODE_ARPCOUNT:
-            stepMode = STEPMODE_GATETYPE;
-            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
-          break;
-
-          default:
-            stepMode = STEPMODE_GATETYPE;
-            knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
-          break;
-
-        }
+        stepMode = (stepMode + 1) % 2;
       } else {
-        stepMode = STEPMODE_GATETYPE;
+        stepMode = 0;
         selectedStep = getNote(i);
-        knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateType - knobRead;
+      }
+      switch(stepMode){
+        case STEPMODE_VELOCITY:
+          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocity - knobRead;
+        break;
+
+        case STEPMODE_VELOCITYTYPE:
+          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocityType - knobRead;
+        break;
+
       }
     }
   }
@@ -620,21 +596,10 @@ void InputModule::channelVelocityModeInputHandler(){
       case STEPMODE_VELOCITY:
       sequenceArray[selectedChannel].stepData[selectedStep].velocity =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].velocity + knobChange, 127);
       break;
-      case STEPMODE_ARPTYPE:
-      sequenceArray[selectedChannel].stepData[selectedStep].arpType=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpType + knobChange, 6);
+      case STEPMODE_VELOCITYTYPE:
+      sequenceArray[selectedChannel].stepData[selectedStep].velocityType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].velocityType + knobChange, 0, 3);
       break;
-    //  case STEPMODE_ARPSPEED:
-    //  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen= // positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen + knobChange, 129) ;
-    //  break;
-      case STEPMODE_ARPOCTAVE:
-      sequenceArray[selectedChannel].stepData[selectedStep].arpOctave=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpOctave + knobChange, 5);
-      break;
-      case STEPMODE_ARPCOUNT:
-      sequenceArray[selectedChannel].stepData[selectedStep].arpCount=  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].arpCount + knobChange, 129);
-      if (sequenceArray[selectedChannel].stepData[selectedStep].arpCount == 0){
-        sequenceArray[selectedChannel].stepData[selectedStep].arpCount = 1;
-      }
-      break;
+
     }
   }
 };

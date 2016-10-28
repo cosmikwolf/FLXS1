@@ -63,7 +63,6 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["bd"] = sequenceArray[channel].stepData[i].beatDiv ;
     stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType ;
     stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
-    stepDataObj["ac"] = sequenceArray[channel].stepData[i].arpCount;
     stepDataObj["at"] = sequenceArray[channel].stepData[i].arpType;
     stepDataObj["ao"] = sequenceArray[channel].stepData[i].arpOctave;
     stepDataObj["an"] = sequenceArray[channel].stepData[i].arpSpdNum;
@@ -169,7 +168,6 @@ Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
      stepDataBuf.beatDiv     = stepDataArray[i]["bd"];
      stepDataBuf.gateType    = stepDataArray[i]["gt"];
      stepDataBuf.gateLength  = stepDataArray[i]["gl"];
-     stepDataBuf.arpCount    = stepDataArray[i]["ac"];
      stepDataBuf.arpType     = stepDataArray[i]["at"];
      stepDataBuf.arpOctave   = stepDataArray[i]["ao"];
      stepDataBuf.arpSpdNum   = stepDataArray[i]["an"];

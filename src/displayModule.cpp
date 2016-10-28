@@ -439,42 +439,18 @@ void DisplayModule::channelVelocityMenuDisplay(char *buf) {
 //  char *gateTypeArray[] = { "off", "on", "1-shot","hold" };
   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
   displayElement[2] = strdup(buf);
+  displayElement[3] = strdup("velocity type:");
+  char *velTypeArray[] = { "voltage", "LFO Sine", "LFO Cosine", "LFO Square"};
+  displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
 
-  displayElement[3] = strdup("type:");
-  char *arpTypeArray[] = { "off","up","dn","up+dn1","up+dn2","rndm" };
-  displayElement[4] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
-
-  char *beatDivArray[] = { "1/1", "3/4", "2/3", "3/5", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9", "1/10", "1/11", "1/12", "1/16", "1/24", "1/32", "1/48", "1/64", "1/72", "1/96", "1/128", "1/256", "1/512" };
-
-  displayElement[5] = strdup("beat divide:");
-  sprintf(buf, "1/%d", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
-  displayElement[6] = strdup(buf);
-
-  displayElement[7] = strdup("octave:");
-  sprintf(buf, "%d oct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
-  displayElement[8] = strdup(buf);
-
-  displayElement[9] = strdup("arp count:");
-  sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].arpCount);
-  displayElement[10] = strdup(buf);
 
   switch (stepMode) {
     case STEPMODE_VELOCITY:
       highlight = 2;
     break;
-    case STEPMODE_ARPTYPE:
+    case STEPMODE_VELOCITYTYPE:
       highlight = 4;
     break;
-    //case STEPMODE_ARPSPEED:
-    //  highlight = 6;
-    //break;
-    case STEPMODE_ARPOCTAVE:
-      highlight = 8;
-    break;
-    case STEPMODE_ARPCOUNT:
-      highlight = 10;
-    break;
-
   }
 
 //Title - arp set
@@ -482,9 +458,9 @@ void DisplayModule::channelVelocityMenuDisplay(char *buf) {
 //velocity
   renderOnce_StringBox(1,  highlight, previousHighlight, 0,  0, 128, 10, false, 0, background, foreground);
   renderOnce_StringBox(2,  highlight, previousHighlight, 0,  6, 128, 15, false, 2, background, foreground);
-//arp type
-//  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  23, 64, 10, false, 0, background, foreground);
-//  renderOnce_StringBox(4,  highlight, previousHighlight, 0,  29, 64, 15, false, 2, background, foreground);
+//vel type
+  renderOnce_StringBox(3,  highlight, previousHighlight, 0,  23, 128, 10, false, 0, background, foreground);
+  renderOnce_StringBox(4,  highlight, previousHighlight, 0,  29, 128, 15, false, 2, background, foreground);
 ////arp speed
 //  renderOnce_StringBox(5,  highlight, previousHighlight, 0,  46, 64, 10, false, 0, background, foreground);
 //  renderOnce_StringBox(6,  highlight, previousHighlight, 0,  52, 64, 15, false, 2, background, foreground);
@@ -793,22 +769,6 @@ void DisplayModule::deleteMenuDisplay(){
   */
 };
 
-
-void DisplayModule::instrumentSelectDisplay(){
-  /*
-  const char* element;
-
-  element =  "INSTRUMENT SELECT";
-  gdispFillStringBox(   0, 31, 128 , 10, element, fontSm, Orange, Red, justifyCenter);
-
-  element = String(instrumentNames[sequenceArray[selectedChannel].instrument]).c_str();
-  gdispFillStringBox(   0, 41, 128 , 24, element, fontSm, Red, Orange, justifyCenter);
-  element = String("vol: " + String(sequenceArray[selectedChannel].volume)).c_str();
-  gdispFillStringBox(   0, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
-  element = String("bank: " + String(sequenceArray[selectedChannel].bank)).c_str();
-  gdispFillStringBox(   64, 65, 64 , 10, element, fontSm, Black, Orange, justifyCenter);
-  */
-}
 
 void DisplayModule::timingMenuDisplay(){
   /*

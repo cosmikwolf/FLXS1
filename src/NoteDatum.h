@@ -48,14 +48,16 @@ typedef	struct StepDatum {
 	uint8_t			chord; //to select what chord to set
 	uint8_t 		gateType;		// gate type (hold, repeat, arpeggio)
 	uint8_t			gateLength;		// gate length becomes arpCount if
-	uint8_t 		arpCount;		// # of arpeggiations for this step
 	uint8_t 		arpType;		// off, up, down, up & down etc
 	uint8_t 		arpOctave;		// off, up, down, up & down etc
 	uint8_t 		arpSpdNum;	//
 	uint8_t 		arpSpdDen;	//
-	uint8_t			velocity;	    // note velocity
 	uint8_t			glide;			// portamento time - to be implemented.
 	uint8_t			beatDiv;
+	uint8_t			velocity;	    // note velocity
+	uint8_t			velocityType;
+	uint8_t			test2;
+
 	// utility variables - dont need to be saved.
 	uint8_t				noteStatus;		// if note is playing or not
 	uint8_t				arpStatus;		// if note is playing or not. Value indicates arp number.

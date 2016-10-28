@@ -61,7 +61,6 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		this->stepData[n].chord	   		=	 0;
 		this->stepData[n].gateType		=	 0;
 		this->stepData[n].gateLength	=	 1;
-		this->stepData[n].arpCount		=	 4;
 		this->stepData[n].arpType			=	 0;
 		this->stepData[n].arpOctave		=  1  ;
 		this->stepData[n].arpSpdNum		=  1;

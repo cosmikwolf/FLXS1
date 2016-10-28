@@ -21,7 +21,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 }
 
 void MasterClock::masterClockFunc(void){
- elapsedMicros loopTimer = 0;
+ //elapsedMicros loopTimer = 0;
 
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 //  timerAvg = (lastTimer + 9*timerAvg) /10;
@@ -49,7 +49,7 @@ void MasterClock::masterClockFunc(void){
 		outputControl->setClockOutput(LOW);
 	}
   wasPlaying = playing;
-  lastTimer = loopTimer;
+  //lastTimer = loopTimer;
 
 }
 
