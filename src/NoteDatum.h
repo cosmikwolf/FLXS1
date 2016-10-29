@@ -34,6 +34,8 @@ typedef struct NoteDatum {
 	uint8_t   noteOnArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
 	bool      noteGateArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
 	uint8_t   noteVelArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
+	uint8_t   noteVelTypeArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
+	uint8_t   noteLfoSpeed[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
 	uint8_t   noteGlideArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
 	uint8_t   noteOffArray[MAX_STEPS_PER_SEQUENCE];  // contains all notes that need to be stopped
 	uint8_t   channel;            // sequence channel (0-3)
@@ -56,7 +58,7 @@ typedef	struct StepDatum {
 	uint8_t			beatDiv;
 	uint8_t			velocity;	    // note velocity
 	uint8_t			velocityType;
-	uint8_t			test2;
+	uint8_t			lfoSpeed;
 
 	// utility variables - dont need to be saved.
 	uint8_t				noteStatus;		// if note is playing or not

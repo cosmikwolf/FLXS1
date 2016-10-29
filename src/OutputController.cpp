@@ -6,6 +6,23 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
 
   this->serialMidi = serialMidi;
   this->adc = adc;
+  this->lfoType[0] = 0;
+  this->lfoType[1] = 0;
+  this->lfoType[2] = 0;
+  this->lfoType[3] = 0;
+  this->lfoSpeed[0] = 1;
+  this->lfoSpeed[1] = 1;
+  this->lfoSpeed[2] = 1;
+  this->lfoSpeed[3] = 1;
+  this->lfoAmplitude[0] = 0;
+  this->lfoAmplitude[1] = 0;
+  this->lfoAmplitude[2] = 0;
+  this->lfoAmplitude[3] = 0;
+  this->lfoRheoSet[0] = 1;
+  this->lfoRheoSet[1] = 1;
+  this->lfoRheoSet[2] = 1;
+  this->lfoRheoSet[3] = 1;
+
   Serial.println("initializing gate outputs");
   this->backplaneGPIO = backplaneGPIO;
   backplaneGPIO->begin(BACKPLANE_MAX7301_CS_PIN);
@@ -164,7 +181,7 @@ Serial.println("CV1: " + String(analogRead(22)) + "\tCV2: " + String(analogRead(
   backplaneGPIO->digitalWrite(8, 0);
 }
 
-void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t glide, bool gate){
+void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -193,7 +210,23 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
 
-    ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
+    if(velocityType == 1){
+        Serial.println("velocitytype == 1 on channel " + String(channel));
+      if (outputMap(channel, RHEOCHANNELCC) == 0){
+        mcp4352_1.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
+      } else {
+        mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
+      }
+      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
+      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
+      lfoRheoSet[channel] = 1;
+    } else if (velocityType > 1){
+      Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
+      lfoAmplitude[channel] = velocity;
+      lfoSpeed[channel] = lfoSpeedSetting;
+      lfoType[channel] = velocityType;
+      lfoRheoSet[channel] = 1;
+    }
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
       mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to 0
@@ -231,6 +264,46 @@ switch (channel){
 
 
 };
+
+
+void OutputController::lfoUpdate(uint8_t channel){
+  uint8_t rheoStatLevel;
+  int8_t voltageLevel;
+
+  Serial.println("beginning lfoUpdate for channel " + String(channel));
+  if (lfoType[channel] != 2){
+    return;
+  }
+
+  switch(lfoType[channel]){
+    case 2:
+      rheoStatLevel = 0;
+      voltageLevel = (sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)))*lfoAmplitude[channel];
+    break;
+
+    default:
+//      return;
+    break;
+  }
+
+  //lfoAmplitude[channel]
+  //lfoRheoSet[channel]
+
+  //if (lfoRheoSet[channel] == 1){
+    if (outputMap(channel, RHEOCHANNELCC) == 0){
+      mcp4352_1.setResistance(outputMap(channel, CCRHEO), rheoStatLevel);        // set digipot to 0
+    } else {
+      mcp4352_2.setResistance(outputMap(channel, CCRHEO), rheoStatLevel);        // set digipot to 0
+    }
+    //Serial.println("setting rheo");
+    lfoRheoSet[channel] = 0;
+  //}
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,0, 65535 ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,0, 65535 ) );  // set CC voltage
+
+  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(rheoStatLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
+
+}
 
 uint8_t OutputController::analogInputTranspose(uint8_t note){
 
@@ -280,6 +353,7 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 void OutputController::noteOff(uint8_t channel, uint8_t note){
 //  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
+
   backplaneGPIO->digitalWrite(channel, LOW);
   serialMidi->sendNoteOff(note, 64, channel);
 
@@ -287,6 +361,9 @@ void OutputController::noteOff(uint8_t channel, uint8_t note){
 
 void OutputController::allNotesOff(uint8_t channel){
     backplaneGPIO->digitalWrite(channel, LOW);
+    this->lfoType[channel] = 0;
+    this->lfoAmplitude[channel] = 0;
+    this->lfoRheoSet[channel] = 1;
 }
 
 void OutputController::setClockOutput(bool value){

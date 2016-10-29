@@ -30,6 +30,7 @@ private:
   NoteDatum *noteData;
   midi::MidiInterface<HardwareSerial>* serialMidi;
   MidiModule *midiControl;
+  elapsedMillis lfoTimer;
 };
 // https://isocpp.org/wiki/faq/pointers-to-members#fnptr-vs-memfnptr-types
 //typedef void (MasterClock::*MasterClockMemFn)();

@@ -572,7 +572,7 @@ void InputModule::channelVelocityModeInputHandler(){
     if (midplaneGPIO->fell(i)){
 
       if (selectedStep == getNote(i)){
-        stepMode = (stepMode + 1) % 2;
+        stepMode = (stepMode + 1) % 3;
       } else {
         stepMode = 0;
         selectedStep = getNote(i);
@@ -586,6 +586,10 @@ void InputModule::channelVelocityModeInputHandler(){
           knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].velocityType - knobRead;
         break;
 
+        case STEPMODE_LFOSPEED:
+          knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].lfoSpeed - knobRead;
+        break;
+
       }
     }
   }
@@ -597,7 +601,10 @@ void InputModule::channelVelocityModeInputHandler(){
       sequenceArray[selectedChannel].stepData[selectedStep].velocity =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].velocity + knobChange, 127);
       break;
       case STEPMODE_VELOCITYTYPE:
-      sequenceArray[selectedChannel].stepData[selectedStep].velocityType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].velocityType + knobChange, 0, 3);
+      sequenceArray[selectedChannel].stepData[selectedStep].velocityType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].velocityType + knobChange, 0, 2);
+      break;
+      case STEPMODE_LFOSPEED:
+      sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed = min_max(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed + knobChange, 1, 255);
       break;
 
     }

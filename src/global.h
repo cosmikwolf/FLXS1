@@ -3,6 +3,7 @@
 #ifndef _global_h_
 #define _global_h_
 
+#define PIMILLION             3141593
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		     	 7
 #define	SEQUENCE_MENU		     	  2
@@ -63,6 +64,7 @@
 //VELOCITY PAGE STEP MODES
 #define STEPMODE_VELOCITY       0
 #define STEPMODE_VELOCITYTYPE   1
+#define STEPMODE_LFOSPEED       2
 
 //STEP PAGE STEP MODES:
 #define STEPMODE_QUANTIZEKEY     17

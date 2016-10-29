@@ -66,6 +66,8 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		this->stepData[n].arpSpdNum		=  1;
 		this->stepData[n].arpSpdDen		=  4;
 		this->stepData[n].velocity		=  67;
+		this->stepData[n].velocityType=  0;
+		this->stepData[n].lfoSpeed		=  16;
 		this->stepData[n].glide				=  0;
 		this->stepData[n].beatDiv			=  4;
 	}
@@ -372,6 +374,8 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum){
 			noteData->noteGateArray[i] = gateTrig;
 			noteData->noteOnArray[i] = stepData[stepNum].notePlaying;
 			noteData->noteVelArray[i] = stepData[stepNum].velocity;
+			noteData->noteVelTypeArray[i] = stepData[stepNum].velocityType;
+			noteData->noteLfoSpeed[i] = stepData[stepNum].lfoSpeed;
 			noteData->noteGlideArray[i] = stepData[stepNum].glide;
 			break;
 		}
@@ -385,6 +389,8 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 	for(int i = 0; i < stepCount; i++){
 		noteData->noteOnArray[i] = NULL;
 		noteData->noteVelArray[i] = NULL;
+		noteData->noteVelTypeArray[i] = NULL;
+		noteData->noteLfoSpeed[i] = NULL;
 		noteData->noteGlideArray[i] = NULL;
 		noteData->noteOffArray[i] = NULL;
 	}

@@ -440,8 +440,12 @@ void DisplayModule::channelVelocityMenuDisplay(char *buf) {
   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
   displayElement[2] = strdup(buf);
   displayElement[3] = strdup("velocity type:");
-  char *velTypeArray[] = { "voltage", "LFO Sine", "LFO Cosine", "LFO Square"};
+  char *velTypeArray[] = { "none", "voltage", "LFO Sine" };
   displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
+  displayElement[5] = strdup("LFO speed:");
+//  char *gateTypeArray[] = { "off", "on", "1-shot","hold" };
+  sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+  displayElement[6] = strdup(buf);
 
 
   switch (stepMode) {
@@ -450,6 +454,9 @@ void DisplayModule::channelVelocityMenuDisplay(char *buf) {
     break;
     case STEPMODE_VELOCITYTYPE:
       highlight = 4;
+    break;
+    case STEPMODE_LFOSPEED:
+      highlight = 6;
     break;
   }
 
@@ -461,9 +468,9 @@ void DisplayModule::channelVelocityMenuDisplay(char *buf) {
 //vel type
   renderOnce_StringBox(3,  highlight, previousHighlight, 0,  23, 128, 10, false, 0, background, foreground);
   renderOnce_StringBox(4,  highlight, previousHighlight, 0,  29, 128, 15, false, 2, background, foreground);
-////arp speed
-//  renderOnce_StringBox(5,  highlight, previousHighlight, 0,  46, 64, 10, false, 0, background, foreground);
-//  renderOnce_StringBox(6,  highlight, previousHighlight, 0,  52, 64, 15, false, 2, background, foreground);
+//lfo speed
+  renderOnce_StringBox(5,  highlight, previousHighlight, 0,  46, 64, 10, false, 0, background, foreground);
+  renderOnce_StringBox(6,  highlight, previousHighlight, 0,  52, 64, 15, false, 2, background, foreground);
 ////arp octave
 //  renderOnce_StringBox(7,  highlight, previousHighlight, 64,  23, 64, 10, false, 0, background, foreground);
 //  renderOnce_StringBox(8,  highlight, previousHighlight, 64,  29, 64, 15, false, 2, background, foreground);
