@@ -67,7 +67,7 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		this->stepData[n].arpSpdDen		=  4;
 		this->stepData[n].velocity		=  67;
 		this->stepData[n].velocityType=  0;
-		this->stepData[n].lfoSpeed		=  ;
+		this->stepData[n].lfoSpeed		=  16;
 		this->stepData[n].glide				=  0;
 		this->stepData[n].beatDiv			=  4;
 	}
