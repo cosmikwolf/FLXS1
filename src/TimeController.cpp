@@ -22,16 +22,19 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   sequencerArray[2].initialize(2, 16, 4, (tempoX100/100));
   sequencerArray[3].initialize(3, 16, 4, (tempoX100/100));
 
-	ledArray.initialize(sequencerArray);
+	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
+	buttonIo.changeState(CHANNEL_PITCH_MODE);
+
 
 	display.initialize(sequencerArray);
+
+	ledArray.initialize(sequencerArray);
+
 
 	outputControl.initialize(&backplaneGPIO, serialMidi, adc);
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
-	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
-	buttonIo.changeState(CHANNEL_PITCH_MODE);
 
 	saveFile.initialize(sequencerArray);
 	saveFile.loadPattern(0, 0b1111);
