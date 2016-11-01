@@ -7,6 +7,10 @@ InputModule::InputModule():knob(ENCODER1LEFTPIN, ENCODER1RIGHTPIN)
 {
 // Encoder lib has no default constructor, so need to use initializer list instead
 // from https://forum.pjrc.com/threads/25082-How-do-I-include-a-library-in-a-library
+
+//pinMode(ENCODER1LEFTPIN, INPUT);
+//pinMode(ENCODER1RIGHTPIN, INPUT);
+
 knobRead = 0;;
 knobBuffer = 0;;
 knobPrevious = 0;;

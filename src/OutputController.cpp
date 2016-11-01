@@ -241,7 +241,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 switch (channel){
   case 1:
   offset = map(adc->analogRead(A12, ADC_1), 0, 1023, 60, -60) ;
-  Serial.println("ch1 offset: "+ String(offset));
+  //Serial.println("ch1 offset: "+ String(offset));
   break;
   case 2:
   offset = map(adc->analogRead(A13, ADC_1), 0, 1023, 60, -60) ;
@@ -270,7 +270,7 @@ void OutputController::lfoUpdate(uint8_t channel){
   uint8_t rheoStatLevel;
   int8_t voltageLevel;
 
-  Serial.println("beginning lfoUpdate for channel " + String(channel));
+  //Serial.println("beginning lfoUpdate for channel " + String(channel));
   if (lfoType[channel] != 2){
     return;
   }

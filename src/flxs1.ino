@@ -40,7 +40,7 @@ elapsedMicros masterLoopTimer;
 void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
-  delay(1500);
+  delay(100);
 
   printHeapStats();
 
@@ -93,8 +93,7 @@ void setup() {
 
   adc->enableInterrupts(ADC_0);
 
-
-  pinMode(A11, INPUT);
+  pinMode(A3, INPUT);
   pinMode(A12, INPUT);
   pinMode(A13, INPUT);
   pinMode(A10, INPUT);
@@ -112,10 +111,10 @@ void loop() {
   timeControl.runLoopHandler();
 
   //digitalWriteFast(26, LOW);
-/*  if (millis()%1000 == 0){
-    Serial.println("1:\t" + String(adc->analogRead(A11, ADC_0)) + "\t2:\t" + String(adc->analogRead(A12, ADC_1)) + "\t3:\t" + String(adc->analogRead(A13, ADC_1)) + "\t4:\t" + String(adc->analogRead(A10, ADC_1)));
+  if (millis()%1000 == 0){
+    Serial.println("1:\t" + String(adc->analogRead(A3, ADC_1)) + "\t2:\t" + String(adc->analogRead(A12, ADC_1)) + "\t3:\t" + String(adc->analogRead(A13, ADC_1)) + "\t4:\t" + String(adc->analogRead(A10, ADC_1)));
   };
-*/
+
 /*  if (!playing){
     if (notefreq.available()) {
     //  Serial

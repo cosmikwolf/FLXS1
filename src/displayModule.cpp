@@ -16,10 +16,10 @@ void DisplayModule::initialize(Sequencer *sequenceArray){
 
   this->sequenceArray = sequenceArray;
   oled.begin();
+  delay(100);
   //oled.setFont(&Font);//this will load the font
   oled.setFont(&unborn_small);//this will load the font
   oled.setTextScale(2);
-
   oled.fillScreen(BLACK);     delay(10);
   oled.fillScreen(RED);     delay(10);
   oled.fillScreen(ORANGE);      delay(10);

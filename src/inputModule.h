@@ -43,7 +43,7 @@
 #define SW_MENU   26
 #define SW_SHIFT   27
 #define ENCODER1LEFTPIN 16
-#define ENCODER1RIGHTPIN 17
+#define ENCODER1RIGHTPIN 25 
 #define MAX7301PIN  5
 
 class InputModule
