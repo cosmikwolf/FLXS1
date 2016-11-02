@@ -132,11 +132,11 @@ void loop() {
 
 void printHeapStats()
 {
-  Serial.print("                  arena: ");Serial.println(mallinfo().arena);
-  Serial.print("  total allocated space: ");Serial.println(mallinfo().uordblks);
-  Serial.print("  total non-inuse space: ");Serial.println(mallinfo().fordblks);
-  Serial.print("   top releasable space: ");Serial.println(mallinfo().keepcost);
-  Serial.println("");
+//  Serial.print("                  arena: ");Serial.println(mallinfo().arena);
+//  Serial.print("  total allocated space: ");Serial.println(mallinfo().uordblks);
+//  Serial.print("  total non-inuse space: ");Serial.println(mallinfo().fordblks);
+//  Serial.print("   top releasable space: ");Serial.println(mallinfo().keepcost);
+//  Serial.println("");
 }
 
 void usbNoteOff(){

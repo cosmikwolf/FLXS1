@@ -330,7 +330,6 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   char *arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
   displayElement[17] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
-  char *beatDivArray[] = { "1/1", "3/4", "2/3", "3/5", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9", "1/10", "1/11", "1/12", "1/16", "1/24", "1/32", "1/48", "1/64", "1/72", "1/96", "1/128", "1/256", "1/512" };
 
   displayElement[18] = strdup("arp");
   displayElement[23] = strdup("spd:");
