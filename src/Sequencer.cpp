@@ -25,19 +25,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->beatCount = beatCount;
 	this->tempoX100 = tempoX100;
 	this->sequenceTimer = 0;
-	//for (int i=0; i < stepCount; i++){
-	// stepData[i].gateLength = 1;
-	//  stepData[i].velocity = 127;
-	// stepData[i].pitch = 24;
-	//};
-
-	for (int i=0; i<MAX_STEPS_PER_SEQUENCE; i++){
-		stepData[i].offset = 0;
-		stepData[i].noteStatus = NOTPLAYING_NOTQUEUED;
-		stepData[i].notePlaying = 0;
-		stepData[i].stepTimer = 0;
-	}
-
 	this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
 	this->monophonic = true;
@@ -58,18 +45,24 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		for (int i=1; i<4; i++){
 			this->stepData[n].pitch[i] = 0;
 		}
-		this->stepData[n].chord	   		=	 0;
-		this->stepData[n].gateType		=	 0;
-		this->stepData[n].gateLength	=	 1;
-		this->stepData[n].arpType			=	 0;
-		this->stepData[n].arpOctave		=  1  ;
-		this->stepData[n].arpSpdNum		=  1;
-		this->stepData[n].arpSpdDen		=  4;
-		this->stepData[n].velocity		=  67;
-		this->stepData[n].velocityType=  0;
-		this->stepData[n].lfoSpeed		=  16;
-		this->stepData[n].glide				=  0;
-		this->stepData[n].beatDiv			=  4;
+		this->stepData[n].chord	   		 =	 0;
+		this->stepData[n].gateType		 =	 0;
+		this->stepData[n].gateLength	 =	 1;
+		this->stepData[n].arpType			 =	 0;
+		this->stepData[n].arpOctave		 =   1;
+		this->stepData[n].arpSpdNum		 =   1;
+		this->stepData[n].arpSpdDen		 =   4;
+		this->stepData[n].glide				 =   0;
+		this->stepData[n].beatDiv			 =   4;
+		this->stepData[n].velocity		 =  67;
+		this->stepData[n].velocityType =   0;
+		this->stepData[n].lfoSpeed		 =  16;
+	//	this->stepData[n].test		     =  16;
+
+		this->stepData[n].offset       =   0;
+		this->stepData[n].noteStatus   =  NOTPLAYING_NOTQUEUED;
+		this->stepData[n].notePlaying  =   0;
+		this->stepData[n].stepTimer    =   0;
 	}
 };
 
