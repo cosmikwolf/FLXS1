@@ -190,7 +190,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
   Serial.println("[[-]]><{{{--}}}><[[-]] LOADING PATTERN: " + String(pattern) + " [[-]]><{{{--}}}><[[-]]");
 //  printPattern();
 
-	for(int i=0; i < sequenceCount; i++){
+	for(int i=0; i < SEQUENCECOUNT; i++){
 
     if ( !(channelSelector & (1 << i) ) ){
       Serial.println("skipping loading channel " + String(i));
@@ -232,9 +232,9 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 }
 
 void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
-	//Serial.println("currentPattern: " + String(currentPattern) + "\tsequenceCount: " + String(sequenceCount));
+	//Serial.println("currentPattern: " + String(currentPattern) + "\tSEQUENCECOUNT: " + String(SEQUENCECOUNT));
 	if(saveFirst){
-    for(int i=0; i < sequenceCount; i++){
+    for(int i=0; i < SEQUENCECOUNT; i++){
   		//saveChannelPattern(i);
       saveSequenceJSON(i, currentPattern);
     }
@@ -253,7 +253,7 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 void FlashMemory::deleteSaveFile(){
   this->deleteAllFiles();
 //  for(int i=0; i<16; i++){
-//    for(int n=0; n<sequenceCount; n++){
+//    for(int n=0; n<SEQUENCECOUNT; n++){
 //      sequenceArray[n].initNewSequence(i, n);
 //    }
 //  }
@@ -293,7 +293,7 @@ void FlashMemory::printDirectory(File dir, int numTabs) {
 
 void FlashMemory::printPattern(){
   Serial.println("Printing Data for pattern: " + String(currentPattern));
-  for(int i=0; i < sequenceCount; i++){
+  for(int i=0; i < SEQUENCECOUNT; i++){
     Serial.print("sc:\t"+String(sequenceArray[i].stepCount) +"\tbc:\t"+String(sequenceArray[i].beatCount) +"\tqk:\t"+String(sequenceArray[i].quantizeKey)+"\t");
     for(int n=0; n<16; n++){
       Serial.print( String(sequenceArray[i].stepData[n].pitch[0]) + "\t" );

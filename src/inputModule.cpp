@@ -372,12 +372,12 @@ void InputModule::altButtonHandler(){
 
         case SW_STOP:
           if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-            for(uint8_t channel = 0; channel < sequenceCount; channel++){
+            for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
               outputControl->allNotesOff(channel);
             }
           }
           playing = false;
-          for(int s = 0; s < sequenceCount; s++){
+          for(int s = 0; s < SEQUENCECOUNT; s++){
             sequenceArray[s].activeStep = 0;
            // sam2695.allNotesOff(s);
           }

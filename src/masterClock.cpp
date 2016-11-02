@@ -15,7 +15,7 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
-  for (int i = 0; i < sequenceCount; i++ ){
+  for (int i = 0; i < SEQUENCECOUNT; i++ ){
     sequenceArray[i].setTempo(tempoX100);
   }
 }
@@ -79,7 +79,7 @@ void MasterClock::internalClockTick(){
  	 }
 		outputControl->setClockOutput(HIGH);
 
-    for (int i=0; i< sequenceCount; i++){
+    for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].clockStart(startTime);
       sequenceArray[i].beatPulse(beatLength, &life);
       sequenceArray[i].runSequence(&noteData[i], &life);
@@ -89,7 +89,7 @@ void MasterClock::internalClockTick(){
     if (queuePattern != currentPattern) {
       //changePattern(queuePattern, true, true);
     }
-    for (int i=0; i< sequenceCount; i++){
+    for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].runSequence(&noteData[i], &life);
       sequenceArray[i].beatPulse(beatLength, &life);
 
@@ -99,12 +99,12 @@ void MasterClock::internalClockTick(){
 
        // Serial.print(" b5 ");
   }  else {
-    for (int i=0; i< sequenceCount; i++){
+    for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].runSequence(&noteData[i], &life);
     }
   }
 	if(lfoTimer > 10){
-		for (int i=0; i< sequenceCount; i++){
+		for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->lfoUpdate(i);
 		}
 		lfoTimer = 0;
@@ -118,13 +118,13 @@ void MasterClock::internalClockTick(){
 void MasterClock::externalClockTick(){
   // ext clock sync
 
-	  for (int i=0; i< sequenceCount; i++){
+	  for (int i=0; i< SEQUENCECOUNT; i++){
 	    sequenceArray[i].runSequence(&noteData[i], &life);
 	  }
 }
 
 void MasterClock::noteOffSwitch(){
-  for (int i=0; i< sequenceCount; i++){
+  for (int i=0; i< SEQUENCECOUNT; i++){
     if (noteData[i].noteOff == true){
       for (int n=0; n< MAX_STEPS_PER_SEQUENCE; n++){
         if (!noteData[i].noteOffArray[n]){
@@ -139,7 +139,7 @@ void MasterClock::noteOffSwitch(){
 
 void MasterClock::noteOnSwitch(){
 
-  for (int i=0; i< sequenceCount; i++){
+  for (int i=0; i< SEQUENCECOUNT; i++){
     if (noteData[i].noteOn == true){
       for (int n=0; n< MAX_STEPS_PER_SEQUENCE; n++){
         if (!noteData[i].noteOnArray[n]){

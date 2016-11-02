@@ -3,6 +3,8 @@
 #ifndef _global_h_
 #define _global_h_
 
+#define SEQUENCECOUNT         4
+
 #define PIMILLION             3141593
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		     	 7
@@ -131,7 +133,6 @@ extern uint8_t patternChannelSelector;
 extern boolean extClock;
 extern boolean debugBoolean;
 // FlashMemory
-extern uint8_t sequenceCount;
 extern uint8_t currentPattern;
 extern uint8_t queuePattern;
 extern boolean playing;

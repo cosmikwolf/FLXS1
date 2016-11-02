@@ -88,7 +88,7 @@ If devices is not receiving any pulses
         firstRun = false;
         beatPulseIndex = masterPulseCount;
 
-        for (int i=0; i< sequenceCount; i++){
+        for (int i=0; i< SEQUENCECOUNT; i++){
           sequenceArray[i].clockStart(startTime);
           sequenceArray[i].beatPulse(beatLength, &life);
         }
@@ -100,7 +100,7 @@ If devices is not receiving any pulses
   //          changePattern(queuePattern, true, true);
         }
 
-        for (int i=0; i< sequenceCount; i++){
+        for (int i=0; i< SEQUENCECOUNT; i++){
           sequenceArray[i].beatPulse(beatLength, &life);
         }
 
