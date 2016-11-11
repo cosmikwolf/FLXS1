@@ -131,7 +131,7 @@ void MasterClock::noteOffSwitch(){
           continue;
         }
 
-				outputControl->noteOff(noteData[i].channel, noteData[i].noteOffArray[n]);
+				outputControl->noteOff(noteData[i].channel, noteData[i].noteOffArray[n],noteData[i].noteGateOffArray[n] );
       }
     }
   }

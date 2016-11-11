@@ -19,8 +19,8 @@ class Sequencer
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
 		void 		incrementActiveStep();
-		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum);
-		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum);
+		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig);
+		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
 
 		void 		calculateStepTimers();
 		void 		beatPulse(uint32_t beatLength, GameOfLife *life);

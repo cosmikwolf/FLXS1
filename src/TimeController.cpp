@@ -52,6 +52,15 @@ void TimeController::runLoopHandler() {
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
 	display.displayLoop(DISPLAY_FREQUENCY);
+
+	outputControl.inputRead();
+
+	if(currentState == CALIBRATION_MENU){
+		playing = 0;
+		outputControl.dacTestLoop();
+		return;
+	}
+
 //	outputControl.dacTestLoop();
 
 }

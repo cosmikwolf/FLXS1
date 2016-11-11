@@ -158,6 +158,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
       case CALIBRATION_MENU:
         calibrationMenuDisplay();
       break;
+
+      case INPUT_DEBUG_MENU:
+        inputDebugMenuDisplay();
+      break;
       /*
       case DEBUG_SCREEN:
         debugScreenDisplay();
@@ -656,8 +660,10 @@ void DisplayModule::patternSelectDisplay(){
   displayElement[13] = strdup("D");
   displayElement[14] = strdup("E");
   displayElement[15] = strdup("F");
-  displayElement[16] = strdup("PATTERN SELECT");
 
+  sprintf(buf, "PATTENRN SELECT: %d", patternChannelSelector);
+
+  displayElement[16] = strdup(buf);
   renderOnce_StringBox(0, highlight, previousHighlight,  0, 0, 32 , 24, false, 3, BLACK, RED);
   renderOnce_StringBox(1, highlight, previousHighlight, 32, 0, 32 , 24, false, 3, BLACK, GREEN);
   renderOnce_StringBox(2, highlight, previousHighlight, 64, 0, 32 , 24, false, 3, BLACK, BLUE);
@@ -684,17 +690,98 @@ void DisplayModule::calibrationMenuDisplay(){
 
   displayElement[0] = strdup("Calibration Menu");
 
-  sprintf(buf, "DAC Value: %d", calibrationBuffer);
+  sprintf(buf, "D0L: %d", dacCalibration[0]);
   displayElement[1] = strdup(buf);
+  sprintf(buf, "D0H: %d", dacCalibration[1]);
+  displayElement[2] = strdup(buf);
+  sprintf(buf, "D1L: %d", dacCalibration[2]);
+  displayElement[3] = strdup(buf);
+  sprintf(buf, "D1H: %d", dacCalibration[3]);
+  displayElement[4] = strdup(buf);
+  sprintf(buf, "D2L: %d", dacCalibration[4]);
+  displayElement[5] = strdup(buf);
+  sprintf(buf, "D2H: %d", dacCalibration[5]);
+  displayElement[6] = strdup(buf);
+  sprintf(buf, "D3L: %d", dacCalibration[6]);
+  displayElement[7] = strdup(buf);
+  sprintf(buf, "D3H: %d", dacCalibration[7]);
+  displayElement[8] = strdup(buf);
+  sprintf(buf, "D4L: %d", dacCalibration[8]);
+  displayElement[9] = strdup(buf);
+  sprintf(buf, "D4H: %d", dacCalibration[9]);
+  displayElement[10] = strdup(buf);
+  sprintf(buf, "D5L: %d", dacCalibration[10]);
+  displayElement[11] = strdup(buf);
+  sprintf(buf, "D5H: %d", dacCalibration[11]);
+  displayElement[12] = strdup(buf);
+  sprintf(buf, "D6L: %d", dacCalibration[12]);
+  displayElement[13] = strdup(buf);
+  sprintf(buf, "D6H: %d", dacCalibration[13]);
+  displayElement[14] = strdup(buf);
+  sprintf(buf, "D7L: %d", dacCalibration[14]);
+  displayElement[15] = strdup(buf);
+  sprintf(buf, "D7H: %d", dacCalibration[15]);
+  displayElement[16] = strdup(buf);
+  sprintf(buf, "D8L: %d", dacCalibration[16]);
+  displayElement[17] = strdup(buf);
+  sprintf(buf, "D8H: %d", dacCalibration[17]);
+  displayElement[18] = strdup(buf);
 
+  renderOnce_StringBox(0, highlight, previousHighlight,  0, 0, 32 , 20, false, 1, WHITE, BLACK);
 
-  renderOnce_StringBox(0, highlight, previousHighlight,  0, 16, 32 , 20, false, 1, BLACK, RED);
+  renderOnce_StringBox(1, highlight, previousHighlight,  0, 8, 32 , 20, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(2, highlight, previousHighlight,  0, 16, 32 , 20, false, 1, WHITE, BLACK);
 
-  renderOnce_StringBox(1, highlight, previousHighlight, 0, 32, 32 , 20, false, 1, BLACK, GREEN);
+  renderOnce_StringBox(3, highlight, previousHighlight,  0, 24, 32 , 20, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(4, highlight, previousHighlight,  0, 32, 32 , 20, false, 1, WHITE, BLACK);
+
+  renderOnce_StringBox(5, highlight, previousHighlight,  0, 40, 32 , 20, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(7, highlight, previousHighlight,  0, 48, 32 , 20, false, 1, WHITE, BLACK);
+
+  renderOnce_StringBox(8, highlight, previousHighlight,  0, 56, 32 , 20, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(9, highlight, previousHighlight,  0, 62, 32 , 20, false, 1, WHITE, BLACK);
 
 }
 
+void DisplayModule::inputDebugMenuDisplay(){
+  uint8_t previousHighlight = highlight;
+  highlight = currentPattern;
 
+  displayElement[0] = strdup("Calibration Menu");
+
+  sprintf(buf, "CV IN 1: %d", cvInputRaw[0] );
+  displayElement[1] = strdup(buf);
+  sprintf(buf, "CV IN 2: %d", cvInputRaw[1] );
+  displayElement[2] = strdup(buf);
+  sprintf(buf, "CV IN 3: %d", cvInputRaw[2] );
+  displayElement[3] = strdup(buf);
+  sprintf(buf, "CV IN 4: %d", cvInputRaw[3] );
+  displayElement[4] = strdup(buf);
+
+  sprintf(buf, "GT IN 1: %d", gateInputRaw[0]);
+  displayElement[5] = strdup(buf);
+  sprintf(buf, "GT IN 2: %d", gateInputRaw[1]);
+  displayElement[6] = strdup(buf);
+  sprintf(buf, "GT IN 3: %d", gateInputRaw[2]);
+  displayElement[7] = strdup(buf);
+  sprintf(buf, "GT IN 4: %d", gateInputRaw[3]);
+  displayElement[8] = strdup(buf);
+
+  renderOnce_StringBox(0, highlight, previousHighlight,  0, 0, 96 , 8, false, 1, WHITE, BLACK);
+
+  renderOnce_StringBox(1, highlight, previousHighlight,  0, 8, 96 , 8, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(2, highlight, previousHighlight,  0, 16, 96 , 8, false, 1, WHITE, BLACK);
+
+  renderOnce_StringBox(3, highlight, previousHighlight,  0, 24, 96 , 8, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(4, highlight, previousHighlight,  0, 32, 96 , 8, false, 1, WHITE, BLACK);
+
+  renderOnce_StringBox(5, highlight, previousHighlight,  0, 40, 96 , 8, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(6, highlight, previousHighlight,  0, 48, 96 , 8, false, 1, WHITE, BLACK);
+
+  renderOnce_StringBox(7, highlight, previousHighlight,  0, 56, 96 , 8, false, 1, WHITE, BLACK);
+  renderOnce_StringBox(8, highlight, previousHighlight,  0, 64, 96 , 8, false, 1, WHITE, BLACK);
+
+}
 
 void DisplayModule::gameOfLifeDisplay(){
 

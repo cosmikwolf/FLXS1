@@ -103,7 +103,6 @@ void setup() {
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
   delay(100);
-
 }
 
 void loop() {
@@ -111,9 +110,9 @@ void loop() {
   timeControl.runLoopHandler();
 
   //digitalWriteFast(26, LOW);
-  if (millis()%1000 == 0){
-    Serial.println("1:\t" + String(adc->analogRead(A3, ADC_1)) + "\t2:\t" + String(adc->analogRead(A12, ADC_1)) + "\t3:\t" + String(adc->analogRead(A13, ADC_1)) + "\t4:\t" + String(adc->analogRead(A10, ADC_1)));
-  };
+//  if (millis()%1000 == 0){
+//    Serial.println("1:\t" + String(adc->analogRead(A3, ADC_1)) + "\t2:\t" +// String(adc->analogRead(A12, ADC_1)) + "\t3:\t" + String(adc->analogRead(A13, ADC_1)) +// "\t4:\t" + String(adc->analogRead(A10, ADC_1)));
+//  };
 
 /*  if (!playing){
     if (notefreq.available()) {

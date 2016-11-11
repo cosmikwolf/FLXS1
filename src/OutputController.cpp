@@ -151,11 +151,21 @@ for (int i=0; i<4; i++){
 }
 
 void OutputController::dacTestLoop(){
-  int voltage = 65535*(sin(millis()/100.0)+1)/2;
+  int voltage; // = 65535*(sin(millis()/10.0)+1)/2;
+
+  if (sin(millis()) > 0 ){
+    voltage = 65535;
+  } else {
+    voltage = 0;
+  }
+
+  Serial.println("setting voltage all dacs to: " + String(voltage) + " -- starttime:" + String(startTime));
+
   for (int i=0; i<8; i++){
-    Serial.println("setting voltage for dac:" + String(i) +" to: " + String(voltage));
 
     ad5676.setVoltage(i, voltage );
+    delayMicroseconds(1);
+
     ad5676.setVoltage(i, voltage );
     delayMicroseconds(1);
     //ad5676.setVoltage(i, 65535sin(millis()/2) );
@@ -173,12 +183,31 @@ void OutputController::inputLoopTest(){
   }
 
   if (trig) {
-Serial.println("CV1: " + String(analogRead(22)) + "\tCV2: " + String(analogRead(21)) + "\tCV3: " + String(analogRead(20)) + "\tCV4: " + String(analogRead(23)));
-
-}
+    Serial.println("CV1: " + String(analogRead(22)) + "\tCV2: " + String(analogRead(21)) + "\tCV3: " + String(analogRead(20)) + "\tCV4: " + String(analogRead(23)));
+  }
   backplaneGPIO->digitalWrite(8, 1);
   delay(1);
   backplaneGPIO->digitalWrite(8, 0);
+}
+
+void OutputController::inputRead(){
+  backplaneGPIO->update();
+
+  cvInputRaw[0] = adc->analogRead(A3, ADC_1);
+  cvInputRaw[1] = adc->analogRead(A12, ADC_1);
+  cvInputRaw[2] = adc->analogRead(A13, ADC_1);
+  cvInputRaw[3] = adc->analogRead(A10, ADC_1);
+  gateInputRaw[0]  = backplaneGPIO->digitalRead(4);
+  gateInputRaw[1]  = backplaneGPIO->digitalRead(5);
+  gateInputRaw[2]  = backplaneGPIO->digitalRead(6);
+  gateInputRaw[3]  = backplaneGPIO->digitalRead(7);
+  for (int i=0; i<28; i++){
+    Serial.println(String(i) + '--' + String(backplaneGPIO->digitalRead(i)));
+  }
+  backplaneGPIO->digitalWrite(8, 1);
+  backplaneGPIO->digitalWrite(8, 0);
+
+
 }
 
 void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate){
@@ -351,10 +380,12 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 
 
-void OutputController::noteOff(uint8_t channel, uint8_t note){
+void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
 //  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
 
-  backplaneGPIO->digitalWrite(channel, LOW);
+  if (gateOff){
+    backplaneGPIO->digitalWrite(channel, LOW);
+  }
   serialMidi->sendNoteOff(note, 64, channel);
 
 }

@@ -189,10 +189,37 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				trigLength = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
 			};
 
+			bool gateTrig;
+			bool gateOff;
+
+			if (stepData[stepNum].gateType == 0) {
+				//no gate
+				gateTrig = false;
+				gateOff = true;
+			} else if (stepData[stepNum].gateType == 1){
+				//gate is on / retrigger
+				gateTrig = true;
+				gateOff = true;
+			} else if (stepData[stepNum].gateType == 2){
+				if (stepData[stepNum].arpStatus == 0){
+					gateTrig = true;
+					gateOff = true;
+				} else {
+					gateTrig = false;
+				}
+			} else {
+				gateTrig = true; // for hold. logic needs to be in note Off section
+				if (stepData[stepNum].stepTimer < stepOffTime - trigLength){
+					gateOff = false;
+				} else {
+					gateOff = true;
+				}
+			}
+
 //			if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
       if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - trigLength/10  || stepData[stepNum].stepTimer > stepOffTime) {
   			// shut off notes that should stop playing.
-				noteShutOff(noteData, stepNum);
+				noteShutOff(noteData, stepNum, gateOff);
 			}
 
 			if ( sequenceTimer >= (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
@@ -211,7 +238,7 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				 sequenceTimer >= stepData[stepNum].offset <-- first of arp begins
 
 				 */
-				noteTrigger(noteData, stepNum);
+				noteTrigger(noteData, stepNum, gateTrig);
 				stepData[stepNum].arpStatus++;
 
 		 /*
@@ -238,7 +265,7 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	}
 }
 
-void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum){
+void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig){
 	// sets pitch of notes to be played.
 	noteData->noteOn = true;
 	noteData->channel = channel;
@@ -340,25 +367,6 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum){
 	}
 
 
-	bool gateTrig;
-
-	if (stepData[stepNum].gateType == 0) {
-		//no gate
-		gateTrig = false;
-	} else if (stepData[stepNum].gateType == 1){
-		//gate is on / retrigger
-		gateTrig = true;
-	} else if (stepData[stepNum].gateType == 2){
-		if (stepData[stepNum].arpStatus == 0){
-			gateTrig = true;
-		} else {
-			gateTrig = false;
-		}
-	} else {
-		gateTrig = true; // for hold. logic needs to be in note Off section
-	}
-
-
 
 	for (int i=0; i< stepCount; i++){
 		// since there could be up to stepCount steps being triggered in a single noteOnArray,
@@ -393,13 +401,15 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 	noteData->noteOffStep = 0;
 }
 
-void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum){
+void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
 	//shut off any other notes that might still be playing.
 
 		if( stepData[stepNum].noteStatus == CURRENTLY_PLAYING ){
 			noteData->noteOff = true;
 			noteData->channel = channel;
 			noteData->noteOffStep = stepNum;
+			noteData->noteGateOffArray[stepNum] = gateOff;
+
 
 			for (int f=0; f<stepCount; f++){
 				if (noteData->noteOffArray[f] == NULL){

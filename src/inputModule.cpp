@@ -71,6 +71,13 @@ void InputModule::loop(uint16_t frequency){
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 
+    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) ){
+      currentState = CALIBRATION_MENU;
+    }
+
+    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_REC) ){
+      currentState = INPUT_DEBUG_MENU;
+    }
     //we always want the alt (non matrix) buttons to behave the same way
     altButtonHandler();
 

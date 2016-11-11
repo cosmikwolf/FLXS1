@@ -37,6 +37,7 @@
 #define	DELETE_MENU			    	 101
 #define	DEBUG_SCREEN		       127
 #define	CALIBRATION_MENU		   126
+#define	INPUT_DEBUG_MENU		     125
 
 
 //PITCH PAGE STEPMODES
@@ -154,6 +155,9 @@ extern elapsedMicros testTimer;
 extern boolean firstRun;
 
 extern uint16_t calibrationBuffer;
+extern uint16_t  dacCalibration[16];
+extern uint16_t  cvInputRaw[4];
+extern uint8_t			gateInputRaw[4];
 
 void debug(const char* text);
 int positive_modulo(int i, int n);

@@ -30,7 +30,7 @@ class OutputController {
 public:
   void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc);
   void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate);
-  void noteOff(uint8_t channel, uint8_t note);
+  void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   void lfoUpdate(uint8_t channel);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
@@ -39,7 +39,7 @@ public:
   void dacTestLoop();
   void calibrationRoutine();
   void inputLoopTest();
-
+  void inputRead();
   elapsedMillis clockOutputTimer;
   elapsedMillis lfoTimer;
   uint8_t lfoType[4];

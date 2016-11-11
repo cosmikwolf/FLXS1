@@ -29,7 +29,9 @@ elapsedMicros masterTempoTimer;
 elapsedMicros internalClockTimer;
 elapsedMicros startTime;
 uint16_t calibrationBuffer = 0;
-
+uint16_t  dacCalibration[16];
+uint16_t  cvInputRaw[4];
+uint8_t			gateInputRaw[4];
 //midi
 elapsedMicros blipTimer;
 elapsedMicros testTimer;
