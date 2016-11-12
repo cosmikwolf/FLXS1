@@ -537,14 +537,10 @@ void InputModule::altButtonHandler(){
             break;
 
           case STEPMODE_BEATCOUNT:
-            newBeatDiv = min_max(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange,1, 16);
+            newBeatDiv = min_max(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange,-16, 16);
 
             for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
-              if (newBeatDiv < 1){
-                sequenceArray[selectedChannel].stepData[i].beatDiv = 1;
-              } else {
                 sequenceArray[selectedChannel].stepData[i].beatDiv = newBeatDiv;
-              }
             }
             break;
 

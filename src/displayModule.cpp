@@ -359,7 +359,13 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   sprintf(buf, "last: %d", sequenceArray[selectedChannel].stepCount, sequenceArray[selectedChannel].beatCount);
   displayElement[12] = strdup(buf);
 
-  sprintf(buf, "lngt: 1/%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
+  if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv == 1){
+    sprintf(buf, "lngt: %d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
+  } else if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv > 0){
+    sprintf(buf, "lngt: 1/%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
+  } else {
+    sprintf(buf, "lngt: %d", abs(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv)+2 );
+  }
   displayElement[9] = strdup(buf);
 
   sprintf(buf, "%d-%d", notePage*16 , (notePage+1)*16 );

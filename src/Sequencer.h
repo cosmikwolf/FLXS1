@@ -40,6 +40,8 @@ class Sequencer
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
+
+		uint32_t  getStepLength(uint8_t stepNum);
 		boolean  	monophonic;
 		uint8_t	 	activeStep;
     uint32_t 	beatLength;

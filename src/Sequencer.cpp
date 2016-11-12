@@ -112,6 +112,7 @@ void Sequencer::clockStart(elapsedMicros startTime){
 	sequenceTimer = startTime;
 };
 
+
 void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 	// this is sent every 24 pulses received from midi clock
 	// and also when a play or continue command is received.
@@ -135,6 +136,14 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 
 }
 
+uint32_t Sequencer::getStepLength(uint8_t stepNum){
+		if (stepData[stepNum].beatDiv > 0){
+			return beatLength/stepData[stepNum].beatDiv;
+		} else { // negative values of beatDiv allow for whole multiples of beatLength
+			return beatLength*(abs(stepData[stepNum].beatDiv)+2);
+		}
+}
+
 void Sequencer::calculateStepTimers(){
 	//stepLength = beatLength*beatCount/stepCount;
 	uint32_t accumulatedOffset = 0;
@@ -142,7 +151,7 @@ void Sequencer::calculateStepTimers(){
 	//stepLength = beatLength/stepDivider*stepCount;
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 		stepData[stepNum].offset = accumulatedOffset;
-		accumulatedOffset += beatLength/stepData[stepNum].beatDiv;
+		accumulatedOffset += getStepLength(stepNum);
 	}
 }
 
@@ -152,7 +161,7 @@ void Sequencer::incrementActiveStep(){
 
 	//calculate if this step should be finished by now.
 	for (int stepNum = 0; stepNum < (activeStep+1); stepNum++ ){
-		activeStepEndTime += beatLength/stepData[stepNum].beatDiv;
+		activeStepEndTime += getStepLength(stepNum);
 	}
 
 	if(sequenceTimerInt > activeStepEndTime ){
@@ -175,18 +184,19 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	// iterate through all steps to determine if they need to have action taken.
 		if (stepData[stepNum].gateType > GATETYPE_REST){
 			// if the gateType is not rest, some action should be taken
-			uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
+			//uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
+
+			uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*getStepLength(stepNum)/4;
 			uint32_t trigLength;
 
 			if (stepData[stepNum].stepTimer > stepOffTime && stepData[stepNum].arpStatus != 0) {
-				//reset arpeggio status so arpeggio can start fresh on next trigger
 				stepData[stepNum].arpStatus = 0;
 			}
 
 			if (stepData[stepNum].arpType != 0 ){
-				trigLength = (beatLength*stepData[stepNum].arpSpdNum)/(stepData[stepNum].beatDiv*stepData[stepNum].arpSpdDen);
+				trigLength = stepData[stepNum].arpSpdNum*getStepLength(stepNum)/stepData[stepNum].arpSpdDen;
 			} else {
-				trigLength = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
+				trigLength = stepOffTime;
 			};
 
 			bool gateTrig;

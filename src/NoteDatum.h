@@ -56,7 +56,7 @@ typedef	struct StepDatum {
 	uint8_t 		arpSpdNum;	//
 	uint8_t 		arpSpdDen;	//
 	uint8_t			glide;			// portamento time - to be implemented.
-	uint8_t			beatDiv;
+	int8_t			beatDiv;
 	uint8_t			velocity;	    // note velocity
 	uint8_t			velocityType;
 	uint8_t			lfoSpeed;
