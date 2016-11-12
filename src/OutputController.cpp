@@ -33,10 +33,10 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
 
   backplaneGPIO->initPort(17, 6, OUTPUT); // clock output
 
-  backplaneGPIO->initPort(4,10, INPUT); // Gate in 1
-  backplaneGPIO->initPort(5,7, INPUT); // Gate input 2
-  backplaneGPIO->initPort(6,11, INPUT); // Gate input 3
-  backplaneGPIO->initPort(7,12, INPUT); // Gate input 4
+  backplaneGPIO->initPort(4,10, INPUT_PULLUP); // Gate in 1
+  backplaneGPIO->initPort(5,7,  INPUT_PULLUP); // Gate input 2
+  backplaneGPIO->initPort(6,11, INPUT_PULLUP); // Gate input 3
+  backplaneGPIO->initPort(7,12, INPUT_PULLUP); // Gate input 4
 /*
 10  P14  10
 11  P11   7
@@ -58,15 +58,14 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
 
   backplaneGPIO->initPort(18, 2, OUTPUT);
 
-  backplaneGPIO->initPort(19, 1, OUTPUT);
-  backplaneGPIO->initPort(20, 26, OUTPUT);
-  backplaneGPIO->initPort(21, 13, OUTPUT);
-  backplaneGPIO->initPort(23, 15, OUTPUT);
-  backplaneGPIO->initPort(24, 16, OUTPUT);
-  backplaneGPIO->initPort(25, 17, OUTPUT);
-  backplaneGPIO->initPort(26, 25, OUTPUT);
-  backplaneGPIO->initPort(27, 0, OUTPUT);
-
+  backplaneGPIO->initPort(19, 1, INPUT);
+  backplaneGPIO->initPort(20, 26, INPUT);
+  backplaneGPIO->initPort(21, 13, INPUT);
+  backplaneGPIO->initPort(23, 15, INPUT);
+  backplaneGPIO->initPort(24, 16, INPUT);
+  backplaneGPIO->initPort(25, 17, INPUT);
+  backplaneGPIO->initPort(26, 25, INPUT);
+  backplaneGPIO->initPort(27, 0, INPUT);
 
   backplaneGPIO->updateGpioPinModes(); // send GPIO pin modes to chip
 
@@ -173,7 +172,7 @@ void OutputController::dacTestLoop(){
 }
 
 void OutputController::inputLoopTest(){
-  backplaneGPIO->update();
+//  backplaneGPIO->update();
   bool trig = false;
   for (int i =0; i<28; i++){
     if (backplaneGPIO->fell(i)){
@@ -185,27 +184,34 @@ void OutputController::inputLoopTest(){
   if (trig) {
     Serial.println("CV1: " + String(analogRead(22)) + "\tCV2: " + String(analogRead(21)) + "\tCV3: " + String(analogRead(20)) + "\tCV4: " + String(analogRead(23)));
   }
-  backplaneGPIO->digitalWrite(8, 1);
+  //backplaneGPIO->digitalWrite(8, 1);
   delay(1);
-  backplaneGPIO->digitalWrite(8, 0);
+  //backplaneGPIO->digitalWrite(8, 0);
 }
 
 void OutputController::inputRead(){
+
   backplaneGPIO->update();
 
   cvInputRaw[0] = adc->analogRead(A3, ADC_1);
   cvInputRaw[1] = adc->analogRead(A12, ADC_1);
   cvInputRaw[2] = adc->analogRead(A13, ADC_1);
   cvInputRaw[3] = adc->analogRead(A10, ADC_1);
-  gateInputRaw[0]  = backplaneGPIO->digitalRead(4);
-  gateInputRaw[1]  = backplaneGPIO->digitalRead(5);
-  gateInputRaw[2]  = backplaneGPIO->digitalRead(6);
-  gateInputRaw[3]  = backplaneGPIO->digitalRead(7);
-  for (int i=0; i<28; i++){
-    Serial.println(String(i) + '--' + String(backplaneGPIO->digitalRead(i)));
-  }
-  backplaneGPIO->digitalWrite(8, 1);
-  backplaneGPIO->digitalWrite(8, 0);
+  gateInputRaw[0]  = backplaneGPIO->pressed(4);
+  gateInputRaw[1]  = backplaneGPIO->pressed(5);
+  gateInputRaw[2]  = backplaneGPIO->pressed(6);
+  gateInputRaw[3]  = backplaneGPIO->pressed(7);
+  //  for (int i=0; i<28; i++){
+  //    Serial.println("Backplane input: " + String(i) + "--" + String(backplaneGPIO->digitalRead(i)));
+  //  }
+/*    for (int i=0; i<4; i++){
+      Serial.println("GATE input: " + String(i) + "--" + String(gateInputRaw[i]));
+    }
+    for (int i=0; i<4; i++){
+      Serial.println("CV input: " + String(i) + "--" + String(cvInputRaw[i]));
+    } */
+    backplaneGPIO->digitalWrite(8, 1);
+    backplaneGPIO->digitalWrite(8, 0);
 
 
 }
@@ -300,7 +306,7 @@ void OutputController::lfoUpdate(uint8_t channel){
   int8_t voltageLevel;
 
   //Serial.println("beginning lfoUpdate for channel " + String(channel));
-  if (lfoType[channel] != 2){
+  if (lfoType[channel] < 2){
     return;
   }
 
@@ -308,6 +314,28 @@ void OutputController::lfoUpdate(uint8_t channel){
     case 2:
       rheoStatLevel = 0;
       voltageLevel = (sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)))*lfoAmplitude[channel];
+    break;
+
+    case 3: // SQUARE WAVE
+      rheoStatLevel = 0;
+      if ( sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)) > 0){
+        voltageLevel = lfoAmplitude[channel];
+      } else {
+        voltageLevel = -lfoAmplitude[channel];
+      }
+      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), HIGH);        // shut off swich with cap to ground, disable slew
+
+    break;
+
+    case 4: //rounded square wave
+      rheoStatLevel = 40;
+      if ( sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)) > 0){
+        voltageLevel = lfoAmplitude[channel];
+      } else {
+        voltageLevel = -lfoAmplitude[channel];
+      }
+      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW);        // shut off swich with cap to ground, disable slew
+
     break;
 
     default:
@@ -327,10 +355,10 @@ void OutputController::lfoUpdate(uint8_t channel){
     //Serial.println("setting rheo");
     lfoRheoSet[channel] = 0;
   //}
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,0, 65535 ) );  // set CC voltage
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,0, 65535 ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,1, 65535 ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,1, 65535 ) );  // set CC voltage
 
-  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(rheoStatLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
+//  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(rheoStatLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
 
 }
 

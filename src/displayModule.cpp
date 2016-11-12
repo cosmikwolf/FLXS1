@@ -443,7 +443,7 @@ void DisplayModule::channelVelocityMenuDisplay(char *buf) {
   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
   displayElement[2] = strdup(buf);
   displayElement[3] = strdup("velocity type:");
-  char *velTypeArray[] = { "none", "voltage", "LFO Sine" };
+  char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "RoundSq" };
   displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
   displayElement[5] = strdup("LFO speed:");
 //  char *gateTypeArray[] = { "off", "on", "1-shot","hold" };

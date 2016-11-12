@@ -163,8 +163,8 @@ void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
 
 bool Zetaohm_MAX7301::digitalRead(uint8_t index){
     uint16_t temp =  readAddress(0x24 + indexMap[index]);
-    Serial.println("READING " + String(index));
-    Serial.println(temp, BIN);
+    //Serial.println("READING " + String(index));
+    //Serial.println(temp, BIN);
     return 1;
 }
 

@@ -67,7 +67,7 @@ void InputModule::loop(uint16_t frequency){
   if (inputTimer > frequency){
     inputTimer = 0;
     knobPrevious = knobRead;
-    knobRead = knob.read()/-2  ;
+    knobRead = knob.read()/-4  ;
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 
@@ -612,7 +612,7 @@ void InputModule::channelVelocityModeInputHandler(){
       sequenceArray[selectedChannel].stepData[selectedStep].velocity =  positive_modulo(sequenceArray[selectedChannel].stepData[selectedStep].velocity + knobChange, 127);
       break;
       case STEPMODE_VELOCITYTYPE:
-      sequenceArray[selectedChannel].stepData[selectedStep].velocityType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].velocityType + knobChange, 0, 2);
+      sequenceArray[selectedChannel].stepData[selectedStep].velocityType = min_max(sequenceArray[selectedChannel].stepData[selectedStep].velocityType + knobChange, 0, 4);
       break;
       case STEPMODE_LFOSPEED:
       sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed = min_max(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed + knobChange, 1, 255);

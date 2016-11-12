@@ -9,7 +9,7 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 	this->serialMidi = serialMidi;
 	this->midiControl = midiControl;
 	Serial.println("Master Clock Initialized");
-
+	lfoTimer = 0;
 };
 
 void MasterClock::changeTempo(uint32_t newTempoX100){
@@ -39,6 +39,13 @@ void MasterClock::masterClockFunc(void){
     } else {
       externalClockTick();
     }
+
+		if(lfoTimer > 10){
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				outputControl->lfoUpdate(i);
+			}
+			lfoTimer = 0;
+		}
 
     noteOffSwitch();
     noteOnSwitch();
@@ -103,12 +110,7 @@ void MasterClock::internalClockTick(){
       sequenceArray[i].runSequence(&noteData[i], &life);
     }
   }
-	if(lfoTimer > 10){
-		for (int i=0; i< SEQUENCECOUNT; i++){
-			outputControl->lfoUpdate(i);
-		}
-		lfoTimer = 0;
-	}
+
 
     debug("end internal clock tick");
   //digitalWriteFast(DEBUG_PIN, LOW);
