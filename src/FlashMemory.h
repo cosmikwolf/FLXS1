@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
+#include <SerialFlash.h>
 #include <ArduinoJson.h>
+#include "serialFlashPrint.h"
 #include "global.h"
 #include "Sequencer.h"
 
@@ -14,7 +16,7 @@ public:
   FlashMemory();
 
   void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant);
-  void initialize(Sequencer *sequenceArray);
+  void initialize(Sequencer *sequenceArray,  SerialFlashChip *spiFlash);
   void deleteSaveFile();
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
@@ -26,6 +28,9 @@ public:
   bool deserialize(uint8_t channel, char* json);
 private:
   Sequencer *sequenceArray;
+  SerialFlashFile file;
+  SerialFlashChip *spiFlash;
+  SerialFlashPrint serialFlashPrint(SerialFlashFile *file);
   File saveData;
   File jsonFile;
 

@@ -3,23 +3,34 @@
 #define FILE_EXISTS 0
 #define SAVEFILE_DOES_NOT_EXIST 1
 #define READ_JSON_ERROR 2
+#define WINBOND_CS_PIN 22
+#define USE_SPI_FLASH  1
+#define FLASHFILESIZE  32768
 /*
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 */
-FlashMemory::FlashMemory(){};
+FlashMemory::FlashMemory(){
+  SerialFlashPrint serialFlashPrint(&file);
+};
 
-void FlashMemory::initialize(Sequencer *sequenceArray){
+void FlashMemory::initialize(Sequencer *sequenceArray, SerialFlashChip *spiFlash){
   Serial.println("<<->> Initializing Flash Memory <<->>");
 
   this->sequenceArray = sequenceArray;
+  this->spiFlash = spiFlash;
 
-  if (!SD.begin(SD_CS_PIN)){
-    Serial.println("SD Card initialization failed!");
-    return;
+  if(USE_SPI_FLASH){
+    if(!spiFlash->begin(WINBOND_CS_PIN)){
+      Serial.println("SPI FLASH CHIP INITIALIZATION FAILED!");
+    }
+  } else {
+    if (!SD.begin(SD_CS_PIN)){
+      Serial.println("SD Card initialization failed!");
+      return;
+    }
   }
-
   //this->deleteAllFiles();
 
   Serial.println("<<->> Flash Memory Initialization Complete <<->>");
@@ -67,31 +78,42 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["ao"] = sequenceArray[channel].stepData[i].arpOctave;
     stepDataObj["an"] = sequenceArray[channel].stepData[i].arpSpdNum;
     stepDataObj["ad"] = sequenceArray[channel].stepData[i].arpSpdDen;
-    stepDataObj["v"] = sequenceArray[channel].stepData[i].velocity ;
+    stepDataObj["v"]  = sequenceArray[channel].stepData[i].velocity ;
     stepDataObj["vt"] = sequenceArray[channel].stepData[i].velocityType ;
     stepDataObj["ls"] = sequenceArray[channel].stepData[i].lfoSpeed;
-    stepDataObj["g"] = sequenceArray[channel].stepData[i].glide ;
+    stepDataObj["g"]  = sequenceArray[channel].stepData[i].glide ;
     stepDataArray.add(stepDataObj);
   }
 
-  if (SD.exists(fileNameChar)){
-    SD.remove(fileNameChar);
+  if(USE_SPI_FLASH){
+    Serial.println("Saving file to SPI flash chip: " + String(fileNameChar));
+    if (!spiFlash->exists(fileNameChar)) {
+      Serial.println("Creating Save File: " + String(fileNameChar)); delay(100);
+      spiFlash->createErasable(fileNameChar, FLASHFILESIZE);
+    } else {
+      Serial.println("File exists: " + String(fileNameChar)); delay(100);
+    }
+    file = spiFlash->open(fileNameChar);
+    if (file){
+      root.printTo(serialFlashPrint);
+    }
+  } else {
+    if (SD.exists(fileNameChar)){
+      SD.remove(fileNameChar);
+    }
+    Serial.println("opening file");
+    jsonFile = SD.open(fileNameChar, FILE_WRITE);
+    jsonFile.seek(0);
+    Serial.println("printing to file handle");
+    root.printTo(jsonFile);
+    Serial.println("fileSize: " + String(jsonFile.size()));
+    jsonFile.close();
   }
-  Serial.println("opening file");
-  jsonFile = SD.open(fileNameChar, FILE_WRITE);
-  jsonFile.seek(0);
-  Serial.println("printing to file handle");
-  root.printTo(jsonFile);
-  Serial.println("fileSize: " + String(jsonFile.size()));
-  jsonFile.close();
-  Serial.print("fileNameChar: ");
-  Serial.println(fileNameChar);
-
   free(fileNameChar);
 
   Serial.println("flash Timer after write: " + String(flashTimer) );
 
-//  Serial.println(String(jsonSaveTimer))
+  //Serial.println(String(jsonSaveTimer))
 
 }
 

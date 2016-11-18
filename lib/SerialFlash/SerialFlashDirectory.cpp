@@ -26,7 +26,6 @@
  */
 
 #include "SerialFlash.h"
-#include "util/crc16.h"
 
 /* On-chip SerialFlash file allocation data structures:
 
@@ -75,7 +74,7 @@ static uint32_t check_signature(void)
 	if (sig[0] == 0xFA96554C) return sig[1];
 	if (sig[0] == 0xFFFFFFFF) {
 		sig[0] = 0xFA96554C;
-		sig[1] = ((DEFAULT_STRINGS_SIZE/4) << 16) | DEFAULT_MAXFILES;
+		sig[1] = ((uint32_t)(DEFAULT_STRINGS_SIZE/4) << 16) | DEFAULT_MAXFILES;
 		SerialFlash.write(0, sig, 8);
 		while (!SerialFlash.ready()) ; // TODO: timeout
 		SerialFlash.read(0, sig, 8);
@@ -239,7 +238,7 @@ static uint32_t string_length(uint32_t addr)
 			len++;
 			if (*p == 0) return len;
 		}
-		addr += len;
+		addr += sizeof(buf);
 	}
 }
 
@@ -311,7 +310,7 @@ bool SerialFlashChip::create(const char *filename, uint32_t length, uint32_t ali
 	// last check, if enough space exists...
 	len = strlen(filename);
 	// TODO: check for enough string space for filename
-	uint8_t id[3];
+	uint8_t id[5];
 	SerialFlash.readID(id);
 	if (address + length > SerialFlash.capacity(id)) return false;
 
@@ -372,6 +371,7 @@ bool SerialFlashChip::readdir(char *filename, uint32_t strsize, uint32_t &filesi
 			}
 		}
 		strsize -= n;
+		straddr += n;
 	}
 	*(p - 1) = 0;
 	 //Serial.printf("  name(overflow) = %s\n", filename);

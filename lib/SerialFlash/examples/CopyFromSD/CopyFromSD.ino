@@ -2,13 +2,21 @@
 #include <SD.h>
 #include <SPI.h>
 
-const int SDchipSelect = 4;
-const int FlashChipSelect = 6;
+const int SDchipSelect = 4;    // Audio Shield has SD card CS on pin 10
+const int FlashChipSelect = 6; // digital pin for flash chip CS pin
+//const int FlashChipSelect = 21; // Arduino 101 built-in SPI Flash
 
 void setup() {
   //uncomment these if using Teensy audio shield
   //SPI.setSCK(14);  // Audio shield has SCK on pin 14
   //SPI.setMOSI(7);  // Audio shield has MOSI on pin 7
+
+  //uncomment these if you have other SPI chips connected
+  //to keep them disabled while using only SerialFlash
+  //pinMode(4, INPUT_PULLUP);
+  //pinMode(10, INPUT_PULLUP);
+
+  Serial.begin(9600);
 
   // wait up to 10 seconds for Arduino Serial Monitor
   unsigned long startMillis = millis();
@@ -19,7 +27,7 @@ void setup() {
   if (!SD.begin(SDchipSelect)) {
     error("Unable to access SD card");
   }
-  if (!SerialFlash.begin()) {
+  if (!SerialFlash.begin(FlashChipSelect)) {
     error("Unable to access SPI Flash chip");
   }
 
@@ -67,6 +75,7 @@ void setup() {
         Serial.print("  copying");
         // copy data loop
         unsigned long count = 0;
+        unsigned char dotcount = 9;
         while (count < length) {
           char buf[256];
           unsigned int n;
@@ -74,9 +83,13 @@ void setup() {
           ff.write(buf, n);
           count = count + n;
           Serial.print(".");
+          if (++dotcount > 100) {
+             Serial.println();
+             dotcount = 0;
+          }
         }
         ff.close();
-        Serial.println();
+        if (dotcount > 0) Serial.println();
       } else {
         Serial.println("  error opening freshly created file!");
       }
@@ -86,7 +99,8 @@ void setup() {
     f.close();
   }
   rootdir.close();
-
+  delay(10);
+  Serial.println("Finished All Files");
 }
 
 

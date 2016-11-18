@@ -36,7 +36,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
 
-	saveFile.initialize(sequencerArray);
+	saveFile.initialize(sequencerArray, &SerialFlash);
 	saveFile.loadPattern(0, 0b1111);
 	//saveFile.deleteSaveFile();
 /*
