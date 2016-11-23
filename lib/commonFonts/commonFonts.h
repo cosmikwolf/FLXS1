@@ -1,7 +1,5 @@
-//#ifndef _common_fontstruct_/
-//#define _common_fontstruct_
-#ifndef _commonFonts_
-#define _commonFonts_
+#ifndef _COMMONFONTS_H_
+#define _COMMONFONTS_H_
 
 typedef struct {
 	const unsigned char *index;
