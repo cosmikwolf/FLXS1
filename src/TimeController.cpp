@@ -11,7 +11,6 @@ TimeController::TimeController(){ };
 
 void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc) {
 
-
 	Serial.println("Initializing TimeController");
 
 	this->serialMidi = serialMidi;
@@ -51,9 +50,10 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 void TimeController::runLoopHandler() {
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
-	display.displayLoop(DISPLAY_FREQUENCY);
+	//display.displayLoop(DISPLAY_FREQUENCY);
 
 	outputControl.inputRead();
+	saveFile.cacheWriteLoop();
 
 	if(currentState == CALIBRATION_MENU){
 		playing = 0;

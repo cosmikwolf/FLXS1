@@ -57,8 +57,6 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		this->stepData[n].velocity		 =  67;
 		this->stepData[n].velocityType =   0;
 		this->stepData[n].lfoSpeed		 =  16;
-	//	this->stepData[n].test		     =  16;
-
 		this->stepData[n].offset       =   0;
 		this->stepData[n].noteStatus   =  NOTPLAYING_NOTQUEUED;
 		this->stepData[n].notePlaying  =   0;

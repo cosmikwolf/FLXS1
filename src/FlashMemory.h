@@ -6,6 +6,8 @@
 #include "serialFlashPrint.h"
 #include "global.h"
 #include "Sequencer.h"
+#include <string>
+
 
 #ifndef _FlashMemory_h_
 #define _FlashMemory_h_
@@ -21,16 +23,24 @@ public:
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
   void printPattern();
+  void cacheWriteLoop();
   void saveSequenceJSON(uint8_t channel, uint8_t pattern);
-  int readSequenceJSON(uint8_t channel, uint8_t pattern);
+  int  readSequenceJSON(uint8_t channel, uint8_t pattern);
   void deleteAllFiles();
   void rm(File dir, String tempPath);
   bool deserialize(uint8_t channel, char* json);
 private:
+  bool  cacheWriteSwitch; // is there data in the cache to be saved?
+  uint8_t cacheWriteFileStatus[4]; // is the file cleared and ready to be written?
+  uint8_t cacheWritePattern[4]; // where should this data be saved?
+  elapsedMicros cacheWriteTimer;
+
   Sequencer *sequenceArray;
   SerialFlashFile file;
   SerialFlashChip *spiFlash;
-  SerialFlashPrint serialFlashPrint(SerialFlashFile *file);
+  //SerialFlashPrint *serialFlashPrint(SerialFlashFile *file);
+  SerialFlashPrint *serialFlashPrint = new SerialFlashPrint(&file);
+
   File saveData;
   File jsonFile;
 

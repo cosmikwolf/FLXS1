@@ -159,6 +159,7 @@ extern uint16_t  dacCalibration[16];
 extern uint16_t  cvInputRaw[4];
 extern uint8_t			gateInputRaw[4];
 
+
 void debug(const char* text);
 int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);

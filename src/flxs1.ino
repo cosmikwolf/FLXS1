@@ -40,7 +40,7 @@ elapsedMicros masterLoopTimer;
 void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
-  delay(100);
+//  while (!Serial) ; // wait for serial monitor window to open
 
   printHeapStats();
 
@@ -49,6 +49,9 @@ void setup() {
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
+  Serial.println("Sizeof Sequencer object: " + String(sizeof(sequence[0])));
+
+  delay(500);
   SPI.begin();
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);

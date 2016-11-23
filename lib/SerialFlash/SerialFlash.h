@@ -50,6 +50,9 @@ public:
 	static void write(uint32_t addr, const void *buf, uint32_t len);
 	static void eraseAll();
 	static void eraseBlock(uint32_t addr);
+	static void eraseBlock4k(uint32_t addr);
+	static void eraseBlock32k(uint32_t addr);
+	static void eraseBlock64k(uint32_t addr);
 
 	static SerialFlashFile open(const char *filename);
 	static bool create(const char *filename, uint32_t length, uint32_t align = 0);
@@ -114,6 +117,8 @@ public:
 		return length - offset;
 	}
 	void erase();
+	void erase4k();
+	
 	void flush() {
 	}
 	void close() {

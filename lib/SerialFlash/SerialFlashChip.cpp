@@ -48,9 +48,14 @@ static SPIClass& SPIPORT = SPI;
 #define FLAG_256K_BLOCKS	0x10	// has 256K erase blocks
 #define FLAG_DIE_MASK		0xC0	// top 2 bits count during multi-die erase
 
+#define SPIFLASH_BLOCKERASE_4K    0x20        // erase one 4K block of flash memory
+#define SPIFLASH_BLOCKERASE_32K   0x52        // erase one 32K block of flash memory
+#define SPIFLASH_BLOCKERASE_64K   0xD8        // erase one 64K block of flash memory
+
 void SerialFlashChip::wait(void)
 {
 	uint32_t status;
+	elapsedMicros timer;
 	//Serial.print("wait-");
 	while (1) {
 		SPIPORT.beginTransaction(SPICONFIG);
@@ -62,6 +67,7 @@ void SerialFlashChip::wait(void)
 			status = SPIPORT.transfer(0);
 			CSRELEASE();
 			SPIPORT.endTransaction();
+			//Serial.print("1");
 			//Serial.printf("b=%02x.", status & 0xFF);
 			if ((status & 0x80)) break;
 		} else {
@@ -70,12 +76,14 @@ void SerialFlashChip::wait(void)
 			status = SPIPORT.transfer(0);
 			CSRELEASE();
 			SPIPORT.endTransaction();
+			//Serial.print("2");
+
 			//Serial.printf("b=%02x.", status & 0xFF);
 			if (!(status & 1)) break;
 		}
 	}
 	busy = 0;
-	//Serial.println();
+	//Serial.println("\ttimer; " + String(timer));
 }
 
 void SerialFlashChip::read(uint32_t addr, void *buf, uint32_t len)
@@ -264,7 +272,53 @@ void SerialFlashChip::eraseAll()
 	busy = 3;
 }
 
-void SerialFlashChip::eraseBlock(uint32_t addr)
+void SerialFlashChip::eraseBlock4k(uint32_t addr)
+{
+	uint8_t f = flags;
+	if (busy) wait();
+	SPIPORT.beginTransaction(SPICONFIG);
+	CSASSERT();
+	SPIPORT.transfer(0x06); // write enable command
+	CSRELEASE();
+	 delayMicroseconds(1);
+	CSASSERT();
+	if (f & FLAG_32BIT_ADDR) {
+		SPIPORT.transfer(0x20);
+		SPIPORT.transfer16(addr >> 16);
+		SPIPORT.transfer16(addr);
+	} else {
+		SPIPORT.transfer16(0x2000 | ((addr >> 16) & 255));
+		SPIPORT.transfer16(addr);
+	}
+	CSRELEASE();
+	SPIPORT.endTransaction();
+	busy = 2;
+}
+
+void SerialFlashChip::eraseBlock32k(uint32_t addr)
+{
+	uint8_t f = flags;
+	if (busy) wait();
+	SPIPORT.beginTransaction(SPICONFIG);
+	CSASSERT();
+	SPIPORT.transfer(0x06); // write enable command
+	CSRELEASE();
+	 delayMicroseconds(1);
+	CSASSERT();
+	if (f & FLAG_32BIT_ADDR) {
+		SPIPORT.transfer(0x52);
+		SPIPORT.transfer16(addr >> 16);
+		SPIPORT.transfer16(addr);
+	} else {
+		SPIPORT.transfer16(0x5200 | ((addr >> 16) & 255));
+		SPIPORT.transfer16(addr);
+	}
+	CSRELEASE();
+	SPIPORT.endTransaction();
+	busy = 2;
+}
+
+void SerialFlashChip::eraseBlock64k(uint32_t addr)
 {
 	uint8_t f = flags;
 	if (busy) wait();
@@ -285,6 +339,10 @@ void SerialFlashChip::eraseBlock(uint32_t addr)
 	CSRELEASE();
 	SPIPORT.endTransaction();
 	busy = 2;
+}
+void SerialFlashChip::eraseBlock(uint32_t addr)
+{
+	eraseBlock64k(addr);
 }
 
 
@@ -434,10 +492,10 @@ void SerialFlashChip::readSerialNumber(uint8_t *buf) //needs room for 8 bytes
 	if (busy) wait();
 	SPIPORT.beginTransaction(SPICONFIG);
 	CSASSERT();
-	SPIPORT.transfer(0x4B);			
-	SPIPORT.transfer16(0);	
+	SPIPORT.transfer(0x4B);
 	SPIPORT.transfer16(0);
-	for (int i=0; i<8; i++) {		
+	SPIPORT.transfer16(0);
+	for (int i=0; i<8; i++) {
 		buf[i] = SPIPORT.transfer(0);
 	}
 	CSRELEASE();
@@ -455,7 +513,7 @@ uint32_t SerialFlashChip::capacity(const uint8_t *id)
 	if (id[2] >= 32 && id[2] <= 37) {
 		n = 1ul << (id[2] - 6);
 	} else
-	if ((id[0]==0 && id[1]==0 && id[2]==0) || 
+	if ((id[0]==0 && id[1]==0 && id[2]==0) ||
 		(id[0]==255 && id[1]==255 && id[2]==255)) {
 		n = 0;
 	}
@@ -494,7 +552,7 @@ SST26VF032	4
 // ----			----	-----	--------	---	-------		-----
 // Winbond W25Q64CV	8	64	EF 40 17
 // Winbond W25Q128FV	16	64	EF 40 18	05	single		60 & C7
-// Winbond W25Q256FV	32	64	EF 40 19	
+// Winbond W25Q256FV	32	64	EF 40 19
 // Spansion S25FL064A	8	?	01 02 16
 // Spansion S25FL127S	16	64	01 20 18	05
 // Spansion S25FL128P	16	64	01 20 18
