@@ -118,7 +118,7 @@ public:
 	}
 	void erase();
 	void erase4k();
-	
+
 	void flush() {
 	}
 	void close() {

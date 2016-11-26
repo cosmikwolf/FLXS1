@@ -24,21 +24,22 @@ public:
   void printDirectory(File dir, int numTabs);
   void printPattern();
   void cacheWriteLoop();
+  void listFiles();
   void saveSequenceJSON(uint8_t channel, uint8_t pattern);
   int  readSequenceJSON(uint8_t channel, uint8_t pattern);
   void deleteAllFiles();
   void rm(File dir, String tempPath);
   bool deserialize(uint8_t channel, char* json);
-private:
   bool  cacheWriteSwitch; // is there data in the cache to be saved?
+private:
   uint8_t cacheWriteFileStatus[4]; // is the file cleared and ready to be written?
   uint8_t cacheWritePattern[4]; // where should this data be saved?
   elapsedMicros cacheWriteTimer;
+  elapsedMicros cacheWriteTotalTimer;
 
   Sequencer *sequenceArray;
   SerialFlashFile file;
   SerialFlashChip *spiFlash;
-  //SerialFlashPrint *serialFlashPrint(SerialFlashFile *file);
   SerialFlashPrint *serialFlashPrint = new SerialFlashPrint(&file);
 
   File saveData;

@@ -77,7 +77,7 @@ void setup() {
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
-	MasterClockTimer.begin(masterLoop,kClockInterval);
+	//MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");

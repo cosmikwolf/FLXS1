@@ -29,15 +29,14 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	ledArray.initialize(sequencerArray);
 
-
 	outputControl.initialize(&backplaneGPIO, serialMidi, adc);
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
-
 	saveFile.initialize(sequencerArray, &SerialFlash);
 	saveFile.loadPattern(0, 0b1111);
-	//saveFile.deleteSaveFile();
+	saveFile.listFiles();
+//	saveFile.deleteSaveFile();
 /*
 	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
 	delay(200);
@@ -48,12 +47,15 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 }
 
 void TimeController::runLoopHandler() {
+	digitalWrite(31, HIGH);
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
-	//display.displayLoop(DISPLAY_FREQUENCY);
 
-	outputControl.inputRead();
+	display.displayLoop(DISPLAY_FREQUENCY);
+
+	//outputControl.inputRead();
 	saveFile.cacheWriteLoop();
+	digitalWrite(31, LOW);
 
 	if(currentState == CALIBRATION_MENU){
 		playing = 0;

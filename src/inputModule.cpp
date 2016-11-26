@@ -199,13 +199,31 @@ void InputModule::globalMenuHandler(){
       changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(4)){
-    for (int i=0; i < 4; i++){
+    for (int i=0; i < SEQUENCECOUNT; i++){
       sequenceArray[i].initNewSequence(sequenceArray[i].patternIndex, i);
     }
     changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(8)){
+    Serial.println("DELETING ALL SAVE FILES");
+  //  saveFile->listFiles();
+    delay(1000);
     saveFile->deleteSaveFile();
+
+    for(int pattern=0; pattern < 16; pattern++){
+      for (int i=0; i < SEQUENCECOUNT; i++){
+        sequenceArray[i].initNewSequence(pattern, i);
+        saveFile->saveSequenceJSON(i,pattern);
+      }
+      while(saveFile->cacheWriteSwitch){
+        saveFile->cacheWriteLoop();
+        delayMicroseconds(100);
+      };
+      Serial.println("***---- Saved pattern " + String(pattern));
+    }
+    saveFile->loadPattern(0, 0b1111);
+    saveFile->listFiles();
+    delay(1000);
     changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(12)){

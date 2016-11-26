@@ -6,8 +6,6 @@ SerialFlashPrint::SerialFlashPrint(SerialFlashFile * file) : Print() {
   this->_current_byte = 0;
 };
 
-
-
 size_t SerialFlashPrint::write(uint8_t c) {
   if(_buffer_count == BUFFER_SIZE){
     this->writeBuf();
@@ -55,6 +53,7 @@ void SerialFlashPrint::writeComplete(){
   for(int i=_buffer_count+1; i< BUFFER_SIZE; i++){
     buf[i] = '\0';
   };
+  //free(buf);
   _file->write(buf, _buffer_count);
   _file->close();
 };

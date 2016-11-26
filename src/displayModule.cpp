@@ -58,27 +58,43 @@ void DisplayModule::clearDisplay(){
 }
 
 void DisplayModule::freeDisplayCache(){
+/*  delete [] displayCache;
+  delete [] displayElement;
+  for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
+    displayCache[i] = NULL;
+    displayElement[i] = NULL;
+  }
+  */
   for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
     //clear displaycache so all data redraws.
       free(displayCache[i]);
-      displayCache[i] = NULL;
+      displayCache[i] = nullptr;
       free(displayElement[i]);
-      displayElement[i] = NULL;
+      displayElement[i] = nullptr;
   }
 }
 
 void DisplayModule::cleanupTextBuffers(){
+/*  delete [] displayCache;
   for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
-    if (displayElement[i] == NULL) {
-      displayElement[i] = strdup("--------");
+    displayCache[i] = strdup(displayElement[i]);
+  }
+  delete [] displayElement;
+  for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
+    displayCache[i] = NULL;
+    displayElement[i] = NULL;
+  }
+*/
+  for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
+    if (displayElement[i] == nullptr) {
+      displayElement[i] = strdup("-");
     };
       free(displayCache[i]);
-      displayCache[i] = NULL;
+      displayCache[i] = nullptr;
       displayCache[i] = strdup(displayElement[i]);
       free(displayElement[i]);
-      displayElement[i] = NULL;
+      displayElement[i] = nullptr;
   };
-  //delete buf;
 };
 
 void DisplayModule::displayLoop(uint16_t frequency) {
@@ -110,8 +126,9 @@ void DisplayModule::displayLoop(uint16_t frequency) {
        Serial.println("about to display a new state");
        freeDisplayCache();
 //       oled.clearScreen();
-      oled.fillScreen(background);
+       oled.fillScreen(background);
     }
+
     switch(currentState) {
 
       case CHANNEL_PITCH_MODE:
@@ -168,12 +185,18 @@ void DisplayModule::displayLoop(uint16_t frequency) {
       break;
       */
     }
+
     if (previousState != currentState){
       Serial.println("finished first loop of displaying new state");
     }
     cleanupTextBuffers();
+    if (previousState != currentState){
+      Serial.println("text buffers cleaned up");
+      Serial.println("Freeram: " + String(FreeRam2()));
+    }
     previousState = currentState;
     previouslySelectedChannel = selectedChannel;
+
   };
 };
 
@@ -233,11 +256,11 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     case STEPMODE_CHORD:
       highlight = 7;    break;
     case STEPMODE_STEPCOUNT:
-      highlight = 12;    break;
+      highlight = 12;   break;
     case STEPMODE_BEATCOUNT:
       highlight = 9;    break;
     case STEPMODE_GATETYPE:
-      highlight = 15;    break;
+      highlight = 15;   break;
     case STEPMODE_ARPTYPE:
       highlight = 17;   break;
     case STEPMODE_ARPSPEEDNUM:
@@ -247,13 +270,13 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     case STEPMODE_ARPOCTAVE:
       highlight = 21;   break;
     case STEPMODE_PITCH1:
-      highlight = 2;   break;
+      highlight = 2;    break;
     case STEPMODE_PITCH2:
-      highlight = 3;   break;
+      highlight = 3;    break;
     case STEPMODE_PITCH3:
-      highlight = 4;   break;
+      highlight = 4;    break;
     case STEPMODE_GLIDE:
-      highlight = 8;   break;
+      highlight = 8;    break;
   }
 
   displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
@@ -284,7 +307,7 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     displayElement[6] = strdup(buf);
   }
 
-  char *chordSelectionArray[] = {
+  const char* chordSelectionArray[] = {
     "unison",
     "maj",
     "min",
@@ -314,7 +337,11 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
     "7#9"
    };
 
-   displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+   //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
+displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+
+  //displayElement[7] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].chord).c_str());
+
 
    displayElement[13] = strdup("Glide:");
 
@@ -326,15 +353,14 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   displayElement[8] = strdup(buf);
 
   displayElement[14] = strdup("Gate\nTrig:");
-  char *gateTypeArray[] = { "off", "on", "1hit","hold" };
-  displayElement[15] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType]);
+  String gateTypeArray[] = { "off", "on", "1hit","hold" };
+  displayElement[15] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
 
   displayElement[16] = strdup("arp");
   displayElement[0]  = strdup("typ:");
-  char *arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
+  const char*  arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
   displayElement[17] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
-
-
+//========
   displayElement[18] = strdup("arp");
   displayElement[23] = strdup("spd:");
   sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
@@ -438,6 +464,7 @@ void DisplayModule::channelPitchMenuDisplay(char *buf){
   // }
 
   //  cleanupTextBuffers(buf, 13);
+
 };
 
 void DisplayModule::channelVelocityMenuDisplay(char *buf) {
