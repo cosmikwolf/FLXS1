@@ -46,12 +46,12 @@ void setup() {
 
   //AudioMemory(25);
   //notefreq.begin(.15);
+  delay(1500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
 
   Serial.println("Sizeof Sequencer object: " + String(sizeof(sequence[0])));
 
-  delay(500);
   SPI.begin();
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
@@ -77,7 +77,7 @@ void setup() {
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
-	//MasterClockTimer.begin(masterLoop,kClockInterval);
+	MasterClockTimer.begin(masterLoop,kClockInterval);
 	SPI.usingInterrupt(MasterClockTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");

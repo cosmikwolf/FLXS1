@@ -31,12 +31,14 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 };
 
 
-void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
+void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
+	Serial.println("*&*&*&*& Initializing pattern: " + String(pattern) + " channel: " + String(ch));
+
 	this->stepCount = 16;
 	this->beatCount = 4;
 	this->quantizeKey = 0;
 	this->quantizeScale = 0;
-	this->patternIndex = index;
+	this->pattern = pattern;
 	this->channel = ch;
 
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
@@ -62,6 +64,8 @@ void Sequencer::initNewSequence(uint8_t index, uint8_t ch){
 		this->stepData[n].notePlaying  =   0;
 		this->stepData[n].stepTimer    =   0;
 	}
+
+	Serial.println("pattern: " + String(pattern));
 };
 
 

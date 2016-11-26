@@ -26,7 +26,7 @@ class Sequencer
 		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
 		void 		clockStart(elapsedMicros startTime);
 		int  		positive_modulo(int i, int n);
-		void 		initNewSequence(uint8_t index, uint8_t ch);
+		void 		initNewSequence(uint8_t pattern, uint8_t ch);
 
 		void 		setTempo(uint32_t tempoX100);
 		void 		setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
@@ -64,7 +64,7 @@ class Sequencer
 		uint16_t beatCount;
 		uint8_t	 quantizeKey;
 		uint8_t	 quantizeScale;
-		uint8_t  patternIndex;
+		uint8_t  pattern;
 		uint8_t	 channel;
 		uint8_t  inputAttenuvert;
 

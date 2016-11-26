@@ -51,10 +51,11 @@ void TimeController::runLoopHandler() {
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
 
-	display.displayLoop(DISPLAY_FREQUENCY);
+	//display.displayLoop(DISPLAY_FREQUENCY);
 
 	//outputControl.inputRead();
 	saveFile.cacheWriteLoop();
+
 	digitalWrite(31, LOW);
 
 	if(currentState == CALIBRATION_MENU){
@@ -68,5 +69,5 @@ void TimeController::runLoopHandler() {
 }
 
 void TimeController::masterClockHandler(){
-	clockMaster.masterClockFunc();
+//	clockMaster.masterClockFunc();
 }

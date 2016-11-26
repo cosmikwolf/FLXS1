@@ -195,12 +195,12 @@ void InputModule::sequenceMenuHandler(){
 
 void InputModule::globalMenuHandler(){
   if (midplaneGPIO->fell(0)){
-    sequenceArray[selectedChannel].initNewSequence(sequenceArray[selectedChannel].patternIndex, selectedChannel);
+    sequenceArray[selectedChannel].initNewSequence(sequenceArray[selectedChannel].pattern, selectedChannel);
       changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(4)){
     for (int i=0; i < SEQUENCECOUNT; i++){
-      sequenceArray[i].initNewSequence(sequenceArray[i].patternIndex, i);
+      sequenceArray[i].initNewSequence(sequenceArray[i].pattern, i);
     }
     changeState(CHANNEL_PITCH_MODE);
 
@@ -211,13 +211,13 @@ void InputModule::globalMenuHandler(){
     saveFile->deleteSaveFile();
 
     for(int pattern=0; pattern < 16; pattern++){
-      for (int i=0; i < SEQUENCECOUNT; i++){
-        sequenceArray[i].initNewSequence(pattern, i);
-        saveFile->saveSequenceJSON(i,pattern);
+      for (int channel=0; channel < SEQUENCECOUNT; channel++){
+        sequenceArray[channel].initNewSequence(pattern, channel);
+        saveFile->saveSequenceJSON(channel, pattern);
       }
       while(saveFile->cacheWriteSwitch){
         saveFile->cacheWriteLoop();
-        delayMicroseconds(100);
+        delay(10);
       };
       Serial.println("***---- Saved pattern " + String(pattern));
     }
@@ -285,7 +285,6 @@ void InputModule::channelButtonHandler(uint8_t channel){
     case CHANNEL_STEP_MODE:
       changeState(CHANNEL_PITCH_MODE);
     break;
-
 
     default:
       changeState(CHANNEL_PITCH_MODE);
@@ -584,7 +583,6 @@ void InputModule::altButtonHandler(){
           case STEPMODE_ARPOCTAVE:
           sequenceArray[selectedChannel].stepData[selectedStep].arpOctave=  min_max(sequenceArray[selectedChannel].stepData[selectedStep].arpOctave + knobChange, 1, 5);
           break;
-;
 
         }
       }
