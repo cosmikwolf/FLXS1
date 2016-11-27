@@ -6,6 +6,7 @@
 #include "serialFlashPrint.h"
 #include "global.h"
 #include "Sequencer.h"
+#include <EEPROM.h>
 #include <string>
 
 

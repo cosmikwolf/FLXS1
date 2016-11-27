@@ -15,6 +15,9 @@
 #define CACHE_WRITTEN 2
 #define CACHE_ERASED 3
 
+#define CACHE0_WRITTEN_EEPROM  0
+#define CACHE1_WRITTEN_EEPROM  1
+#define CACHE2_WRITTEN_EEPROM  2
 /*
 ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING! ¡WARNING!
 This file contains code that enables saving and loading of patterns. Changing this file could result in an inability to read existing save files.
@@ -74,16 +77,16 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["p1"] = sequenceArray[channel].stepData[i].pitch[1];
     stepDataObj["p2"] = sequenceArray[channel].stepData[i].pitch[2];
     stepDataObj["p3"] = sequenceArray[channel].stepData[i].pitch[3];
-    stepDataObj["ch"] = sequenceArray[channel].stepData[i].chord ;
-    stepDataObj["bd"] = sequenceArray[channel].stepData[i].beatDiv ;
-    stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType ;
-    stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength ;
+    stepDataObj["ch"] = sequenceArray[channel].stepData[i].chord;
+    stepDataObj["bd"] = sequenceArray[channel].stepData[i].beatDiv;
+    stepDataObj["gt"] = sequenceArray[channel].stepData[i].gateType;
+    stepDataObj["gl"] = sequenceArray[channel].stepData[i].gateLength;
     stepDataObj["at"] = sequenceArray[channel].stepData[i].arpType;
     stepDataObj["ao"] = sequenceArray[channel].stepData[i].arpOctave;
     stepDataObj["an"] = sequenceArray[channel].stepData[i].arpSpdNum;
     stepDataObj["ad"] = sequenceArray[channel].stepData[i].arpSpdDen;
     stepDataObj["v"]  = sequenceArray[channel].stepData[i].velocity ;
-    stepDataObj["vt"] = sequenceArray[channel].stepData[i].velocityType ;
+    stepDataObj["vt"] = sequenceArray[channel].stepData[i].velocityType;
     stepDataObj["ls"] = sequenceArray[channel].stepData[i].lfoSpeed;
     stepDataObj["g"]  = sequenceArray[channel].stepData[i].glide;
     stepDataArray.add(stepDataObj);
