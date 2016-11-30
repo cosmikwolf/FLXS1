@@ -54,7 +54,6 @@ void TimeController::runLoopHandler() {
 	//display.displayLoop(DISPLAY_FREQUENCY);
 
 	//outputControl.inputRead();
-	saveFile.cacheWriteLoop();
 
 	digitalWrite(31, LOW);
 
@@ -69,5 +68,11 @@ void TimeController::runLoopHandler() {
 }
 
 void TimeController::masterClockHandler(){
+//	saveFile.cacheWriteLoop();
+
 //	clockMaster.masterClockFunc();
+}
+
+void TimeController::cacheWriteHandler(){
+	saveFile.cacheWriteLoop();
 }

@@ -208,22 +208,32 @@ void InputModule::globalMenuHandler(){
     Serial.println("DELETING ALL SAVE FILES");
   //  saveFile->listFiles();
     delay(1000);
-    saveFile->deleteSaveFile();
-
+  //  saveFile->deleteSaveFile();
+  //  saveFile->initializeCache();
     for(int pattern=0; pattern < 16; pattern++){
+      Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
+
       for (int channel=0; channel < SEQUENCECOUNT; channel++){
         sequenceArray[channel].initNewSequence(pattern, channel);
+      }
+      for (int channel=0; channel < SEQUENCECOUNT; channel++){
         saveFile->saveSequenceJSON(channel, pattern);
       }
       while(saveFile->cacheWriteSwitch){
-        saveFile->cacheWriteLoop();
+//        saveFile->cacheWriteLoop();
+        Serial.print(".");
         delay(10);
       };
-      Serial.println("***---- Saved pattern " + String(pattern));
+      Serial.println(" ");
+      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
+      delay(500);
+    }
+
+    while(saveFile->cacheWriteSwitch){
+      delay(1);
     }
     saveFile->loadPattern(0, 0b1111);
     saveFile->listFiles();
-    delay(1000);
     changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(12)){

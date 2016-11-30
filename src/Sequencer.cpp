@@ -21,6 +21,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	// initialization routine that runs during setup
 	Serial.println("Initializing Sequencer Object");
 	this->channel = ch;
+	this->pattern = 0;
 	this->stepCount = stepCount;
 	this->beatCount = beatCount;
 	this->tempoX100 = tempoX100;
@@ -64,8 +65,6 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 		this->stepData[n].notePlaying  =   0;
 		this->stepData[n].stepTimer    =   0;
 	}
-
-	Serial.println("pattern: " + String(pattern));
 };
 
 

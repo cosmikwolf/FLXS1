@@ -15,12 +15,14 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kClockInterval 600
+#define kMasterClockInterval 600
+#define kCacheClockInterval 100000
 #define kMosiPin 11
 #define kSpiClockPin 13
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
+IntervalTimer CacheTimer;
 
 MidiModule midiControl;
 NoteDatum noteData[SEQUENCECOUNT];
@@ -77,8 +79,10 @@ void setup() {
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
-	MasterClockTimer.begin(masterLoop,kClockInterval);
-	SPI.usingInterrupt(MasterClockTimer);
+  MasterClockTimer.begin(masterLoop,kMasterClockInterval);
+  CacheTimer.begin(cacheLoop,kCacheClockInterval);
+  SPI.usingInterrupt(MasterClockTimer);
+  SPI.usingInterrupt(CacheTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
@@ -158,7 +162,9 @@ void masterLoop(){
   timeControl.masterClockHandler();
   digitalWriteFast(31, LOW);
 }
-
+void cacheLoop(){
+  timeControl.cacheWriteHandler();
+}
 // global wrappers to create pointers to MidiModule member functions
 // https://isocpp.org/wiki/faq/pointers-to-members
 void midiClockPulseHandlerWrapper(){

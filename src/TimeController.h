@@ -21,6 +21,7 @@ class TimeController {
     void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc);
     void runLoopHandler();
     void masterClockHandler();
+    void cacheWriteHandler();
 
   private:
     MasterClock clockMaster;
