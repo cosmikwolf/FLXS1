@@ -19,12 +19,13 @@
 #define CACHE_WRITE_DELAY        500
 #define AWAITING_FILE_ERASURE    0
 
-#define CACHE_COUNT              8
+#define CACHE_COUNT              16
 #define CACHE_READY              0   // CACHE IS CLEARED AND READY
-#define CACHE_WRITING            1   // WRITING TO CACHE IN PROGRESS
-#define FILE_ERASING             2   // DEST FILE HAS BEEN ERASED
-#define FILE_COPYING             3   // CACHE HAS BEEN COPIED
-#define CACHE_ERASING            4   // CACHE FILE IS ERASING
+#define CACHE_SET                1   // CACHE SET, AWAITING WRITE
+#define CACHE_WRITING            2   // WRITING TO CACHE IN PROGRESS
+#define FILE_ERASING             3   // DEST FILE HAS BEEN ERASED
+#define FILE_COPYING             4   // CACHE HAS BEEN COPIED
+#define CACHE_ERASING            5   // CACHE FILE IS ERASING
 
 #define CACHE_UNAVAILABLE      255   // NO FREE CACHE AVAILABLE
 
@@ -63,18 +64,22 @@ public:
   void saveSequenceJSON(uint8_t channel, uint8_t pattern);
   int  readSequenceJSON(uint8_t channel, uint8_t pattern);
   int getSaveAddress(uint8_t channel, uint8_t pattern);
+  void serialize(char* fileBuffer, uint8_t channel, uint8_t pattern);
+  bool validateJson(char* fileBuffer);
 
   void deleteAllFiles();
   void rm(File dir, String tempPath);
   bool deserialize(uint8_t channel, char* json);
   bool  cacheWriteSwitch; // is there data in the cache to be saved?
   bool  spiFlashBusy;
+  bool  cacheWriteBusy;
   bool  saveSequenceBusy;
 
 private:
   uint16_t cacheOffset;
   uint8_t cacheStatus[CACHE_COUNT];
-
+  uint8_t cacheNum;
+  
   elapsedMicros cacheWriteTimer;
   elapsedMicros cacheWriteTotalTimer;
 

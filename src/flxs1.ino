@@ -16,13 +16,14 @@
 
 #define kSerialSpeed 115200
 #define kMasterClockInterval 600
-#define kCacheClockInterval 100000
+#define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
 IntervalTimer CacheTimer;
+IntervalTimer LEDTimer;
 
 MidiModule midiControl;
 NoteDatum noteData[SEQUENCECOUNT];
@@ -46,8 +47,8 @@ void setup() {
 
   printHeapStats();
 
-  //AudioMemory(25);
-  //notefreq.begin(.15);
+  AudioMemory(25);
+  notefreq.begin(.15);
   delay(1500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
@@ -79,8 +80,16 @@ void setup() {
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
+
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
+  MasterClockTimer.priority(0);
+
+//  LEDTimer.begin(ledLoop, kLEDTimerInterval);
+//  LEDTimer.priority(1);
+
   CacheTimer.begin(cacheLoop,kCacheClockInterval);
+  CacheTimer.priority(2);
+
   SPI.usingInterrupt(MasterClockTimer);
   SPI.usingInterrupt(CacheTimer);
 
@@ -157,10 +166,8 @@ void usbNoteOn(byte channel, byte note, byte velocity){
 // global wrapper to create pointer to ClockMaster member function
 // https://isocpp.org/wiki/faq/pointers-to-members
 void masterLoop(){
-  digitalWriteFast(31, HIGH);
   usbMIDI.read();
   timeControl.masterClockHandler();
-  digitalWriteFast(31, LOW);
 }
 void cacheLoop(){
   timeControl.cacheWriteHandler();

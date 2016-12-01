@@ -23,7 +23,9 @@ void FlashMemory::initialize(Sequencer *sequenceArray, SerialFlashChip *spiFlash
   if(!spiFlash->begin(WINBOND_CS_PIN)){
     Serial.println("SPI FLASH CHIP INITIALIZATION FAILED!");
   }
-
+  spiFlashBusy = 0;
+  cacheWriteBusy = 0;
+  saveSequenceBusy = 0;
   initializeCache();
 
   Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
@@ -59,7 +61,7 @@ void FlashMemory::initializeCache(){
   //Randomize a cache offset so that EEPROM is used evenly across all bytes
   //EEPROM will begin to degrade after 100000 writes, so this will increase longevity of the device.
   //Identify previous cache offset value:
-
+  cacheNum = 0;
   cacheOffset = EEPROMReadlong(0);
   spiFlashBusy = false;
   uint16_t newCacheOffset = random(1,2000);
@@ -133,29 +135,68 @@ int  FlashMemory::getCacheStatus(uint16_t _cacheOffset, uint8_t cacheIndex){
   }
 };
 
-
 void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
-  StaticJsonBuffer<16384> jsonBuffer;
 
   uint8_t selectedCacheIndex = findFreeCache();
   while (selectedCacheIndex == CACHE_UNAVAILABLE){  // probably need some kind of timeout here
+    cacheWriteLoop();
     selectedCacheIndex = findFreeCache();
-    delay(10);
   }
-
-  saveSequenceBusy = true;  // this line must go after findFreeCache or it will never find one.
+  saveSequenceBusy = 1;
 
   setCachePattern(cacheOffset, selectedCacheIndex, pattern);
   setCacheChannel(cacheOffset, selectedCacheIndex, channel);
-  setCacheStatus(cacheOffset, selectedCacheIndex, CACHE_WRITING);
+  setCacheStatus(cacheOffset, selectedCacheIndex, CACHE_SET);
 
-
-  char *cacheFileName = (char *) malloc(sizeof(char) * 12);
+  char* cacheFileName = (char *) malloc(sizeof(char) * 12);
   strcpy(cacheFileName, "cache.txt");
-  elapsedMillis flashTimer = 0;
 
-  // following ArduinoJSON serialize example: https://githtub.com/bblanchon/ArduinoJson/wiki/FAQ#whats-the-best-way-to-use-the-library
+  char * fileBuffer = (char*)malloc(SAVEBLOCKSIZE);
+  bool validation = 0;
+
+  serialize(fileBuffer,  channel, pattern);
+
+  while(!(spiFlash->ready()|| !spiFlashBusy) ){
+    delay(1);
+  }
+  spiFlashBusy = true;
+  file = spiFlash->open(cacheFileName);
+  if (file){
+    file.seek(getSaveAddress(channel, pattern));
+    file.write(fileBuffer,SAVEBLOCKSIZE);
+    file.read(fileBuffer,SAVEBLOCKSIZE);
+
+    setCacheStatus(cacheOffset, selectedCacheIndex, CACHE_WRITING);
+    file.close();
+  } else {
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(cacheFileName));
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+      Serial.println("##############");
+  }
+
+
+  free(fileBuffer);
+  free(cacheFileName);
+  saveSequenceBusy = 0;
+  spiFlashBusy = 0;
+  cacheWriteSwitch = 1;
+  cacheWriteTotalTimer = 0;
+
+}
+
+void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
+  StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
   root["stepCount"]     = sequenceArray[channel].stepCount;
@@ -168,7 +209,7 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
 
   for (int i=0; i< root["stepCount"]; i++){
     JsonObject& stepDataObj = jsonBuffer.createObject();
-    stepDataObj["i"] = i ;
+    stepDataObj["i"] = i;
     stepDataObj["p0"] = sequenceArray[channel].stepData[i].pitch[0];
     stepDataObj["p1"] = sequenceArray[channel].stepData[i].pitch[1];
     stepDataObj["p2"] = sequenceArray[channel].stepData[i].pitch[2];
@@ -187,78 +228,24 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     stepDataObj["g"]  = sequenceArray[channel].stepData[i].glide;
     stepDataArray.add(stepDataObj);
   }
-
-  Serial.println("Saving file to SPI flash chip: " + String(cacheFileName) + " timer: " + String(flashTimer));
-
-  file = spiFlash->open(cacheFileName);
-  if (file){
-    char * fileBuffer = (char*)malloc(SAVEBLOCKSIZE);  // Allocate memory for the file and a terminating null char.
-    file.seek(getSaveAddress(channel, pattern));
-    root.printTo(fileBuffer,SAVEBLOCKSIZE);
-    file.write(fileBuffer,SAVEBLOCKSIZE);
-    setCacheStatus(cacheOffset, selectedCacheIndex, CACHE_WRITING);
-    free(fileBuffer);
-  } else {
-    Serial.print("unable to open file: "  + String(cacheFileName));
-  }
-
-  file.close();
-  free(cacheFileName);
-
-  cacheWriteSwitch = 1;
-  cacheWriteTotalTimer = 0;
-  saveSequenceBusy = false;
-  Serial.println("&*&*&*&*&*&*&*&*&*&*& flash Timer after write: " + String(flashTimer) );
-
+  root.printTo(fileBuffer,SAVEBLOCKSIZE);
 }
 
-void FlashMemory::listFiles(){
-  spiFlash->opendir();
-  while (1) {
-    char filename[64];
-    uint32_t filesize;
-
-    if (spiFlash->readdir(filename, sizeof(filename), filesize)) {
-      Serial.print("  ");
-      Serial.print(filename);
-      for (int i=0; i < (20 - strlen(filename)); i++) {
-        Serial.print(" ");
-      }
-      Serial.print("  ");
-      Serial.print(filesize);
-      Serial.print(" bytes");
-      Serial.println();
-      for(int i=0; i<64; i++){
-        char* fileBuffer = (char*)malloc(SAVEBLOCKSIZE);  // Allocate memory for the file and a terminating null char.
-        file.seek(SAVEBLOCKSIZE*i);
-        file.read(fileBuffer, SAVEBLOCKSIZE);
-        fileBuffer[SAVEBLOCKSIZE] = '\0';               // Add the terminating null char.
-        Serial.println(String(i) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
-        free(fileBuffer);
-      }
-
-    } else {
-      break; // no more files
-    }
-  }
-  for(int i=0; i<CACHE_COUNT; i++){
-    Serial.print(String(i) + "\t");
-    Serial.print("pt:" + String(getCachePattern(cacheOffset, i)) + "\t");
-    Serial.print("ch:" + String(getCacheChannel(cacheOffset, i)) + "\t");
-    Serial.print("st:" + String(getCacheStatus(cacheOffset, i))  + "\t");
-    Serial.println(" ");
-  }
+bool FlashMemory::validateJson(char* fileBuffer){
+  StaticJsonBuffer<16384> jsonBuffer;
+  JsonObject& root = jsonBuffer.parse(fileBuffer);
+  return root.success();
 }
 
 void FlashMemory::cacheWriteLoop(){
-  if(spiFlashBusy || saveSequenceBusy){
+  if(cacheWriteBusy || saveSequenceBusy){
     return;
   }
-  spiFlashBusy = true;
-  for(int cacheNum = 0; cacheNum < CACHE_COUNT; cacheNum++){
+  cacheWriteBusy = true;
+  cacheNum = (cacheNum+1)%CACHE_COUNT;
     uint8_t channel = getCacheChannel(cacheOffset, cacheNum);
     uint8_t pattern = getCachePattern(cacheOffset, cacheNum);
-    if( (getCacheStatus(cacheOffset, cacheNum) >= CACHE_WRITING)
+    if( (getCacheStatus(cacheOffset, cacheNum) >= CACHE_SET)
          && cacheWriteTimer > CACHE_WRITE_DELAY   ){
         //Serial.print("A+");
         // Serial.println("Running Cache Write Loop:\t" + String(cacheNum) + "\tch: " + String(channel) +"\tpa: "+ String(getCachePattern(cacheOffset, cacheNum)) + "\tstatus: " + String(getCacheStatus(cacheOffset, cacheNum)) + "\tms: " + String(millis()) );
@@ -267,11 +254,34 @@ void FlashMemory::cacheWriteLoop(){
         strcpy(cacheFileName, "cache.txt");
         strcpy(fileName, "data.txt");
 
-
         switch (getCacheStatus(cacheOffset, cacheNum) ){
-          case CACHE_WRITING: //clear the file where cache will be written to
+
+          case CACHE_SET:
+            if(spiFlashBusy){break;};
             if (spiFlash->ready()){
-              Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: ERASING DESTINATION - " + String(fileName) + " CH: " + String(channel) + "\tpat:" + String(pattern) +" timer:" + String(cacheWriteTotalTimer));
+               spiFlashBusy = true;
+              file = spiFlash->open(cacheFileName);
+              if (file){
+                char * fileBuffer = (char*)malloc(SAVEBLOCKSIZE);
+                file.seek(getSaveAddress(channel, pattern));
+                serialize(fileBuffer,  channel, pattern);
+                file.write(fileBuffer,SAVEBLOCKSIZE);
+                setCacheStatus(cacheOffset, cacheNum, CACHE_WRITING);
+                free(fileBuffer);
+              } else {
+                Serial.print("unable to open file: "  + String(cacheFileName));
+              }
+              file.close();
+              spiFlashBusy = false;
+            }
+
+          break;
+          case CACHE_WRITING: //clear the file where cache will be written to
+            if(spiFlashBusy){break;};
+            if (spiFlash->ready()){
+              spiFlashBusy = true;
+
+            //  Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: ERASING DESTINATION - " + String(fileName) + " CH: " + String(channel) + "\tpat:" + String(pattern) +" timer:" + String(cacheWriteTotalTimer));
               file = spiFlash->open(fileName);   //open cache file
               if(file){
                 file.seek(getSaveAddress(channel, pattern)); //seek to address
@@ -282,16 +292,17 @@ void FlashMemory::cacheWriteLoop(){
                 Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: FILE ERASE ERROR - " + String(fileName));
               }
               file.close();
-
+              spiFlashBusy = false;
             }
           break;
 
           case FILE_ERASING: //write cache to cleared file location
+            if(spiFlashBusy){break;};
             if (spiFlash->ready()){
+               spiFlashBusy = true;
 
-              Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: WRITING CACHE - CH: " + String(channel));
-              char* fileBuffer = (char*)malloc(SAVEBLOCKSIZE);  // Allocate memory for the file and a terminating null char.
-              // read cache file
+            //  Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: WRITING CACHE - CH: " + String(channel));
+              char* fileBuffer = (char*)malloc(SAVEBLOCKSIZE);  // Allocate memory
               file = spiFlash->open(cacheFileName); // open cache file
               if(file){
                 file.seek(getSaveAddress(channel, pattern));
@@ -300,41 +311,49 @@ void FlashMemory::cacheWriteLoop(){
               } else { Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: CACHE READ ERROR - CH: "+ String(channel)); }
               file.close();    // close cache file
 
-
               // write to save file
               file = spiFlash->open(fileName);   //open save file
               if (file){
                 file.seek(getSaveAddress(channel, pattern)); //seek to address
                 file.write(fileBuffer, SAVEBLOCKSIZE);
                 cacheWriteTimer = 0;
+                Serial.print("Writing CH:" + String(channel) + "\tPT:" + String(pattern) + "\t" );
+                Serial.println(fileBuffer);
               } else { Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: CACHE WRITE ERROR - CH: "+ String(channel)); }
               file.close();    // close cache file
               setCacheStatus(cacheOffset, cacheNum, FILE_COPYING);
               free(fileBuffer);
+              spiFlashBusy = false;
 
             }
           break;
 
           case FILE_COPYING:
+            if(spiFlashBusy){break;};
             if (spiFlash->ready()){
-              Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: CLEARING CACHE - CH: " + String(channel)  );
+               spiFlashBusy = true;
 
+            //  Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: CLEARING CACHE - CH: " + String(channel)  );
               file = spiFlash->open(cacheFileName); // open cache file
               if (file) {
                 file.seek(getSaveAddress(channel, pattern));
                 file.erase4k();
                 cacheWriteTimer = 0;
+                setCacheStatus(cacheOffset, cacheNum, CACHE_ERASING);
               } else { Serial.println(":::{{{--->>><<<---}}}:::CACHELOOP " + String(cacheNum) + " :::{{{--->>><<<---}}}::: CACHE CLEAR ERROR - CH: "+ String(channel));}
 
               file.close();    // close cache file
-              setCacheStatus(cacheOffset, cacheNum, CACHE_ERASING);
-              Serial.println("@@@@@@--***%%***--@@@@@@ ^ __ ^ <<<???>>> FILE SAVED SUCCESSFULLY: " + String(fileName) + "<<<???>>>  ^ __ ^  @@@@@@--***%%***--@@@@@@ \t\tPT:" + String(pattern)+ "\tCH: " + String(channel)  +" timer:" + String(cacheWriteTotalTimer));
+          //    Serial.println("@@@@@@--***%%***--@@@@@@ ^ __ ^ <<<???>>> FILE SAVED SUCCESSFULLY: " + String(fileName) + "<<<???>>>  ^ __ ^  @@@@@@--***%%***--@@@@@@ \t\tPT:" + String(pattern)+ "\tCH: " + String(channel)  +" timer:" + String(cacheWriteTotalTimer));
+            spiFlashBusy = false;
             }
           break;
 
           case CACHE_ERASING:
+            if(spiFlashBusy){break;};
             if (spiFlash->ready()){
+              spiFlashBusy = true;
               setCacheStatus(cacheOffset, cacheNum, CACHE_READY);
+              spiFlashBusy = false;
             }
           break;
         };
@@ -343,13 +362,19 @@ void FlashMemory::cacheWriteLoop(){
         free(cacheFileName);
       }
 
-      if (getCacheStatus(cacheOffset, cacheNum) != CACHE_READY) {
-        continue;
-      } else {
-        cacheWriteSwitch = 0;
+
+    cacheWriteBusy = false;
+
+    for(int _cacheNum = 0; _cacheNum < CACHE_COUNT; _cacheNum++){
+      if (getCacheStatus(cacheOffset, _cacheNum) != CACHE_READY) {
+        break;
       }
+      if(cacheWriteSwitch){
+        Serial.println("SAVE OPERATION COMPLETE " + String(cacheWriteTotalTimer));
+      }
+      cacheWriteSwitch = 0;
     }
-    spiFlashBusy = false;
+
 }
 
 int FlashMemory::getSaveAddress(uint8_t channel, uint8_t pattern){
@@ -370,7 +395,9 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
       strcpy(fileName, String("data.txt").c_str());
       Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE " + String(fileName) + " LOAD START *&*&*&*&*&*&*&*&*&");
 
+
       if (spiFlash->exists(fileName)){
+
         Serial.println("Save file exists... attempting load");
         file = spiFlash->open(fileName);
         if (file){
@@ -459,6 +486,12 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
 }
 
 void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
+  for (int i = 0; i<CACHE_COUNT; i++){
+    while( getCachePattern(cacheOffset, i) == pattern && getCacheStatus(cacheOffset, i) != 0 ) {
+      Serial.println("Delaying because pattern " + String(pattern) + " has pending save operation");
+      cacheWriteLoop();
+    }
+  }
 
   Serial.println("[[-]]><{{{--}}}><[[-]] LOADING PATTERN: " + String(pattern) + " [[-]]><{{{--}}}><[[-]]");
 //  printPattern();
@@ -611,6 +644,46 @@ void FlashMemory::deleteAllFiles(){
  //root.close();
 
 }
+
+
+void FlashMemory::listFiles(){
+  spiFlash->opendir();
+  while (1) {
+    char filename[64];
+    uint32_t filesize;
+
+    if (spiFlash->readdir(filename, sizeof(filename), filesize)) {
+      Serial.print("  ");
+      Serial.print(filename);
+      for (int i=0; i < (20 - strlen(filename)); i++) {
+        Serial.print(" ");
+      }
+      Serial.print("  ");
+      Serial.print(filesize);
+      Serial.print(" bytes");
+      Serial.println();
+      for(int i=0; i<64; i++){
+        char* fileBuffer = (char*)malloc(SAVEBLOCKSIZE);  // Allocate memory for the file and a terminating null char.
+        file.seek(SAVEBLOCKSIZE*i);
+        file.read(fileBuffer, SAVEBLOCKSIZE);
+        fileBuffer[SAVEBLOCKSIZE] = '\0';               // Add the terminating null char.
+        Serial.println(String(i) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
+        free(fileBuffer);
+      }
+
+    } else {
+      break; // no more files
+    }
+  }
+  for(int i=0; i<CACHE_COUNT; i++){
+    Serial.print(String(i) + "\t");
+    Serial.print("pt:" + String(getCachePattern(cacheOffset, i)) + "\t");
+    Serial.print("ch:" + String(getCacheChannel(cacheOffset, i)) + "\t");
+    Serial.print("st:" + String(getCacheStatus(cacheOffset, i))  + "\t");
+    Serial.println(" ");
+  }
+}
+
 
 void FlashMemory::rm(File dir, String tempPath) {
   int DeletedCount = 0;

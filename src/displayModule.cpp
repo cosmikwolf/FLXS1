@@ -397,7 +397,7 @@ displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].st
   sprintf(buf, "%d-%d", notePage*16 , (notePage+1)*16 );
   displayElement[10] = strdup(buf);
 
-  sprintf(buf, "%d:%d", selectedChannel , sequenceArray[selectedChannel].patternIndex );
+  sprintf(buf, "%d:%d", selectedChannel , sequenceArray[selectedChannel].pattern );
   displayElement[11] = strdup(buf);
 
 // PITCH INFO

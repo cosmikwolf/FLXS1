@@ -83,7 +83,7 @@
 #define CHANNEL_TUNER_MODE_ORDER  2
 
 
-#define DEBUG_PIN				    	 127
+#define DEBUG_PIN				    	 31
 #define SD_CS_PIN				    	  15
 #define LED_PIN                 5
 #define MIDPLANE_MAX7301_CS_PIN  0

@@ -47,15 +47,20 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 }
 
 void TimeController::runLoopHandler() {
-	digitalWrite(31, HIGH);
+
 	ledArray.loop(LED_FREQUENCY);
 	buttonIo.loop(INPUT_FREQUENCY);
+	if (cacheWriteTimer>1000){
+		digitalWriteFast(DEBUG_PIN, HIGH);
+		saveFile.cacheWriteLoop();
+		digitalWriteFast(DEBUG_PIN, LOW);
+		cacheWriteTimer=0;
+	}
 
-	//display.displayLoop(DISPLAY_FREQUENCY);
+	display.displayLoop(DISPLAY_FREQUENCY);
 
-	//outputControl.inputRead();
+	outputControl.inputRead();
 
-	digitalWrite(31, LOW);
 
 	if(currentState == CALIBRATION_MENU){
 		playing = 0;
@@ -70,9 +75,9 @@ void TimeController::runLoopHandler() {
 void TimeController::masterClockHandler(){
 //	saveFile.cacheWriteLoop();
 
-//	clockMaster.masterClockFunc();
+	clockMaster.masterClockFunc();
 }
 
 void TimeController::cacheWriteHandler(){
-	saveFile.cacheWriteLoop();
+//	saveFile.cacheWriteLoop();
 }

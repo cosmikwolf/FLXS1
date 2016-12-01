@@ -36,6 +36,7 @@ class TimeController {
     midi::MidiInterface<HardwareSerial>* serialMidi;
     Sequencer *sequencerArray;
     ADC *adc;
+    elapsedMicros cacheWriteTimer;
 
 };
 //extern Sequencer sequence[4];

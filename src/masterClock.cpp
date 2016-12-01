@@ -33,23 +33,19 @@ void MasterClock::masterClockFunc(void){
 	midiControl->midiClockSyncFunc(serialMidi);
 
   if(playing){
-
     if( extClock == false ){
       internalClockTick();
     } else {
       externalClockTick();
     }
-
 		if(lfoTimer > 10){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->lfoUpdate(i);
 			}
 			lfoTimer = 0;
 		}
-
     noteOffSwitch();
     noteOnSwitch();
-
   }
 
 	if (outputControl->clockOutputTimer > 2) {
@@ -74,8 +70,7 @@ void MasterClock::internalClockTick(){
     internalClockTimer = 0;
     startTime = 0;
 
-
-		for (int i=0; i<4; i++){
+   for (int i=0; i<4; i++){
  		 outputControl->allNotesOff(i);
  		 noteData[i].noteOn = false;
  		 noteData[i].noteOff = false;
@@ -104,15 +99,13 @@ void MasterClock::internalClockTick(){
 		outputControl->setClockOutput(HIGH);
     internalClockTimer = 0;
 
-       // Serial.print(" b5 ");
   }  else {
     for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].runSequence(&noteData[i], &life);
     }
   }
 
-
-    debug("end internal clock tick");
+	debug("end internal clock tick");
   //digitalWriteFast(DEBUG_PIN, LOW);
 
 }

@@ -195,12 +195,12 @@ void InputModule::sequenceMenuHandler(){
 
 void InputModule::globalMenuHandler(){
   if (midplaneGPIO->fell(0)){
-    sequenceArray[selectedChannel].initNewSequence(sequenceArray[selectedChannel].pattern, selectedChannel);
+    sequenceArray[selectedChannel].initNewSequence(currentPattern, selectedChannel);
       changeState(CHANNEL_PITCH_MODE);
 
   } else if (midplaneGPIO->fell(4)){
     for (int i=0; i < SEQUENCECOUNT; i++){
-      sequenceArray[i].initNewSequence(sequenceArray[i].pattern, i);
+      sequenceArray[i].initNewSequence(currentPattern, i);
     }
     changeState(CHANNEL_PITCH_MODE);
 
@@ -220,18 +220,19 @@ void InputModule::globalMenuHandler(){
         saveFile->saveSequenceJSON(channel, pattern);
       }
       while(saveFile->cacheWriteSwitch){
-//        saveFile->cacheWriteLoop();
-        Serial.print(".");
-        delay(10);
+        saveFile->cacheWriteLoop();
+      //  Serial.print(".");
+//        delay(10);
       };
-      Serial.println(" ");
-      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
+    //  Serial.println(" ");
+    //  Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
       delay(500);
     }
 
     while(saveFile->cacheWriteSwitch){
-      delay(1);
+      saveFile->cacheWriteLoop();
     }
+    delay(1000);
     saveFile->loadPattern(0, 0b1111);
     saveFile->listFiles();
     changeState(CHANNEL_PITCH_MODE);
