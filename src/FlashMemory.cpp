@@ -13,11 +13,12 @@ FlashMemory::FlashMemory(){
   //SerialFlashPrint serialFlashPrint(&file);
 };
 
-void FlashMemory::initialize(Sequencer *sequenceArray, SerialFlashChip *spiFlash){
+void FlashMemory::initialize(Sequencer *sequenceArray, SerialFlashChip *spiFlash, ADC *adc){
   Serial.println("<</~*^*~\>>Initializing Flash Memory<</~*^*~\>>");
 
   this->sequenceArray = sequenceArray;
   this->spiFlash = spiFlash;
+  this->adc = adc;
 
 //  wipeEEPROM();
   if(!spiFlash->begin(WINBOND_CS_PIN)){
@@ -64,7 +65,8 @@ void FlashMemory::initializeCache(){
   cacheNum = 0;
   cacheOffset = EEPROMReadlong(0);
   spiFlashBusy = false;
-  uint16_t newCacheOffset = random(1,2000);
+  randomSeed(adc->analogRead(A7, ADC_1) + micros());
+  uint16_t newCacheOffset = random(2,2000);
   Serial.println("*&^%*&^%*&^% Cache Offset:\t" + String(cacheOffset));
   Serial.println("*&^%*&^%*&^% new Cache Offset:\t" + String(newCacheOffset));
 

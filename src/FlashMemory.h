@@ -8,6 +8,7 @@
 #include "Sequencer.h"
 #include <EEPROM.h>
 #include <string>
+#include <ADC.h>
 
 #define FILE_EXISTS              0
 #define SAVEFILE_DOES_NOT_EXIST  1
@@ -38,7 +39,7 @@ public:
   FlashMemory();
 
   void changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant);
-  void initialize(Sequencer *sequenceArray,  SerialFlashChip *spiFlash);
+  void initialize(Sequencer *sequenceArray,  SerialFlashChip *spiFlash, ADC *adc);
   void deleteSaveFile();
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
@@ -79,7 +80,7 @@ private:
   uint16_t cacheOffset;
   uint8_t cacheStatus[CACHE_COUNT];
   uint8_t cacheNum;
-  
+
   elapsedMicros cacheWriteTimer;
   elapsedMicros cacheWriteTotalTimer;
 
@@ -87,6 +88,7 @@ private:
   SerialFlashFile file;
   SerialFlashChip *spiFlash;
   SerialFlashPrint *serialFlashPrint = new SerialFlashPrint(&file);
+  ADC *adc;
 
   File saveData;
   File jsonFile;

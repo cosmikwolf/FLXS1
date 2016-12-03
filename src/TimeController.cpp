@@ -4,7 +4,7 @@
 
 #define DISPLAY_FREQUENCY 10000
 #define INPUT_FREQUENCY 10000
-#define LED_FREQUENCY 30000
+#define LED_FREQUENCY 10000
 
 
 TimeController::TimeController(){ };
@@ -33,9 +33,14 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 
-	saveFile.initialize(sequencerArray, &SerialFlash);
-	saveFile.loadPattern(0, 0b1111);
-	saveFile.listFiles();
+	saveFile.initialize(sequencerArray, &SerialFlash, adc);
+//	saveFile.loadPattern(0, 0b1111);
+//	saveFile.listFiles();
+//
+	//saveFile.deleteSaveFile();
+	//saveFile.wipeEEPROM();
+	//saveFile.initializeCache();
+
 //	saveFile.deleteSaveFile();
 /*
 	saveFile.saveSequenceJSON(sequence[0], 0, 0 );

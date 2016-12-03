@@ -208,8 +208,9 @@ void InputModule::globalMenuHandler(){
     Serial.println("DELETING ALL SAVE FILES");
   //  saveFile->listFiles();
     delay(1000);
-  //  saveFile->deleteSaveFile();
-  //  saveFile->initializeCache();
+    saveFile->deleteSaveFile();
+    saveFile->wipeEEPROM();
+    saveFile->initializeCache();
     for(int pattern=0; pattern < 16; pattern++){
       Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
 
