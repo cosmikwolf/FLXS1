@@ -16,6 +16,9 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	this->serialMidi = serialMidi;
   this->sequencerArray = sequencerArray;
 	this->adc = adc;
+
+	outputControl.initialize(&backplaneGPIO, serialMidi, adc);
+
 	sequencerArray[0].initialize(0, 16, 4, (tempoX100/100));
   sequencerArray[1].initialize(1, 16, 4, (tempoX100/100));
   sequencerArray[2].initialize(2, 16, 4, (tempoX100/100));
@@ -29,7 +32,6 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	ledArray.initialize(sequencerArray);
 
-	outputControl.initialize(&backplaneGPIO, serialMidi, adc);
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 

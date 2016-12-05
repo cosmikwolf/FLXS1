@@ -85,6 +85,8 @@ void FlashMemory::initializeCache(){
   };
   cacheOffset = newCacheOffset;
   EEPROMWrite16(0, cacheOffset); //write the new offset to EEPROM so it will persist to the next reboot.
+
+  listFiles();
 }
 
 int FlashMemory::findFreeCache(){
