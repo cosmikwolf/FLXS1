@@ -8,6 +8,11 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 	this->noteData = noteData;
 	this->serialMidi = serialMidi;
 	this->midiControl = midiControl;
+	gatePrevState[0] = false;
+	gatePrevState[1] = false;
+	gatePrevState[2] = false;
+	gatePrevState[3] = false;
+	firstRun = false;
 	Serial.println("Master Clock Initialized");
 	lfoTimer = 0;
 };
@@ -33,11 +38,27 @@ void MasterClock::masterClockFunc(void){
 	midiControl->midiClockSyncFunc(serialMidi);
 
   if(playing){
-    if( extClock == false ){
-      internalClockTick();
-    } else {
-      externalClockTick();
-    }
+		switch(clockMode){
+	    case INTERNAL_CLOCK:
+				internalClockTick();
+	    	break;
+	    case EXTERNAL_MIDI_CLOCK:
+				midiClockTick();
+		    break;
+			case EXTERNAL_CLOCK_GATE_0:
+				externalClockTick(0);
+				break;
+	    case EXTERNAL_CLOCK_GATE_1:
+				externalClockTick(1);
+			  break;
+	    case EXTERNAL_CLOCK_GATE_2:
+				externalClockTick(2);
+		    break;
+	    case EXTERNAL_CLOCK_GATE_3:
+				externalClockTick(3);
+			  break;
+	  }
+
 		if(lfoTimer > 10){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->lfoUpdate(i);
@@ -56,6 +77,76 @@ void MasterClock::masterClockFunc(void){
 
 }
 
+bool MasterClock::gateTrigger(uint8_t gateNum){
+
+}
+
+void MasterClock::checkGateClock(){
+	for (int i =0; i <4; i++){
+		if (gateInputRaw[i] == 0 && gatePrevState[i] != gateInputRaw[i] ){
+			gateTrig[i] = true;
+		}else {
+			gateTrig[i] = false;
+		};
+		gatePrevState[i] = gateInputRaw[i];
+	}
+}
+
+void MasterClock::externalClockTick(uint8_t gateNum){
+	checkGateClock();
+
+	if (gateTrig[gateNum]){
+			Serial.println("gate trig!");
+	    // If the time since the last midi pulse is too long, beatLength should not be changed.
+	    if (pulseTimer > GATE_CLOCK_TIMEOUT) {
+	      masterPulseCount = 4;
+	      masterTempoTimer = beatLength;
+	      Serial.println("pulse Timer exceeded timeout: " + String(pulseTimer));
+	    }
+	    pulseTimer = 0; // pulse timer needs to be reset after beatLength calculations
+
+	    // Keep track of how many midi clock pulses have been received since the last beat -> 1 beat = 24 pulses
+	    masterPulseCount = (masterPulseCount + 1) % 4;
+
+	    if (masterPulseCount == 0) {
+	      beatLength = (masterTempoTimer + beatLength) / 2;
+
+	      Serial.println("setting beatlength: " + String(beatLength ));
+	      masterTempoTimer = 0;
+	    }
+
+	    if (firstRun){
+	        firstRun = false;
+	        beatPulseIndex = masterPulseCount;
+
+	        for (int i=0; i< SEQUENCECOUNT; i++){
+	          sequenceArray[i].clockStart(startTime);
+	          sequenceArray[i].beatPulse(beatLength, &life);
+	        }
+
+	    } else {
+	      if (masterPulseCount == beatPulseIndex){
+	        //this gets triggered every quarter note
+	        if (queuePattern != currentPattern) {
+	  //          changePattern(queuePattern, true, true);
+	        }
+
+	        for (int i=0; i< SEQUENCECOUNT; i++){
+	          sequenceArray[i].beatPulse(beatLength, &life);
+	        }
+
+	      }
+	    }
+
+
+		}
+
+
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				sequenceArray[i].runSequence(&noteData[i], &life);
+			}
+
+}
 
 void MasterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
@@ -110,7 +201,7 @@ void MasterClock::internalClockTick(){
 
 }
 
-void MasterClock::externalClockTick(){
+void MasterClock::midiClockTick(){
   // ext clock sync
 
 	  for (int i=0; i< SEQUENCECOUNT; i++){

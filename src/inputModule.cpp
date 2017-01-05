@@ -60,6 +60,13 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   midplaneGPIO->initPort(27, 15, INPUT_PULLUP);  // SW_SHIFT
 
   midplaneGPIO->updateGpioPinModes();
+  midplaneGPIO->update();
+
+  if( midplaneGPIO->pressed(SW_PLAY)&&
+  midplaneGPIO->pressed(SW_REC)&&
+  midplaneGPIO->pressed(SW_STOP) ){
+    eraseAllFlag = true;
+  }
 
 }
 
@@ -163,11 +170,7 @@ void InputModule::tempoMenuHandler(){
       break;
 
       case STEPMODE_EXTCLOCK:
-        if (knobChange > 0){
-          extClock = 1;
-        } else {
-          extClock = 0;
-        }
+        clockMode = positive_modulo(clockMode + knobChange, 6);
       break;
     }
   }
@@ -217,16 +220,18 @@ void InputModule::globalMenuHandler(){
       for (int channel=0; channel < SEQUENCECOUNT; channel++){
         sequenceArray[channel].initNewSequence(pattern, channel);
       }
+      Serial.println("Patterns initialized");
       for (int channel=0; channel < SEQUENCECOUNT; channel++){
         saveFile->saveSequenceJSON(channel, pattern);
       }
+      Serial.println("json sequence saved");
       while(saveFile->cacheWriteSwitch){
         saveFile->cacheWriteLoop();
       //  Serial.print(".");
 //        delay(10);
       };
     //  Serial.println(" ");
-    //  Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
+      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
       delay(500);
     }
 
@@ -249,9 +254,6 @@ void InputModule::globalMenuHandler(){
     }
     */
     changeState(CHANNEL_PITCH_MODE);
-  } else if (midplaneGPIO->fell(3)){
-    extClock = !extClock;
-        changeState(CHANNEL_PITCH_MODE);
   }
 }
 
@@ -386,7 +388,6 @@ void InputModule::altButtonHandler(){
             stepMode = STEPMODE_TEMPO;
             break;
           }
-
           if (midplaneGPIO->pressed(SW_SHIFT)){
             changeState(TEMPO_MENU);
             stepMode = STEPMODE_TEMPO;
@@ -394,6 +395,7 @@ void InputModule::altButtonHandler(){
           } else {
             notePage = positive_modulo(notePage - 1, 4);
           }
+
 
         break;
 

@@ -34,9 +34,50 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
-
 	saveFile.initialize(sequencerArray, &SerialFlash, adc);
-//	saveFile.loadPattern(0, 0b1111);
+
+
+	if(eraseAllFlag){
+    Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
+    saveFile.deleteSaveFile();
+    saveFile.wipeEEPROM();
+		saveFile.initializeCache();
+
+    for(int pattern=0; pattern < 16; pattern++){
+      Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
+
+      for (int channel=0; channel < SEQUENCECOUNT; channel++){
+        sequencerArray[channel].initNewSequence(pattern, channel);
+      }
+      Serial.println("Patterns initialized");
+      for (int channel=0; channel < SEQUENCECOUNT; channel++){
+        saveFile.saveSequenceJSON(channel, pattern);
+      }
+      Serial.println("json sequence saved");
+      while(saveFile.cacheWriteSwitch){
+        saveFile.cacheWriteLoop();
+      //  Serial.print(".");
+//        delay(10);
+      };
+    //  Serial.println(" ");
+      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
+      delay(500);
+    }
+
+    while(saveFile.cacheWriteSwitch){
+      saveFile.cacheWriteLoop();
+    }
+    delay(1000);
+//    saveFile.loadPattern(0, 0b1111);
+    saveFile.listFiles();
+  //  changeState(CHANNEL_PITCH_MODE);
+
+  }
+
+	saveFile.initializeCache();
+
+	saveFile.loadPattern(0, 0b1111);
+
 //	saveFile.listFiles();
 //
 	//saveFile.deleteSaveFile();

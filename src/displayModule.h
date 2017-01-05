@@ -59,6 +59,7 @@ class DisplayModule
     void patternSelectDisplay();
 
     void channelPitchMenuDisplay(char *buf);
+    void channelPitchMenuDisplay2(char *buf);
     void channelVelocityMenuDisplay(char *buf);
     void channelEnvelopeMenuDisplay(char *buf);
     void channelStepMenuDisplay(char *buf);

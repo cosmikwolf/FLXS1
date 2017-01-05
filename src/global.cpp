@@ -15,7 +15,9 @@ uint8_t patternChannelSelector = 0b1111;
 float   probability;
 float   frequency;
 
+boolean eraseAllFlag = false;
 boolean extClock = false;
+uint8_t clockMode = 0;
 boolean debugBoolean = false;
 uint8_t currentPattern = 0;
 uint8_t queuePattern = 0;

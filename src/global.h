@@ -118,6 +118,14 @@
 #define POSITIVE 1
 #define NEGATIVE 0
 
+#define INTERNAL_CLOCK 0
+#define EXTERNAL_MIDI_CLOCK 1
+#define EXTERNAL_CLOCK_GATE_0 2
+#define EXTERNAL_CLOCK_GATE_1 3
+#define EXTERNAL_CLOCK_GATE_2 4
+#define EXTERNAL_CLOCK_GATE_3 5
+#define GATE_CLOCK_TIMEOUT 5000000
+
 extern uint32_t tempoX100;
 extern uint8_t stepMode;
 extern uint8_t notePage;
@@ -132,6 +140,7 @@ extern uint8_t selectedStep;
 extern uint8_t patternChannelSelector;
 
 extern boolean extClock;
+extern uint8_t clockMode;
 extern boolean debugBoolean;
 // FlashMemory
 extern uint8_t currentPattern;
@@ -153,6 +162,7 @@ extern elapsedMicros startTime;
 //midi
 extern elapsedMicros testTimer;
 extern boolean firstRun;
+extern boolean eraseAllFlag;
 
 extern uint16_t calibrationBuffer;
 extern uint16_t  dacCalibration[16];

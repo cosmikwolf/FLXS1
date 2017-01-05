@@ -16,9 +16,19 @@ public:
   void changeTempo(uint32_t newTempoX100);
   void masterClockFunc();
   void internalClockTick();
-  void externalClockTick();
+  void midiClockTick();
+  void externalClockTick(uint8_t gateNum);
   void noteOffSwitch();
   void noteOnSwitch();
+
+  bool gateTrigger(uint8_t gateNum);
+  void checkGateClock();
+
+  bool gateTrig[4];
+  bool gatePrevState[4];
+  elapsedMicros pulseTimer;
+  uint8_t beatPulseIndex;
+  boolean firstRun;
 
   uint8_t gateMap[4];
   uint8_t dacCvMap[4];

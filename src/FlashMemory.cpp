@@ -27,7 +27,6 @@ void FlashMemory::initialize(Sequencer *sequenceArray, SerialFlashChip *spiFlash
   spiFlashBusy = 0;
   cacheWriteBusy = 0;
   saveSequenceBusy = 0;
-  initializeCache();
 
   Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
 }
