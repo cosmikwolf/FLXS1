@@ -54,7 +54,6 @@ void FlashMemory::initializeCache(){
     Serial.println("Creating Save File: " + String(cacheFileName) );
     spiFlash->createErasable(fileName, FLASHFILESIZE);
   }
-
   free(cacheFileName);
   free(fileName);
 

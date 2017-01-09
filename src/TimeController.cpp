@@ -4,7 +4,7 @@
 
 #define DISPLAY_FREQUENCY 10000
 #define INPUT_FREQUENCY 10000
-#define LED_FREQUENCY 10000
+#define LED_FREQUENCY 7000
 
 
 TimeController::TimeController(){ };
@@ -96,16 +96,23 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 void TimeController::runLoopHandler() {
 
+	elapsedMicros timeControlTimer = 0;
 	ledArray.loop(LED_FREQUENCY);
+
+//	Serial.println("LED Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	buttonIo.loop(INPUT_FREQUENCY);
+	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
+
 	if (cacheWriteTimer>1000){
 		digitalWriteFast(DEBUG_PIN, HIGH);
 		saveFile.cacheWriteLoop();
 		digitalWriteFast(DEBUG_PIN, LOW);
 		cacheWriteTimer=0;
 	}
+	//Serial.println("Cache Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
 	display.displayLoop(DISPLAY_FREQUENCY);
+	//Serial.println("Display Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
 	outputControl.inputRead();
 

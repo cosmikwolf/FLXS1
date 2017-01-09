@@ -226,7 +226,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 -5v - 17210
 -10v  1540
 */
-  //Serial3.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
+  Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
 
   if (glide > 0) {
 
@@ -287,13 +287,14 @@ switch (channel){
   break;
 }
 
-  serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
-  delayMicroseconds(5);
+  //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
+  //delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
-  delayMicroseconds(5);
+  //delayMicroseconds(5);
 
   if (gate){
+    Serial.println("\tGATE\t");
     backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
   }
 

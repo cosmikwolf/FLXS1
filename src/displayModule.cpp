@@ -920,19 +920,19 @@ void DisplayModule::tempoMenuDisplay(){
       displayElement[1] = strdup("EXT MIDI");
       displayElement[2] = strdup("MIDI SYNC");
     break;
-    case EXTERNAL_CLOCK_GATE_1:
+    case EXTERNAL_CLOCK_GATE_0:
       displayElement[1] = strdup("EXT ANALOG SYNC");
       displayElement[2] = strdup("GATE INPUT 1");
     break;
-    case EXTERNAL_CLOCK_GATE_2:
+    case EXTERNAL_CLOCK_GATE_1:
       displayElement[1] = strdup("EXT ANALOG SYNC");
       displayElement[2] = strdup("GATE INPUT 2");
     break;
-    case EXTERNAL_CLOCK_GATE_3:
+    case EXTERNAL_CLOCK_GATE_2:
       displayElement[1] = strdup("EXT ANALOG SYNC");
       displayElement[2] = strdup("GATE INPUT 3");
     break;
-    case EXTERNAL_CLOCK_GATE_4:
+    case EXTERNAL_CLOCK_GATE_3:
       displayElement[1] = strdup("EXT ANALOG SYNC");
       displayElement[2] = strdup("GATE INPUT 4");
     break;

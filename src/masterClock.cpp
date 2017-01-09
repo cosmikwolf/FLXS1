@@ -203,7 +203,6 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::midiClockTick(){
   // ext clock sync
-
 	  for (int i=0; i< SEQUENCECOUNT; i++){
 	    sequenceArray[i].runSequence(&noteData[i], &life);
 	  }
@@ -231,7 +230,10 @@ void MasterClock::noteOnSwitch(){
         if (!noteData[i].noteOnArray[n]){
           continue;
         }
+
+				Serial.print(String(noteData[i].noteOnStep) + "\t"  + String(noteData[i].noteGlideArray[n]) + "\t") ;
 				outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n],noteData[i].noteVelTypeArray[n], noteData[i].noteLfoSpeed[n], noteData[i].noteGlideArray[n], noteData[i].noteGateArray[n] );
+
       }
     }
   }

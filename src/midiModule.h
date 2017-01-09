@@ -7,7 +7,7 @@
 #define _midiModule_h_
 
 #define MIDI_PULSE_TIMEOUT 85000 //timeout length between midi clock pulses
-
+#define MIDI_PULSE_COUNT  24
 
 class MidiModule {
 public:

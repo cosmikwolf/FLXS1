@@ -36,7 +36,7 @@ void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
 }
 
 void MidiModule::midiStartContinueHandler(){
-  if (extClock == true) {
+  if (clockMode == EXTERNAL_MIDI_CLOCK) {
     Serial.println("Midi Start / Continue");
 
     testTimer = 0;
@@ -47,71 +47,51 @@ void MidiModule::midiStartContinueHandler(){
 }
 
 void MidiModule::midiClockPulseHandler(){
-  if (extClock == false) {
+  if (clockMode != EXTERNAL_MIDI_CLOCK) {
     return; // no need to run clock pulse handler if using internal clock.
   }
 
-/*
-If device is receiving clock pulses,
-  then set beatLength based upon pulse lengths.
-
-If devices is not receiving any pulses
-  beatLength should remain the same.
-
-  How to determine if device is receiving clock pulses?
-
-  If pulse length is greater than a certain amount, the data should be thrown out.
-
-
-
-*/
-
     // If the time since the last midi pulse is too long, beatLength should not be changed.
     if (pulseTimer > MIDI_PULSE_TIMEOUT) {
-      masterPulseCount = 23;
+      masterPulseCount = MIDI_PULSE_COUNT-1;
       masterTempoTimer = beatLength;
       Serial.println("pulse Timer exceeded timeout: " + String(pulseTimer));
     }
     pulseTimer = 0; // pulse timer needs to be reset after beatLength calculations
 
     // Keep track of how many midi clock pulses have been received since the last beat -> 1 beat = 24 pulses
-    masterPulseCount = (masterPulseCount + 1) % 24;
+    masterPulseCount = (masterPulseCount + 1) % MIDI_PULSE_COUNT;
+    if (masterPulseCount == 0) {
+      Serial.println("masterPulseCount is 0 beatlength: " + String(beatLength ) + "masterTempoTimer diff: " + String((int)beatLength- (int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep));
+
+}
+    beatLength = (masterTempoTimer/masterPulseCount) * MIDI_PULSE_COUNT;
 
     if (masterPulseCount == 0) {
-      beatLength = (masterTempoTimer + beatLength) / 2;
-
-      Serial.println("setting beatlength: " + String(beatLength ));
+//      beatLength = (masterTempoTimer + beatLength) / 2;
       masterTempoTimer = 0;
+
     }
 
-    if (firstRun){
+
+  if (firstRun){
         firstRun = false;
         beatPulseIndex = masterPulseCount;
-
         for (int i=0; i< SEQUENCECOUNT; i++){
           sequenceArray[i].clockStart(startTime);
           sequenceArray[i].beatPulse(beatLength, &life);
         }
-
     } else {
       if (masterPulseCount == beatPulseIndex){
-        //this gets triggered every quarter note
+          //this gets triggered every quarter note
         if (queuePattern != currentPattern) {
-  //          changePattern(queuePattern, true, true);
+          //changePattern(queuePattern, true, true);
         }
-
         for (int i=0; i< SEQUENCECOUNT; i++){
           sequenceArray[i].beatPulse(beatLength, &life);
         }
-
       }
+
     }
-
-
-
-
-
 //    Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\ttempotimer: " + String(masterTempoTimer) + "\tbeatLength: " + String(beatLength) + "\tbeatPulseIndex: " + String(beatPulseIndex));
-
-
 }

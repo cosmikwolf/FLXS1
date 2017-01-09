@@ -125,7 +125,14 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 	if(firstBeat){
 		activeStep = 0;
 		firstBeat = false;
+		for (int stepNum = 0; stepNum < stepCount; stepNum++){
+			if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
+				stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
+			}
+  	}
+
 	}
+
 
 };
 
@@ -134,7 +141,6 @@ void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 	clearNoteData(noteData);
 	incrementActiveStep();
 	sequenceModeStandardStep(noteData);
-
 }
 
 uint32_t Sequencer::getStepLength(uint8_t stepNum){
@@ -167,6 +173,8 @@ void Sequencer::incrementActiveStep(){
 
 	if(sequenceTimerInt > activeStepEndTime ){
 		activeStep++;
+		stepData[activeStep % stepCount].noteStatus = NOTPLAYING_NOTQUEUED;
+
 		if (activeStep >= stepCount ) {
 			activeStep = 0;
 			sequenceTimer = 0;
@@ -249,8 +257,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				 sequenceTimer >= stepData[stepNum].offset <-- first of arp begins
 
 				 */
-				noteTrigger(noteData, stepNum, gateTrig);
-				stepData[stepNum].arpStatus++;
+					noteTrigger(noteData, stepNum, gateTrig);
+					stepData[stepNum].arpStatus++;
 
 		 /*
 				Serial.println("First Condition Met - stepNum: " + String(stepNum)  +
@@ -287,6 +295,13 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig)
 		stepData[stepNum].stepTimer = 0;
 	}
 
+	if ( stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION ) {
+//		Serial.println("Skipping trig: " + String(stepNum));
+		return;
+	} else {
+	//	Serial.println("trig: " + String(stepNum));
+
+	}
 	stepData[stepNum].noteStatus = CURRENTLY_PLAYING;
 
 	//fill an array with the pitches of the step
@@ -377,8 +392,6 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig)
 		stepData[stepNum].notePlaying = playPitch;
 	}
 
-
-
 	for (int i=0; i< stepCount; i++){
 		// since there could be up to stepCount steps being triggered in a single noteOnArray,
 		// need to find the first NULL entry. After setting it, break.
@@ -421,7 +434,6 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
 			noteData->noteOffStep = stepNum;
 			noteData->noteGateOffArray[stepNum] = gateOff;
 
-
 			for (int f=0; f<stepCount; f++){
 				if (noteData->noteOffArray[f] == NULL){
 					noteData->noteOffArray[f] = stepData[stepNum].notePlaying;
@@ -442,7 +454,7 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
 			}
 			Serial.println("");
   */
-			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
+			stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
 		}
 
 }
