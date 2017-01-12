@@ -431,7 +431,7 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 		noteData->noteGlideArray[i] = NULL;
 		noteData->noteOffArray[i] = NULL;
 	}
-	
+
 	noteData->channel = 0;
 	noteData->noteOnStep = 0;
 	noteData->noteOffStep = 0;
@@ -474,83 +474,7 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
 
 
 void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
-	// GAME OF LIFE SEQUENCING MODE
-
-	int activeCellCount = 0;
-	int activeCellValues[16];
-	int activeRowValues[16];
-
-	for(int row=0; row < LIFELINES; row++){
-		if (life->grid[row][activeStep] > 0 ){
-			activeCellValues[activeCellCount] = life->grid[row][activeStep];
-			activeRowValues[activeCellCount] = row;
-			activeCellCount++;
-		};
-	}
-
-	//if the step just began, trigger the first note
-	//if the step has passed a percentage, trigger the next note:
-	//percentage is cells played divided by represented by number of active cells
-	//cells played can be calculated as how many cells should have been played so far.
-	//divide the step length by the number of active cells.
-	//current step time index is needed. individual StepTimer can be used.
-	// stepUtil[activeStep].stepTimer is reset in the activeStep increment section above
-	// to determine which cell should be played, we need to know what the time index is, and when each cell index should be played.
-	// activeCellValues[0] should be played at stepTimer= 0 and then stepTimer= cellPlayLength; up to stepTimer
-	// so the timing of this runSequence could be off by up to 1ms sometimes... perhaps we need to keep track of what has already played.
-	// lifeCellToPlay will keep track of the next cell to play
-
-
-	int cellPlayLength = stepLength/activeCellCount;
-
-
-	for(int d=0; d<16; d++){
-		if(stepUtil[activeStep].stepTimer > d * cellPlayLength ){
-			lifeCellToPlay = d;
-		}
-	}
-
-
-	if ( (stepUtil[activeStep].stepTimer > (lifeCellToPlay * cellPlayLength) )
-	&& activeCellCount > 0
-	&& lifeCellsPlayed == lifeCellToPlay) {
-
-		// Serial.println("activeCellCount: " + String(activeCellCount));
-		for (int stepNum = 0; stepNum < stepCount; stepNum++){
-			if(stepUtil[stepNum].noteStatus == CURRENTLY_PLAYING){
-				noteData->noteOff = true;
-				noteData->channel = channel;
-				noteData->noteOffStep = stepNum;
-				for (int f=0; f<stepCount; f++){
-					if (noteData->noteOffArray[f] == NULL){
-						noteData->noteOffArray[f] = stepUtil[stepNum].notePlaying;
-						break;
-					}
-				}
-				stepUtil[stepNum].noteStatus = 0;
-			}
-		}
-
-		noteData->noteOn = true;
-		noteData->channel = channel;
-		noteData->noteOnStep = lifeCellToPlay;
-
-		//noteData->triggerTime = micros();
-		//noteData->sequenceTime = sequenceTimer;
-
-		if (quantizeScale > 0){
-			stepUtil[lifeCellToPlay].notePlaying = quantizePitch(activeCellValues[lifeCellToPlay], quantizeKey, quantizeScale, 1);
-			// Serial.println("quantized note: " + String(stepData[stepNum].pitch) + " -> " + String(stepData[stepNum].notePlaying));
-		} else {
-			stepUtil[lifeCellToPlay].notePlaying = activeCellValues[lifeCellToPlay];
-		}
-
-		stepUtil[lifeCellToPlay].noteStatus = 1;
-		noteData->noteOnArray[lifeCellToPlay] = stepUtil[lifeCellToPlay].notePlaying;
-		noteData->noteVelArray[lifeCellToPlay] = stepData[lifeCellToPlay].velocity;
-		lifeCellsPlayed++;
-	}
-
+	// GAME OF LIFE SEQUENCING MODE 
 }
 
 uint8_t Sequencer::quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction){
