@@ -26,7 +26,7 @@ IntervalTimer CacheTimer;
 IntervalTimer LEDTimer;
 
 MidiModule midiControl;
-NoteDatum noteData[SEQUENCECOUNT];
+NoteDatum noteData[4];
 Sequencer sequence[SEQUENCECOUNT];
 AudioInputAnalog              audio_adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;

@@ -24,6 +24,8 @@ public:
   bool gateTrigger(uint8_t gateNum);
   void checkGateClock();
 
+  bool masterDebugSwitch;
+
   bool gateTrig[4];
   bool gatePrevState[4];
   elapsedMicros pulseTimer;

@@ -158,6 +158,7 @@ extern unsigned long lastTimer;
 extern elapsedMicros masterTempoTimer;
 extern elapsedMicros internalClockTimer;
 extern elapsedMicros startTime;
+extern uint16_t masterDebugCounter;
 
 //midi
 extern elapsedMicros testTimer;

@@ -69,6 +69,7 @@ class Sequencer
 		uint8_t  inputAttenuvert;
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
+		StepUtility stepUtil[MAX_STEPS_PER_SEQUENCE];
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;

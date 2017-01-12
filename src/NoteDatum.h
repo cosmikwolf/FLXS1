@@ -61,45 +61,17 @@ typedef	struct StepDatum {
 	uint8_t			velocityType;
 	uint8_t			lfoSpeed;
 	//uint8_t			test;
+} StepDatum;
 
+typedef	struct StepUtility {
 	// utility variables - dont need to be saved.
 	uint8_t				noteStatus;		// if note is playing or not
 	uint8_t				arpStatus;		// if note is playing or not. Value indicates arp number.
 	uint8_t				notePlaying;	// stores the note that is played so it can be turned off.
-	uint8_t				stepStatus;		// if note is playing or not
+	//uint8_t				stepStatus;		// if note is playing or not
 	//uint32_t			stepOffTime;	// timer value when the note should be stopped.
-
 	uint32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
   elapsedMicros	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
-
-/*
-	uint8_t 		arpSpeedNumerator(){
-
-	};
-
-	uint8_t 		arpSpeedNumerator(uint8_t numerator){
-		arpSpeed &= 0b00001111;
-		arpSpeed |= (numerator & 0b1111 ) << 4
-	};
-
-	uint8_t 		arpSpeedDenominator(){
-
-	};
-
-	uint8_t 		arpSpeedDenominator(uint8_t denominator){
-	};
-*/
-/*
-	uint32_t	arpLength() {
-		//return stepOffTime / gateType;
-		if(arpType != 0){
-			return stepOffTime / arpSpdDen;
-		} else {
-			return stepOffTime;
-		}
-	}*/
-
-} StepDatum;
-
+} StepUtility;
 
 #endif

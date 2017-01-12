@@ -41,6 +41,8 @@ uint8_t			gateInputRaw[4];
 elapsedMicros blipTimer;
 elapsedMicros testTimer;
 
+uint16_t masterDebugCounter = 0;
+
 uint8_t chordArray[27][3] = {
 {255,255,255},
 {4,7,255},

@@ -35,6 +35,13 @@ void MasterClock::masterClockFunc(void){
 //  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
 //  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
 //  lastAvgInterval = avgInterval;
+if(masterDebugSwitch == HIGH){
+	Serial.println("MASTERDEBUG HIGH!");
+}
+masterDebugSwitch = HIGH;
+
+	masterDebugCounter++;
+
 	midiControl->midiClockSyncFunc(serialMidi);
 
   if(playing){
@@ -74,6 +81,7 @@ void MasterClock::masterClockFunc(void){
 	}
   wasPlaying = playing;
   //lastTimer = loopTimer;
+	masterDebugSwitch = LOW;
 
 }
 
@@ -150,7 +158,6 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 
 void MasterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
-
   debug("begin internal clock tick");
         // int clock
   if (wasPlaying == false){
@@ -197,8 +204,8 @@ void MasterClock::internalClockTick(){
   }
 
 	debug("end internal clock tick");
-  //digitalWriteFast(DEBUG_PIN, LOW);
 
+  //digitalWriteFast(DEBUG_PIN, LOW);
 }
 
 void MasterClock::midiClockTick(){
