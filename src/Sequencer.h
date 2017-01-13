@@ -40,6 +40,7 @@ class Sequencer
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
+		uint8_t   getArpCount(uint8_t stepNum);
 
 		uint32_t  getStepLength(uint8_t stepNum);
 		boolean  	monophonic;
@@ -69,7 +70,6 @@ class Sequencer
 		uint8_t  inputAttenuvert;
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
-		StepUtility stepUtil[MAX_STEPS_PER_SEQUENCE];
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;

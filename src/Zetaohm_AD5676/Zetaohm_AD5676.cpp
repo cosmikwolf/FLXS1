@@ -33,7 +33,7 @@ Zetaohm_AD5676::Zetaohm_AD5676() {
   _ldac_pin = 0;
   pinMode(_cs_pin, OUTPUT);                        // cs_pin is also the SYNC pin
   digitalWriteFast(_cs_pin, HIGH);  //deactivate DAC
-  AD5676_SPI = SPISettings(SPI_CLOCK_DIV2, MSBFIRST, SPI_MODE0);
+  AD5676_SPI = SPISettings(48000000, MSBFIRST, SPI_MODE0);
 
   SPI.begin ();
 }

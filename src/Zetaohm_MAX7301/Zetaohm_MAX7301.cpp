@@ -12,7 +12,7 @@ void Zetaohm_MAX7301::begin(uint8_t csPin) {
   _spiTransactionsSpeed = 36000000;
   _cs = csPin;
   //	postSetup(csPin);
-	MAX7301_SPI = SPISettings(16000000, MSBFIRST, SPI_MODE0);//mode3
+	MAX7301_SPI = SPISettings(12000000, MSBFIRST, SPI_MODE0);//mode3
 
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
@@ -117,21 +117,24 @@ uint16_t Zetaohm_MAX7301::readAddress(byte addr){
 	return temp;
 }
 
-void Zetaohm_MAX7301::writeByte(byte addr, byte data){
+uint16_t Zetaohm_MAX7301::writeByte(byte addr, byte data){
+  uint16_t returnData = 0;
   waitFifoEmpty();
 	startTransaction();
 	digitalWriteFast(_cs, LOW);
 	SPI.transfer(addr & 0x7F);
-
 	SPI.transfer(data);
 
 	digitalWriteFast(_cs, HIGH);
 	digitalWriteFast(_cs, LOW);
 
-	SPI.transfer(0x00);
-	SPI.transfer(0x00);
+	returnData = SPI.transfer(0x00) << 8;
+	returnData = returnData | SPI.transfer(0x00);
+
 	digitalWriteFast(_cs, HIGH);
 	endTransaction();
+
+  return returnData;
 }
 
 
@@ -158,14 +161,22 @@ void Zetaohm_MAX7301::update(){
 
 
 void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
+    noInterrupts();
     writeByte(0x24 + indexMap[index], value);
+    interrupts();
 }
 
-bool Zetaohm_MAX7301::digitalRead(uint8_t index){
+void Zetaohm_MAX7301::digitalWritePrint(uint8_t index, bool value){
+    noInterrupts();
+    Serial.println("digitalWrite return: " + String( writeByte(0x24 + indexMap[index], value) , BIN) );
+    interrupts();
+}
+
+uint16_t Zetaohm_MAX7301::digitalRead(uint8_t index){
     uint16_t temp =  readAddress(0x24 + indexMap[index]);
     //Serial.println("READING " + String(index));
     //Serial.println(temp, BIN);
-    return 1;
+    return temp;
 }
 
 bool Zetaohm_MAX7301::fell(uint8_t index){

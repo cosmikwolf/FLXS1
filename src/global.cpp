@@ -33,6 +33,8 @@ unsigned long beatLength = 60000000/(tempoX100/100);
 elapsedMicros masterTempoTimer;
 elapsedMicros internalClockTimer;
 elapsedMicros startTime;
+elapsedMicros debugTimer2;
+
 uint16_t calibrationBuffer = 0;
 uint16_t  dacCalibration[16];
 uint16_t  cvInputRaw[4];

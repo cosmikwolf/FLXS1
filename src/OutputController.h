@@ -42,6 +42,8 @@ public:
   void inputRead();
   elapsedMillis clockOutputTimer;
   elapsedMillis lfoTimer;
+
+  elapsedMicros debugTimer1;
   uint8_t lfoType[4];
   uint8_t lfoSpeed[4];
   uint8_t lfoAmplitude[4];

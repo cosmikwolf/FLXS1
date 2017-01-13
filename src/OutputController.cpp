@@ -36,7 +36,7 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   backplaneGPIO->initPort(4,10, INPUT_PULLUP); // Gate in 1
   backplaneGPIO->initPort(5,7,  INPUT_PULLUP); // Gate input 2
   backplaneGPIO->initPort(6,11, INPUT_PULLUP); // Gate input 3
-  backplaneGPIO->initPort(7,12, INPUT_PULLUP); // Gate input 4
+  backplaneGPIO->initPort(7,12, INPUT_PULLUP); // Gate\ input 4
 /*
 10  P14  10
 11  P11   7
@@ -226,25 +226,18 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 -5v - 17210
 -10v  1540
 */
-  Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
+  //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
 
   if (glide > 0) {
-
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), LOW);           // turn on switch with cap to ground, enable slew
-
     if (outputMap(channel, RHEOCHANNELCV) == 0){
       mcp4352_1.setResistance(outputMap(channel, CVRHEO), map(glide, 0,127,0,255) );        // set digipot to correct resistance, set slew rate
     } else {
       mcp4352_2.setResistance(outputMap(channel, CVRHEO), map(glide, 0,127,0,255));           // set digipot to correct resistance, set slew rate
     }
-
-
     //  Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
-
   } else {
-
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
-
     if(velocityType == 1){
         Serial.println("velocitytype == 1 on channel " + String(channel));
       if (outputMap(channel, RHEOCHANNELCC) == 0){
@@ -273,31 +266,31 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
   }
   int offset = 0;
-switch (channel){
-  case 1:
-  offset = map(adc->analogRead(A12, ADC_1), 0, 1023, 60, -60) ;
-  //Serial.println("ch1 offset: "+ String(offset));
-  break;
-  case 2:
-  offset = map(adc->analogRead(A13, ADC_1), 0, 1023, 60, -60) ;
+  switch (channel){
+    case 1:
+    offset = map(adc->analogRead(A12, ADC_1), 0, 1023, 60, -60) ;
+    //Serial.println("ch1 offset: "+ String(offset));
+    break;
+    case 2:
+    offset = map(adc->analogRead(A13, ADC_1), 0, 1023, 60, -60) ;
 
-  break;
-  case 3:
-  offset = map(adc->analogRead(A10, ADC_1), 0, 1023, 60, -60) ;
-  break;
-}
-
-  //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
-  //delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
-  //delayMicroseconds(5);
-
-  if (gate){
-    Serial.println("\tGATE\t");
-    backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
+    break;
+    case 3:
+    offset = map(adc->analogRead(A10, ADC_1), 0, 1023, 60, -60) ;
+    break;
   }
 
+  //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
+  delayMicroseconds(5);
+  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
+  delayMicroseconds(5);
+  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
+  delayMicroseconds(5);
+
+  if (gate){
+    backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
+  }
+  debugTimer1 = 0;
 
 };
 
@@ -410,7 +403,7 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 
 void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
-//  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) );
+  //Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) + "\timer: " + String(debugTimer1) );
 
   if (gateOff){
     backplaneGPIO->digitalWrite(channel, LOW);

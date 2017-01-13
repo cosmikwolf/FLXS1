@@ -178,4 +178,8 @@ int min_max(int value, int min, int max);
 uint8_t getNote(uint8_t index);
 uint32_t FreeRam2();
 
+
+
+extern elapsedMicros debugTimer2;
+
 #endif

@@ -2,9 +2,9 @@
 #include "TimeController.h"
 #include "midiModule.h"
 
-#define DISPLAY_FREQUENCY 10000
-#define INPUT_FREQUENCY 10000
-#define LED_FREQUENCY 7000
+#define DISPLAY_FREQUENCY 25000
+#define INPUT_FREQUENCY 15000
+#define LED_FREQUENCY 8000
 
 
 TimeController::TimeController(){ };
@@ -31,7 +31,6 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	display.initialize(sequencerArray);
 
 	ledArray.initialize(sequencerArray);
-
 
 	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
 	saveFile.initialize(sequencerArray, &SerialFlash, adc);
@@ -103,7 +102,7 @@ void TimeController::runLoopHandler() {
 	buttonIo.loop(INPUT_FREQUENCY);
 	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
-	if (cacheWriteTimer>1000){
+	if (cacheWriteTimer>3000 && saveFile.cacheWriteSwitch){
 		digitalWriteFast(DEBUG_PIN, HIGH);
 		saveFile.cacheWriteLoop();
 		digitalWriteFast(DEBUG_PIN, LOW);
@@ -115,7 +114,6 @@ void TimeController::runLoopHandler() {
 	//Serial.println("Display Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
 	outputControl.inputRead();
-
 
 	if(currentState == CALIBRATION_MENU){
 		playing = 0;
