@@ -119,7 +119,6 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 	// and also when a play or continue command is received.
 	this->beatLength = beatLength;
 	calculateStepTimers();
-	beatTimer = 0;
 	tempoPulse = true;
 
 	if(firstBeat){
@@ -135,7 +134,8 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 
 };
 
-void Sequencer::runSequence(NoteDatum *noteData, uint32_t beatTimer, GameOfLife *life){
+void Sequencer::runSequence(NoteDatum *noteData, elapsedMicros beatTimer, GameOfLife *life){
+	this->beatTimer = beatTimer;
 	calculateStepTimers();
 	clearNoteData(noteData);
 	incrementActiveStep(beatTimer);
@@ -161,7 +161,7 @@ void Sequencer::calculateStepTimers(){
 	}
 }
 
-void Sequencer::incrementActiveStep(uint32_t beatTimer){
+void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
 	uint32_t sequenceTimerInt = sequenceTimer;
 	uint32_t activeStepEndTime = 0;
 
@@ -170,34 +170,12 @@ void Sequencer::incrementActiveStep(uint32_t beatTimer){
 		activeStepEndTime += getStepLength(stepNum);
 	}
 
-	/*
-
-Last time music was played is the last starting point.
-
-Using Data:
-	Midi Pulse Index is set to zero when playing begins.
-  Step
-
-beatTimer * stepCount* stepData[0].arpSpdNum / stepData[0].arpSpdDen
-	*/
 	if(sequenceTimerInt > activeStepEndTime ){
+
 		activeStep++;
+
 		if (activeStep >= stepCount ) {
 			activeStep = 0;
-			zeroBeat = (zeroBeat + 1) % stepData[0].arpSpdDen;
-
-			if (zeroBeat == 0){
-				Serial.println(String(zeroBeat) + "\tSeqeuncetimer at zerobeat " + String((int)sequenceTimer) + "\tbeatTimer: " + String(beatTimer));
-			// 	sequenceTimer = (int)beatTimer;  //whenever the beat should be.
-			sequenceTimer = 0;
-
-			 // timer value that keeps track of midi beat, perhaps a timer between PPQs,
-			 // need to figure out what to do if its a negative value!
-			 // maybe this should correct at every step, fractionally.
-			} else {
-				sequenceTimer = 0;
-			}
-
 //			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 			for (int stepNum = 0; stepNum < stepCount; stepNum++){
 				if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
@@ -205,6 +183,16 @@ beatTimer * stepCount* stepData[0].arpSpdNum / stepData[0].arpSpdDen
 				}
 			}
 		}
+
+		zeroBeat = (zeroBeat + 1) % stepData[0].arpSpdDen;
+
+		if (zeroBeat == 0){
+			Serial.println(String(activeStep) + "\t" + String(zeroBeat) + "\tst:" + String((unsigned long)sequenceTimer) + "\tbeatTimer: " + String(beatTimer) + "\tnewBeatTimer: " + String(beatTimer*activeStep/stepData[0].arpSpdDen));
+			sequenceTimer = beatTimer*activeStep/stepData[0].arpSpdDen;  //whenever the beat should be.;
+		}
+
+
+	
 	}
 
 

@@ -11,14 +11,14 @@ class Sequencer
 		Sequencer();
 
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void 		runSequence(NoteDatum *noteData, uint32_t beatTimer, GameOfLife *life);
+		void 		runSequence(NoteDatum *noteData, elapsedMicros beatTimer, GameOfLife *life);
 		// Sequencing Modes
 		void 		sequenceModeStandardStep(NoteDatum *noteData);
 		void    sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life);
 
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
-		void 		incrementActiveStep(uint32_t beatTimer);
+		void 		incrementActiveStep(elapsedMicros beatTimer);
 		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig);
 		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
 
@@ -59,7 +59,6 @@ class Sequencer
 
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
 		elapsedMicros beatTimer;
-
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
 		// data that needs to be stored
 		uint8_t  stepCount;  		// sequence length in 1/16th notes]
