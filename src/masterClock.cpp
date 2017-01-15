@@ -175,7 +175,7 @@ void MasterClock::internalClockTick(){
 		outputControl->setClockOutput(HIGH);
 
     for (int i=0; i< SEQUENCECOUNT; i++){
-      sequenceArray[i].clockStart(startTime);
+    sequenceArray[i].clockStart(startTime);
       sequenceArray[i].beatPulse(beatLength, &life);
       sequenceArray[i].runSequence(&noteData[i], masterTempoTimer, &life);
     }

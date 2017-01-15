@@ -20,7 +20,14 @@ void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMi
 }
 
 void MidiModule::midiStopHandler(){
+  if (playing == 0){
+    for (int i=0; i< SEQUENCECOUNT; i++){
+      sequenceArray[i].activeStep = 0;
+      sequenceArray[i].zeroBeat = 0;
+    }
+  }
   playing = 0;
+
 }
 
 void MidiModule::midiNoteOffHandler(byte channel, byte note, byte velocity){

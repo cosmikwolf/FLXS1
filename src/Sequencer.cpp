@@ -111,6 +111,7 @@ void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 void Sequencer::clockStart(elapsedMicros startTime){
 	firstBeat = true;
 	sequenceTimer = startTime;
+	Serial.println("starttime: " + String(startTime));
 };
 
 
@@ -136,10 +137,10 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 
 void Sequencer::runSequence(NoteDatum *noteData, elapsedMicros beatTimer, GameOfLife *life){
 	this->beatTimer = beatTimer;
-	calculateStepTimers();
 	clearNoteData(noteData);
 	incrementActiveStep(beatTimer);
 	sequenceModeStandardStep(noteData);
+	calculateStepTimers();
 }
 
 uint32_t Sequencer::getStepLength(uint8_t stepNum){
@@ -161,6 +162,10 @@ void Sequencer::calculateStepTimers(){
 	}
 }
 
+uint32_t Sequencer::getSequenceTime(){
+	return zeroBeat * beatLength + (int)beatTimer;
+};
+
 void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
 	uint32_t sequenceTimerInt = sequenceTimer;
 	uint32_t activeStepEndTime = 0;
@@ -173,9 +178,12 @@ void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
 	if(sequenceTimerInt > activeStepEndTime ){
 
 		activeStep++;
+		zeroBeat = (zeroBeat + 1) % stepData[0].arpSpdDen;
 
 		if (activeStep >= stepCount ) {
 			activeStep = 0;
+			sequenceTimer = 0;
+
 //			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 			for (int stepNum = 0; stepNum < stepCount; stepNum++){
 				if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
@@ -184,15 +192,29 @@ void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
 			}
 		}
 
-		zeroBeat = (zeroBeat + 1) % stepData[0].arpSpdDen;
 
 		if (zeroBeat == 0){
-			Serial.println(String(activeStep) + "\t" + String(zeroBeat) + "\tst:" + String((unsigned long)sequenceTimer) + "\tbeatTimer: " + String(beatTimer) + "\tnewBeatTimer: " + String(beatTimer*activeStep/stepData[0].arpSpdDen));
-			sequenceTimer = beatTimer*activeStep/stepData[0].arpSpdDen;  //whenever the beat should be.;
+			int32_t beatDifference;
+
+			if (beatTimer < beatLength/2){
+				beatDifference = beatTimer;
+			} else {
+				beatDifference = beatTimer-beatLength;
+			}
+
+			Serial.println(String(activeStep) + "\t" + String(zeroBeat) + "\tst:" + String((unsigned long)sequenceTimer) + "\tbeatDifference: " + String(beatDifference) + "\tbeatTimer: " + String(beatTimer) + "\tnewBeatTimer: " + String(beatLength*activeStep/stepData[0].arpSpdDen+beatDifference) );
+			sequenceTimer = (int)sequenceTimer + (int)beatDifference;  //whenever the beat should be.;
 		}
+/*
+
+0		500000   0x 						arpSpdDen = 4  activeStep = 0 0/
+4		500000 + 1xbeatLength
+8   500000 + 2xBeatLength
+12  500000 + 3x BeatLength
+
+*/
 
 
-	
 	}
 
 

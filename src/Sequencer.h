@@ -15,7 +15,7 @@ class Sequencer
 		// Sequencing Modes
 		void 		sequenceModeStandardStep(NoteDatum *noteData);
 		void    sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life);
-
+		uint32_t getSequenceTime();
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
 		void 		incrementActiveStep(elapsedMicros beatTimer);
