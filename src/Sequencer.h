@@ -11,14 +11,14 @@ class Sequencer
 		Sequencer();
 
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
+		void 		runSequence(NoteDatum *noteData, uint32_t beatTimer, GameOfLife *life);
 		// Sequencing Modes
 		void 		sequenceModeStandardStep(NoteDatum *noteData);
 		void    sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life);
 
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
-		void 		incrementActiveStep();
+		void 		incrementActiveStep(uint32_t beatTimer);
 		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig);
 		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
 
@@ -45,6 +45,7 @@ class Sequencer
 		uint32_t  getStepLength(uint8_t stepNum);
 		boolean  	monophonic;
 		uint8_t	 	activeStep;
+		uint8_t	 	zeroBeat;		// this value needs to keep track of the beat that is the Zero sync .
     uint32_t 	beatLength;
 		uint32_t 	stepLength;		// length of each step in mcs
 

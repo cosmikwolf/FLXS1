@@ -93,7 +93,7 @@ void MasterClock::checkGateClock(){
 	for (int i =0; i <4; i++){
 		if (gateInputRaw[i] == 0 && gatePrevState[i] != gateInputRaw[i] ){
 			gateTrig[i] = true;
-		}else {
+		} else {
 			gateTrig[i] = false;
 		};
 		gatePrevState[i] = gateInputRaw[i];
@@ -116,25 +116,21 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 	    // Keep track of how many midi clock pulses have been received since the last beat -> 1 beat = 24 pulses
 	    masterPulseCount = (masterPulseCount + 1) % 4;
 
-	    if (masterPulseCount == 0) {
-	      beatLength = (masterTempoTimer + beatLength) / 2;
-
-	      Serial.println("setting beatlength: " + String(beatLength ));
-	      masterTempoTimer = 0;
-	    }
-
 	    if (firstRun){
 	        firstRun = false;
 	        beatPulseIndex = masterPulseCount;
-
+    			masterTempoTimer = 0;
 	        for (int i=0; i< SEQUENCECOUNT; i++){
 	          sequenceArray[i].clockStart(startTime);
 	          sequenceArray[i].beatPulse(beatLength, &life);
 	        }
-
 	    } else {
 	      if (masterPulseCount == beatPulseIndex){
 	        //this gets triggered every quarter note
+					beatLength = (masterTempoTimer + beatLength) / 2;
+					Serial.println("setting beatlength: " + String(beatLength ));
+					masterTempoTimer = 0;
+
 	        if (queuePattern != currentPattern) {
 	  //          changePattern(queuePattern, true, true);
 	        }
@@ -149,10 +145,9 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 
 		}
 
-
-			for (int i=0; i< SEQUENCECOUNT; i++){
-				sequenceArray[i].runSequence(&noteData[i], &life);
-			}
+		for (int i=0; i< SEQUENCECOUNT; i++){
+			sequenceArray[i].runSequence(&noteData[i], (int)masterTempoTimer, &life);
+		}
 
 }
 
@@ -182,24 +177,24 @@ void MasterClock::internalClockTick(){
     for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].clockStart(startTime);
       sequenceArray[i].beatPulse(beatLength, &life);
-      sequenceArray[i].runSequence(&noteData[i], &life);
+      sequenceArray[i].runSequence(&noteData[i], (int)masterTempoTimer, &life);
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
+	  masterTempoTimer = 0;
     if (queuePattern != currentPattern) {
       //changePattern(queuePattern, true, true);
     }
     for (int i=0; i< SEQUENCECOUNT; i++){
-      sequenceArray[i].runSequence(&noteData[i], &life);
-      sequenceArray[i].beatPulse(beatLength, &life);
-
+			sequenceArray[i].beatPulse(beatLength, &life);
+      sequenceArray[i].runSequence(&noteData[i], (int)masterTempoTimer, &life);
     }
 		outputControl->setClockOutput(HIGH);
     internalClockTimer = 0;
 
   }  else {
     for (int i=0; i< SEQUENCECOUNT; i++){
-      sequenceArray[i].runSequence(&noteData[i], &life);
+      sequenceArray[i].runSequence(&noteData[i], (int)masterTempoTimer, &life);
     }
   }
 
@@ -211,7 +206,7 @@ void MasterClock::internalClockTick(){
 void MasterClock::midiClockTick(){
   // ext clock sync
 	  for (int i=0; i< SEQUENCECOUNT; i++){
-	    sequenceArray[i].runSequence(&noteData[i], &life);
+			sequenceArray[i].runSequence(&noteData[i], (int)masterTempoTimer, &life);
 	  }
 }
 

@@ -124,21 +124,21 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 
 	if(firstBeat){
 		activeStep = 0;
+		zeroBeat = 0;
 		firstBeat = false;
 		for (int stepNum = 0; stepNum < stepCount; stepNum++){
 			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 			stepData[stepNum].arpStatus = 0;
 		}
-
 	}
 
 
 };
 
-void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
+void Sequencer::runSequence(NoteDatum *noteData, uint32_t beatTimer, GameOfLife *life){
 	calculateStepTimers();
 	clearNoteData(noteData);
-	incrementActiveStep();
+	incrementActiveStep(beatTimer);
 	sequenceModeStandardStep(noteData);
 }
 
@@ -161,7 +161,7 @@ void Sequencer::calculateStepTimers(){
 	}
 }
 
-void Sequencer::incrementActiveStep(){
+void Sequencer::incrementActiveStep(uint32_t beatTimer){
 	uint32_t sequenceTimerInt = sequenceTimer;
 	uint32_t activeStepEndTime = 0;
 
@@ -170,11 +170,34 @@ void Sequencer::incrementActiveStep(){
 		activeStepEndTime += getStepLength(stepNum);
 	}
 
+	/*
+
+Last time music was played is the last starting point.
+
+Using Data:
+	Midi Pulse Index is set to zero when playing begins.
+  Step
+
+beatTimer * stepCount* stepData[0].arpSpdNum / stepData[0].arpSpdDen
+	*/
 	if(sequenceTimerInt > activeStepEndTime ){
 		activeStep++;
 		if (activeStep >= stepCount ) {
 			activeStep = 0;
+			zeroBeat = (zeroBeat + 1) % stepData[0].arpSpdDen;
+
+			if (zeroBeat == 0){
+				Serial.println(String(zeroBeat) + "\tSeqeuncetimer at zerobeat " + String((int)sequenceTimer) + "\tbeatTimer: " + String(beatTimer));
+			// 	sequenceTimer = (int)beatTimer;  //whenever the beat should be.
 			sequenceTimer = 0;
+
+			 // timer value that keeps track of midi beat, perhaps a timer between PPQs,
+			 // need to figure out what to do if its a negative value!
+			 // maybe this should correct at every step, fractionally.
+			} else {
+				sequenceTimer = 0;
+			}
+
 //			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 			for (int stepNum = 0; stepNum < stepCount; stepNum++){
 				if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
