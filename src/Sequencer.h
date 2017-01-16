@@ -11,14 +11,13 @@ class Sequencer
 		Sequencer();
 
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void 		runSequence(NoteDatum *noteData, elapsedMicros beatTimer, GameOfLife *life);
+		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
 		// Sequencing Modes
 		void 		sequenceModeStandardStep(NoteDatum *noteData);
 		void    sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life);
-		uint32_t getSequenceTime();
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
-		void 		incrementActiveStep(elapsedMicros beatTimer);
+		void 		incrementActiveStep();
 		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig);
 		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
 
@@ -50,7 +49,7 @@ class Sequencer
 		uint32_t 	stepLength;		// length of each step in mcs
 
 		uint32_t 	tempoX100;
-		boolean  	tempoPulse;
+		boolean  	beatPulseResyncFlag;
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
 		int16_t 	sequenceJitter[9];
 

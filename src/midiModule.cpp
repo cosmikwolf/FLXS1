@@ -58,7 +58,6 @@ void MidiModule::midiClockPulseHandler(){
   if (clockMode != EXTERNAL_MIDI_CLOCK) {
     return; // no need to run clock pulse handler if using internal clock.
   }
-
     // If the time since the last midi pulse is too long, beatLength should not be changed.
     if (pulseTimer > MIDI_PULSE_TIMEOUT) {
       masterPulseCount = MIDI_PULSE_COUNT-1;

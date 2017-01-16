@@ -110,7 +110,6 @@ void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 
 void Sequencer::clockStart(elapsedMicros startTime){
 	firstBeat = true;
-	sequenceTimer = startTime;
 	Serial.println("starttime: " + String(startTime));
 };
 
@@ -119,10 +118,22 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 	// this is sent every 24 pulses received from midi clock
 	// and also when a play or continue command is received.
 	this->beatLength = beatLength;
+	if(playing){
+		incrementActiveStep();
+	}
+	if (beatPulseResyncFlag == true){
+		activeStep = 0;
+		sequenceTimer = 0;
+		beatPulseResyncFlag = false;
+
+		if(channel == 0){
+			Serial.println("resetting sequence timer! finalval:"  + String(sequenceTimer) + "\tbeatLength: " + String(beatLength));
+		}
+	}
 	calculateStepTimers();
-	tempoPulse = true;
 
 	if(firstBeat){
+		sequenceTimer = 0;
 		activeStep = 0;
 		zeroBeat = 0;
 		firstBeat = false;
@@ -135,12 +146,11 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 
 };
 
-void Sequencer::runSequence(NoteDatum *noteData, elapsedMicros beatTimer, GameOfLife *life){
-	this->beatTimer = beatTimer;
+void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
 	clearNoteData(noteData);
-	incrementActiveStep(beatTimer);
-	sequenceModeStandardStep(noteData);
+	incrementActiveStep();
 	calculateStepTimers();
+	sequenceModeStandardStep(noteData);
 }
 
 uint32_t Sequencer::getStepLength(uint8_t stepNum){
@@ -162,11 +172,7 @@ void Sequencer::calculateStepTimers(){
 	}
 }
 
-uint32_t Sequencer::getSequenceTime(){
-	return zeroBeat * beatLength + (int)beatTimer;
-};
-
-void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
+void Sequencer::incrementActiveStep(){
 	uint32_t sequenceTimerInt = sequenceTimer;
 	uint32_t activeStepEndTime = 0;
 
@@ -175,16 +181,23 @@ void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
 		activeStepEndTime += getStepLength(stepNum);
 	}
 
-	if(sequenceTimerInt > activeStepEndTime ){
-
+	if(sequenceTimer > activeStepEndTime ){
 		activeStep++;
-		zeroBeat = (zeroBeat + 1) % stepData[0].arpSpdDen;
+		zeroBeat = (zeroBeat + 1) % stepData[0].beatDiv;
 
-		if (activeStep >= stepCount ) {
-			activeStep = 0;
-			sequenceTimer = 0;
+		if(channel == 0){
+			Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|ST: " +String(sequenceTimerInt) );
+		}
 
-//			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
+		//Serial.print("AS:" + String(activeStep) + " ");
+		if (activeStep >= stepCount) {
+			if (zeroBeat == 0){
+				beatPulseResyncFlag = true;
+			} else {
+				activeStep = 0;
+				sequenceTimer = 0;
+			}
+	//			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 			for (int stepNum = 0; stepNum < stepCount; stepNum++){
 				if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
 					stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
@@ -192,19 +205,6 @@ void Sequencer::incrementActiveStep(elapsedMicros beatTimer){
 			}
 		}
 
-
-		if (zeroBeat == 0){
-			int32_t beatDifference;
-
-			if (beatTimer < beatLength/2){
-				beatDifference = beatTimer;
-			} else {
-				beatDifference = beatTimer-beatLength;
-			}
-
-			Serial.println(String(activeStep) + "\t" + String(zeroBeat) + "\tst:" + String((unsigned long)sequenceTimer) + "\tbeatDifference: " + String(beatDifference) + "\tbeatTimer: " + String(beatTimer) + "\tnewBeatTimer: " + String(beatLength*activeStep/stepData[0].arpSpdDen+beatDifference) );
-			sequenceTimer = (int)sequenceTimer + (int)beatDifference;  //whenever the beat should be.;
-		}
 /*
 
 0		500000   0x 						arpSpdDen = 4  activeStep = 0 0/
