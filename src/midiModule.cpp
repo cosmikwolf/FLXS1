@@ -10,7 +10,6 @@ void MidiModule::midiSetup( Sequencer *sequenceArray, NoteDatum *noteData){
   beatPulseIndex = 0;
   firstRun = false;
   pulseTimer = 0;
-
 }
 
 void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi){
@@ -47,7 +46,6 @@ void MidiModule::midiStartContinueHandler(){
     Serial.println("Midi Start / Continue");
 
     testTimer = 0;
-    playing = 1;
     firstRun = true;
     startTime = 0;
     masterPulseCount = 0;
@@ -70,28 +68,32 @@ void MidiModule::midiClockPulseHandler(){
     masterPulseCount = (masterPulseCount + 1) % MIDI_PULSE_COUNT;
 
     if (firstRun){
+        Serial.println("First run! ---->-._._>>>>>>____>_>_>_>_>>>>>>>>__>__>>___>_>_>>_>___>__> MPC: " + String(masterPulseCount));
+        playing = 1;
         firstRun = false;
-        beatPulseIndex = masterPulseCount;
-        masterTempoTimer = beatLength;
+        //beatPulseIndex = masterPulseCount;
+        masterPulseCount = 0;
+        masterTempoTimer = 0;
         for (int i=0; i< SEQUENCECOUNT; i++){
           sequenceArray[i].clockStart(startTime);
-          sequenceArray[i].beatPulse(beatLength, &life);
+          sequenceArray[i].beatPulse(beatLength);
         }
     } else {
-//      beatLength =  (2* beatLength + ((masterTempoTimer)/beatPulseIndex) * MIDI_PULSE_COUNT ) /3;
-      if (masterPulseCount == beatPulseIndex){
+
+      //if (masterPulseCount == beatPulseIndex){
+      if (masterPulseCount == 0){
           //this gets triggered every quarter note
         beatLength = masterTempoTimer;
-        Serial.println("masterPulseCount is 0 beatlength: " + String(beatLength ) + "\tmasterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tTempo: " + String(int(6000000000 / beatLength)));
+        masterTempoTimer = 0;
 
+        Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength)));
 
         if (queuePattern != currentPattern) {
           //changePattern(queuePattern, true, true);
         }
         for (int i=0; i< SEQUENCECOUNT; i++){
-          sequenceArray[i].beatPulse(beatLength, &life);
+          sequenceArray[i].beatPulse(beatLength);
         }
-        masterTempoTimer = 0;
 
       }
     }

@@ -2,9 +2,9 @@
 #include "TimeController.h"
 #include "midiModule.h"
 
-#define DISPLAY_FREQUENCY 25000
-#define INPUT_FREQUENCY 15000
-#define LED_FREQUENCY 8000
+#define DISPLAY_FREQUENCY 35000
+#define INPUT_FREQUENCY 32000
+#define LED_FREQUENCY 30000
 
 
 TimeController::TimeController(){ };
@@ -97,23 +97,32 @@ void TimeController::runLoopHandler() {
 
 	elapsedMicros timeControlTimer = 0;
 	ledArray.loop(LED_FREQUENCY);
+	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
 //	Serial.println("LED Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	buttonIo.loop(INPUT_FREQUENCY);
+	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+
 	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
-	if (cacheWriteTimer>3000 && saveFile.cacheWriteSwitch){
+	if (cacheWriteTimer>10000 && saveFile.cacheWriteSwitch){
+
 		digitalWriteFast(DEBUG_PIN, HIGH);
 		saveFile.cacheWriteLoop();
 		digitalWriteFast(DEBUG_PIN, LOW);
 		cacheWriteTimer=0;
+		if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+
 	}
 	//Serial.println("Cache Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
 	display.displayLoop(DISPLAY_FREQUENCY);
+	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* DISPLAY LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+
 	//Serial.println("Display Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
 	outputControl.inputRead();
+	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* INPUTREDLOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
 	if(currentState == CALIBRATION_MENU){
 		playing = 0;
@@ -129,6 +138,10 @@ void TimeController::masterClockHandler(){
 //	saveFile.cacheWriteLoop();
 
 	clockMaster.masterClockFunc();
+}
+
+void TimeController::midiClockHandler(){
+	midiControl->midiClockSyncFunc(serialMidi);
 }
 
 void TimeController::cacheWriteHandler(){

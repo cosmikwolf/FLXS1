@@ -15,7 +15,8 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 200  
+#define kMasterClockInterval 1000
+#define kMidiClockInterval  100
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
@@ -23,7 +24,7 @@
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
 IntervalTimer CacheTimer;
-IntervalTimer LEDTimer;
+IntervalTimer MIDITimer;
 
 MidiModule midiControl;
 NoteDatum noteData[4];
@@ -70,6 +71,10 @@ void setup() {
   serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
   serialMidi.setHandleStop(midiStopHandlerWrapper);
 
+  usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
+  usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
+  usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
+
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
   //usbMIDI.setHandleVelocityChange(OnVelocityChange)
@@ -82,7 +87,10 @@ void setup() {
   timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
 
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
-  MasterClockTimer.priority(0);
+  MasterClockTimer.priority(1);
+
+  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
+  MIDITimer.priority(0);
 
 //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
 //  LEDTimer.priority(1);
@@ -91,6 +99,7 @@ void setup() {
   CacheTimer.priority(2);
 
   SPI.usingInterrupt(MasterClockTimer);
+  SPI.usingInterrupt(MIDITimer);
   SPI.usingInterrupt(CacheTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
@@ -169,11 +178,19 @@ void masterLoop(){
   usbMIDI.read();
   timeControl.masterClockHandler();
 }
+
+void midiTimerLoop(){
+  usbMIDI.read();
+  timeControl.midiClockHandler();
+}
+
 void cacheLoop(){
   timeControl.cacheWriteHandler();
 }
 // global wrappers to create pointers to MidiModule member functions
 // https://isocpp.org/wiki/faq/pointers-to-members
+
+
 void midiClockPulseHandlerWrapper(){
   midiControl.midiClockPulseHandler();
 }
@@ -195,9 +212,22 @@ void midiStopHandlerWrapper(){
 }
 
 void usbMidiRealTimeMessageHandler(byte realtimebyte) {
-  Serial.println("realTimeMessage!:\t" + String(realtimebyte));
-  if (realtimebyte == 248) {
+//  Serial.println("realTimeMessage!:\t" + String(realtimebyte));
+  switch(realtimebyte){
+    case 248:
     midiControl.midiClockPulseHandler();
+    break;
+    case 250:
+    midiControl.midiStartContinueHandler();
+    break;
+    case 251:
+    midiControl.midiStartContinueHandler();
+    break;
+    case 252:
+    midiControl.midiStopHandler();
+    break;
+  }
+  if (realtimebyte == 248) {
   };
   //switch(realtimebyte){
   //  case MIDI_CLOCK:

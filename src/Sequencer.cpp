@@ -11,8 +11,6 @@
 
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
 
-
-
 Sequencer::Sequencer() {
 
 };
@@ -113,8 +111,7 @@ void Sequencer::clockStart(elapsedMicros startTime){
 	Serial.println("starttime: " + String(startTime));
 };
 
-
-void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
+void Sequencer::beatPulse(uint32_t beatLength){
 	// this is sent every 24 pulses received from midi clock
 	// and also when a play or continue command is received.
 	this->beatLength = beatLength;
@@ -127,7 +124,7 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 		beatPulseResyncFlag = false;
 
 		if(channel == 0){
-			Serial.println("resetting sequence timer! finalval:"  + String(sequenceTimer) + "\tbeatLength: " + String(beatLength));
+			Serial.println("---***---***---***---*** resetting sequence timer! finalval:"  + String(sequenceTimer) + "\tbeatLength: " + String(beatLength) + "\t***---***---***---***---");
 		}
 	}
 	calculateStepTimers();
@@ -141,15 +138,16 @@ void Sequencer::beatPulse(uint32_t beatLength, GameOfLife *life){
 			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 			stepData[stepNum].arpStatus = 0;
 		}
+		Serial.println("FIRST BEATPULSE!");
 	}
 
 
 };
 
-void Sequencer::runSequence(NoteDatum *noteData, GameOfLife *life){
+void Sequencer::runSequence(NoteDatum *noteData){
 	clearNoteData(noteData);
 	incrementActiveStep();
-	calculateStepTimers();
+//	calculateStepTimers();
 	sequenceModeStandardStep(noteData);
 }
 
@@ -184,6 +182,7 @@ void Sequencer::incrementActiveStep(){
 	if(sequenceTimer > activeStepEndTime ){
 		activeStep++;
 		zeroBeat = (zeroBeat + 1) % stepData[0].beatDiv;
+
 
 		if(channel == 0){
 			Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|ST: " +String(sequenceTimerInt) );
@@ -530,10 +529,6 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
 			}
 		}
 
-}
-
-void Sequencer::sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life){
-	// GAME OF LIFE SEQUENCING MODE
 }
 
 uint8_t Sequencer::quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction){

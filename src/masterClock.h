@@ -29,6 +29,7 @@ public:
   bool gateTrig[4];
   bool gatePrevState[4];
   elapsedMicros pulseTimer;
+  elapsedMicros masterClockDebugTimer;
   uint8_t beatPulseIndex;
   boolean firstRun;
 

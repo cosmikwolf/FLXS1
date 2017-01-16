@@ -11,10 +11,9 @@ class Sequencer
 		Sequencer();
 
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void 		runSequence(NoteDatum *noteData, GameOfLife *life);
+		void 		runSequence(NoteDatum *noteData);
 		// Sequencing Modes
 		void 		sequenceModeStandardStep(NoteDatum *noteData);
-		void    sequenceModeGameOfLife(NoteDatum *noteData, GameOfLife *life);
 		// Note Trigger Utilities
 		void  	clearNoteData(NoteDatum *noteData);
 		void 		incrementActiveStep();
@@ -22,7 +21,7 @@ class Sequencer
 		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
 
 		void 		calculateStepTimers();
-		void 		beatPulse(uint32_t beatLength, GameOfLife *life);
+		void 		beatPulse(uint32_t beatLength);
 		void 		clockStart(elapsedMicros startTime);
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
@@ -45,6 +44,7 @@ class Sequencer
 		boolean  	monophonic;
 		uint8_t	 	activeStep;
 		uint8_t	 	zeroBeat;		// this value needs to keep track of the beat that is the Zero sync .
+		uint8_t		zeroBeatTracker;
     uint32_t 	beatLength;
 		uint32_t 	stepLength;		// length of each step in mcs
 
@@ -53,7 +53,6 @@ class Sequencer
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
 		int16_t 	sequenceJitter[9];
 
-		uint8_t		lifeCellToPlay;
 		uint8_t		lifeCellsPlayed;
 
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
