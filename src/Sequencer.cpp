@@ -26,6 +26,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->sequenceTimer = 0;
 	this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
+	this->zeroBeatIndex = 0;
 	this->monophonic = true;
 };
 
@@ -124,7 +125,7 @@ void Sequencer::beatPulse(uint32_t beatLength){
 		beatPulseResyncFlag = false;
 
 		if(channel == 0){
-			Serial.println("---***---***---***---*** resetting sequence timer! finalval:"  + String(sequenceTimer) + "\tbeatLength: " + String(beatLength) + "\t***---***---***---***---");
+			Serial.println("---***---***---***---*** Beatpulse Resync! ppqTimer: "  + String(ppqSequenceTime()) + "\tbeatLength: " + String(beatLength) + "\t***---***---***---***---");
 		}
 	}
 	calculateStepTimers();
@@ -133,6 +134,10 @@ void Sequencer::beatPulse(uint32_t beatLength){
 		sequenceTimer = 0;
 		activeStep = 0;
 		zeroBeat = 0;
+
+		zeroBeatIndex = 0;
+		ppqPulseIndex = 0;
+
 		firstBeat = false;
 		for (int stepNum = 0; stepNum < stepCount; stepNum++){
 			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
@@ -145,8 +150,8 @@ void Sequencer::beatPulse(uint32_t beatLength){
 };
 
 void Sequencer::runSequence(NoteDatum *noteData){
-//	clearNoteData(noteData);
-//	incrementActiveStep();
+	clearNoteData(noteData);
+	incrementActiveStep();
 //	calculateStepTimers();
 	sequenceModeStandardStep(noteData);
 }
@@ -179,12 +184,12 @@ void Sequencer::incrementActiveStep(){
 		activeStepEndTime += getStepLength(stepNum);
 	}
 
-	if(sequenceTimer > activeStepEndTime ){
+	if(ppqSequenceTime() > activeStepEndTime ){
 		activeStep++;
 		zeroBeat = (zeroBeat + 1) % stepData[0].beatDiv;
 
 		if(channel == 0){
-			Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|ST: " +String(sequenceTimerInt) );
+			Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\tzeroBeatIndex: " + String(zeroBeatIndex) + "\tppqPulseIndex" + String(ppqPulseIndex) + "\t|ST: " +String(ppqSequenceTime()) );
 		}
 
 		//Serial.print("AS:" + String(activeStep) + " ");
@@ -222,9 +227,16 @@ void Sequencer::incrementActiveStep(){
 
 	void Sequencer::ppqPulse(uint8_t maxPulseCount){
 		this->maxPulseCount = maxPulseCount;
+		ppqPulseIndex++;
 		 if(ppqPulseIndex >= maxPulseCount){
 			ppqPulseIndex = 0;
 			zeroBeatIndex++;
+
+			stepCount * stepData[0].beatDiv
+
+			if (zeroBeatIndex >= stepData[0].beatDiv){
+				zeroBeatIndex = 0;
+			}
 		}
 		pulseTimer = 0;
 	};
@@ -232,7 +244,9 @@ void Sequencer::incrementActiveStep(){
 	uint32_t Sequencer::ppqSequenceTime(){
 		uint32_t pulseTime = beatLength / maxPulseCount;
 
-		return (ppqPulseIndex * pulseTime) + pulseTimer + (zeroBeatIndex * beatLength); //	 //	Time since last beat:  + Time between ZeroBeat and most recent beat:
+		return (ppqPulseIndex * pulseTime) + pulseTimer + (zeroBeat * beatLength) ;
+
+		//	 //	Time since last beat:  + Time between ZeroBeat and most recent beat:
 	}
 
 
@@ -309,8 +323,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				}
 			}
 		//	interrupts();
-			if ( sequenceTimer > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
-			   if ( sequenceTimer < (stepData[stepNum].offset + stepOffTime - 500  )) {
+			if ( ppqSequenceTime() > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
+			   if ( ppqSequenceTime() < (stepData[stepNum].offset + stepOffTime - 500  )) {
 					 // 1000us buffer is so that a note doesn't get retriggered after it gets shut off for the last time.
 /*
 				 sequenceTimer <-- starts at the beginning of the sequence

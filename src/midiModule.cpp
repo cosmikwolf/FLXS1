@@ -99,5 +99,12 @@ void MidiModule::midiClockPulseHandler(){
 
       }
     }
+
+    if (playing == 1){
+      for (int i=0; i< SEQUENCECOUNT; i++){
+        sequenceArray[i].ppqPulse(MIDI_PULSE_COUNT);
+      }
+
+    }
 //    Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\ttempotimer: " + String(masterTempoTimer) + "\tbeatLength: " + String(beatLength) + "\tbeatPulseIndex: " + String(beatPulseIndex));
 }
