@@ -35,6 +35,10 @@ class Sequencer
 
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
+
+		void 		ppqPulse(uint8_t maxPulseCount);
+		uint32_t 		ppqSequenceTime();
+
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
@@ -44,7 +48,7 @@ class Sequencer
 		boolean  	monophonic;
 		uint8_t	 	activeStep;
 		uint8_t	 	zeroBeat;		// this value needs to keep track of the beat that is the Zero sync .
-		uint8_t		zeroBeatTracker;
+		uint8_t		zeroBeatIndex;
     uint32_t 	beatLength;
 		uint32_t 	stepLength;		// length of each step in mcs
 
@@ -53,10 +57,10 @@ class Sequencer
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
 		int16_t 	sequenceJitter[9];
 
-		uint8_t		lifeCellsPlayed;
+		uint8_t		ppqPulseIndex;
 
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
-		elapsedMicros beatTimer;
+		elapsedMicros pulseTimer;
 		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
 		// data that needs to be stored
 		uint8_t  stepCount;  		// sequence length in 1/16th notes]
@@ -65,7 +69,7 @@ class Sequencer
 		uint8_t	 quantizeScale;
 		uint8_t  pattern;
 		uint8_t	 channel;
-		uint8_t  inputAttenuvert;
+		uint8_t  maxPulseCount;
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 

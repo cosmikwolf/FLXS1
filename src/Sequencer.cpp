@@ -183,7 +183,6 @@ void Sequencer::incrementActiveStep(){
 		activeStep++;
 		zeroBeat = (zeroBeat + 1) % stepData[0].beatDiv;
 
-
 		if(channel == 0){
 			Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|ST: " +String(sequenceTimerInt) );
 		}
@@ -220,6 +219,21 @@ void Sequencer::incrementActiveStep(){
 	//Serial.println("ending incrementactivestep beatdiv:\t" + String(stepData[activeStep].beatDiv) + "\tendtime:\t" + String(activeStepEndTime) + "\tactivestep\t" + String(activeStep));
 
 }
+
+	void Sequencer::ppqPulse(uint8_t maxPulseCount){
+		this->maxPulseCount = maxPulseCount;
+		 if(ppqPulseIndex >= maxPulseCount){
+			ppqPulseIndex = 0;
+			zeroBeatIndex++;
+		}
+		pulseTimer = 0;
+	};
+
+	uint32_t Sequencer::ppqSequenceTime(){
+		uint32_t pulseTime = beatLength / maxPulseCount;
+
+		return (ppqPulseIndex * pulseTime) + pulseTimer + (zeroBeatIndex * beatLength); //	 //	Time since last beat:  + Time between ZeroBeat and most recent beat:
+	}
 
 
 void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
@@ -280,36 +294,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 			}
 			//noInterrupts();
 	//  if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
-	/*		Data Needed:
-				zeroBeat;
-				zeroBeatIndex;
-				uint8_t ppqPulseIndex;
 
 
-
-				void ppqPulse(maxPulseCount){
-					 if(ppqPulseIndex >= maxPulseCount){
-						ppqPulseIndex = 0;
-						zeroBeatIndex++;
-					}
-					pulseTimer = 0;
-				};
-
-				int ppqSequenceTime(){
-					int pulseTime = beatLength / pulsecount;
-
-					Time since last beat: ppqPulseIndex * pulseTime + pulseTimer;
-					Time between ZeroBeat and most recent beat:  zeroBeatIndex * beatLength
-					
-					stepCount *
-				}
-
-
-
-				if zerobeat is 5
-
-
-*/
       if ( (int32_t)stepData[stepNum].stepTimer > (int32_t)(stepData[stepNum].arpStatus * trigLength - trigLength/10) ) {
   			// shut off notes that should stop playing.
 				if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
