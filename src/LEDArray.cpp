@@ -90,20 +90,16 @@ void LEDArray::loop(uint16_t frequency){
         //    leds[ledMapping[i]] = CHSV(0,0,0);
       }*/
           leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
-
         };
         for (int i=0;i<4;i++){
           leds.setPixelColor(ledChannelButtons[i], 0,0,0);
         }
-
       break;
-
 
       case PATTERN_SELECT:
         for (int i=0; i < 16; i++){
           //leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
           leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
-
         }
 
         for (int i=0; i < 4; i++){

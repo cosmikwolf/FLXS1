@@ -145,8 +145,8 @@ void Sequencer::beatPulse(uint32_t beatLength){
 };
 
 void Sequencer::runSequence(NoteDatum *noteData){
-	clearNoteData(noteData);
-	incrementActiveStep();
+//	clearNoteData(noteData);
+//	incrementActiveStep();
 //	calculateStepTimers();
 	sequenceModeStandardStep(noteData);
 }
@@ -225,8 +225,12 @@ void Sequencer::incrementActiveStep(){
 void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	// sequenceModeStandardStep determines if any notes should be triggered this loop.
 	// This means that this loop is responsible for all timing calculations and triggering notes
-	for (int stepNum = 0; stepNum < stepCount; stepNum++){
+	for (int stepNum = 0; stepNum < activeStep; stepNum++){
 	// iterate through all steps to determine if they need to have action taken.
+		if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
+			return;
+		}
+
 		if (stepData[stepNum].gateType > GATETYPE_REST){
 			// if the gateType is not rest, some action should be taken
 			//uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
@@ -241,7 +245,6 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 			if (stepData[stepNum].noteStatus == NOTPLAYING_NOTQUEUED){
 					stepData[stepNum].arpStatus = 0;
 			}
-
 
 			if (stepData[stepNum].arpType != ARPTYPE_OFF ){
 				trigLength = stepData[stepNum].arpSpdNum*getStepLength(stepNum)/stepData[stepNum].arpSpdDen;
@@ -275,8 +278,38 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 					gateOff = true;
 				}
 			}
-			noInterrupts();
+			//noInterrupts();
 	//  if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
+	/*		Data Needed:
+				zeroBeat;
+				zeroBeatIndex;
+				uint8_t ppqPulseIndex;
+
+
+
+				void ppqPulse(maxPulseCount){
+					 if(ppqPulseIndex >= maxPulseCount){
+						ppqPulseIndex = 0;
+						zeroBeatIndex++;
+					}
+					pulseTimer = 0;
+				};
+
+				int ppqSequenceTime(){
+					int pulseTime = beatLength / pulsecount;
+
+					Time since last beat: ppqPulseIndex * pulseTime + pulseTimer;
+					Time between ZeroBeat and most recent beat:  zeroBeatIndex * beatLength
+					
+					stepCount *
+				}
+
+
+
+				if zerobeat is 5
+
+
+*/
       if ( (int32_t)stepData[stepNum].stepTimer > (int32_t)(stepData[stepNum].arpStatus * trigLength - trigLength/10) ) {
   			// shut off notes that should stop playing.
 				if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
@@ -289,7 +322,7 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 					noteShutOff(noteData, stepNum, gateOff);
 				}
 			}
-			interrupts();
+		//	interrupts();
 			if ( sequenceTimer > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
 			   if ( sequenceTimer < (stepData[stepNum].offset + stepOffTime - 500  )) {
 					 // 1000us buffer is so that a note doesn't get retriggered after it gets shut off for the last time.

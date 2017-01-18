@@ -15,8 +15,8 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 1000
-#define kMidiClockInterval  100
+#define kMasterClockInterval 750
+#define kMidiClockInterval  200
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
@@ -95,12 +95,12 @@ void setup() {
 //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
 //  LEDTimer.priority(1);
 
-  CacheTimer.begin(cacheLoop,kCacheClockInterval);
-  CacheTimer.priority(2);
+  //CacheTimer.begin(cacheLoop,kCacheClockInterval);
+  //CacheTimer.priority(2);
 
   SPI.usingInterrupt(MasterClockTimer);
   SPI.usingInterrupt(MIDITimer);
-  SPI.usingInterrupt(CacheTimer);
+  //SPI.usingInterrupt(CacheTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
@@ -177,6 +177,7 @@ void usbNoteOn(byte channel, byte note, byte velocity){
 void masterLoop(){
   usbMIDI.read();
   timeControl.masterClockHandler();
+  usbMIDI.read();
 }
 
 void midiTimerLoop(){

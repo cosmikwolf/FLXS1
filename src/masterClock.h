@@ -30,7 +30,11 @@ public:
   bool gatePrevState[4];
   elapsedMicros pulseTimer;
   elapsedMicros masterClockDebugTimer;
+  elapsedMicros masterClockDebugTimer2;
+  int masterClockDebugValue;
+  int masterClockDebugHigh;
   uint8_t beatPulseIndex;
+  uint8_t clickCounter;
   boolean firstRun;
 
   uint8_t gateMap[4];

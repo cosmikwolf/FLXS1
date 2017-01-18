@@ -62,6 +62,8 @@ void MidiModule::midiClockPulseHandler(){
       masterTempoTimer = beatLength;
       Serial.println("pulse Timer exceeded timeout: " + String(pulseTimer));
     }
+    avgPulseTimer = (avgPulseTimer*9 + (int)pulseTimer)/10;
+
     pulseTimer = 0; // pulse timer needs to be reset after beatLength calculations
 
     // Keep track of how many midi clock pulses have been received since the last beat -> 1 beat = 24 pulses
@@ -83,10 +85,10 @@ void MidiModule::midiClockPulseHandler(){
       //if (masterPulseCount == beatPulseIndex){
       if (masterPulseCount == 0){
           //this gets triggered every quarter note
-        beatLength = masterTempoTimer;
+        beatLength = (beatLength+ masterTempoTimer)/2;
         masterTempoTimer = 0;
 
-        Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength)));
+        Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength) ) + "\tAvgPulseTimer: " + String(avgPulseTimer) );
 
         if (queuePattern != currentPattern) {
           //changePattern(queuePattern, true, true);

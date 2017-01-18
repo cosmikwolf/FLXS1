@@ -12,6 +12,7 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 	gatePrevState[1] = false;
 	gatePrevState[2] = false;
 	gatePrevState[3] = false;
+	clickCounter = 0;
 	firstRun = false;
 	Serial.println("Master Clock Initialized");
 	lfoTimer = 0;
@@ -28,7 +29,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 void MasterClock::masterClockFunc(void){
 	outputControl->setClockOutput(HIGH);
 
- //elapsedMicros loopTimer = 0;
+ elapsedMicros masterClockDebugTimer = 0;
 
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 //  timerAvg = (lastTimer + 9*timerAvg) /10;
@@ -86,6 +87,15 @@ if(masterDebugSwitch == HIGH){
 	masterDebugSwitch = LOW;
 	outputControl->setClockOutput(LOW);
 
+  masterClockDebugValue = ((int)masterClockDebugTimer + masterClockDebugValue*9)/10 ;
+	if ( (int)masterClockDebugTimer > masterClockDebugHigh){
+		masterClockDebugHigh = (int)masterClockDebugTimer;
+	}
+	if (masterClockDebugTimer2 > 3000000){
+		masterClockDebugTimer2 = 0;
+		Serial.println("$%^&^%$%^&^%$%^%$#$%^&^%$#$%^&  Masterclock interval: " + String(masterClockDebugValue) + "\thigh val; " + String(masterClockDebugHigh));
+		masterClockDebugHigh = 0;
+	}
 }
 
 bool MasterClock::gateTrigger(uint8_t gateNum){
@@ -208,6 +218,9 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::midiClockTick(){
   // ext clock sync
+		clickCounter = (clickCounter + 1) % SEQUENCECOUNT;
+	//	sequenceArray[clickCounter].runSequence(&noteData[clickCounter]);
+
 	  for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].runSequence(&noteData[i]);
 	  }
