@@ -73,8 +73,8 @@
 #define STEPMODE_QUANTIZEKEY     17
 #define STEPMODE_QUANTIZESCALE   18
 
-#define STEPMODE_TEMPO          6
-#define STEPMODE_EXTCLOCK       7
+#define STEPMODE_TEMPO          14
+#define STEPMODE_EXTCLOCK       15
 
 // for stepmode order
 #define MAX_STEPMODE_COUNT 10

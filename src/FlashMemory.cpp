@@ -484,6 +484,33 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
      sequenceArray[channel].stepData[i] = stepDataBuf;
   }
 
+  for(int n = jsonReader["stepCount"]; n< MAX_STEPS_PER_SEQUENCE; n++){
+    StepDatum stepDataBuf;
+
+    stepDataBuf.pitch[0]   = 24;
+    for (int i=1; i<4; i++){
+      stepDataBuf.pitch[i] = 0;
+    }
+    stepDataBuf.chord	   		 =	 0;
+    stepDataBuf.gateType		 =	 0;
+    stepDataBuf.gateLength	 =	 1;
+    stepDataBuf.arpType			 =	 0;
+    stepDataBuf.arpOctave		 =   1;
+    stepDataBuf.arpSpdNum		 =   1;
+    stepDataBuf.arpSpdDen		 =   4;
+    stepDataBuf.glide				 =   0;
+    stepDataBuf.beatDiv			 =   4;
+    stepDataBuf.velocity		 =  67;
+    stepDataBuf.velocityType =   0;
+    stepDataBuf.lfoSpeed		 =  16;
+    stepDataBuf.offset       =   0;
+    stepDataBuf.noteStatus   =  NOTPLAYING_NOTQUEUED;
+    stepDataBuf.notePlaying  =   0;
+    stepDataBuf.stepTimer    =   0;
+    sequenceArray[channel].stepData[n] = stepDataBuf;
+
+  }
+
   return jsonReader.success();
 }
 

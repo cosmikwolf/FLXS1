@@ -17,7 +17,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray){
   this->sequenceArray = sequenceArray;
   oled.begin();
   delay(100);
-  oled.setBrightness(15);
+  oled.setBrightness(255);
   //oled.setFont(&Font);//this will load the font
   oled.setFont(&unborn_small);//this will load the font
   oled.setTextScale(2);

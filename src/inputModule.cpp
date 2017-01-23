@@ -144,14 +144,17 @@ void InputModule::loop(uint16_t frequency){
 // STATE VARIABLE INPUT HANDLERS
 
 void InputModule::patternSelectHandler(){
+
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
       saveFile->changePattern(i, patternChannelSelector,  true, true);
 
-      delay(10);
+      //delay(10);
       changeState(CHANNEL_PITCH_MODE);
     }
   }
+  stepMode = STEPMODE_PITCH0;
+
 }
 
 void InputModule::tempoMenuHandler(){
@@ -395,7 +398,6 @@ void InputModule::altButtonHandler(){
           } else {
             notePage = positive_modulo(notePage - 1, 4);
           }
-
 
         break;
 
