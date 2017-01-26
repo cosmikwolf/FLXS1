@@ -28,7 +28,7 @@ IntervalTimer CacheTimer;
 IntervalTimer MIDITimer;
 
 MidiModule midiControl;
-NoteDatum noteData[4];
+//NoteDatum noteData[4];
 Sequencer sequence[SEQUENCECOUNT];
 AudioInputAnalog              audio_adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;
@@ -48,7 +48,6 @@ void setup() {
 //  while (!Serial) ; // wait for serial monitor window to open
 
   printHeapStats();
-
   AudioMemory(25);
   notefreq.begin(.15);
   //delay(1500);
@@ -63,7 +62,7 @@ void setup() {
 
   serialMidi.begin(MIDI_CHANNEL_OMNI);
 
-  midiControl.midiSetup(sequence, noteData);
+  midiControl.midiSetup(sequence);
 
 	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
   serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
@@ -85,7 +84,7 @@ void setup() {
   //usbMIDI.setHandlePitchChange(OnPitchChange)
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
-  timeControl.initialize(&serialMidi, &midiControl, noteData, sequence, adc);
+  timeControl.initialize(&serialMidi, &midiControl, sequence, adc);
 
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
   MasterClockTimer.priority(1);

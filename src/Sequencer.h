@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "OutputController.h"
-#include "NoteDatum.h"
+#include "StepDatum.h"
 #include "global.h"
 
 #ifndef _Sequencer_h_
@@ -15,14 +15,14 @@ class Sequencer
 
 	//	void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl);
-		void 		runSequence(NoteDatum *noteData);
+		void 		runSequence();
 		// Sequencing Modes
-		void 		sequenceModeStandardStep(NoteDatum *noteData);
+		void 		sequenceModeStandardStep();
 		// Note Trigger Utilities
-		void  	clearNoteData(NoteDatum *noteData);
+	//	void  	clearNoteData(NoteDatum *noteData);
 		void 		incrementActiveStep();
-		void    noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig);
-		void    noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff);
+		void    noteTrigger(uint8_t stepNum, bool gateTrig);
+		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
 		void 		calculateStepTimers();
 		void 		beatPulse(uint32_t beatLength);
@@ -41,57 +41,38 @@ class Sequencer
 		void 		setBeatCount(uint16_t beatCountNew);
 
 		void 		ppqPulse(uint8_t maxPulseCount);
-		uint32_t 		ppqSequenceTime();
-
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
-
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint8_t   getArpCount(uint8_t stepNum);
-
 		uint32_t  getStepLength(uint8_t stepNum);
+		uint32_t  ppqSequenceTime();
+
 		boolean  	monophonic;
+		boolean  	beatPulseResyncFlag;
+		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
+
 		uint8_t	 	activeStep;
 		uint8_t	 	zeroBeat;		// this value needs to keep track of the beat that is the Zero sync .
 		uint8_t		zeroBeatIndex;
-    uint32_t 	beatLength;
-		uint32_t 	stepLength;		// length of each step in mcs
-
-		uint32_t 	tempoX100;
-		boolean  	beatPulseResyncFlag;
-		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
-		int16_t 	sequenceJitter[9];
-
 		uint8_t		ppqPulseIndex;
+		uint8_t 	stepCount;  		// sequence length in 1/16th notes]
+		uint8_t		quantizeKey;
+		uint8_t		quantizeScale;
+		uint8_t 	pattern;
+		uint8_t		channel;
+		uint8_t 	maxPulseCount;
 
+		int16_t 	sequenceJitter[9];
+		uint16_t beatCount;
+
+		uint32_t 	beatLength;
+		uint32_t 	stepLength;		// length of each step in mcs
+		uint32_t 	tempoX100;
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
 		elapsedMicros pulseTimer;
-		// http://www.happybearsoftware.com/implementing-a-dynamic-array.html
-		// data that needs to be stored
-		uint8_t  stepCount;  		// sequence length in 1/16th notes]
-		uint16_t beatCount;
-		uint8_t	 quantizeKey;
-		uint8_t	 quantizeScale;
-		uint8_t  pattern;
-		uint8_t	 channel;
-		uint8_t  maxPulseCount;
-
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 
 		OutputController* outputControl;
-
-		// DEBUG VARIABLES
-		//unsigned long timekeeper;
-//	void StepDatum_init(StepDatum *stepDatum);
-
-//	void StepDatum_append(StepDatum *stepDatum, int value);
-
-//	StepDatum StepDatum_get(StepDatum *stepDatum, int index);
-
-//	void StepDatum_set(StepDatum *stepDatum, int index, int value);
-
-//	void StepDatum_double_capacity_if_full(StepDatum *stepDatum);
-
-//	void StepDatum_free(StepDatum *stepDatum);
 
 	private:
 

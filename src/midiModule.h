@@ -11,7 +11,7 @@
 
 class MidiModule {
 public:
-  void midiSetup(Sequencer *sequenceArray, NoteDatum *noteData);
+  void midiSetup(Sequencer *sequenceArray);
   void midiStopHandler();
   void midiNoteOffHandler(byte channel, byte note, byte velocity);
   void midiNoteOnHandler(byte channel, byte note, byte velocity);
@@ -26,6 +26,5 @@ private:
   boolean firstRun;
 
   Sequencer *sequenceArray;
-  NoteDatum *noteData;
 };
 #endif

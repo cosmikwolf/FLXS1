@@ -9,7 +9,7 @@
 
 TimeController::TimeController(){ };
 
-void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, NoteDatum *noteData, Sequencer* sequencerArray, ADC *adc) {
+void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, Sequencer* sequencerArray, ADC *adc) {
 
 	Serial.println("Initializing TimeController");
 
@@ -31,7 +31,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	ledArray.initialize(sequencerArray);
 
-	clockMaster.initialize(&outputControl, sequencerArray, noteData, serialMidi, midiControl);
+	clockMaster.initialize(&outputControl, sequencerArray, serialMidi, midiControl);
 	saveFile.initialize(sequencerArray, &SerialFlash, adc);
 
 

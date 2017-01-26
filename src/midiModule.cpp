@@ -3,9 +3,9 @@
 #include "midiModule.h"
 
 
-void MidiModule::midiSetup( Sequencer *sequenceArray, NoteDatum *noteData){
+void MidiModule::midiSetup( Sequencer *sequenceArray){
   this->sequenceArray = sequenceArray;
-  this->noteData = noteData;
+//  this->noteData = noteData;
 
   beatPulseIndex = 0;
   firstRun = false;

@@ -12,14 +12,14 @@
 class MasterClock {
 
 public:
-  void initialize(OutputController* outputControl, Sequencer *sequenceArray, NoteDatum *noteData, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl);
+  void initialize(OutputController* outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl);
   void changeTempo(uint32_t newTempoX100);
   void masterClockFunc();
   void internalClockTick();
   void midiClockTick();
   void externalClockTick(uint8_t gateNum);
-  void noteOffSwitch();
-  void noteOnSwitch();
+//  void noteOffSwitch();
+//  void noteOnSwitch();
 
   bool gateTrigger(uint8_t gateNum);
   void checkGateClock();
@@ -44,7 +44,6 @@ public:
 private:
   OutputController* outputControl;
   Sequencer *sequenceArray;
-  NoteDatum *noteData;
   midi::MidiInterface<HardwareSerial>* serialMidi;
   MidiModule *midiControl;
   elapsedMillis lfoTimer;

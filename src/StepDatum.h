@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-#ifndef NoteDatum_h
-#define NoteDatum_h
+#ifndef StepDatum_h
+#define StepDatum_h
 
 // noteStatus indicates the status of the next note
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
@@ -27,23 +27,6 @@
 #define ARPTYPE_UPDN1 3
 #define ARPTYPE_UPDN2 4
 #define ARPTYPE_RNDM	5
-
-typedef struct NoteDatum {
-	bool      noteOn;             // is a note going to play?
-	bool      noteOff;            // does a note need to be shut off?
-	uint8_t   noteOnArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
-	bool      noteGateArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
-	bool      noteGateOffArray[MAX_STEPS_PER_SEQUENCE];   // contains all notes that need to be played
-	uint8_t   noteVelArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
-	uint8_t   noteVelTypeArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
-	uint8_t   noteLfoSpeed[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
-	uint8_t   noteGlideArray[MAX_STEPS_PER_SEQUENCE];  // contains CC info for notes to be played
-	uint8_t   noteOffArray[MAX_STEPS_PER_SEQUENCE];  // contains all notes that need to be stopped
-	uint8_t   channel;            // sequence channel (0-3)
-	uint8_t   noteOnStep;         // step number that originated the noteOn message.
-	uint8_t   noteOffStep;        // step number that originated the noteOff message.
-	uint32_t	offset;
-} NoteDatum;
 
 typedef	struct StepDatum {
 	// data that needs to be stored

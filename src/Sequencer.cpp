@@ -144,11 +144,11 @@ void Sequencer::beatPulse(uint32_t beatLength){
 
 };
 
-void Sequencer::runSequence(NoteDatum *noteData){
-	clearNoteData(noteData);
+void Sequencer::runSequence(){
+//	clearNoteData(noteData);
 	incrementActiveStep();
 //	calculateStepTimers();
-	sequenceModeStandardStep(noteData);
+	sequenceModeStandardStep();
 }
 
 uint32_t Sequencer::getStepLength(uint8_t stepNum){
@@ -221,7 +221,7 @@ void Sequencer::incrementActiveStep(){
 }
 
 
-void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
+void Sequencer::sequenceModeStandardStep(){
 	// sequenceModeStandardStep determines if any notes should be triggered this loop.
 	// This means that this loop is responsible for all timing calculations and triggering notes
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
@@ -318,7 +318,7 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 				"\tstepOffTime: " + String(stepOffTime) +
 				"\ttrigLength: " + String(trigLength)
 			);*/
-					noteShutOff(noteData, stepNum, gateOff);
+					noteShutOff(stepNum, gateOff);
 				}
 			}
 		//	interrupts();
@@ -352,9 +352,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 					 + "\tmasterDebugCount: " + String(masterDebugCounter)
 					 );
 */
-					noteTrigger(noteData, stepNum, gateTrig);
+					noteTrigger(stepNum, gateTrig);
 
-//					outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n],noteData[i].noteVelTypeArray[n], noteData[i].noteLfoSpeed[n], noteData[i].noteGlideArray[n], noteData[i].noteGateArray[n] );
 
 		 /*
 				Serial.println("First Condition Met - stepNum: " + String(stepNum)  +
@@ -381,12 +380,12 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 	}
 }
 
-void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig){
+void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
 	// sets pitch of notes to be played.
-	noteData->noteOn = true;
-	noteData->channel = channel;
-	noteData->noteOnStep = stepNum;
-	noteData->offset = stepData[stepNum].offset;
+	//noteData->noteOn = true;
+	//noteData->channel = channel;
+	//noteData->noteOnStep = stepNum;
+	//noteData->offset = stepData[stepNum].offset;
 	if (stepData[stepNum].arpStatus == 0){
 		//only reset the step timer if it is the first trigger of the arpeggio
 		stepData[stepNum].stepTimer = stepData[stepNum].stepTimer - stepData[stepNum].stepTimer;
@@ -527,7 +526,7 @@ uint8_t Sequencer::getArpCount(uint8_t stepNum){
 	return arpCount;
 }
 
-void Sequencer::clearNoteData(NoteDatum *noteData){
+/*void Sequencer::clearNoteData(NoteDatum *noteData){
 	noteData->noteOff = false;
 	noteData->noteOn = false;
 
@@ -543,16 +542,16 @@ void Sequencer::clearNoteData(NoteDatum *noteData){
 	noteData->channel = 0;
 	noteData->noteOnStep = 0;
 	noteData->noteOffStep = 0;
-}
+}*/
 
-void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
+void Sequencer::noteShutOff(uint8_t stepNum, bool gateOff){
 	//shut off any other notes that might still be playing.
 
 		if( stepData[stepNum].noteStatus == CURRENTLY_PLAYING ){
-			noteData->noteOff = true;
-			noteData->channel = channel;
-			noteData->noteOffStep = stepNum;
-			noteData->noteGateOffArray[stepNum] = gateOff;
+	//		noteData->noteOff = true;
+	//		noteData->channel = channel;
+	//		noteData->noteOffStep = stepNum;
+	//		noteData->noteGateOffArray[stepNum] = gateOff;
 
 
 			outputControl->noteOff(channel, stepData[stepNum].notePlaying, gateOff );

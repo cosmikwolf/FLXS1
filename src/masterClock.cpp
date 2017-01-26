@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include "MasterClock.h"
 
-void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, NoteDatum *noteData, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl){
+void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl){
 	Serial.println("Initializing Master Clock");
 	this->sequenceArray = sequenceArray;
 	this->outputControl = outputControl;
-	this->noteData = noteData;
 	this->serialMidi = serialMidi;
 	this->midiControl = midiControl;
 	gatePrevState[0] = false;
@@ -75,8 +74,8 @@ if(masterDebugSwitch == HIGH){
 			}
 			lfoTimer = 0;
 		}
-    noteOffSwitch();
-    noteOnSwitch();
+    //noteOffSwitch();
+    //noteOnSwitch();
   }
 
 	if (outputControl->clockOutputTimer > 2) {
@@ -160,7 +159,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 		}
 
 		for (int i=0; i< SEQUENCECOUNT; i++){
-			sequenceArray[i].runSequence(&noteData[i]);
+			sequenceArray[i].runSequence();
 		}
 
 }
@@ -179,11 +178,11 @@ void MasterClock::internalClockTick(){
 
    for (int i=0; i<4; i++){
  		 outputControl->allNotesOff(i);
- 		 noteData[i].noteOn = false;
- 		 noteData[i].noteOff = false;
+ 	//	 noteData[i].noteOn = false;
+ 	//	 noteData[i].noteOff = false;
  		 for (int n=0; n<MAX_STEPS_PER_SEQUENCE; n++){
- 		   	noteData[i].noteOffArray[n] = NULL;
- 				noteData[i].noteOnArray[n] = NULL;
+ 		//   	noteData[i].noteOffArray[n] = NULL;
+ 		//		noteData[i].noteOnArray[n] = NULL;
  		 }
  	 }
 		outputControl->setClockOutput(HIGH);
@@ -191,7 +190,7 @@ void MasterClock::internalClockTick(){
     for (int i=0; i< SEQUENCECOUNT; i++){
     sequenceArray[i].clockStart(startTime);
       sequenceArray[i].beatPulse(beatLength);
-      sequenceArray[i].runSequence(&noteData[i]);
+      sequenceArray[i].runSequence();
     }
   } else if (internalClockTimer > 60000000/(tempoX100/100)){
        // Serial.print(" b4 ");
@@ -201,14 +200,14 @@ void MasterClock::internalClockTick(){
     }
     for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].beatPulse(beatLength);
-      sequenceArray[i].runSequence(&noteData[i]);
+      sequenceArray[i].runSequence();
     }
 		outputControl->setClockOutput(HIGH);
     internalClockTimer = 0;
 
   }  else {
     for (int i=0; i< SEQUENCECOUNT; i++){
-      sequenceArray[i].runSequence(&noteData[i]);
+      sequenceArray[i].runSequence();
     }
   }
 
@@ -223,10 +222,10 @@ void MasterClock::midiClockTick(){
 	//	sequenceArray[clickCounter].runSequence(&noteData[clickCounter]);
 
 	  for (int i=0; i< SEQUENCECOUNT; i++){
-			sequenceArray[i].runSequence(&noteData[i]);
+			sequenceArray[i].runSequence();
 	  }
 }
-
+/*
 void MasterClock::noteOffSwitch(){
   for (int i=0; i< SEQUENCECOUNT; i++){
     if (noteData[i].noteOff == true){
@@ -257,3 +256,5 @@ void MasterClock::noteOnSwitch(){
     }
   }
 }
+
+*/
