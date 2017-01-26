@@ -11,7 +11,7 @@ void LEDArray::initialize(Sequencer *sequenceArray){
 
   //LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
-  leds.setBrightness(25);
+  leds.setBrightness(100);
   leds.begin();
   leds.show(); // Initialize all pixels to 'off'
 

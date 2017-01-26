@@ -11,11 +11,11 @@
 
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
 
-Sequencer::Sequencer() {
+//Sequencer::Sequencer() {
+//};
 
-};
-
-void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100){
+//void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100){
+	void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl){
 	// initialization routine that runs during setup
 	Serial.println("Initializing Sequencer Object");
 	this->channel = ch;
@@ -27,6 +27,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
 	this->monophonic = true;
+	this->outputControl = outputControl;
 };
 
 
@@ -353,6 +354,8 @@ void Sequencer::sequenceModeStandardStep(NoteDatum *noteData){
 */
 					noteTrigger(noteData, stepNum, gateTrig);
 
+//					outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n],noteData[i].noteVelTypeArray[n], noteData[i].noteLfoSpeed[n], noteData[i].noteGlideArray[n], noteData[i].noteGateArray[n] );
+
 		 /*
 				Serial.println("First Condition Met - stepNum: " + String(stepNum)  +
 					+ "\tarpStatus: " + String(stepData[stepNum
@@ -486,6 +489,12 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig)
 		stepData[stepNum].notePlaying = playPitch;
 	}
 
+
+	//Serial.println("noteOn"); delay(10);
+	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gateTrig );
+	//Serial.println("noteOn complete"); delay(10);
+
+/*
 	for (int i=0; i< stepCount; i++){
 		// since there could be up to stepCount steps being triggered in a single noteOnArray,
 		// need to find the first NULL entry. After setting it, break.
@@ -499,7 +508,7 @@ void Sequencer::noteTrigger(NoteDatum *noteData, uint8_t stepNum, bool gateTrig)
 			break;
 		}
 	}
-
+ */
 
 	stepData[stepNum].arpStatus++;
 
@@ -545,13 +554,16 @@ void Sequencer::noteShutOff(NoteDatum *noteData, uint8_t stepNum, bool gateOff){
 			noteData->noteOffStep = stepNum;
 			noteData->noteGateOffArray[stepNum] = gateOff;
 
+
+			outputControl->noteOff(channel, stepData[stepNum].notePlaying, gateOff );
+/*
 			for (int f=0; f<stepCount; f++){
 				if (noteData->noteOffArray[f] == NULL){
 					noteData->noteOffArray[f] = stepData[stepNum].notePlaying;
 					break;
 				}
 			}
-
+*/
 			if ( stepData[stepNum].arpStatus > getArpCount(stepNum) && stepData[stepNum].noteStatus != NOTE_HAS_BEEN_PLAYED_THIS_ITERATION ){
 				stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
 			//	Serial.println(String(stepNum) + " has been played arpCount: " + String(getArpCount(stepNum)) + "\tarpStatus: " + String(stepData[stepNum].arpStatus) );

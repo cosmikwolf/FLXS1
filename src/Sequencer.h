@@ -1,16 +1,20 @@
+#include <Arduino.h>
+#include "OutputController.h"
+#include "NoteDatum.h"
+#include "global.h"
+
 #ifndef _Sequencer_h_
 #define _Sequencer_h_
 
-#include "NoteDatum.h"
-#include "global.h"
-#include "GameOfLife.h"
+class OutputController;
 
 class Sequencer
 {
 	public:
-		Sequencer();
+		//Sequencer();
 
-		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
+	//	void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
+		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl);
 		void 		runSequence(NoteDatum *noteData);
 		// Sequencing Modes
 		void 		sequenceModeStandardStep(NoteDatum *noteData);
@@ -72,6 +76,8 @@ class Sequencer
 		uint8_t  maxPulseCount;
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
+
+		OutputController* outputControl;
 
 		// DEBUG VARIABLES
 		//unsigned long timekeeper;

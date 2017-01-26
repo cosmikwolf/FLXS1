@@ -9,6 +9,7 @@
 #include <malloc.h>
 #include <ADC.h>
 #include "TimeController.h"
+#include "OutputController.h"
 #include "Sequencer.h"
 #include "midiModule.h"
 #include "global.h"

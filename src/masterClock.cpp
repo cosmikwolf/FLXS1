@@ -86,7 +86,7 @@ if(masterDebugSwitch == HIGH){
   //lastTimer = loopTimer;
 	masterDebugSwitch = LOW;
 	outputControl->setClockOutput(LOW);
-
+/*
   masterClockDebugValue = ((int)masterClockDebugTimer + masterClockDebugValue*9)/10 ;
 	if ( (int)masterClockDebugTimer > masterClockDebugHigh){
 		masterClockDebugHigh = (int)masterClockDebugTimer;
@@ -96,6 +96,7 @@ if(masterDebugSwitch == HIGH){
 		Serial.println("$%^&^%$%^&^%$%^%$#$%^&^%$#$%^&  Masterclock interval: " + String(masterClockDebugValue) + "\thigh val; " + String(masterClockDebugHigh));
 		masterClockDebugHigh = 0;
 	}
+	*/
 }
 
 bool MasterClock::gateTrigger(uint8_t gateNum){
