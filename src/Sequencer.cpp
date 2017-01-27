@@ -104,8 +104,6 @@ void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 	stepData[step].glide = glideTime;
 }
 
-
-
 void Sequencer::clockStart(elapsedMicros startTime){
 	firstBeat = true;
 	Serial.println("starttime: " + String(startTime));
