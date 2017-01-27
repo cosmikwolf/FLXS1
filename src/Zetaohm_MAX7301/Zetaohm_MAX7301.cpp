@@ -12,7 +12,7 @@ void Zetaohm_MAX7301::begin(uint8_t csPin) {
   _spiTransactionsSpeed = 36000000;
   _cs = csPin;
   //	postSetup(csPin);
-	MAX7301_SPI = SPISettings(12000000, MSBFIRST, SPI_MODE0);//mode3
+	MAX7301_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);//mode3
 
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
@@ -121,17 +121,17 @@ uint16_t Zetaohm_MAX7301::writeByte(byte addr, byte data){
   uint16_t returnData = 0;
   waitFifoEmpty();
 	startTransaction();
+
 	digitalWriteFast(_cs, LOW);
 	SPI.transfer(addr & 0x7F);
 	SPI.transfer(data);
-
 	digitalWriteFast(_cs, HIGH);
-	digitalWriteFast(_cs, LOW);
 
+	digitalWriteFast(_cs, LOW);
 	returnData = SPI.transfer(0x00) << 8;
 	returnData = returnData | SPI.transfer(0x00);
-
 	digitalWriteFast(_cs, HIGH);
+
 	endTransaction();
 
   return returnData;

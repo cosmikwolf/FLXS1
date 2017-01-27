@@ -24,7 +24,6 @@ private:
   int avgPulseTimer;
   elapsedMicros pulseTimer;
   boolean firstRun;
-
   Sequencer *sequenceArray;
 };
 #endif

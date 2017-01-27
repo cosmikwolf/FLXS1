@@ -17,7 +17,7 @@
 
 #define kSerialSpeed 115200
 #define kMasterClockInterval 750
-#define kMidiClockInterval  200
+#define kMidiClockInterval  100
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
@@ -28,8 +28,8 @@ IntervalTimer CacheTimer;
 IntervalTimer MIDITimer;
 
 MidiModule midiControl;
-//NoteDatum noteData[4];
 Sequencer sequence[SEQUENCECOUNT];
+
 AudioInputAnalog              audio_adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;
 AudioConnection               patchCord0(audio_adc, 0 , notefreq, 0);
@@ -87,7 +87,7 @@ void setup() {
   timeControl.initialize(&serialMidi, &midiControl, sequence, adc);
 
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
-  MasterClockTimer.priority(1);
+  MasterClockTimer.priority(4);
 
   MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
   MIDITimer.priority(0);
@@ -193,7 +193,9 @@ void cacheLoop(){
 
 
 void midiClockPulseHandlerWrapper(){
+//  timeControl.setDebugPin(3, HIGH);
   midiControl.midiClockPulseHandler();
+//  timeControl.setDebugPin(3, LOW);
 }
 
 void midiNoteOnHandlerWrapper(byte channel, byte note, byte velocity){

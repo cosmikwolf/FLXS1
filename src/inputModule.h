@@ -8,7 +8,6 @@
 #include "DisplayModule.h"
 #include "Sequencer.h"
 #include "MasterClock.h"
-#include "GameOfLife.h"
 #include "global.h"
 
 #ifndef _InputModule_h_
@@ -43,7 +42,7 @@
 #define SW_MENU   26
 #define SW_SHIFT   27
 #define ENCODER1LEFTPIN 16
-#define ENCODER1RIGHTPIN 25 
+#define ENCODER1RIGHTPIN 25
 #define MAX7301PIN  5
 
 class InputModule

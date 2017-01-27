@@ -19,6 +19,7 @@ class TimeController {
   public:
     TimeController();
     void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, Sequencer* sequencerArray, ADC *adc);
+
     void runLoopHandler();
     void masterClockHandler();
     void midiClockHandler();

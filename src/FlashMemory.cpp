@@ -37,7 +37,7 @@ void FlashMemory::wipeEEPROM(){
     EEPROM.update(i, 0);
     Serial.println("\t" + String(EEPROM.read(i) ));
   }
-  delay(1000);
+  delay(500);
 }
 
 void FlashMemory::initializeCache(){
@@ -67,8 +67,7 @@ void FlashMemory::initializeCache(){
   uint16_t newCacheOffset = random(2,2000);
   Serial.println("*&^%*&^%*&^% Cache Offset:\t" + String(cacheOffset));
   Serial.println("*&^%*&^%*&^% new Cache Offset:\t" + String(newCacheOffset));
-
-  delay(1000);
+  delay(500);
   for(int i=0; i<CACHE_COUNT; i++){
     if (getCacheStatus(cacheOffset, i) != CACHE_READY){
       //copy any cache info over if cache still needs to be written
@@ -78,12 +77,11 @@ void FlashMemory::initializeCache(){
       setCacheChannel(newCacheOffset, i, getCacheChannel(cacheOffset, i));
       setCachePattern(newCacheOffset, i, getCachePattern(cacheOffset, i));
       setCacheStatus( newCacheOffset, i, getCacheStatus(cacheOffset, i));
-      delay(2000);
+      delay(500);
     }
   };
   cacheOffset = newCacheOffset;
   EEPROMWrite16(0, cacheOffset); //write the new offset to EEPROM so it will persist to the next reboot.
-
   listFiles();
 }
 
@@ -519,6 +517,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
     while( getCachePattern(cacheOffset, i) == pattern && getCacheStatus(cacheOffset, i) != 0 ) {
       Serial.println("Delaying because pattern " + String(pattern) + " has pending save operation");
       cacheWriteLoop();
+      delay(500);
     }
   }
 

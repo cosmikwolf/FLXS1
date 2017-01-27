@@ -3,10 +3,9 @@
 #include "midiModule.h"
 
 
-void MidiModule::midiSetup( Sequencer *sequenceArray){
+void MidiModule::midiSetup( Sequencer *sequenceArray){ // backplane is for debug purposes only
   this->sequenceArray = sequenceArray;
 //  this->noteData = noteData;
-
   beatPulseIndex = 0;
   firstRun = false;
   pulseTimer = 0;

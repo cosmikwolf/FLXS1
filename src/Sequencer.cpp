@@ -134,6 +134,7 @@ void Sequencer::beatPulse(uint32_t beatLength){
 		activeStep = 0;
 		zeroBeat = 0;
 		firstBeat = false;
+
 		for (int stepNum = 0; stepNum < stepCount; stepNum++){
 			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
 			stepData[stepNum].arpStatus = 0;
@@ -198,7 +199,9 @@ void Sequencer::incrementActiveStep(){
 	//			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
 			for (int stepNum = 0; stepNum < stepCount; stepNum++){
 				if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
+					//Serial.println("resetting step num: " + String(stepNum));
 					stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
+					stepData[stepNum].arpStatus = 0;
 				}
 			}
 		}
@@ -224,10 +227,11 @@ void Sequencer::incrementActiveStep(){
 void Sequencer::sequenceModeStandardStep(){
 	// sequenceModeStandardStep determines if any notes should be triggered this loop.
 	// This means that this loop is responsible for all timing calculations and triggering notes
-	for (int stepNum = 0; stepNum < stepCount; stepNum++){
+	for (int stepNum = 0; stepNum < activeStep + 1; stepNum++){
 	// iterate through all steps to determine if they need to have action taken.
 		if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-			//return;
+		//	Serial.println("------- has been played: ActiveStep: " + String(activeStep) + "\tstepNum: " + String(stepNum));
+			continue;
 		}
 
 		if (stepData[stepNum].gateType > GATETYPE_REST){

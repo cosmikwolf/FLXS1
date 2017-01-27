@@ -28,7 +28,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 void MasterClock::masterClockFunc(void){
 	outputControl->setClockOutput(HIGH);
 
- elapsedMicros masterClockDebugTimer = 0;
+  elapsedMicros masterClockDebugTimer = 0;
 
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 //  timerAvg = (lastTimer + 9*timerAvg) /10;
