@@ -426,6 +426,10 @@ void OutputController::setClockOutput(bool value){
     }
 }
 
+void OutputController::setGateOutputDebug(uint8_t index, bool value){
+  backplaneGPIO->digitalWrite(index, value);
+}
+
 void OutputController::calibrationRoutine(){
   for (int i=0; i<8; i++){
     ad5676.setVoltage(i,calibrationBuffer);

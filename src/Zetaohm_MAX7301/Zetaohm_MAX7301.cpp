@@ -50,8 +50,6 @@ void Zetaohm_MAX7301::initPort(uint8_t index, uint8_t port, uint16_t mode) {
   portConfig[portConfigIndex] |= setting << offset*2;        // set mode at correct offset
 
   Serial.println("Port Config Index: " + String(portConfigIndex) + "\tsetting: " + String(setting) + "\tvalue: " + String(portConfig[portConfigIndex], HEX) + "\toffset: " + String(offset) + "\tclear: 0b" + String(uint8_t(~(0x3 << offset*2) ), BIN) + "\tassignment: 0x" + String(setting << offset, HEX));
-
-
 };
 
 void Zetaohm_MAX7301::updateGpioPinModes(){

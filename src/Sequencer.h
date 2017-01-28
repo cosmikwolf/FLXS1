@@ -52,21 +52,26 @@ class Sequencer
 		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
 
 		uint8_t	 	activeStep;
-		uint8_t	 	zeroBeat;		// this value needs to keep track of the beat that is the Zero sync .
+		uint8_t	 	zeroBeat;
 		uint8_t		zeroBeatIndex;
 		uint8_t		ppqPulseIndex;
-		uint8_t 	stepCount;  		// sequence length in 1/16th notes]
+		uint8_t 	stepCount;
 		uint8_t		quantizeKey;
 		uint8_t		quantizeScale;
 		uint8_t 	pattern;
 		uint8_t		channel;
 		uint8_t 	maxPulseCount;
 
+		uint8_t 	lowEndStep;
+		uint8_t 	tempVar1;  //temp vars that i have to keep around because data corruption
+		uint8_t 	tempVar2;  //temp vars that i have to keep around because data corruption
+		uint8_t 	tempVar3;  //temp vars that i have to keep around because data corruption
+
 		int16_t 	sequenceJitter[9];
-		uint16_t beatCount;
+		uint16_t  beatCount;
 
 		uint32_t 	beatLength;
-		uint32_t 	stepLength;		// length of each step in mcs
+//		uint32_t 	stepLength;
 		uint32_t 	tempoX100;
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
 		elapsedMicros pulseTimer;

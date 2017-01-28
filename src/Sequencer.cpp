@@ -28,6 +28,7 @@
 	this->calculateStepTimers();
 	this->monophonic = true;
 	this->outputControl = outputControl;
+	//this->initNewSequence(pattern, ch);
 };
 
 
@@ -232,153 +233,63 @@ void Sequencer::sequenceModeStandardStep(){
 			continue;
 		}
 
-		if (stepData[stepNum].gateType > GATETYPE_REST){
-			// if the gateType is not rest, some action should be taken
-			//uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*beatLength/(stepData[stepNum].beatDiv*4);
+		if (stepData[stepNum].gateType == GATETYPE_REST){
+		//	outputControl->setGateOutputDebug(3,HIGH);
+		//	outputControl->setGateOutputDebug(3,LOW);
+			continue;
+		}
+/*
+		uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*getStepLength(stepNum)/4;
+		uint32_t trigLength;
 
-			uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*getStepLength(stepNum)/4;
-			uint32_t trigLength;
+		if (stepData[stepNum].noteStatus == NOTPLAYING_NOTQUEUED){
+				stepData[stepNum].arpStatus = 0;
+		}
 
-			if ((int)stepData[stepNum].stepTimer > stepOffTime ) {
-			//	stepData[stepNum].arpStatus = 0;
-			}
+		if (stepData[stepNum].arpType != ARPTYPE_OFF ){
+			trigLength = stepData[stepNum].arpSpdNum*getStepLength(stepNum)/stepData[stepNum].arpSpdDen;
+		} else {
+			trigLength = stepOffTime;
+		};
 
-			if (stepData[stepNum].noteStatus == NOTPLAYING_NOTQUEUED){
-					stepData[stepNum].arpStatus = 0;
-			}
+		bool gateTrig;
+		bool gateOff;
 
-			if (stepData[stepNum].arpType != ARPTYPE_OFF ){
-				trigLength = stepData[stepNum].arpSpdNum*getStepLength(stepNum)/stepData[stepNum].arpSpdDen;
-			} else {
-				trigLength = stepOffTime;
-			};
-
-			bool gateTrig;
-			bool gateOff;
-
-			if (stepData[stepNum].gateType == 0) {
-				//no gate
-				gateTrig = false;
-				gateOff = true;
-			} else if (stepData[stepNum].gateType == 1){
-				//gate is on / retrigger
+		if (stepData[stepNum].gateType == 0) {
+			//no gate
+			gateTrig = false;
+			gateOff = true;
+		} else if (stepData[stepNum].gateType == 1){
+			//gate is on / retrigger
+			gateTrig = true;
+			gateOff = true;
+		} else if (stepData[stepNum].gateType == 2){
+			if (stepData[stepNum].arpStatus == 0){
 				gateTrig = true;
 				gateOff = true;
-			} else if (stepData[stepNum].gateType == 2){
-				if (stepData[stepNum].arpStatus == 0){
-					gateTrig = true;
-					gateOff = true;
-				} else {
-					gateTrig = false;
-				}
 			} else {
-				gateTrig = true; // for hold. logic needs to be in note Off section
-				if ((int)stepData[stepNum].stepTimer < stepOffTime - trigLength){
-					gateOff = false;
-				} else {
-					gateOff = true;
-				}
+				gateTrig = false;
 			}
-			//noInterrupts();
-	//  if (stepData[stepNum].stepTimer > stepData[stepNum].arpStatus * trigLength - 10000 ) {
-	/*		Data Needed:
-				zeroBeat;
-				zeroBeatIndex;
-				uint8_t ppqPulseIndex;
-
-
-
-				void ppqPulse(maxPulseCount){
-					 if(ppqPulseIndex >= maxPulseCount){
-						ppqPulseIndex = 0;
-						zeroBeatIndex++;
-					}
-					pulseTimer = 0;
-				};
-
-				int ppqSequenceTime(){
-					int pulseTime = beatLength / pulsecount;
-
-					Time since last beat: ppqPulseIndex * pulseTime + pulseTimer;
-					Time between ZeroBeat and most recent beat:  zeroBeatIndex * beatLength
-
-					stepCount *
-				}
-
-
-
-				if zerobeat is 5
-
-
-*/
-      if ( (int32_t)stepData[stepNum].stepTimer > (int32_t)(stepData[stepNum].arpStatus * trigLength - trigLength/10) ) {
-  			// shut off notes that should stop playing.
-				if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-		/*			Serial.println("NoteShutOff - stepTimer: " + String((int)stepData[stepNum].stepTimer) +
-					"\tcond: " + String(stepData[stepNum].arpStatus * trigLength - trigLength/10) +
-				"\tarpStatus: " + String(stepData[stepNum].arpStatus) +
-				"\tstepOffTime: " + String(stepOffTime) +
-				"\ttrigLength: " + String(trigLength)
-			);*/
-					noteShutOff(stepNum, gateOff);
-				}
-			}
-		//	interrupts();
-			if ( sequenceTimer > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
-			   if ( sequenceTimer < (stepData[stepNum].offset + stepOffTime - 500  )) {
-					 // 1000us buffer is so that a note doesn't get retriggered after it gets shut off for the last time.
-/*
-				 sequenceTimer <-- starts at the beginning of the sequence
-				 stepData[stepNum].offset <-- time index when step should start. offset from beginning
-				 stepData[stepNum].arpStatus <-- whihc arpeggiation is being triggered
-				 stepData[stepNum].arpLength <-- stepTime
-				 stepData[stepNum].stepOffTime <-- stepTime
-				 stepData[stepNum].arpSpeed <-- stepTime
-
-				 if
-
-				 sequenceTimer >= stepData[stepNum].offset <-- first of arp begins
-
-				 */
-			/*	 Serial.println("NoteOn -> stepNum: " + String(stepNum)  +
-					 + "\tarpStatus: " + String(stepData[stepNum].arpStatus)
-					 + "\tst: " + String(sequenceTimer)
-					 + "\t1st: " + String( (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength))
-					 + "\t2nd: " + String((stepData[stepNum].offset + stepOffTime - 500 ))
-					 + "\tstTM: " + String((int)stepData[stepNum].stepTimer)
-					 + "\tstOT: " + String(stepOffTime)
-					 + "\toffst: " + String(stepData[stepNum].offset)
-					 + "\ttrigLnth: " + String(trigLength)
-					 + "\tnoteSts: " + String(stepData[stepNum].noteStatus)
-					 + "\tgateTrig" + String(gateTrig)
-					 + "\tmasterDebugCount: " + String(masterDebugCounter)
-					 );
-*/
-					noteTrigger(stepNum, gateTrig);
-
-
-		 /*
-				Serial.println("First Condition Met - stepNum: " + String(stepNum)  +
-					+ "\tarpStatus: " + String(stepData[stepNum
-				)
-					+ "\tsequenceTimer: " + String(sequenceTimer)
-					+ "\tlt: " + String(stepData[stepNum].offset + stepData[stepNum].stepOffTime)
-					+ "\tgteq: " + String(stepData[stepNum].offset + stepData[stepNum].arpStatus*stepData[stepNum].arpLength())
-					+ "\toffset: " + String(stepData[stepNum].offset)
-					+ "\tstepoff: " + String(stepData[stepNum].stepOffTime)
-					+ "\tarpLength: " + String(stepData[stepNum].arpLength())
-					+ "\tstpLength: " + String(stepLength)
-					+ "\tgateLength: " + String(stepData[stepNum].gateLength)
-					+ "\tbeatLength: " + String(beatLength)
-					+ "\tbeatDiv:" + String(stepData[stepNum].beatDiv)
-					+ "\tstepCount:" + String(stepCount)
-					+ "\ttrigLength:" + String(trigLength)
-				);
-		 */
-
+		} else {
+			gateTrig = true; // for hold. logic needs to be in note Off section
+			if ((int)stepData[stepNum].stepTimer < stepOffTime - trigLength){
+				gateOff = false;
+			} else {
+				gateOff = true;
 			}
 		}
+
+		if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
+    	if ( (int32_t)stepData[stepNum].stepTimer > (int32_t)(stepData[stepNum].arpStatus * trigLength - trigLength/10) ) {
+				noteShutOff(stepNum, gateOff);
+			}
 		}
+		if ( sequenceTimer > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
+		  if ( sequenceTimer < (stepData[stepNum].offset + stepOffTime - 500  )) {
+				noteTrigger(stepNum, gateTrig);
+			}
+		}
+		*/
 	}
 }
 

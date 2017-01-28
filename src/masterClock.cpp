@@ -79,7 +79,7 @@ if(masterDebugSwitch == HIGH){
   }
 
 	if (outputControl->clockOutputTimer > 2) {
-		outputControl->setClockOutput(LOW);
+//		outputControl->setClockOutput(LOW);
 	}
   wasPlaying = playing;
   //lastTimer = loopTimer;

@@ -16,7 +16,7 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 250
+#define kMasterClockInterval 750
 #define kMidiClockInterval  100
 #define kCacheClockInterval 10000
 #define kMosiPin 11

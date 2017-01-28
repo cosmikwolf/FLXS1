@@ -42,9 +42,9 @@ void FlashMemory::wipeEEPROM(){
 
 void FlashMemory::initializeCache(){
   char *cacheFileName = (char *) malloc(sizeof(char) * 12);
-  strcpy(cacheFileName, "cache.txt");
+  cacheFileName = strdup( "cache.txt");
   char* fileName = (char *) malloc(sizeof(char) * 12);
-  strcpy(fileName, "data.txt");
+  fileName =strdup("data.txt");
 
   if (!spiFlash->exists(cacheFileName)) {
     Serial.println("Creating Cache File: " + String(cacheFileName) + "\tsize: " + String(FLASHFILESIZE));
@@ -150,7 +150,7 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   setCacheStatus(cacheOffset, selectedCacheIndex, CACHE_SET);
 
   char* cacheFileName = (char *) malloc(sizeof(char) * 12);
-  strcpy(cacheFileName, "cache.txt");
+  cacheFileName = strdup("cache.txt");
 
   char * fileBuffer = (char*)malloc(SAVEBLOCKSIZE);
   bool validation = 0;
@@ -251,8 +251,8 @@ void FlashMemory::cacheWriteLoop(){
         // Serial.println("Running Cache Write Loop:\t" + String(cacheNum) + "\tch: " + String(channel) +"\tpa: "+ String(getCachePattern(cacheOffset, cacheNum)) + "\tstatus: " + String(getCacheStatus(cacheOffset, cacheNum)) + "\tms: " + String(millis()) );
         char* fileName = (char *) malloc(sizeof(char) * 12);
         char* cacheFileName = (char *) malloc(sizeof(char) * 12);
-        strcpy(cacheFileName, "cache.txt");
-        strcpy(fileName, "data.txt");
+        cacheFileName = strdup("cache.txt");
+        fileName = strdup("data.txt");
 
         switch (getCacheStatus(cacheOffset, cacheNum) ){
 
@@ -392,7 +392,7 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
       char* fileName = (char *) malloc(sizeof(char) * 12);
 
       //strcpy(fileName, String("p" + String(pattern) + ".txt").c_str());
-      strcpy(fileName, String("data.txt").c_str());
+      fileName = strdup(String("data.txt").c_str());
       Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE " + String(fileName) + " LOAD START *&*&*&*&*&*&*&*&*&");
 
 

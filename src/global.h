@@ -96,7 +96,6 @@
 #define MIDI_CONTINE   251
 #define MIDI_STOP   252
 
-
 //these 12 bit INTs define chromatic scales
 //the bit position indicates scale degree
 
@@ -166,9 +165,9 @@ extern boolean firstRun;
 extern boolean eraseAllFlag;
 
 extern uint16_t calibrationBuffer;
-extern uint16_t  dacCalibration[16];
-extern uint16_t  cvInputRaw[4];
-extern uint8_t			gateInputRaw[4];
+extern uint16_t dacCalibration[16];
+extern uint16_t cvInputRaw[4];
+extern uint8_t	gateInputRaw[4];
 
 
 void debug(const char* text);

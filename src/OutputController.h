@@ -34,6 +34,8 @@ public:
   void lfoUpdate(uint8_t channel);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
+  void setGateOutputDebug(uint8_t index, bool value);
+
   uint8_t analogInputTranspose(uint8_t note);
 
   void dacTestLoop();
