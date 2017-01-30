@@ -68,6 +68,7 @@ void FlashMemory::initializeCache(){
   Serial.println("*&^%*&^%*&^% Cache Offset:\t" + String(cacheOffset));
   Serial.println("*&^%*&^%*&^% new Cache Offset:\t" + String(newCacheOffset));
   delay(500);
+
   for(int i=0; i<CACHE_COUNT; i++){
     if (getCacheStatus(cacheOffset, i) != CACHE_READY){
       //copy any cache info over if cache still needs to be written
@@ -513,6 +514,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
 }
 
 void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
+  /*
   for (int i = 0; i<CACHE_COUNT; i++){
     while( getCachePattern(cacheOffset, i) == pattern && getCacheStatus(cacheOffset, i) != 0 ) {
       Serial.println("Delaying because pattern " + String(pattern) + " has pending save operation");
@@ -520,7 +522,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
       delay(500);
     }
   }
-
+*/
   Serial.println("[[-]]><{{{--}}}><[[-]] LOADING PATTERN: " + String(pattern) + " [[-]]><{{{--}}}><[[-]]");
 //  printPattern();
 

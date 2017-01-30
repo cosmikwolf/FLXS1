@@ -10,7 +10,7 @@
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
-
+#define FRAMES_PER_BEAT  1048576
 //Sequencer::Sequencer() {
 //};
 
@@ -41,7 +41,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->quantizeScale = 0;
 	this->pattern = pattern;
 	this->channel = ch;
-
+	this->avgPulseLength = 20000;
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
 		this->stepData[n].pitch[0]   = 24;
 		for (int i=1; i<4; i++){
@@ -111,55 +111,91 @@ void Sequencer::clockStart(elapsedMicros startTime){
 };
 
 void Sequencer::beatPulse(uint32_t beatLength){
-	// this is sent every 24 pulses received from midi clock
-	// and also when a play or continue command is received.
-	this->beatLength = beatLength;
-	if(playing){
-		incrementActiveStep();
-	}
-	if (beatPulseResyncFlag == true){
-		activeStep = 0;
-		sequenceTimer = 0;
-		beatPulseResyncFlag = false;
-
-		if(channel == 0){
-			Serial.println("---***---***---***---*** resetting sequence timer! finalval:"  + String(sequenceTimer) + "\tbeatLength: " + String(beatLength) + "\t***---***---***---***---");
-		}
-	}
-	calculateStepTimers();
-
-	if(firstBeat){
-		sequenceTimer = 0;
-		activeStep = 0;
-		zeroBeat = 0;
-		firstBeat = false;
-
-		for (int stepNum = 0; stepNum < stepCount; stepNum++){
-			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
-			stepData[stepNum].arpStatus = 0;
-		}
-		Serial.println("FIRST BEATPULSE!");
-	}
-
 
 };
 
 void Sequencer::runSequence(){
 //	clearNoteData(noteData);
 	incrementActiveStep();
-//	calculateStepTimers();
 	sequenceModeStandardStep();
+}
+
+void Sequencer::ppqPulse(uint8_t maxPulseCount){
+	this->maxPulseCount = maxPulseCount;
+	framesPerPulse = FRAMES_PER_BEAT / maxPulseCount;
+	ppqPulseIndex = (ppqPulseIndex + 1) % maxPulseCount;
+
+	if (pulseTimer > 50 * avgPulseLength){
+		//pulse has been stopped. simply reset pulseTimer. do not modify avgPulseLength
+	//	ppqPulseIndex = 0;
+	} else {
+	//	avgPulseLength = (avgPulseLength * 2 + (int)pulseTimer ) / 3;
+	}
+	avgPulseLength = (avgPulseLength * 2 + (int)pulseTimer ) / 3;
+
+	if (ppqPulseIndex == 0){
+		beatsSinceZero++;
+		beatsSinceZero = beatsSinceZero % stepCount; //resync at the zero point, which is stepCounts beats from the start.
+		if (beatsSinceZero == 0){
+			zeroSequenceCount = 0;
+		}
+	}
+
+	if(firstBeat){
+		zeroSequenceCount = 0;
+		activeStep = 0;
+		zeroBeat = 0;
+		firstBeat = false;
+		ppqPulseIndex = 0;
+		beatsSinceZero = 0;
+		for (int stepNum = 0; stepNum < stepCount; stepNum++){
+			stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
+			stepData[stepNum].arpStatus = 0;
+		}
+		//		Serial.println("FIRST PPQ PULSE-  CH: " + String(channel) + "\tavgPulseLength: " + String(avgPulseLength) + "\tpulseTimer:  " + String(pulseTimer));
+	}
+	//Serial.println("another PPQ PULSE-  CH: " + String(channel) + "\tavgPulseLength: " + String(avgPulseLength) + "\tpulseTimer:  " + String(pulseTimer));
+	pulseTimer = 0;
+
+//	calculateStepTimers();
+
+	if(channel == 0 && ppqPulseIndex == 0){
+		Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|CF: " +String(getCurrentFrame()) + "\toffset: " + String(stepData[activeStep].offset) + "\tavgPulseLength: " + String(avgPulseLength) + "\tppqPulseIndex: " + String(ppqPulseIndex) + "\tbeatsSinceZero: " + String(beatsSinceZero) + "\tzeroSequenceCount" + String(zeroSequenceCount));
+	}
+
+};
+
+uint32_t Sequencer::getCurrentFrame(){
+  uint32_t currentFrame = beatsSinceZero*FRAMES_PER_BEAT + ppqPulseIndex * framesPerPulse + (pulseTimer * framesPerPulse)/avgPulseLength;
+	uint32_t sequenceLength = calculateStepTimers();
+	if (currentFrame > sequenceLength * zeroSequenceCount){
+		if(channel ==1){
+			Serial.println("RESETTING ACTIVESTEP CF: " + String(currentFrame)  + "\tSL:" + String(sequenceLength));
+		}
+		zeroSequenceCount++;
+		activeStep = 0;
+		for (int stepNum = 0; stepNum < stepCount; stepNum++){
+			if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
+				stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
+				stepData[stepNum].arpStatus = 0;
+			}
+		}
+	}
+	currentFrame = currentFrame % sequenceLength;
+	return currentFrame;
 }
 
 uint32_t Sequencer::getStepLength(uint8_t stepNum){
 		if (stepData[stepNum].beatDiv > 0){
-			return beatLength/stepData[stepNum].beatDiv;
+			//return beatLength/stepData[stepNum].beatDiv;
+			return FRAMES_PER_BEAT / stepData[stepNum].beatDiv;
 		} else { // negative values of beatDiv allow for whole multiples of beatLength
-			return beatLength*(abs(stepData[stepNum].beatDiv)+2);
+			return FRAMES_PER_BEAT*(abs(stepData[stepNum].beatDiv)+2);
+		//	return beatLength*(abs(stepData[stepNum].beatDiv)+2);
 		}
 }
 
-void Sequencer::calculateStepTimers(){
+uint32_t Sequencer::calculateStepTimers(){
 	//stepLength = beatLength*beatCount/stepCount;
 	uint32_t accumulatedOffset = 0;
 	//beatOffset
@@ -168,58 +204,31 @@ void Sequencer::calculateStepTimers(){
 		stepData[stepNum].offset = accumulatedOffset;
 		accumulatedOffset += getStepLength(stepNum);
 	}
+	return accumulatedOffset;
 }
 
 void Sequencer::incrementActiveStep(){
-	uint32_t sequenceTimerInt = sequenceTimer;
-	uint32_t activeStepEndTime = 0;
+	calculateStepTimers();
 
-	//calculate if this step should be finished by now.
-	for (int stepNum = 0; stepNum < (activeStep+1); stepNum++ ){
-		activeStepEndTime += getStepLength(stepNum);
-	}
-
-	if(sequenceTimer > activeStepEndTime ){
+	if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
 		activeStep++;
-		zeroBeat = (zeroBeat + 1) % stepData[0].beatDiv;
+		zeroBeat++;
+		zeroBeat = zeroBeat % stepData[0].beatDiv;
 
-		if(channel == 0){
-			Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|ST: " +String(sequenceTimerInt) );
+		if(channel ==0 ){
+		//	Serial.println(" AS++" + String(activeStep) + "\tCF:" + String(getCurrentFrame())+"\toffset:" + String(stepData[activeStep].offset) + "\tSL:" + String(getStepLength(activeStep)) + "\tZB:" + String(zeroBeat) + "\tBSZ:" + String(beatsSinceZero) + "\tcalcStepTime: " + String(calculateStepTimers()));
 		}
 
-		//Serial.print("AS:" + String(activeStep) + " ");
-		if (activeStep >= stepCount) {
-			if (zeroBeat == 0){
-				beatPulseResyncFlag = true;
-			} else {
-				activeStep = 0;
-				sequenceTimer = 0;
-			}
-	//			stepData[0].noteStatus = NOTPLAYING_NOTQUEUED;
-			for (int stepNum = 0; stepNum < stepCount; stepNum++){
-				if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-					//Serial.println("resetting step num: " + String(stepNum));
-					stepData[stepNum].noteStatus = NOTPLAYING_NOTQUEUED;
-					stepData[stepNum].arpStatus = 0;
-				}
-			}
-		}
+//		if (activeStep >= stepCount) {
+		//	if (zeroBeat == 0){
+		//		beatPulseResyncFlag = true;
+		//		beatsSinceZero = 0;
+		//	}
+	//		activeStep = 0;
 
-/*
-
-0		500000   0x 						arpSpdDen = 4  activeStep = 0 0/
-4		500000 + 1xbeatLength
-8   500000 + 2xBeatLength
-12  500000 + 3x BeatLength
-
-*/
-
+	//	}
 
 	}
-
-
-	//Serial.println("ending incrementactivestep beatdiv:\t" + String(stepData[activeStep].beatDiv) + "\tendtime:\t" + String(activeStepEndTime) + "\tactivestep\t" + String(activeStep));
-
 }
 
 
@@ -238,7 +247,7 @@ void Sequencer::sequenceModeStandardStep(){
 		//	outputControl->setGateOutputDebug(3,LOW);
 			continue;
 		}
-/*
+
 		uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*getStepLength(stepNum)/4;
 		uint32_t trigLength;
 
@@ -280,16 +289,17 @@ void Sequencer::sequenceModeStandardStep(){
 		}
 
 		if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-    	if ( (int32_t)stepData[stepNum].stepTimer > (int32_t)(stepData[stepNum].arpStatus * trigLength - trigLength/10) ) {
+    	if ( getCurrentFrame() > (stepData[stepNum].arpStatus * trigLength - trigLength/10) ) {
 				noteShutOff(stepNum, gateOff);
 			}
 		}
-		if ( sequenceTimer > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
-		  if ( sequenceTimer < (stepData[stepNum].offset + stepOffTime - 500  )) {
+
+		if ( getCurrentFrame() > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
+		  if ( getCurrentFrame() < (stepData[stepNum].offset + stepOffTime - 500  )) {
 				noteTrigger(stepNum, gateTrig);
 			}
 		}
-		*/
+
 	}
 }
 

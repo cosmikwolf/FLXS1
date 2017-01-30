@@ -24,7 +24,7 @@ class Sequencer
 		void    noteTrigger(uint8_t stepNum, bool gateTrig);
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
-		void 		calculateStepTimers();
+		uint32_t 		calculateStepTimers();
 		void 		beatPulse(uint32_t beatLength);
 		void 		clockStart(elapsedMicros startTime);
 		int  		positive_modulo(int i, int n);
@@ -41,6 +41,8 @@ class Sequencer
 		void 		setBeatCount(uint16_t beatCountNew);
 
 		void 		ppqPulse(uint8_t maxPulseCount);
+		uint32_t   	getCurrentFrame();
+
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint8_t   getArpCount(uint8_t stepNum);
@@ -63,11 +65,18 @@ class Sequencer
 		uint8_t 	maxPulseCount;
 
 		uint8_t 	lowEndStep;
-		uint8_t 	tempVar1;  //temp vars that i have to keep around because data corruption
-		uint8_t 	tempVar2;  //temp vars that i have to keep around because data corruption
-		uint8_t 	tempVar3;  //temp vars that i have to keep around because data corruption
+		uint8_t 	beatsSinceZero;  //temp vars that i have to keep around because data corruption
 
-		int16_t 	sequenceJitter[9];
+		uint32_t	avgPulseLength;
+		uint32_t	framesPerPulse;
+		uint32_t	zeroBeatOffset;
+		uint8_t	  zeroSequenceCount;
+
+		uint8_t	tempVar8_1;
+		uint8_t	tempVar8_2;
+		uint8_t	tempVar8_3;
+		uint32_t	tempVar32_4;
+
 		uint16_t  beatCount;
 
 		uint32_t 	beatLength;
@@ -88,45 +97,28 @@ class Sequencer
 
 /*
 
-The Sequence is the brain of the AFX-01
+The Sequence is the brain of the FLXS1
 
 All musical logic is set here.
 
-Each sequence at its base is just a set of numbers, stored in a few arrays.
-The index of the array equates to the step number of the note value.
-
-At every interval of the midi engine,
+At every interval of the clock source,
 each sequencer object should be polled
 to identify what, if any, notes should
-be played, and should have already played.
+be played over the next clock interval,
+at the current tempo, and which should
+be turned off.
 
-Each sequence can be played differently.
+An internal clock is kept, at 1024 frames per step.
+at 64 steps, thats 65536 frames per max length sequence.
+Whenever the internal clock is compared to the system clock,
+it is compared to a timer that was set to 0 at the last time
+the clock pulse was received plus the average .
 
-HOW THIS SHOULD BE RUN:
 
-noteToPlay(time) should be called very frequently
-	it should check to see what note should have played between lastRun and now
 
-There is basic linear sequencing. This has a few attributes:
-	Step Length:			1/32 notes - 1 whole note
-	Number of steps:	1 - 128
-	Retrigger step: 	0  - Last
 
-Each step has various attributes:
-	Step Type:
-		Sequence Trigger Type:
-			Sequence number: 	Int
-			Repeat:						boolean
-		Note Trigger Type:
 
-	Pitch 1: note value
-	Pitch 2: note value
-	Pitch 3: note value
-	Velocity: 0 - 127
-	¬µ timing:	-1000ms - 1000ms micro timing adjustments
-	Note Length: 1 - max steps in sequence:
-
-There are some modifications that are distructive changes to the sequence itself:
+future ideas:
 
 All generators share thes attributes:
 		High Note:						highest note for generation

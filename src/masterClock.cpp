@@ -26,9 +26,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 }
 
 void MasterClock::masterClockFunc(void){
-	outputControl->setClockOutput(HIGH);
 
-  elapsedMicros masterClockDebugTimer = 0;
 
 //  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 //  timerAvg = (lastTimer + 9*timerAvg) /10;
@@ -37,14 +35,9 @@ void MasterClock::masterClockFunc(void){
 //  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
 //  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
 //  lastAvgInterval = avgInterval;
-if(masterDebugSwitch == HIGH){
-	Serial.println("MASTERDEBUG HIGH!");
-}
-	masterDebugSwitch = HIGH;
-
-	masterDebugCounter++;
 
 //	midiControl->midiClockSyncFunc(serialMidi);
+outputControl->setClockOutput(HIGH);
 
   if(playing){
 		switch(clockMode){
@@ -82,9 +75,10 @@ if(masterDebugSwitch == HIGH){
 //		outputControl->setClockOutput(LOW);
 	}
   wasPlaying = playing;
-  //lastTimer = loopTimer;
-	masterDebugSwitch = LOW;
+
 	outputControl->setClockOutput(LOW);
+
+  //lastTimer = loopTimer;
 /*
   masterClockDebugValue = ((int)masterClockDebugTimer + masterClockDebugValue*9)/10 ;
 	if ( (int)masterClockDebugTimer > masterClockDebugHigh){
@@ -114,6 +108,7 @@ void MasterClock::checkGateClock(){
 }
 
 void MasterClock::externalClockTick(uint8_t gateNum){
+
 	checkGateClock();
 
 	if (gateTrig[gateNum]){
@@ -185,7 +180,7 @@ void MasterClock::internalClockTick(){
  		//		noteData[i].noteOnArray[n] = NULL;
  		 }
  	 }
-		outputControl->setClockOutput(HIGH);
+		//outputControl->setClockOutput(HIGH);
 
     for (int i=0; i< SEQUENCECOUNT; i++){
     sequenceArray[i].clockStart(startTime);
@@ -202,7 +197,7 @@ void MasterClock::internalClockTick(){
 			sequenceArray[i].beatPulse(beatLength);
       sequenceArray[i].runSequence();
     }
-		outputControl->setClockOutput(HIGH);
+	//	outputControl->setClockOutput(HIGH);
     internalClockTimer = 0;
 
   }  else {

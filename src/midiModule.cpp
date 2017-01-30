@@ -62,9 +62,7 @@ void MidiModule::midiClockPulseHandler(){
       Serial.println("pulse Timer exceeded timeout: " + String(pulseTimer));
     }
     avgPulseTimer = (avgPulseTimer*9 + (int)pulseTimer)/10;
-
     pulseTimer = 0; // pulse timer needs to be reset after beatLength calculations
-
     // Keep track of how many midi clock pulses have been received since the last beat -> 1 beat = 24 pulses
     masterPulseCount = (masterPulseCount + 1) % MIDI_PULSE_COUNT;
 
@@ -77,7 +75,6 @@ void MidiModule::midiClockPulseHandler(){
         masterTempoTimer = 0;
         for (int i=0; i< SEQUENCECOUNT; i++){
           sequenceArray[i].clockStart(startTime);
-          sequenceArray[i].beatPulse(beatLength);
         }
     } else {
 
@@ -87,23 +84,17 @@ void MidiModule::midiClockPulseHandler(){
         beatLength = (beatLength+ masterTempoTimer)/2;
         masterTempoTimer = 0;
 
-        Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength) ) + "\tAvgPulseTimer: " + String(avgPulseTimer) );
+    //    Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength) ) + "\tAvgPulseTimer: " + String(avgPulseTimer) );
 
         if (queuePattern != currentPattern) {
           //changePattern(queuePattern, true, true);
         }
-        for (int i=0; i< SEQUENCECOUNT; i++){
-          sequenceArray[i].beatPulse(beatLength);
-        }
 
       }
     }
-
-    if (playing == 1){
-      for (int i=0; i< SEQUENCECOUNT; i++){
-        //sequenceArray[i].ppqPulse(MIDI_PULSE_COUNT);
-      }
-
+    for (int i=0; i< SEQUENCECOUNT; i++){
+      sequenceArray[i].ppqPulse(MIDI_PULSE_COUNT);
     }
+
 //    Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\ttempotimer: " + String(masterTempoTimer) + "\tbeatLength: " + String(beatLength) + "\tbeatPulseIndex: " + String(beatPulseIndex));
 }
