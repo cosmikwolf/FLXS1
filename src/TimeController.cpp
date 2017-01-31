@@ -32,8 +32,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	ledArray.initialize(sequencerArray);
 
 	clockMaster.initialize(&outputControl, sequencerArray, serialMidi, midiControl);
-	saveFile.initialize(sequencerArray, &SerialFlash, adc);
 
+	saveFile.initialize(sequencerArray, &SerialFlash, adc);
 
 	if(eraseAllFlag){
     Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
@@ -71,6 +71,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   //  changeState(CHANNEL_PITCH_MODE);
 
   }
+
+//	saveFile.fileSizeTest();
 
 	saveFile.initializeCache();
 

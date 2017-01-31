@@ -15,7 +15,7 @@
 #define READ_JSON_ERROR          2
 #define WINBOND_CS_PIN           22
 #define USE_SPI_FLASH            1
-#define FLASHFILESIZE            262144
+#define FLASHFILESIZE            65536
 #define SAVEBLOCKSIZE            4096
 #define CACHE_WRITE_DELAY        500
 #define AWAITING_FILE_ERASURE    0
@@ -46,6 +46,7 @@ public:
   void printPattern();
   void initializeCache();
   int  findFreeCache();
+  void fileSizeTest();
 
   void setCacheStatus(uint16_t cacheOffset, uint8_t cacheIndex, uint8_t status);
   void setCacheChannel(uint16_t cacheOffset, uint8_t cacheIndex, uint8_t channel);
@@ -61,6 +62,7 @@ public:
   void wipeEEPROM();
 
   void cacheWriteLoop();
+
   void listFiles();
   void saveSequenceJSON(uint8_t channel, uint8_t pattern);
   int  readSequenceJSON(uint8_t channel, uint8_t pattern);

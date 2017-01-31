@@ -30,7 +30,7 @@
 
 #define CSASSERT()  DIRECT_WRITE_LOW(cspin_basereg, cspin_bitmask)
 #define CSRELEASE() DIRECT_WRITE_HIGH(cspin_basereg, cspin_bitmask)
-#define SPICONFIG   SPISettings(96000000, MSBFIRST, SPI_MODE0)
+#define SPICONFIG   SPISettings(104000000, MSBFIRST, SPI_MODE0)
 
 uint16_t SerialFlashChip::dirindex = 0;
 uint8_t SerialFlashChip::flags = 0;
