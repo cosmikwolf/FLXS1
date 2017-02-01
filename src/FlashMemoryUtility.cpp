@@ -231,6 +231,97 @@ void FlashMemory::wipeEEPROM(){
 }
 
 
+void FlashMemory::deleteTest() {
+
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  elapsedMicros tempTimer;
+  Serial.println("****^*^^^*****^^*^*^*^^** BEGINNING DELETE TEST, LISTING FILES: ***^^*^*^^*^^*^*^**^*^^**^*^*");
+
+    spiFlash->opendir();
+    while (1) {
+      char filename[64];
+      uint32_t filesize;
+
+      if (spiFlash->readdir(filename, sizeof(filename), filesize)) {
+        Serial.print("  ");
+        Serial.print(filename);
+        for (int i=0; i < (20 - strlen(filename)); i++) {
+          Serial.print(" ");
+        }
+        Serial.print("  ");
+        Serial.print(filesize);
+        Serial.print(" bytes");
+        Serial.println();
+      } else {
+        break; // no more files
+      }
+    }
+    delay(1000);
+    Serial.println("****^*^^^*****^^*^*^*^^** BEGINNING DELETE TEST, LISTING FILES: ***^^*^*^^*^^*^*^**^*^^**^*^*");
+
+  fileName = strdup("testFile" );
+  if (!spiFlash->exists(fileName)) {
+    Serial.println("Creating Test File: " + String(fileName) + "\tsize: " + String(FLASHFILESIZE));
+    spiFlash->createErasable(fileName, FLASHFILESIZE);
+  }
+
+  while(!spiFlash->ready() ){
+    Serial.println("waiting for flash to be ready...");
+    delay(500);
+  }
+
+  file = spiFlash->open(fileName);
+  if (file){
+    file.seek(0);
+    Serial.println("About to erase 4k");
+    tempTimer = 0;
+    file.erase4k();
+    while(!spiFlash->ready() ){
+    }
+    Serial.println("erase timer: " + String(tempTimer));
+    delay(1000);
+    Serial.println("About to write test file.");
+    char * fileBuffer = (char*)malloc(SAVEBLOCKSIZE);
+    fileName = strdup("0_ABCDEFGHIJKLMNOPQRSTUVWXYZ_1_ABCDEFGHIJKLMNOPQRSTUVWXYZ_2_ABCDEFGHIJKLMNOPQRSTUVWXYZ_3_ABCDEFGHIJKLMNOPQRSTUVWXYZ_4_ABCDEFGHIJKLMNOPQRSTUVWXYZ_5_ABCDEFGHIJKLMNOPQRSTUVWXYZ_6_ABCDEFGHIJKLMNOPQRSTUVWXYZ_7_ABCDEFGHIJKLMNOPQRSTUVWXYZ_8_ABCDEFGHIJKLMNOPQRSTUVWXYZ_9_ABCDEFGHIJKLMNOPQRSTUVWXYZ_10_ABCDEFGHIJKLMNOPQRSTUVWXYZ_11_ABCDEFGHIJKLMNOPQRSTUVWXYZ_12_ABCDEFGHIJKLMNOPQRSTUVWXYZ_13_ABCDEFGHIJKLMNOPQRSTUVWXYZ_14_ABCDEFGHIJKLMNOPQRSTUVWXYZ_15_ABCDEFGHIJKLMNOPQRSTUVWXYZ_16");
+    elapsedMicros tempTimer = 0;
+    file.write(fileBuffer,SAVEBLOCKSIZE);
+
+    while(!spiFlash->ready() ){
+    }
+    Serial.println("File written, about to erase 4k then immediately reset chip.  Write timer: " + String(tempTimer));
+
+
+    file.seek(0);
+    Serial.println("About to erase 4k");
+    tempTimer = 0;
+    file.erase4k();
+
+    Serial.println( "timer before reset: " + String(tempTimer) );
+    spiFlash->reset();
+    Serial.println( "timer after reset: " + String(tempTimer) );
+    file.seek(0);
+
+    for(int i=0; i<64; i++){
+      file.seek(SAVEBLOCKSIZE*i);
+      file.read(fileBuffer, SAVEBLOCKSIZE);
+      fileBuffer[SAVEBLOCKSIZE] = '\0';               // Add the terminating null char.
+      Serial.println(String(i) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
+      free(fileBuffer);
+    }
+
+    free(fileBuffer);
+  } else {
+    Serial.print("unable to open file: "  + String(fileName));
+  }
+  file.close();
+  spiFlashBusy = false;
+
+  free(fileName);
+
+
+}
+
+
 void FlashMemory::fileSizeTest(){
 
   uint16_t maxFileLimit = 1024;

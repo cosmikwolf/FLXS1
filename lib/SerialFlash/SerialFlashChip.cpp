@@ -469,6 +469,18 @@ void SerialFlashChip::wakeup()
 	CSRELEASE();
 }
 
+void SerialFlashChip::reset()
+{
+	SPIPORT.beginTransaction(SPICONFIG);
+	CSASSERT();
+	SPIPORT.transfer(0x66); // Wake up from deep power down command
+	CSRELEASE();
+	CSASSERT();
+	SPIPORT.transfer(0x99); // Wake up from deep power down command
+	CSRELEASE();
+	SPIPORT.endTransaction();
+}
+
 void SerialFlashChip::readID(uint8_t *buf)
 {
 	if (busy) wait();

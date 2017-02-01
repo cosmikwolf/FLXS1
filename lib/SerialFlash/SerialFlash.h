@@ -42,6 +42,7 @@ public:
 	static uint32_t blockSize();
 	static void sleep();
 	static void wakeup();
+	static void reset();
 	static void readID(uint8_t *buf);
 	static void readSerialNumber(uint8_t *buf);
 	static void read(uint32_t addr, void *buf, uint32_t len);

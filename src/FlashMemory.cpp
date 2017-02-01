@@ -31,7 +31,10 @@ void FlashMemory::initialize(Sequencer *sequenceArray, SerialFlashChip *spiFlash
   Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
 }
 
-
+// BRAIN DUMP:
+// always use dedicated cache for each file save.
+// cache file contains
+//
 
 void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array

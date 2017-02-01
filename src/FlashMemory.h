@@ -47,6 +47,7 @@ public:
   void initializeCache();
   int  findFreeCache();
   void fileSizeTest();
+  void deleteTest();
 
   void setCacheStatus(uint16_t cacheOffset, uint8_t cacheIndex, uint8_t status);
   void setCacheChannel(uint16_t cacheOffset, uint8_t cacheIndex, uint8_t channel);
