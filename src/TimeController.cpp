@@ -55,9 +55,9 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
       while(saveFile.cacheWriteSwitch){
         saveFile.cacheWriteLoop();
       //  Serial.print(".");
-//        delay(10);
+      //  delay(10);
       };
-    //  Serial.println(" ");
+      //  Serial.println(" ");
       Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
       delay(500);
     }
@@ -73,10 +73,14 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   }
 
 //	saveFile.fileSizeTest();
+//	saveFile.deleteSaveFile();
+	//saveFile.wipeEEPROM();
+saveFile.loadPattern(1, 0b1111);
+	saveFile.deleteTest();
 
-	saveFile.initializeCache();
+//	saveFile.initializeCache();
 
-	saveFile.loadPattern(0, 0b1111);
+//
 
 //	saveFile.listFiles();
 //

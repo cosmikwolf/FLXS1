@@ -9,6 +9,7 @@
 #include <EEPROM.h>
 #include <string>
 #include <ADC.h>
+#include <MD5.h>
 
 #define FILE_EXISTS              0
 #define SAVEFILE_DOES_NOT_EXIST  1

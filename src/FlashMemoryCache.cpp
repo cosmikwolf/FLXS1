@@ -141,8 +141,9 @@ void FlashMemory::cacheWriteLoop(){
               file.close();
               spiFlashBusy = false;
             }
-
           break;
+
+
           case CACHE_WRITING: //clear the file where cache will be written to
             if(spiFlashBusy){break;};
             if (spiFlash->ready()){

@@ -37,7 +37,7 @@ void MasterClock::masterClockFunc(void){
 //  lastAvgInterval = avgInterval;
 
 //	midiControl->midiClockSyncFunc(serialMidi);
-outputControl->setClockOutput(HIGH);
+	outputControl->setClockOutput(HIGH);
 
   if(playing){
 		switch(clockMode){
@@ -93,7 +93,6 @@ outputControl->setClockOutput(HIGH);
 }
 
 bool MasterClock::gateTrigger(uint8_t gateNum){
-
 }
 
 void MasterClock::checkGateClock(){

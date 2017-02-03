@@ -236,7 +236,7 @@ void FlashMemory::deleteTest() {
   char* fileName = (char *) malloc(sizeof(char) * 12);
   elapsedMicros tempTimer;
   Serial.println("****^*^^^*****^^*^*^*^^** BEGINNING DELETE TEST, LISTING FILES: ***^^*^*^^*^^*^*^**^*^^**^*^*");
-
+  delay(1000);
     spiFlash->opendir();
     while (1) {
       char filename[64];
@@ -274,42 +274,105 @@ void FlashMemory::deleteTest() {
   if (file){
     file.seek(0);
     Serial.println("About to erase 4k");
+    while(!spiFlash->ready() ){
+    }
+
     tempTimer = 0;
     file.erase4k();
     while(!spiFlash->ready() ){
     }
     Serial.println("erase timer: " + String(tempTimer));
-    delay(1000);
+    delay(500);
     Serial.println("About to write test file.");
     char * fileBuffer = (char*)malloc(SAVEBLOCKSIZE);
-    fileName = strdup("0_ABCDEFGHIJKLMNOPQRSTUVWXYZ_1_ABCDEFGHIJKLMNOPQRSTUVWXYZ_2_ABCDEFGHIJKLMNOPQRSTUVWXYZ_3_ABCDEFGHIJKLMNOPQRSTUVWXYZ_4_ABCDEFGHIJKLMNOPQRSTUVWXYZ_5_ABCDEFGHIJKLMNOPQRSTUVWXYZ_6_ABCDEFGHIJKLMNOPQRSTUVWXYZ_7_ABCDEFGHIJKLMNOPQRSTUVWXYZ_8_ABCDEFGHIJKLMNOPQRSTUVWXYZ_9_ABCDEFGHIJKLMNOPQRSTUVWXYZ_10_ABCDEFGHIJKLMNOPQRSTUVWXYZ_11_ABCDEFGHIJKLMNOPQRSTUVWXYZ_12_ABCDEFGHIJKLMNOPQRSTUVWXYZ_13_ABCDEFGHIJKLMNOPQRSTUVWXYZ_14_ABCDEFGHIJKLMNOPQRSTUVWXYZ_15_ABCDEFGHIJKLMNOPQRSTUVWXYZ_16");
+    for (int i=0; i < 4096; i++){
+      fileBuffer[i] = 'Q';
+    }
+    free(fileBuffer);
+    file.write(fileBuffer,SAVEBLOCKSIZE);
+    serialize(fileBuffer,  0, 1);
+
+  //  Serial.println("FileBufferToWrite: " + String(fileBuffer));                // Print the file to the serial monitor.
+
     elapsedMicros tempTimer = 0;
     file.write(fileBuffer,SAVEBLOCKSIZE);
+    free(fileBuffer);
+
+    for (int i=0; i < 4096; i++){
+      fileBuffer[i] = 'Z';
+    }
+    file.write(fileBuffer,SAVEBLOCKSIZE);
+    free(fileBuffer);
+
+    Serial.println("written ------- timer: " + String(tempTimer));                // Print the file to the serial monitor.
+
+    delay(500);
+
+
+    for(int i=0; i<33; i++){
+      file.seek(128*i);
+      file.read(fileBuffer, 128);
+      fileBuffer[128] = '\0';               // Add the terminating null char.
+      Serial.println(String(i) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
+      free(fileBuffer);
+    }
+
+    file.seek(0);
+    file.read(fileBuffer, 4096);
+    tempTimer = 0;
+
+    unsigned char* hash=MD5::make_hash(fileBuffer);
+    free(fileBuffer);
+    //generate the digest (hex encoding) of our hash
+    char *md5str = MD5::make_digest(hash, 16);
+    free(hash);
+    //print it on our serial monitor
+    Serial.print("MD5 timer: " + String(tempTimer) + "\t\tHash: ");
+    Serial.println(md5str);
+    //Give the Memory back to the System if you run the md5 Hash generation in a loop
+    free(md5str);
+
+    delay(500);
 
     while(!spiFlash->ready() ){
     }
     Serial.println("File written, about to erase 4k then immediately reset chip.  Write timer: " + String(tempTimer));
-
+    delay(500);
 
     file.seek(0);
     Serial.println("About to erase 4k");
     tempTimer = 0;
     file.erase4k();
+    delayMicroseconds(10);
 
     Serial.println( "timer before reset: " + String(tempTimer) );
     spiFlash->reset();
     Serial.println( "timer after reset: " + String(tempTimer) );
     file.seek(0);
 
-    for(int i=0; i<64; i++){
-      file.seek(SAVEBLOCKSIZE*i);
-      file.read(fileBuffer, SAVEBLOCKSIZE);
-      fileBuffer[SAVEBLOCKSIZE] = '\0';               // Add the terminating null char.
+    delay(500);
+    for(int i=0; i<33; i++){
+      file.seek(128*i);
+      file.read(fileBuffer, 128);
+      fileBuffer[128] = '\0';               // Add the terminating null char.
       Serial.println(String(i) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
       free(fileBuffer);
     }
+    file.seek(0);
+    file.read(fileBuffer, 4096);
+    tempTimer = 0;
 
+    hash=MD5::make_hash(fileBuffer);
+    //generate the digest (hex encoding) of our hash
+    md5str = MD5::make_digest(hash, 16);
     free(fileBuffer);
+    free(hash);
+    //print it on our serial monitor
+    Serial.print("MD5 timer: " + String(tempTimer) + "\t\tHash: ");
+    Serial.println(md5str);
+    //Give the Memory back to the System if you run the md5 Hash generation in a loop
+    free(md5str);
+
   } else {
     Serial.print("unable to open file: "  + String(fileName));
   }
