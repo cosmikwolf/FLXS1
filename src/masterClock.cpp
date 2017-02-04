@@ -37,7 +37,6 @@ void MasterClock::masterClockFunc(void){
 //  lastAvgInterval = avgInterval;
 
 //	midiControl->midiClockSyncFunc(serialMidi);
-	outputControl->setClockOutput(HIGH);
 
   if(playing){
 		switch(clockMode){
@@ -76,7 +75,6 @@ void MasterClock::masterClockFunc(void){
 	}
   wasPlaying = playing;
 
-	outputControl->setClockOutput(LOW);
 
   //lastTimer = loopTimer;
 /*

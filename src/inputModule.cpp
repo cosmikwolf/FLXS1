@@ -214,9 +214,10 @@ void InputModule::globalMenuHandler(){
     Serial.println("DELETING ALL SAVE FILES");
   //  saveFile->listFiles();
     delay(1000);
-    saveFile->deleteSaveFile();
-    saveFile->wipeEEPROM();
+  //  saveFile->wipeEEPROM();
     saveFile->initializeCache();
+    saveFile->eraseSaveFile();
+
     for(int pattern=0; pattern < 16; pattern++){
       Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
 
@@ -230,10 +231,8 @@ void InputModule::globalMenuHandler(){
       Serial.println("json sequence saved");
       while(saveFile->cacheWriteSwitch){
         saveFile->cacheWriteLoop();
-      //  Serial.print(".");
-//        delay(10);
-      };
-    //  Serial.println(" ");
+
+      }
       Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
       delay(500);
     }
@@ -241,7 +240,7 @@ void InputModule::globalMenuHandler(){
     while(saveFile->cacheWriteSwitch){
       saveFile->cacheWriteLoop();
     }
-    delay(1000);
+    delay(500);
     saveFile->loadPattern(0, 0b1111);
     saveFile->listFiles();
     changeState(CHANNEL_PITCH_MODE);

@@ -33,13 +33,12 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	clockMaster.initialize(&outputControl, sequencerArray, serialMidi, midiControl);
 
-	saveFile.initialize(sequencerArray, &SerialFlash, adc);
+	saveFile.initialize(&outputControl, sequencerArray, &SerialFlash, adc);
 
 	if(eraseAllFlag){
     Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
-    saveFile.deleteSaveFile();
-    saveFile.wipeEEPROM();
-		saveFile.initializeCache();
+    saveFile.formatChip();
+    saveFile.initializeCache();
 
     for(int pattern=0; pattern < 16; pattern++){
       Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
@@ -75,10 +74,10 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 //	saveFile.fileSizeTest();
 //	saveFile.deleteSaveFile();
 	//saveFile.wipeEEPROM();
-saveFile.loadPattern(1, 0b1111);
-	saveFile.deleteTest();
+	//saveFile.deleteTest();
 
-//	saveFile.initializeCache();
+	saveFile.initializeCache();
+	saveFile.loadPattern(0, 0b1111);
 
 //
 
@@ -111,13 +110,11 @@ void TimeController::runLoopHandler() {
 	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
 	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch){
-
 		digitalWriteFast(DEBUG_PIN, HIGH);
 		saveFile.cacheWriteLoop();
 		digitalWriteFast(DEBUG_PIN, LOW);
 		cacheWriteTimer=0;
 		if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
-
 	}
 	//Serial.println("Cache Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
