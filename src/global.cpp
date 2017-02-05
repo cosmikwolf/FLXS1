@@ -18,8 +18,8 @@ float   frequency;
 boolean eraseAllFlag = false;
 boolean extClock = false;
 
-//uint8_t clockMode = INTERNAL_CLOCK;
-uint8_t clockMode = EXTERNAL_MIDI_CLOCK;
+uint8_t clockMode = INTERNAL_CLOCK;
+//uint8_t clockMode = EXTERNAL_MIDI_CLOCK;
 //uint8_t clockMode = EXTERNAL_CLOCK_GATE_0;
 
 boolean debugBoolean = false;
