@@ -4,10 +4,12 @@
 #include "midiModule.h"
 
 #include "global.h"
+#define INTERNAL_PPQ_COUNT 32
 
 // DAC Mapping for each channel:
 #ifndef _MasterClock_h_
 #define _MasterClock_h_
+
 
 class MasterClock {
 
@@ -29,6 +31,7 @@ public:
   bool gateTrig[4];
   bool gatePrevState[4];
   elapsedMicros pulseTimer;
+  uint32_t avgPulseTimer;
   elapsedMicros masterClockDebugTimer;
   elapsedMicros masterClockDebugTimer2;
   int masterClockDebugValue;

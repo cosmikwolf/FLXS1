@@ -25,7 +25,6 @@ void MidiModule::midiStopHandler(){
     }
   }
   playing = 0;
-
 }
 
 void MidiModule::midiNoteOffHandler(byte channel, byte note, byte velocity){
@@ -84,7 +83,7 @@ void MidiModule::midiClockPulseHandler(){
         beatLength = (beatLength+ masterTempoTimer)/2;
         masterTempoTimer = 0;
 
-    //    Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength) ) + "\tAvgPulseTimer: " + String(avgPulseTimer) );
+        //    Serial.println("masterPulseCount is 0 masterTempoTimer: " + String((int)masterTempoTimer) + "\tactiveStep: " + String(sequenceArray[0].activeStep) + "\tbeatLength:" + String(beatLength) + "\tBPIndex: " + String(masterPulseCount) + "\tTempo: " + String(int(6000000000 / beatLength) ) + "\tAvgPulseTimer: " + String(avgPulseTimer) );
 
         if (queuePattern != currentPattern) {
           //changePattern(queuePattern, true, true);

@@ -1,0 +1,164 @@
+\hypertarget{display_module_8h}{}\section{src/display\+Module.h File Reference}
+\label{display_module_8h}\index{src/display\+Module.\+h@{src/display\+Module.\+h}}
+{\ttfamily \#include $<$Arduino.\+h$>$}\newline
+{\ttfamily \#include $<$S\+P\+I.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}Sequencer.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}global.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$S\+S\+D\+\_\+13\+X\+X.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}\+\_\+fonts/unborn\+\_\+small.\+c\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}\+\_\+fonts/orbitron14.\+c\char`\"{}}\newline
+Include dependency graph for display\+Module.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{display_module_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{display_module_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_display_module}{Display\+Module}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{display_module_8h_ab2ee9bdede8e3af96ff696c7b2ba7416}{N\+A\+VY}~0x000\+F      /$\ast$   0,   0, 128 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_a417b60720dd3d179e06f7efecca21123}{D\+A\+R\+K\+G\+R\+E\+EN}~0x03\+E0      /$\ast$   0, 128,   0 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_a15c55ca6a5cd0dc32804985d35dd7459}{D\+A\+R\+K\+C\+Y\+AN}~0x03\+E\+F      /$\ast$   0, 128, 128 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_acb94f6551a49a0687321b68cc5ff5ae7}{M\+A\+R\+O\+ON}~0x7800      /$\ast$ 128,   0,   0 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_a0bb0b009e7a7390473ace4d98bd843c0}{P\+U\+R\+P\+LE}~0x780\+F      /$\ast$ 128,   0, 128 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_a07fc0f45feae04b5da68627d5cf3ac62}{O\+L\+I\+VE}~0x7\+B\+E0      /$\ast$ 128, 128,   0 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_ad6f956656202c51eba717eb306602871}{L\+I\+G\+H\+T\+G\+R\+EY}~0x\+C618      /$\ast$ 192, 192, 192 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_ae275d21d0f9d8bb065e6706921c132d9}{D\+A\+R\+K\+G\+R\+EY}~0x7\+B\+E\+F      /$\ast$ 128, 128, 128 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_ac5b6e19bf06822021f35602c59658de3}{O\+R\+A\+N\+GE}~0x\+F\+D20      /$\ast$ 255, 165,   0 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_a167d9383df1bee1a1b1baef570b563bd}{G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW}~0x\+A\+F\+E5      /$\ast$ 173, 255,  47 $\ast$/
+\item 
+\#define \hyperlink{display_module_8h_ada419fe3b48fcf19daed7cc57ccf1174}{P\+I\+NK}~0x\+F81F
+\item 
+\#define \hyperlink{display_module_8h_abe1981b0fbcc50f7d519265b4be45aca}{D\+A\+R\+K\+P\+U\+R\+P\+LE}~0x48\+B3
+\item 
+\#define \hyperlink{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}~30
+\item 
+\#define \hyperlink{display_module_8h_a1dc6c4886242abf4447d0da651125d5d}{L\+C\+D\+\_\+\+DC}~10
+\item 
+\#define \hyperlink{display_module_8h_a71d24cab0e16b054de228f29139f1b79}{L\+C\+D\+\_\+\+CS}~6
+\item 
+\#define \hyperlink{display_module_8h_aec0f0ab242f1b58b1d017bc9ab4b898b}{L\+C\+D\+\_\+\+R\+ST}~9
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{display_module_8h_a15c55ca6a5cd0dc32804985d35dd7459}\label{display_module_8h_a15c55ca6a5cd0dc32804985d35dd7459}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!D\+A\+R\+K\+C\+Y\+AN@{D\+A\+R\+K\+C\+Y\+AN}}
+\index{D\+A\+R\+K\+C\+Y\+AN@{D\+A\+R\+K\+C\+Y\+AN}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+R\+K\+C\+Y\+AN}{DARKCYAN}}
+{\footnotesize\ttfamily \#define D\+A\+R\+K\+C\+Y\+AN~0x03\+E\+F      /$\ast$   0, 128, 128 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_a417b60720dd3d179e06f7efecca21123}\label{display_module_8h_a417b60720dd3d179e06f7efecca21123}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!D\+A\+R\+K\+G\+R\+E\+EN@{D\+A\+R\+K\+G\+R\+E\+EN}}
+\index{D\+A\+R\+K\+G\+R\+E\+EN@{D\+A\+R\+K\+G\+R\+E\+EN}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+R\+K\+G\+R\+E\+EN}{DARKGREEN}}
+{\footnotesize\ttfamily \#define D\+A\+R\+K\+G\+R\+E\+EN~0x03\+E0      /$\ast$   0, 128,   0 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_ae275d21d0f9d8bb065e6706921c132d9}\label{display_module_8h_ae275d21d0f9d8bb065e6706921c132d9}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!D\+A\+R\+K\+G\+R\+EY@{D\+A\+R\+K\+G\+R\+EY}}
+\index{D\+A\+R\+K\+G\+R\+EY@{D\+A\+R\+K\+G\+R\+EY}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+R\+K\+G\+R\+EY}{DARKGREY}}
+{\footnotesize\ttfamily \#define D\+A\+R\+K\+G\+R\+EY~0x7\+B\+E\+F      /$\ast$ 128, 128, 128 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_abe1981b0fbcc50f7d519265b4be45aca}\label{display_module_8h_abe1981b0fbcc50f7d519265b4be45aca}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!D\+A\+R\+K\+P\+U\+R\+P\+LE@{D\+A\+R\+K\+P\+U\+R\+P\+LE}}
+\index{D\+A\+R\+K\+P\+U\+R\+P\+LE@{D\+A\+R\+K\+P\+U\+R\+P\+LE}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+R\+K\+P\+U\+R\+P\+LE}{DARKPURPLE}}
+{\footnotesize\ttfamily \#define D\+A\+R\+K\+P\+U\+R\+P\+LE~0x48\+B3}
+
+\mbox{\Hypertarget{display_module_8h_a167d9383df1bee1a1b1baef570b563bd}\label{display_module_8h_a167d9383df1bee1a1b1baef570b563bd}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW@{G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW}}
+\index{G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW@{G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW}{GREENYELLOW}}
+{\footnotesize\ttfamily \#define G\+R\+E\+E\+N\+Y\+E\+L\+L\+OW~0x\+A\+F\+E5      /$\ast$ 173, 255,  47 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_a71d24cab0e16b054de228f29139f1b79}\label{display_module_8h_a71d24cab0e16b054de228f29139f1b79}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!L\+C\+D\+\_\+\+CS@{L\+C\+D\+\_\+\+CS}}
+\index{L\+C\+D\+\_\+\+CS@{L\+C\+D\+\_\+\+CS}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{L\+C\+D\+\_\+\+CS}{LCD\_CS}}
+{\footnotesize\ttfamily \#define L\+C\+D\+\_\+\+CS~6}
+
+\mbox{\Hypertarget{display_module_8h_a1dc6c4886242abf4447d0da651125d5d}\label{display_module_8h_a1dc6c4886242abf4447d0da651125d5d}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!L\+C\+D\+\_\+\+DC@{L\+C\+D\+\_\+\+DC}}
+\index{L\+C\+D\+\_\+\+DC@{L\+C\+D\+\_\+\+DC}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{L\+C\+D\+\_\+\+DC}{LCD\_DC}}
+{\footnotesize\ttfamily \#define L\+C\+D\+\_\+\+DC~10}
+
+\mbox{\Hypertarget{display_module_8h_aec0f0ab242f1b58b1d017bc9ab4b898b}\label{display_module_8h_aec0f0ab242f1b58b1d017bc9ab4b898b}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!L\+C\+D\+\_\+\+R\+ST@{L\+C\+D\+\_\+\+R\+ST}}
+\index{L\+C\+D\+\_\+\+R\+ST@{L\+C\+D\+\_\+\+R\+ST}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{L\+C\+D\+\_\+\+R\+ST}{LCD\_RST}}
+{\footnotesize\ttfamily \#define L\+C\+D\+\_\+\+R\+ST~9}
+
+\mbox{\Hypertarget{display_module_8h_ad6f956656202c51eba717eb306602871}\label{display_module_8h_ad6f956656202c51eba717eb306602871}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!L\+I\+G\+H\+T\+G\+R\+EY@{L\+I\+G\+H\+T\+G\+R\+EY}}
+\index{L\+I\+G\+H\+T\+G\+R\+EY@{L\+I\+G\+H\+T\+G\+R\+EY}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{L\+I\+G\+H\+T\+G\+R\+EY}{LIGHTGREY}}
+{\footnotesize\ttfamily \#define L\+I\+G\+H\+T\+G\+R\+EY~0x\+C618      /$\ast$ 192, 192, 192 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_acb94f6551a49a0687321b68cc5ff5ae7}\label{display_module_8h_acb94f6551a49a0687321b68cc5ff5ae7}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!M\+A\+R\+O\+ON@{M\+A\+R\+O\+ON}}
+\index{M\+A\+R\+O\+ON@{M\+A\+R\+O\+ON}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+R\+O\+ON}{MAROON}}
+{\footnotesize\ttfamily \#define M\+A\+R\+O\+ON~0x7800      /$\ast$ 128,   0,   0 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}\label{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS@{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}}
+\index{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS@{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}{MAX\_DISPLAY\_ELEMENTS}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS~30}
+
+\mbox{\Hypertarget{display_module_8h_ab2ee9bdede8e3af96ff696c7b2ba7416}\label{display_module_8h_ab2ee9bdede8e3af96ff696c7b2ba7416}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!N\+A\+VY@{N\+A\+VY}}
+\index{N\+A\+VY@{N\+A\+VY}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{N\+A\+VY}{NAVY}}
+{\footnotesize\ttfamily \#define N\+A\+VY~0x000\+F      /$\ast$   0,   0, 128 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_a07fc0f45feae04b5da68627d5cf3ac62}\label{display_module_8h_a07fc0f45feae04b5da68627d5cf3ac62}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!O\+L\+I\+VE@{O\+L\+I\+VE}}
+\index{O\+L\+I\+VE@{O\+L\+I\+VE}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{O\+L\+I\+VE}{OLIVE}}
+{\footnotesize\ttfamily \#define O\+L\+I\+VE~0x7\+B\+E0      /$\ast$ 128, 128,   0 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_ac5b6e19bf06822021f35602c59658de3}\label{display_module_8h_ac5b6e19bf06822021f35602c59658de3}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!O\+R\+A\+N\+GE@{O\+R\+A\+N\+GE}}
+\index{O\+R\+A\+N\+GE@{O\+R\+A\+N\+GE}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{O\+R\+A\+N\+GE}{ORANGE}}
+{\footnotesize\ttfamily \#define O\+R\+A\+N\+GE~0x\+F\+D20      /$\ast$ 255, 165,   0 $\ast$/}
+
+\mbox{\Hypertarget{display_module_8h_ada419fe3b48fcf19daed7cc57ccf1174}\label{display_module_8h_ada419fe3b48fcf19daed7cc57ccf1174}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!P\+I\+NK@{P\+I\+NK}}
+\index{P\+I\+NK@{P\+I\+NK}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{P\+I\+NK}{PINK}}
+{\footnotesize\ttfamily \#define P\+I\+NK~0x\+F81F}
+
+\mbox{\Hypertarget{display_module_8h_a0bb0b009e7a7390473ace4d98bd843c0}\label{display_module_8h_a0bb0b009e7a7390473ace4d98bd843c0}} 
+\index{display\+Module.\+h@{display\+Module.\+h}!P\+U\+R\+P\+LE@{P\+U\+R\+P\+LE}}
+\index{P\+U\+R\+P\+LE@{P\+U\+R\+P\+LE}!display\+Module.\+h@{display\+Module.\+h}}
+\subsubsection{\texorpdfstring{P\+U\+R\+P\+LE}{PURPLE}}
+{\footnotesize\ttfamily \#define P\+U\+R\+P\+LE~0x780\+F      /$\ast$ 128,   0, 128 $\ast$/}
+

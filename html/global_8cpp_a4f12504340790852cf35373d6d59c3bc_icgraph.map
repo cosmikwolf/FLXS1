@@ -1,0 +1,5 @@
+<map id="debug" name="debug">
+<area shape="rect" id="node2" href="$class_master_clock.html#a96924e6693fee4ac2f9994583d0f33ba" title="MasterClock::internalClockTick" alt="" coords="112,12,316,37"/>
+<area shape="rect" id="node3" href="$class_master_clock.html#a6d2a014da8caf9c4f39917ce4c09b83d" title="MasterClock::masterClockFunc" alt="" coords="364,12,570,37"/>
+<area shape="rect" id="node4" href="$class_time_controller.html#af3df3fed28e3d6a6a23da80b7d9e579e" title="TimeController::masterClock\lHandler" alt="" coords="618,5,808,44"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="OutputController::calibrationRoutine" name="OutputController::calibrationRoutine">
+<area shape="rect" id="node2" href="$class_input_module.html#a75dd14eb87936e206ba74ca406851201" title="InputModule::calibration\lMenuHandler" alt="" coords="241,5,404,44"/>
+<area shape="rect" id="node3" href="$class_input_module.html#ad481ab7241ffe3a168e063a5afd6d892" title="InputModule::loop" alt="" coords="452,12,579,37"/>
+<area shape="rect" id="node4" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="627,12,838,37"/>
+</map>

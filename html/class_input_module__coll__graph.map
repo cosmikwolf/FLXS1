@@ -1,0 +1,5 @@
+<map id="InputModule" name="InputModule">
+<area shape="rect" id="node2" href="$class_output_controller.html" title="OutputController" alt="" coords="5,5,124,31"/>
+<area shape="rect" id="node3" href="$class_master_clock.html" title="MasterClock" alt="" coords="157,92,253,117"/>
+<area shape="rect" id="node4" href="$class_midi_module.html" title="MidiModule" alt="" coords="163,5,252,31"/>
+</map>

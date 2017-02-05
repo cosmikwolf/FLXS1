@@ -1,0 +1,16 @@
+<map id="DisplayModule::renderOnce_StringBox" name="DisplayModule::renderOnce_StringBox">
+<area shape="rect" id="node2" href="$class_display_module.html#a61c9ecea836833a5460f2834a18eef05" title="DisplayModule::channelPitch\lMenuDisplay" alt="" coords="253,5,445,44"/>
+<area shape="rect" id="node5" href="$class_display_module.html#a5e665571a41c10190dd2015489f87f3e" title="DisplayModule::channelPitch\lMenuDisplay2" alt="" coords="253,68,445,107"/>
+<area shape="rect" id="node6" href="$class_display_module.html#afb4cbf31bb1058fdeceb3d10ae7fe3a6" title="DisplayModule::channelVelocity\lMenuDisplay" alt="" coords="245,131,454,169"/>
+<area shape="rect" id="node7" href="$class_display_module.html#a61256f4c2a099fd0b0c59a5bba277914" title="DisplayModule::channelEnvelope\lMenuDisplay" alt="" coords="240,193,458,232"/>
+<area shape="rect" id="node8" href="$class_display_module.html#a579629d520ad24f721a25b9b1340516b" title="DisplayModule::channelTuner\lDisplay" alt="" coords="251,256,448,295"/>
+<area shape="rect" id="node9" href="$class_display_module.html#ad5607972b28b5da028dda61cfe640638" title="DisplayModule::channelStep\lMenuDisplay" alt="" coords="254,319,444,357"/>
+<area shape="rect" id="node10" href="$class_display_module.html#a5082cabe11332dc4a9d0daea8a60f9dc" title="DisplayModule::globalMenu\lDisplay" alt="" coords="257,381,442,420"/>
+<area shape="rect" id="node11" href="$class_display_module.html#a3e2fc0a60ef41f41e57d463faf59bd2b" title="DisplayModule::sequenceMenu\lDisplay" alt="" coords="245,444,453,483"/>
+<area shape="rect" id="node12" href="$class_display_module.html#ac5999c2f0f4b1ecc12bafe7094c7b7d2" title="DisplayModule::tempoMenu\lDisplay" alt="" coords="256,507,442,545"/>
+<area shape="rect" id="node13" href="$class_display_module.html#a95fa96a6b2d74b8d15eeb0c71786b1b2" title="DisplayModule::patternSelect\lDisplay" alt="" coords="252,569,447,608"/>
+<area shape="rect" id="node14" href="$class_display_module.html#ae68c2f34985c276b559df3d7f4fafbbd" title="DisplayModule::calibration\lMenuDisplay" alt="" coords="261,632,438,671"/>
+<area shape="rect" id="node15" href="$class_display_module.html#a776e918a0d9f50ae079d6839524cc471" title="DisplayModule::inputDebug\lMenuDisplay" alt="" coords="257,695,441,733"/>
+<area shape="rect" id="node3" href="$class_display_module.html#ab89f4bb8387cd4a0557b23ee14133568" title="DisplayModule::displayLoop" alt="" coords="506,388,694,413"/>
+<area shape="rect" id="node4" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="742,388,953,413"/>
+</map>

@@ -1,0 +1,333 @@
+\hypertarget{class_master_clock}{}\section{Master\+Clock Class Reference}
+\label{class_master_clock}\index{Master\+Clock@{Master\+Clock}}
+
+
+{\ttfamily \#include $<$master\+Clock.\+h$>$}
+
+
+
+Collaboration diagram for Master\+Clock\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{class_master_clock__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_master_clock_aa7106b58216e1bc65dc88cdbba1d0514}{initialize} (\hyperlink{class_output_controller}{Output\+Controller} $\ast$\hyperlink{class_master_clock_a6ec5b571edf2361d6c02834dec70fc09}{output\+Control}, Sequencer $\ast$\hyperlink{class_master_clock_a5e1a8b89151a6f5698e0ee3a0923e7bb}{sequence\+Array}, midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$\hyperlink{class_master_clock_a4c93dc002c3c69bd93a4b694a9ae0834}{serial\+Midi}, \hyperlink{class_midi_module}{Midi\+Module} $\ast$\hyperlink{class_master_clock_ac38ecfe6fdbbe0d43fb7b09d32dd4999}{midi\+Control})
+\item 
+void \hyperlink{class_master_clock_a81cfc025162075b165cd8ff93da5489a}{change\+Tempo} (uint32\+\_\+t new\+Tempo\+X100)
+\item 
+void \hyperlink{class_master_clock_a6d2a014da8caf9c4f39917ce4c09b83d}{master\+Clock\+Func} ()
+\item 
+void \hyperlink{class_master_clock_a96924e6693fee4ac2f9994583d0f33ba}{internal\+Clock\+Tick} ()
+\item 
+void \hyperlink{class_master_clock_a9c19932a580f5c5797fd31a58dc1a410}{midi\+Clock\+Tick} ()
+\item 
+void \hyperlink{class_master_clock_ab64882eca80c7e2de0b9e57020661df9}{external\+Clock\+Tick} (uint8\+\_\+t gate\+Num)
+\item 
+bool \hyperlink{class_master_clock_a16c1149bcc96dbea9d57063ad7a65d17}{gate\+Trigger} (uint8\+\_\+t gate\+Num)
+\item 
+void \hyperlink{class_master_clock_a94e8a4d26a0bb028a132d7582d602f01}{check\+Gate\+Clock} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{class_master_clock_a5c77eeb804310bc0058796eeaec02bbc}{master\+Debug\+Switch}
+\item 
+bool \hyperlink{class_master_clock_afc3d54b72c3a90063691f5e171710314}{gate\+Trig} \mbox{[}4\mbox{]}
+\item 
+bool \hyperlink{class_master_clock_ae919e5bfda6905d221b2f149fd033c2d}{gate\+Prev\+State} \mbox{[}4\mbox{]}
+\item 
+elapsed\+Micros \hyperlink{class_master_clock_ad68af6405839bca474e1044548d08f48}{pulse\+Timer}
+\item 
+elapsed\+Micros \hyperlink{class_master_clock_aa512b11ce67b901db7c784ef06adab5a}{master\+Clock\+Debug\+Timer}
+\item 
+elapsed\+Micros \hyperlink{class_master_clock_a797809c2f6478b735a50e75f7704b46b}{master\+Clock\+Debug\+Timer2}
+\item 
+int \hyperlink{class_master_clock_ae3cc05875b81ac9e713fc5c7e1eb4424}{master\+Clock\+Debug\+Value}
+\item 
+int \hyperlink{class_master_clock_a79fc4a121043c27d50e624138eaa442a}{master\+Clock\+Debug\+High}
+\item 
+uint8\+\_\+t \hyperlink{class_master_clock_a0ad4b4c84d2c4edb8922b4ee35a82463}{beat\+Pulse\+Index}
+\item 
+uint8\+\_\+t \hyperlink{class_master_clock_a38515df1824a4cadd6d8a277b5792dc3}{click\+Counter}
+\item 
+boolean \hyperlink{class_master_clock_a6cf4f883b5bfe440ec16c62728d87700}{first\+Run}
+\item 
+uint8\+\_\+t \hyperlink{class_master_clock_a21dc33657b252a53f66a2550c544451d}{gate\+Map} \mbox{[}4\mbox{]}
+\item 
+uint8\+\_\+t \hyperlink{class_master_clock_a35960fd751776d935310d4d580b3647d}{dac\+Cv\+Map} \mbox{[}4\mbox{]}
+\item 
+uint8\+\_\+t \hyperlink{class_master_clock_a8b3d56a964ecdfc61f7368184713dea0}{dac\+Cc\+Map} \mbox{[}4\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_output_controller}{Output\+Controller} $\ast$ \hyperlink{class_master_clock_a6ec5b571edf2361d6c02834dec70fc09}{output\+Control}
+\item 
+Sequencer $\ast$ \hyperlink{class_master_clock_a5e1a8b89151a6f5698e0ee3a0923e7bb}{sequence\+Array}
+\item 
+midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$ \hyperlink{class_master_clock_a4c93dc002c3c69bd93a4b694a9ae0834}{serial\+Midi}
+\item 
+\hyperlink{class_midi_module}{Midi\+Module} $\ast$ \hyperlink{class_master_clock_ac38ecfe6fdbbe0d43fb7b09d32dd4999}{midi\+Control}
+\item 
+elapsed\+Millis \hyperlink{class_master_clock_a23fa94160f59287a003b39676ef7a5a8}{lfo\+Timer}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_master_clock_a81cfc025162075b165cd8ff93da5489a}\label{class_master_clock_a81cfc025162075b165cd8ff93da5489a}} 
+\index{Master\+Clock@{Master\+Clock}!change\+Tempo@{change\+Tempo}}
+\index{change\+Tempo@{change\+Tempo}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{change\+Tempo()}{changeTempo()}}
+{\footnotesize\ttfamily void Master\+Clock\+::change\+Tempo (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{new\+Tempo\+X100 }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a81cfc025162075b165cd8ff93da5489a_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_master_clock_a94e8a4d26a0bb028a132d7582d602f01}\label{class_master_clock_a94e8a4d26a0bb028a132d7582d602f01}} 
+\index{Master\+Clock@{Master\+Clock}!check\+Gate\+Clock@{check\+Gate\+Clock}}
+\index{check\+Gate\+Clock@{check\+Gate\+Clock}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{check\+Gate\+Clock()}{checkGateClock()}}
+{\footnotesize\ttfamily void Master\+Clock\+::check\+Gate\+Clock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a94e8a4d26a0bb028a132d7582d602f01_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_master_clock_ab64882eca80c7e2de0b9e57020661df9}\label{class_master_clock_ab64882eca80c7e2de0b9e57020661df9}} 
+\index{Master\+Clock@{Master\+Clock}!external\+Clock\+Tick@{external\+Clock\+Tick}}
+\index{external\+Clock\+Tick@{external\+Clock\+Tick}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{external\+Clock\+Tick()}{externalClockTick()}}
+{\footnotesize\ttfamily void Master\+Clock\+::external\+Clock\+Tick (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{gate\+Num }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_ab64882eca80c7e2de0b9e57020661df9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_ab64882eca80c7e2de0b9e57020661df9_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_master_clock_a16c1149bcc96dbea9d57063ad7a65d17}\label{class_master_clock_a16c1149bcc96dbea9d57063ad7a65d17}} 
+\index{Master\+Clock@{Master\+Clock}!gate\+Trigger@{gate\+Trigger}}
+\index{gate\+Trigger@{gate\+Trigger}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{gate\+Trigger()}{gateTrigger()}}
+{\footnotesize\ttfamily bool Master\+Clock\+::gate\+Trigger (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{gate\+Num }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_master_clock_aa7106b58216e1bc65dc88cdbba1d0514}\label{class_master_clock_aa7106b58216e1bc65dc88cdbba1d0514}} 
+\index{Master\+Clock@{Master\+Clock}!initialize@{initialize}}
+\index{initialize@{initialize}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Master\+Clock\+::initialize (\begin{DoxyParamCaption}\item[{\hyperlink{class_output_controller}{Output\+Controller} $\ast$}]{output\+Control,  }\item[{Sequencer $\ast$}]{sequence\+Array,  }\item[{midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$}]{serial\+Midi,  }\item[{\hyperlink{class_midi_module}{Midi\+Module} $\ast$}]{midi\+Control }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_aa7106b58216e1bc65dc88cdbba1d0514_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_master_clock_a96924e6693fee4ac2f9994583d0f33ba}\label{class_master_clock_a96924e6693fee4ac2f9994583d0f33ba}} 
+\index{Master\+Clock@{Master\+Clock}!internal\+Clock\+Tick@{internal\+Clock\+Tick}}
+\index{internal\+Clock\+Tick@{internal\+Clock\+Tick}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{internal\+Clock\+Tick()}{internalClockTick()}}
+{\footnotesize\ttfamily void Master\+Clock\+::internal\+Clock\+Tick (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a96924e6693fee4ac2f9994583d0f33ba_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a96924e6693fee4ac2f9994583d0f33ba_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_master_clock_a6d2a014da8caf9c4f39917ce4c09b83d}\label{class_master_clock_a6d2a014da8caf9c4f39917ce4c09b83d}} 
+\index{Master\+Clock@{Master\+Clock}!master\+Clock\+Func@{master\+Clock\+Func}}
+\index{master\+Clock\+Func@{master\+Clock\+Func}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{master\+Clock\+Func()}{masterClockFunc()}}
+{\footnotesize\ttfamily void Master\+Clock\+::master\+Clock\+Func (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a6d2a014da8caf9c4f39917ce4c09b83d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a6d2a014da8caf9c4f39917ce4c09b83d_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_master_clock_a9c19932a580f5c5797fd31a58dc1a410}\label{class_master_clock_a9c19932a580f5c5797fd31a58dc1a410}} 
+\index{Master\+Clock@{Master\+Clock}!midi\+Clock\+Tick@{midi\+Clock\+Tick}}
+\index{midi\+Clock\+Tick@{midi\+Clock\+Tick}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{midi\+Clock\+Tick()}{midiClockTick()}}
+{\footnotesize\ttfamily void Master\+Clock\+::midi\+Clock\+Tick (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_master_clock_a9c19932a580f5c5797fd31a58dc1a410_icgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_master_clock_a0ad4b4c84d2c4edb8922b4ee35a82463}\label{class_master_clock_a0ad4b4c84d2c4edb8922b4ee35a82463}} 
+\index{Master\+Clock@{Master\+Clock}!beat\+Pulse\+Index@{beat\+Pulse\+Index}}
+\index{beat\+Pulse\+Index@{beat\+Pulse\+Index}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{beat\+Pulse\+Index}{beatPulseIndex}}
+{\footnotesize\ttfamily uint8\+\_\+t Master\+Clock\+::beat\+Pulse\+Index}
+
+\mbox{\Hypertarget{class_master_clock_a38515df1824a4cadd6d8a277b5792dc3}\label{class_master_clock_a38515df1824a4cadd6d8a277b5792dc3}} 
+\index{Master\+Clock@{Master\+Clock}!click\+Counter@{click\+Counter}}
+\index{click\+Counter@{click\+Counter}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{click\+Counter}{clickCounter}}
+{\footnotesize\ttfamily uint8\+\_\+t Master\+Clock\+::click\+Counter}
+
+\mbox{\Hypertarget{class_master_clock_a8b3d56a964ecdfc61f7368184713dea0}\label{class_master_clock_a8b3d56a964ecdfc61f7368184713dea0}} 
+\index{Master\+Clock@{Master\+Clock}!dac\+Cc\+Map@{dac\+Cc\+Map}}
+\index{dac\+Cc\+Map@{dac\+Cc\+Map}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{dac\+Cc\+Map}{dacCcMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Master\+Clock\+::dac\+Cc\+Map\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_master_clock_a35960fd751776d935310d4d580b3647d}\label{class_master_clock_a35960fd751776d935310d4d580b3647d}} 
+\index{Master\+Clock@{Master\+Clock}!dac\+Cv\+Map@{dac\+Cv\+Map}}
+\index{dac\+Cv\+Map@{dac\+Cv\+Map}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{dac\+Cv\+Map}{dacCvMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Master\+Clock\+::dac\+Cv\+Map\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_master_clock_a6cf4f883b5bfe440ec16c62728d87700}\label{class_master_clock_a6cf4f883b5bfe440ec16c62728d87700}} 
+\index{Master\+Clock@{Master\+Clock}!first\+Run@{first\+Run}}
+\index{first\+Run@{first\+Run}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{first\+Run}{firstRun}}
+{\footnotesize\ttfamily boolean Master\+Clock\+::first\+Run}
+
+\mbox{\Hypertarget{class_master_clock_a21dc33657b252a53f66a2550c544451d}\label{class_master_clock_a21dc33657b252a53f66a2550c544451d}} 
+\index{Master\+Clock@{Master\+Clock}!gate\+Map@{gate\+Map}}
+\index{gate\+Map@{gate\+Map}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{gate\+Map}{gateMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Master\+Clock\+::gate\+Map\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_master_clock_ae919e5bfda6905d221b2f149fd033c2d}\label{class_master_clock_ae919e5bfda6905d221b2f149fd033c2d}} 
+\index{Master\+Clock@{Master\+Clock}!gate\+Prev\+State@{gate\+Prev\+State}}
+\index{gate\+Prev\+State@{gate\+Prev\+State}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{gate\+Prev\+State}{gatePrevState}}
+{\footnotesize\ttfamily bool Master\+Clock\+::gate\+Prev\+State\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_master_clock_afc3d54b72c3a90063691f5e171710314}\label{class_master_clock_afc3d54b72c3a90063691f5e171710314}} 
+\index{Master\+Clock@{Master\+Clock}!gate\+Trig@{gate\+Trig}}
+\index{gate\+Trig@{gate\+Trig}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{gate\+Trig}{gateTrig}}
+{\footnotesize\ttfamily bool Master\+Clock\+::gate\+Trig\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_master_clock_a23fa94160f59287a003b39676ef7a5a8}\label{class_master_clock_a23fa94160f59287a003b39676ef7a5a8}} 
+\index{Master\+Clock@{Master\+Clock}!lfo\+Timer@{lfo\+Timer}}
+\index{lfo\+Timer@{lfo\+Timer}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{lfo\+Timer}{lfoTimer}}
+{\footnotesize\ttfamily elapsed\+Millis Master\+Clock\+::lfo\+Timer\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_master_clock_a79fc4a121043c27d50e624138eaa442a}\label{class_master_clock_a79fc4a121043c27d50e624138eaa442a}} 
+\index{Master\+Clock@{Master\+Clock}!master\+Clock\+Debug\+High@{master\+Clock\+Debug\+High}}
+\index{master\+Clock\+Debug\+High@{master\+Clock\+Debug\+High}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{master\+Clock\+Debug\+High}{masterClockDebugHigh}}
+{\footnotesize\ttfamily int Master\+Clock\+::master\+Clock\+Debug\+High}
+
+\mbox{\Hypertarget{class_master_clock_aa512b11ce67b901db7c784ef06adab5a}\label{class_master_clock_aa512b11ce67b901db7c784ef06adab5a}} 
+\index{Master\+Clock@{Master\+Clock}!master\+Clock\+Debug\+Timer@{master\+Clock\+Debug\+Timer}}
+\index{master\+Clock\+Debug\+Timer@{master\+Clock\+Debug\+Timer}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{master\+Clock\+Debug\+Timer}{masterClockDebugTimer}}
+{\footnotesize\ttfamily elapsed\+Micros Master\+Clock\+::master\+Clock\+Debug\+Timer}
+
+\mbox{\Hypertarget{class_master_clock_a797809c2f6478b735a50e75f7704b46b}\label{class_master_clock_a797809c2f6478b735a50e75f7704b46b}} 
+\index{Master\+Clock@{Master\+Clock}!master\+Clock\+Debug\+Timer2@{master\+Clock\+Debug\+Timer2}}
+\index{master\+Clock\+Debug\+Timer2@{master\+Clock\+Debug\+Timer2}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{master\+Clock\+Debug\+Timer2}{masterClockDebugTimer2}}
+{\footnotesize\ttfamily elapsed\+Micros Master\+Clock\+::master\+Clock\+Debug\+Timer2}
+
+\mbox{\Hypertarget{class_master_clock_ae3cc05875b81ac9e713fc5c7e1eb4424}\label{class_master_clock_ae3cc05875b81ac9e713fc5c7e1eb4424}} 
+\index{Master\+Clock@{Master\+Clock}!master\+Clock\+Debug\+Value@{master\+Clock\+Debug\+Value}}
+\index{master\+Clock\+Debug\+Value@{master\+Clock\+Debug\+Value}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{master\+Clock\+Debug\+Value}{masterClockDebugValue}}
+{\footnotesize\ttfamily int Master\+Clock\+::master\+Clock\+Debug\+Value}
+
+\mbox{\Hypertarget{class_master_clock_a5c77eeb804310bc0058796eeaec02bbc}\label{class_master_clock_a5c77eeb804310bc0058796eeaec02bbc}} 
+\index{Master\+Clock@{Master\+Clock}!master\+Debug\+Switch@{master\+Debug\+Switch}}
+\index{master\+Debug\+Switch@{master\+Debug\+Switch}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{master\+Debug\+Switch}{masterDebugSwitch}}
+{\footnotesize\ttfamily bool Master\+Clock\+::master\+Debug\+Switch}
+
+\mbox{\Hypertarget{class_master_clock_ac38ecfe6fdbbe0d43fb7b09d32dd4999}\label{class_master_clock_ac38ecfe6fdbbe0d43fb7b09d32dd4999}} 
+\index{Master\+Clock@{Master\+Clock}!midi\+Control@{midi\+Control}}
+\index{midi\+Control@{midi\+Control}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{midi\+Control}{midiControl}}
+{\footnotesize\ttfamily \hyperlink{class_midi_module}{Midi\+Module}$\ast$ Master\+Clock\+::midi\+Control\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_master_clock_a6ec5b571edf2361d6c02834dec70fc09}\label{class_master_clock_a6ec5b571edf2361d6c02834dec70fc09}} 
+\index{Master\+Clock@{Master\+Clock}!output\+Control@{output\+Control}}
+\index{output\+Control@{output\+Control}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{output\+Control}{outputControl}}
+{\footnotesize\ttfamily \hyperlink{class_output_controller}{Output\+Controller}$\ast$ Master\+Clock\+::output\+Control\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_master_clock_ad68af6405839bca474e1044548d08f48}\label{class_master_clock_ad68af6405839bca474e1044548d08f48}} 
+\index{Master\+Clock@{Master\+Clock}!pulse\+Timer@{pulse\+Timer}}
+\index{pulse\+Timer@{pulse\+Timer}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{pulse\+Timer}{pulseTimer}}
+{\footnotesize\ttfamily elapsed\+Micros Master\+Clock\+::pulse\+Timer}
+
+\mbox{\Hypertarget{class_master_clock_a5e1a8b89151a6f5698e0ee3a0923e7bb}\label{class_master_clock_a5e1a8b89151a6f5698e0ee3a0923e7bb}} 
+\index{Master\+Clock@{Master\+Clock}!sequence\+Array@{sequence\+Array}}
+\index{sequence\+Array@{sequence\+Array}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{sequence\+Array}{sequenceArray}}
+{\footnotesize\ttfamily Sequencer$\ast$ Master\+Clock\+::sequence\+Array\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_master_clock_a4c93dc002c3c69bd93a4b694a9ae0834}\label{class_master_clock_a4c93dc002c3c69bd93a4b694a9ae0834}} 
+\index{Master\+Clock@{Master\+Clock}!serial\+Midi@{serial\+Midi}}
+\index{serial\+Midi@{serial\+Midi}!Master\+Clock@{Master\+Clock}}
+\subsubsection{\texorpdfstring{serial\+Midi}{serialMidi}}
+{\footnotesize\ttfamily midi\+::\+Midi\+Interface$<$Hardware\+Serial$>$$\ast$ Master\+Clock\+::serial\+Midi\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{master_clock_8h}{master\+Clock.\+h}\item 
+src/\hyperlink{master_clock_8cpp}{master\+Clock.\+cpp}\end{DoxyCompactItemize}

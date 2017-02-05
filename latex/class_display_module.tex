@@ -1,0 +1,581 @@
+\hypertarget{class_display_module}{}\section{Display\+Module Class Reference}
+\label{class_display_module}\index{Display\+Module@{Display\+Module}}
+
+
+{\ttfamily \#include $<$display\+Module.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_display_module_a6e39f0daba38d7d919ebece3e85c24b1}{Display\+Module} ()
+\item 
+void \hyperlink{class_display_module_a68451c130f98f5d820377e9aa15a7242}{initialize} (Sequencer $\ast$\hyperlink{class_display_module_a9eb0f63acb02bc366bdc36cf60efb799}{sequence\+Array})
+\item 
+void \hyperlink{class_display_module_ab89f4bb8387cd4a0557b23ee14133568}{display\+Loop} (uint16\+\_\+t \hyperlink{global_8h_acdfc8898c9e67fbcec81f3b04ae61bd9}{frequency})
+\item 
+void \hyperlink{class_display_module_a1e2ecbe240db8c38bea2839a76c566f0}{clear\+Display} ()
+\item 
+void \hyperlink{class_display_module_a4eb1fdb54d5ce4e0b8e460d30b443aac}{free\+Display\+Cache} ()
+\item 
+void \hyperlink{class_display_module_ac1d55595826fc36738b2d9df6be9516e}{step\+Display} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_a95fa96a6b2d74b8d15eeb0c71786b1b2}{pattern\+Select\+Display} ()
+\item 
+void \hyperlink{class_display_module_a61c9ecea836833a5460f2834a18eef05}{channel\+Pitch\+Menu\+Display} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_a5e665571a41c10190dd2015489f87f3e}{channel\+Pitch\+Menu\+Display2} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_afb4cbf31bb1058fdeceb3d10ae7fe3a6}{channel\+Velocity\+Menu\+Display} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_a61256f4c2a099fd0b0c59a5bba277914}{channel\+Envelope\+Menu\+Display} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_ad5607972b28b5da028dda61cfe640638}{channel\+Step\+Menu\+Display} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_a579629d520ad24f721a25b9b1340516b}{channel\+Tuner\+Display} (char $\ast$\hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf})
+\item 
+void \hyperlink{class_display_module_a3e2fc0a60ef41f41e57d463faf59bd2b}{sequence\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_a5082cabe11332dc4a9d0daea8a60f9dc}{global\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_ac5999c2f0f4b1ecc12bafe7094c7b7d2}{tempo\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_a38006afa64e93afb6c259b137f45bcde}{game\+Of\+Life\+Display} ()
+\item 
+void \hyperlink{class_display_module_a87e0b873a0f1fcec1bc67f2fa7c9739a}{delete\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_ab730677e34ecadf39916f9b71c2a41fe}{cleanup\+Text\+Buffers} ()
+\item 
+void \hyperlink{class_display_module_a722a8c3b1cce1c58fa7e17e2865c3e57}{timing\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_ae68c2f34985c276b559df3d7f4fafbbd}{calibration\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_a776e918a0d9f50ae079d6839524cc471}{input\+Debug\+Menu\+Display} ()
+\item 
+void \hyperlink{class_display_module_a453ceefb9e2a9a82dd7b62825cc2cac8}{render\+Once\+\_\+\+String\+Box} (uint8\+\_\+t index, uint8\+\_\+t \hyperlink{class_display_module_a33ee7436481d6285fb6c81166711fbce}{highlight}, uint8\+\_\+t previous\+Highlight, int16\+\_\+t x, int16\+\_\+t y, int16\+\_\+t w, int16\+\_\+t h, bool border, uint8\+\_\+t text\+Size, uint16\+\_\+t \hyperlink{class_display_module_ac071b7f3b2027d0e90b7d3031d61a99b}{color}, uint16\+\_\+t bg\+Color)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{class_display_module_ac071b7f3b2027d0e90b7d3031d61a99b}{color} = 0
+\item 
+uint32\+\_\+t \hyperlink{class_display_module_a5c8825161e8df40668c79145e5dace28}{runcount}
+\item 
+char $\ast$ \hyperlink{class_display_module_adf0d12d4d19fa7bff2fc66411e4255a2}{display\+Cache} \mbox{[}\hyperlink{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}\mbox{]}
+\item 
+char $\ast$ \hyperlink{class_display_module_a7af82afb24a27ab297fda02a9d1f0eb3}{display\+Element} \mbox{[}\hyperlink{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}\mbox{]}
+\item 
+char $\ast$ \hyperlink{class_display_module_a07c140067fde1f0cbc4061296179d69a}{buf} = new char\mbox{[}51\mbox{]}
+\item 
+uint8\+\_\+t \hyperlink{class_display_module_a33ee7436481d6285fb6c81166711fbce}{highlight}
+\item 
+uint8\+\_\+t \hyperlink{class_display_module_aaca9b1f6821215e5ebdc5bb6edb390b8}{previously\+Selected\+Channel}
+\item 
+S\+S\+D\+\_\+13\+XX \hyperlink{class_display_module_abcfa732c08671b60dbf7f8d7e0d17e74}{oled} = S\+S\+D\+\_\+13\+XX(\hyperlink{display_module_8h_a71d24cab0e16b054de228f29139f1b79}{L\+C\+D\+\_\+\+CS}, \hyperlink{display_module_8h_a1dc6c4886242abf4447d0da651125d5d}{L\+C\+D\+\_\+\+DC}, \hyperlink{display_module_8h_aec0f0ab242f1b58b1d017bc9ab4b898b}{L\+C\+D\+\_\+\+R\+ST})
+\item 
+elapsed\+Micros \hyperlink{class_display_module_a0c92fa8b35e030ef848db6207fe5067b}{display\+Timer}
+\item 
+uint16\+\_\+t \hyperlink{class_display_module_ab3b6b57d36f08a63a68641eefdb56446}{foreground}
+\item 
+uint16\+\_\+t \hyperlink{class_display_module_a7ebe1c30eb4c306a99a3129f6a165e2a}{background}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Sequencer $\ast$ \hyperlink{class_display_module_a9eb0f63acb02bc366bdc36cf60efb799}{sequence\+Array}
+\item 
+const char $\ast$ \hyperlink{class_display_module_a76bde3057832542df04f4796ae917d48}{midi\+Notes} \mbox{[}128\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_display_module_a6e39f0daba38d7d919ebece3e85c24b1}\label{class_display_module_a6e39f0daba38d7d919ebece3e85c24b1}} 
+\index{Display\+Module@{Display\+Module}!Display\+Module@{Display\+Module}}
+\index{Display\+Module@{Display\+Module}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{Display\+Module()}{DisplayModule()}}
+{\footnotesize\ttfamily Display\+Module\+::\+Display\+Module (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_display_module_ae68c2f34985c276b559df3d7f4fafbbd}\label{class_display_module_ae68c2f34985c276b559df3d7f4fafbbd}} 
+\index{Display\+Module@{Display\+Module}!calibration\+Menu\+Display@{calibration\+Menu\+Display}}
+\index{calibration\+Menu\+Display@{calibration\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{calibration\+Menu\+Display()}{calibrationMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::calibration\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ae68c2f34985c276b559df3d7f4fafbbd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ae68c2f34985c276b559df3d7f4fafbbd_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a61256f4c2a099fd0b0c59a5bba277914}\label{class_display_module_a61256f4c2a099fd0b0c59a5bba277914}} 
+\index{Display\+Module@{Display\+Module}!channel\+Envelope\+Menu\+Display@{channel\+Envelope\+Menu\+Display}}
+\index{channel\+Envelope\+Menu\+Display@{channel\+Envelope\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{channel\+Envelope\+Menu\+Display()}{channelEnvelopeMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::channel\+Envelope\+Menu\+Display (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a61256f4c2a099fd0b0c59a5bba277914_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a61256f4c2a099fd0b0c59a5bba277914_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a61c9ecea836833a5460f2834a18eef05}\label{class_display_module_a61c9ecea836833a5460f2834a18eef05}} 
+\index{Display\+Module@{Display\+Module}!channel\+Pitch\+Menu\+Display@{channel\+Pitch\+Menu\+Display}}
+\index{channel\+Pitch\+Menu\+Display@{channel\+Pitch\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{channel\+Pitch\+Menu\+Display()}{channelPitchMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::channel\+Pitch\+Menu\+Display (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a61c9ecea836833a5460f2834a18eef05_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a61c9ecea836833a5460f2834a18eef05_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a5e665571a41c10190dd2015489f87f3e}\label{class_display_module_a5e665571a41c10190dd2015489f87f3e}} 
+\index{Display\+Module@{Display\+Module}!channel\+Pitch\+Menu\+Display2@{channel\+Pitch\+Menu\+Display2}}
+\index{channel\+Pitch\+Menu\+Display2@{channel\+Pitch\+Menu\+Display2}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{channel\+Pitch\+Menu\+Display2()}{channelPitchMenuDisplay2()}}
+{\footnotesize\ttfamily void Display\+Module\+::channel\+Pitch\+Menu\+Display2 (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a5e665571a41c10190dd2015489f87f3e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_ad5607972b28b5da028dda61cfe640638}\label{class_display_module_ad5607972b28b5da028dda61cfe640638}} 
+\index{Display\+Module@{Display\+Module}!channel\+Step\+Menu\+Display@{channel\+Step\+Menu\+Display}}
+\index{channel\+Step\+Menu\+Display@{channel\+Step\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{channel\+Step\+Menu\+Display()}{channelStepMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::channel\+Step\+Menu\+Display (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ad5607972b28b5da028dda61cfe640638_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ad5607972b28b5da028dda61cfe640638_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a579629d520ad24f721a25b9b1340516b}\label{class_display_module_a579629d520ad24f721a25b9b1340516b}} 
+\index{Display\+Module@{Display\+Module}!channel\+Tuner\+Display@{channel\+Tuner\+Display}}
+\index{channel\+Tuner\+Display@{channel\+Tuner\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{channel\+Tuner\+Display()}{channelTunerDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::channel\+Tuner\+Display (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a579629d520ad24f721a25b9b1340516b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a579629d520ad24f721a25b9b1340516b_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_afb4cbf31bb1058fdeceb3d10ae7fe3a6}\label{class_display_module_afb4cbf31bb1058fdeceb3d10ae7fe3a6}} 
+\index{Display\+Module@{Display\+Module}!channel\+Velocity\+Menu\+Display@{channel\+Velocity\+Menu\+Display}}
+\index{channel\+Velocity\+Menu\+Display@{channel\+Velocity\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{channel\+Velocity\+Menu\+Display()}{channelVelocityMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::channel\+Velocity\+Menu\+Display (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_afb4cbf31bb1058fdeceb3d10ae7fe3a6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_afb4cbf31bb1058fdeceb3d10ae7fe3a6_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_ab730677e34ecadf39916f9b71c2a41fe}\label{class_display_module_ab730677e34ecadf39916f9b71c2a41fe}} 
+\index{Display\+Module@{Display\+Module}!cleanup\+Text\+Buffers@{cleanup\+Text\+Buffers}}
+\index{cleanup\+Text\+Buffers@{cleanup\+Text\+Buffers}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{cleanup\+Text\+Buffers()}{cleanupTextBuffers()}}
+{\footnotesize\ttfamily void Display\+Module\+::cleanup\+Text\+Buffers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ab730677e34ecadf39916f9b71c2a41fe_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a1e2ecbe240db8c38bea2839a76c566f0}\label{class_display_module_a1e2ecbe240db8c38bea2839a76c566f0}} 
+\index{Display\+Module@{Display\+Module}!clear\+Display@{clear\+Display}}
+\index{clear\+Display@{clear\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{clear\+Display()}{clearDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::clear\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_display_module_a87e0b873a0f1fcec1bc67f2fa7c9739a}\label{class_display_module_a87e0b873a0f1fcec1bc67f2fa7c9739a}} 
+\index{Display\+Module@{Display\+Module}!delete\+Menu\+Display@{delete\+Menu\+Display}}
+\index{delete\+Menu\+Display@{delete\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{delete\+Menu\+Display()}{deleteMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::delete\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a87e0b873a0f1fcec1bc67f2fa7c9739a_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_ab89f4bb8387cd4a0557b23ee14133568}\label{class_display_module_ab89f4bb8387cd4a0557b23ee14133568}} 
+\index{Display\+Module@{Display\+Module}!display\+Loop@{display\+Loop}}
+\index{display\+Loop@{display\+Loop}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{display\+Loop()}{displayLoop()}}
+{\footnotesize\ttfamily void Display\+Module\+::display\+Loop (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{frequency }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ab89f4bb8387cd4a0557b23ee14133568_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ab89f4bb8387cd4a0557b23ee14133568_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a4eb1fdb54d5ce4e0b8e460d30b443aac}\label{class_display_module_a4eb1fdb54d5ce4e0b8e460d30b443aac}} 
+\index{Display\+Module@{Display\+Module}!free\+Display\+Cache@{free\+Display\+Cache}}
+\index{free\+Display\+Cache@{free\+Display\+Cache}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{free\+Display\+Cache()}{freeDisplayCache()}}
+{\footnotesize\ttfamily void Display\+Module\+::free\+Display\+Cache (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a4eb1fdb54d5ce4e0b8e460d30b443aac_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a38006afa64e93afb6c259b137f45bcde}\label{class_display_module_a38006afa64e93afb6c259b137f45bcde}} 
+\index{Display\+Module@{Display\+Module}!game\+Of\+Life\+Display@{game\+Of\+Life\+Display}}
+\index{game\+Of\+Life\+Display@{game\+Of\+Life\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{game\+Of\+Life\+Display()}{gameOfLifeDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::game\+Of\+Life\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_display_module_a5082cabe11332dc4a9d0daea8a60f9dc}\label{class_display_module_a5082cabe11332dc4a9d0daea8a60f9dc}} 
+\index{Display\+Module@{Display\+Module}!global\+Menu\+Display@{global\+Menu\+Display}}
+\index{global\+Menu\+Display@{global\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{global\+Menu\+Display()}{globalMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::global\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a5082cabe11332dc4a9d0daea8a60f9dc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a5082cabe11332dc4a9d0daea8a60f9dc_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a68451c130f98f5d820377e9aa15a7242}\label{class_display_module_a68451c130f98f5d820377e9aa15a7242}} 
+\index{Display\+Module@{Display\+Module}!initialize@{initialize}}
+\index{initialize@{initialize}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Display\+Module\+::initialize (\begin{DoxyParamCaption}\item[{Sequencer $\ast$}]{sequence\+Array }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a68451c130f98f5d820377e9aa15a7242_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a776e918a0d9f50ae079d6839524cc471}\label{class_display_module_a776e918a0d9f50ae079d6839524cc471}} 
+\index{Display\+Module@{Display\+Module}!input\+Debug\+Menu\+Display@{input\+Debug\+Menu\+Display}}
+\index{input\+Debug\+Menu\+Display@{input\+Debug\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{input\+Debug\+Menu\+Display()}{inputDebugMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::input\+Debug\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a776e918a0d9f50ae079d6839524cc471_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a776e918a0d9f50ae079d6839524cc471_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a95fa96a6b2d74b8d15eeb0c71786b1b2}\label{class_display_module_a95fa96a6b2d74b8d15eeb0c71786b1b2}} 
+\index{Display\+Module@{Display\+Module}!pattern\+Select\+Display@{pattern\+Select\+Display}}
+\index{pattern\+Select\+Display@{pattern\+Select\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{pattern\+Select\+Display()}{patternSelectDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::pattern\+Select\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a95fa96a6b2d74b8d15eeb0c71786b1b2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a95fa96a6b2d74b8d15eeb0c71786b1b2_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a453ceefb9e2a9a82dd7b62825cc2cac8}\label{class_display_module_a453ceefb9e2a9a82dd7b62825cc2cac8}} 
+\index{Display\+Module@{Display\+Module}!render\+Once\+\_\+\+String\+Box@{render\+Once\+\_\+\+String\+Box}}
+\index{render\+Once\+\_\+\+String\+Box@{render\+Once\+\_\+\+String\+Box}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{render\+Once\+\_\+\+String\+Box()}{renderOnce\_StringBox()}}
+{\footnotesize\ttfamily void Display\+Module\+::render\+Once\+\_\+\+String\+Box (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{index,  }\item[{uint8\+\_\+t}]{highlight,  }\item[{uint8\+\_\+t}]{previous\+Highlight,  }\item[{int16\+\_\+t}]{x,  }\item[{int16\+\_\+t}]{y,  }\item[{int16\+\_\+t}]{w,  }\item[{int16\+\_\+t}]{h,  }\item[{bool}]{border,  }\item[{uint8\+\_\+t}]{text\+Size,  }\item[{uint16\+\_\+t}]{color,  }\item[{uint16\+\_\+t}]{bg\+Color }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a453ceefb9e2a9a82dd7b62825cc2cac8_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a3e2fc0a60ef41f41e57d463faf59bd2b}\label{class_display_module_a3e2fc0a60ef41f41e57d463faf59bd2b}} 
+\index{Display\+Module@{Display\+Module}!sequence\+Menu\+Display@{sequence\+Menu\+Display}}
+\index{sequence\+Menu\+Display@{sequence\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{sequence\+Menu\+Display()}{sequenceMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::sequence\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a3e2fc0a60ef41f41e57d463faf59bd2b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a3e2fc0a60ef41f41e57d463faf59bd2b_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_ac1d55595826fc36738b2d9df6be9516e}\label{class_display_module_ac1d55595826fc36738b2d9df6be9516e}} 
+\index{Display\+Module@{Display\+Module}!step\+Display@{step\+Display}}
+\index{step\+Display@{step\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{step\+Display()}{stepDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::step\+Display (\begin{DoxyParamCaption}\item[{char $\ast$}]{buf }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_display_module_ac5999c2f0f4b1ecc12bafe7094c7b7d2}\label{class_display_module_ac5999c2f0f4b1ecc12bafe7094c7b7d2}} 
+\index{Display\+Module@{Display\+Module}!tempo\+Menu\+Display@{tempo\+Menu\+Display}}
+\index{tempo\+Menu\+Display@{tempo\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{tempo\+Menu\+Display()}{tempoMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::tempo\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ac5999c2f0f4b1ecc12bafe7094c7b7d2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_ac5999c2f0f4b1ecc12bafe7094c7b7d2_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_display_module_a722a8c3b1cce1c58fa7e17e2865c3e57}\label{class_display_module_a722a8c3b1cce1c58fa7e17e2865c3e57}} 
+\index{Display\+Module@{Display\+Module}!timing\+Menu\+Display@{timing\+Menu\+Display}}
+\index{timing\+Menu\+Display@{timing\+Menu\+Display}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{timing\+Menu\+Display()}{timingMenuDisplay()}}
+{\footnotesize\ttfamily void Display\+Module\+::timing\+Menu\+Display (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_display_module_a722a8c3b1cce1c58fa7e17e2865c3e57_icgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_display_module_a7ebe1c30eb4c306a99a3129f6a165e2a}\label{class_display_module_a7ebe1c30eb4c306a99a3129f6a165e2a}} 
+\index{Display\+Module@{Display\+Module}!background@{background}}
+\index{background@{background}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{background}{background}}
+{\footnotesize\ttfamily uint16\+\_\+t Display\+Module\+::background}
+
+\mbox{\Hypertarget{class_display_module_a07c140067fde1f0cbc4061296179d69a}\label{class_display_module_a07c140067fde1f0cbc4061296179d69a}} 
+\index{Display\+Module@{Display\+Module}!buf@{buf}}
+\index{buf@{buf}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{buf}{buf}}
+{\footnotesize\ttfamily char$\ast$ Display\+Module\+::buf = new char\mbox{[}51\mbox{]}}
+
+\mbox{\Hypertarget{class_display_module_ac071b7f3b2027d0e90b7d3031d61a99b}\label{class_display_module_ac071b7f3b2027d0e90b7d3031d61a99b}} 
+\index{Display\+Module@{Display\+Module}!color@{color}}
+\index{color@{color}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{color}{color}}
+{\footnotesize\ttfamily int Display\+Module\+::color = 0}
+
+\mbox{\Hypertarget{class_display_module_adf0d12d4d19fa7bff2fc66411e4255a2}\label{class_display_module_adf0d12d4d19fa7bff2fc66411e4255a2}} 
+\index{Display\+Module@{Display\+Module}!display\+Cache@{display\+Cache}}
+\index{display\+Cache@{display\+Cache}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{display\+Cache}{displayCache}}
+{\footnotesize\ttfamily char$\ast$ Display\+Module\+::display\+Cache\mbox{[}\hyperlink{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}\mbox{]}}
+
+\mbox{\Hypertarget{class_display_module_a7af82afb24a27ab297fda02a9d1f0eb3}\label{class_display_module_a7af82afb24a27ab297fda02a9d1f0eb3}} 
+\index{Display\+Module@{Display\+Module}!display\+Element@{display\+Element}}
+\index{display\+Element@{display\+Element}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{display\+Element}{displayElement}}
+{\footnotesize\ttfamily char$\ast$ Display\+Module\+::display\+Element\mbox{[}\hyperlink{display_module_8h_a6114392da1243b69a45b549bd4ddfd39}{M\+A\+X\+\_\+\+D\+I\+S\+P\+L\+A\+Y\+\_\+\+E\+L\+E\+M\+E\+N\+TS}\mbox{]}}
+
+\mbox{\Hypertarget{class_display_module_a0c92fa8b35e030ef848db6207fe5067b}\label{class_display_module_a0c92fa8b35e030ef848db6207fe5067b}} 
+\index{Display\+Module@{Display\+Module}!display\+Timer@{display\+Timer}}
+\index{display\+Timer@{display\+Timer}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{display\+Timer}{displayTimer}}
+{\footnotesize\ttfamily elapsed\+Micros Display\+Module\+::display\+Timer}
+
+\mbox{\Hypertarget{class_display_module_ab3b6b57d36f08a63a68641eefdb56446}\label{class_display_module_ab3b6b57d36f08a63a68641eefdb56446}} 
+\index{Display\+Module@{Display\+Module}!foreground@{foreground}}
+\index{foreground@{foreground}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{foreground}{foreground}}
+{\footnotesize\ttfamily uint16\+\_\+t Display\+Module\+::foreground}
+
+\mbox{\Hypertarget{class_display_module_a33ee7436481d6285fb6c81166711fbce}\label{class_display_module_a33ee7436481d6285fb6c81166711fbce}} 
+\index{Display\+Module@{Display\+Module}!highlight@{highlight}}
+\index{highlight@{highlight}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{highlight}{highlight}}
+{\footnotesize\ttfamily uint8\+\_\+t Display\+Module\+::highlight}
+
+\mbox{\Hypertarget{class_display_module_a76bde3057832542df04f4796ae917d48}\label{class_display_module_a76bde3057832542df04f4796ae917d48}} 
+\index{Display\+Module@{Display\+Module}!midi\+Notes@{midi\+Notes}}
+\index{midi\+Notes@{midi\+Notes}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{midi\+Notes}{midiNotes}}
+{\footnotesize\ttfamily const char$\ast$ Display\+Module\+::midi\+Notes\mbox{[}128\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+    \textcolor{stringliteral}{"C -2"},\textcolor{stringliteral}{"C#-2"},\textcolor{stringliteral}{"D -2"},\textcolor{stringliteral}{"D#-2"},\textcolor{stringliteral}{"E -2"},\textcolor{stringliteral}{"F -2"},\textcolor{stringliteral}{"F#-2"},\textcolor{stringliteral}{"G -2"},\textcolor{stringliteral}{"G#-2"},\textcolor{stringliteral}{"A -2"},\textcolor{stringliteral}{"A#-2"},\textcolor{stringliteral}{"B -2"},
+    \textcolor{stringliteral}{"C -1"},\textcolor{stringliteral}{"C#-1"},\textcolor{stringliteral}{"D -1"},\textcolor{stringliteral}{"D#-1"},\textcolor{stringliteral}{"E -1"},\textcolor{stringliteral}{"F -1"},\textcolor{stringliteral}{"F#-1"},\textcolor{stringliteral}{"G -1"},\textcolor{stringliteral}{"G#-1"},\textcolor{stringliteral}{"A -1"},\textcolor{stringliteral}{"A#-1"},\textcolor{stringliteral}{"B -1"},
+    \textcolor{stringliteral}{"C  0"},\textcolor{stringliteral}{"C# 0"},\textcolor{stringliteral}{"D  0"},\textcolor{stringliteral}{"D# 0"},\textcolor{stringliteral}{"E  0"},\textcolor{stringliteral}{"F  0"},\textcolor{stringliteral}{"F# 0"},\textcolor{stringliteral}{"G  0"},\textcolor{stringliteral}{"G# 0"},\textcolor{stringliteral}{"A  0"},\textcolor{stringliteral}{"A# 0"},\textcolor{stringliteral}{"B  0"},
+    \textcolor{stringliteral}{"C  1"},\textcolor{stringliteral}{"C# 1"},\textcolor{stringliteral}{"D  1"},\textcolor{stringliteral}{"D# 1"},\textcolor{stringliteral}{"E  1"},\textcolor{stringliteral}{"F  1"},\textcolor{stringliteral}{"F# 1"},\textcolor{stringliteral}{"G  1"},\textcolor{stringliteral}{"G# 1"},\textcolor{stringliteral}{"A  1"},\textcolor{stringliteral}{"A# 1"},\textcolor{stringliteral}{"B  1"},
+    \textcolor{stringliteral}{"C  2"},\textcolor{stringliteral}{"C# 2"},\textcolor{stringliteral}{"D  2"},\textcolor{stringliteral}{"D# 2"},\textcolor{stringliteral}{"E  2"},\textcolor{stringliteral}{"F  2"},\textcolor{stringliteral}{"F# 2"},\textcolor{stringliteral}{"G  2"},\textcolor{stringliteral}{"G# 2"},\textcolor{stringliteral}{"A  2"},\textcolor{stringliteral}{"A# 2"},\textcolor{stringliteral}{"B  2"},
+    \textcolor{stringliteral}{"C  3"},\textcolor{stringliteral}{"C# 3"},\textcolor{stringliteral}{"D  3"},\textcolor{stringliteral}{"D# 3"},\textcolor{stringliteral}{"E  3"},\textcolor{stringliteral}{"F  3"},\textcolor{stringliteral}{"F# 3"},\textcolor{stringliteral}{"G  3"},\textcolor{stringliteral}{"G# 3"},\textcolor{stringliteral}{"A  3"},\textcolor{stringliteral}{"A# 3"},\textcolor{stringliteral}{"B  3"},
+    \textcolor{stringliteral}{"C  4"},\textcolor{stringliteral}{"C# 4"},\textcolor{stringliteral}{"D  4"},\textcolor{stringliteral}{"D# 4"},\textcolor{stringliteral}{"E  4"},\textcolor{stringliteral}{"F  4"},\textcolor{stringliteral}{"F# 4"},\textcolor{stringliteral}{"G  4"},\textcolor{stringliteral}{"G# 4"},\textcolor{stringliteral}{"A  4"},\textcolor{stringliteral}{"A# 4"},\textcolor{stringliteral}{"B  4"},
+    \textcolor{stringliteral}{"C  5"},\textcolor{stringliteral}{"C# 5"},\textcolor{stringliteral}{"D  5"},\textcolor{stringliteral}{"D# 5"},\textcolor{stringliteral}{"E  5"},\textcolor{stringliteral}{"F  5"},\textcolor{stringliteral}{"F# 5"},\textcolor{stringliteral}{"G  5"},\textcolor{stringliteral}{"G# 5"},\textcolor{stringliteral}{"A  5"},\textcolor{stringliteral}{"A# 5"},\textcolor{stringliteral}{"B  5"},
+    \textcolor{stringliteral}{"C  6"},\textcolor{stringliteral}{"C# 6"},\textcolor{stringliteral}{"D  6"},\textcolor{stringliteral}{"D# 6"},\textcolor{stringliteral}{"E  6"},\textcolor{stringliteral}{"F  6"},\textcolor{stringliteral}{"F# 6"},\textcolor{stringliteral}{"G  6"},\textcolor{stringliteral}{"G# 6"},\textcolor{stringliteral}{"A  6"},\textcolor{stringliteral}{"A# 6"},\textcolor{stringliteral}{"B  6"},
+    \textcolor{stringliteral}{"C  7"},\textcolor{stringliteral}{"C# 7"},\textcolor{stringliteral}{"D  7"},\textcolor{stringliteral}{"D# 7"},\textcolor{stringliteral}{"E  7"},\textcolor{stringliteral}{"F  7"},\textcolor{stringliteral}{"F# 7"},\textcolor{stringliteral}{"G  7"},\textcolor{stringliteral}{"G# 7"},\textcolor{stringliteral}{"A  7"},\textcolor{stringliteral}{"A# 7"},\textcolor{stringliteral}{"B  7"},
+    \textcolor{stringliteral}{"C  8"},\textcolor{stringliteral}{"C# 8"},\textcolor{stringliteral}{"D  8"},\textcolor{stringliteral}{"D# 8"},\textcolor{stringliteral}{"E  8"},\textcolor{stringliteral}{"F  8"},\textcolor{stringliteral}{"F# 8"},\textcolor{stringliteral}{"G  8"} \}
+\end{DoxyCode}
+\mbox{\Hypertarget{class_display_module_abcfa732c08671b60dbf7f8d7e0d17e74}\label{class_display_module_abcfa732c08671b60dbf7f8d7e0d17e74}} 
+\index{Display\+Module@{Display\+Module}!oled@{oled}}
+\index{oled@{oled}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{oled}{oled}}
+{\footnotesize\ttfamily S\+S\+D\+\_\+13\+XX Display\+Module\+::oled = S\+S\+D\+\_\+13\+XX(\hyperlink{display_module_8h_a71d24cab0e16b054de228f29139f1b79}{L\+C\+D\+\_\+\+CS}, \hyperlink{display_module_8h_a1dc6c4886242abf4447d0da651125d5d}{L\+C\+D\+\_\+\+DC}, \hyperlink{display_module_8h_aec0f0ab242f1b58b1d017bc9ab4b898b}{L\+C\+D\+\_\+\+R\+ST})}
+
+\mbox{\Hypertarget{class_display_module_aaca9b1f6821215e5ebdc5bb6edb390b8}\label{class_display_module_aaca9b1f6821215e5ebdc5bb6edb390b8}} 
+\index{Display\+Module@{Display\+Module}!previously\+Selected\+Channel@{previously\+Selected\+Channel}}
+\index{previously\+Selected\+Channel@{previously\+Selected\+Channel}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{previously\+Selected\+Channel}{previouslySelectedChannel}}
+{\footnotesize\ttfamily uint8\+\_\+t Display\+Module\+::previously\+Selected\+Channel}
+
+\mbox{\Hypertarget{class_display_module_a5c8825161e8df40668c79145e5dace28}\label{class_display_module_a5c8825161e8df40668c79145e5dace28}} 
+\index{Display\+Module@{Display\+Module}!runcount@{runcount}}
+\index{runcount@{runcount}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{runcount}{runcount}}
+{\footnotesize\ttfamily uint32\+\_\+t Display\+Module\+::runcount}
+
+\mbox{\Hypertarget{class_display_module_a9eb0f63acb02bc366bdc36cf60efb799}\label{class_display_module_a9eb0f63acb02bc366bdc36cf60efb799}} 
+\index{Display\+Module@{Display\+Module}!sequence\+Array@{sequence\+Array}}
+\index{sequence\+Array@{sequence\+Array}!Display\+Module@{Display\+Module}}
+\subsubsection{\texorpdfstring{sequence\+Array}{sequenceArray}}
+{\footnotesize\ttfamily Sequencer$\ast$ Display\+Module\+::sequence\+Array\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{display_module_8h}{display\+Module.\+h}\item 
+src/\hyperlink{display_module_8cpp}{display\+Module.\+cpp}\end{DoxyCompactItemize}

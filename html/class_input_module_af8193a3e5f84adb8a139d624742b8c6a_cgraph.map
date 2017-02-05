@@ -1,0 +1,5 @@
+<map id="InputModule::channelPitchModeInputHandler" name="InputModule::channelPitchModeInputHandler">
+<area shape="rect" id="node2" href="$global_8cpp.html#abe76ce51470a6735d5953441b7c3932f" title="getNote" alt="" coords="257,5,325,31"/>
+<area shape="rect" id="node3" href="$global_8cpp.html#aeddfefe61681b99486efc7774bb0cc46" title="positive_modulo" alt="" coords="232,55,349,80"/>
+<area shape="rect" id="node4" href="$global_8cpp.html#a8f79f95810e068b9f8f7cef7ba30dd1a" title="min_max" alt="" coords="253,104,328,129"/>
+</map>

@@ -1,0 +1,165 @@
+\hypertarget{class_serial_flash_print}{}\section{Serial\+Flash\+Print Class Reference}
+\label{class_serial_flash_print}\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+
+
+{\ttfamily \#include $<$serial\+Flash\+Print.\+h$>$}
+
+
+
+Inheritance diagram for Serial\+Flash\+Print\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=167pt]{class_serial_flash_print__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Serial\+Flash\+Print\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=167pt]{class_serial_flash_print__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_serial_flash_print_a74950628c4028de6785bf936022322c6}{Serial\+Flash\+Print} (Serial\+Flash\+File $\ast$file)
+\item 
+virtual size\+\_\+t \hyperlink{class_serial_flash_print_a95a2b426100a53b7fc09e1130eaece94}{write} (uint8\+\_\+t)
+\item 
+virtual size\+\_\+t \hyperlink{class_serial_flash_print_af814e70a1869c2b418351acdb7ebecc7}{write} (const uint8\+\_\+t $\ast$buffer, size\+\_\+t size)
+\item 
+void \hyperlink{class_serial_flash_print_a657e3b8f295104f90842535dd0eea2e8}{write\+Prepare} (uint8\+\_\+t channel, uint16\+\_\+t file\+\_\+size)
+\item 
+void \hyperlink{class_serial_flash_print_aa3bc4b5315d97d3a2fb81391a9b83088}{write\+Buf} ()
+\item 
+void \hyperlink{class_serial_flash_print_a10d8aba39135e5b1cf6251961a87186f}{write\+Complete} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \hyperlink{class_serial_flash_print_a876c496ebcda3b4489fdfbc15e475c04}{buf} \mbox{[}\hyperlink{serial_flash_print_8h_a6b20d41d6252e9871430c242cb1a56e7}{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}\mbox{]}
+\item 
+uint16\+\_\+t \hyperlink{class_serial_flash_print_a696d4337c1f4b883bc5dc6f40ef4f742}{\+\_\+current\+\_\+byte}
+\item 
+uint16\+\_\+t \hyperlink{class_serial_flash_print_a6cc148b94a7b3be261918631c75cdfdd}{\+\_\+buffer\+\_\+count}
+\item 
+uint16\+\_\+t \hyperlink{class_serial_flash_print_a78602cd3cd89f168abb493e36bb77190}{\+\_\+file\+\_\+size}
+\item 
+bool \hyperlink{class_serial_flash_print_a0671fb69d73d7ca8d703443579b262a1}{\+\_\+data\+\_\+to\+\_\+write}
+\item 
+Serial\+Flash\+File $\ast$ \hyperlink{class_serial_flash_print_a92c30b40ce975e84b7dfd34352fb1469}{\+\_\+file}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_serial_flash_print_a74950628c4028de6785bf936022322c6}\label{class_serial_flash_print_a74950628c4028de6785bf936022322c6}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{Serial\+Flash\+Print()}{SerialFlashPrint()}}
+{\footnotesize\ttfamily Serial\+Flash\+Print\+::\+Serial\+Flash\+Print (\begin{DoxyParamCaption}\item[{Serial\+Flash\+File $\ast$}]{file }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_serial_flash_print_a95a2b426100a53b7fc09e1130eaece94}\label{class_serial_flash_print_a95a2b426100a53b7fc09e1130eaece94}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!write@{write}}
+\index{write@{write}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily size\+\_\+t Serial\+Flash\+Print\+::write (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{c }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_serial_flash_print_a95a2b426100a53b7fc09e1130eaece94_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_serial_flash_print_af814e70a1869c2b418351acdb7ebecc7}\label{class_serial_flash_print_af814e70a1869c2b418351acdb7ebecc7}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!write@{write}}
+\index{write@{write}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily size\+\_\+t Serial\+Flash\+Print\+::write (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{buffer,  }\item[{size\+\_\+t}]{size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_serial_flash_print_af814e70a1869c2b418351acdb7ebecc7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_serial_flash_print_aa3bc4b5315d97d3a2fb81391a9b83088}\label{class_serial_flash_print_aa3bc4b5315d97d3a2fb81391a9b83088}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!write\+Buf@{write\+Buf}}
+\index{write\+Buf@{write\+Buf}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{write\+Buf()}{writeBuf()}}
+{\footnotesize\ttfamily void Serial\+Flash\+Print\+::write\+Buf (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_serial_flash_print_aa3bc4b5315d97d3a2fb81391a9b83088_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_serial_flash_print_a10d8aba39135e5b1cf6251961a87186f}\label{class_serial_flash_print_a10d8aba39135e5b1cf6251961a87186f}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!write\+Complete@{write\+Complete}}
+\index{write\+Complete@{write\+Complete}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{write\+Complete()}{writeComplete()}}
+{\footnotesize\ttfamily void Serial\+Flash\+Print\+::write\+Complete (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_flash_print_a657e3b8f295104f90842535dd0eea2e8}\label{class_serial_flash_print_a657e3b8f295104f90842535dd0eea2e8}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!write\+Prepare@{write\+Prepare}}
+\index{write\+Prepare@{write\+Prepare}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{write\+Prepare()}{writePrepare()}}
+{\footnotesize\ttfamily void Serial\+Flash\+Print\+::write\+Prepare (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{channel,  }\item[{uint16\+\_\+t}]{file\+\_\+size }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_serial_flash_print_a6cc148b94a7b3be261918631c75cdfdd}\label{class_serial_flash_print_a6cc148b94a7b3be261918631c75cdfdd}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!\+\_\+buffer\+\_\+count@{\+\_\+buffer\+\_\+count}}
+\index{\+\_\+buffer\+\_\+count@{\+\_\+buffer\+\_\+count}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{\+\_\+buffer\+\_\+count}{\_buffer\_count}}
+{\footnotesize\ttfamily uint16\+\_\+t Serial\+Flash\+Print\+::\+\_\+buffer\+\_\+count\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_serial_flash_print_a696d4337c1f4b883bc5dc6f40ef4f742}\label{class_serial_flash_print_a696d4337c1f4b883bc5dc6f40ef4f742}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!\+\_\+current\+\_\+byte@{\+\_\+current\+\_\+byte}}
+\index{\+\_\+current\+\_\+byte@{\+\_\+current\+\_\+byte}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{\+\_\+current\+\_\+byte}{\_current\_byte}}
+{\footnotesize\ttfamily uint16\+\_\+t Serial\+Flash\+Print\+::\+\_\+current\+\_\+byte\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_serial_flash_print_a0671fb69d73d7ca8d703443579b262a1}\label{class_serial_flash_print_a0671fb69d73d7ca8d703443579b262a1}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!\+\_\+data\+\_\+to\+\_\+write@{\+\_\+data\+\_\+to\+\_\+write}}
+\index{\+\_\+data\+\_\+to\+\_\+write@{\+\_\+data\+\_\+to\+\_\+write}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{\+\_\+data\+\_\+to\+\_\+write}{\_data\_to\_write}}
+{\footnotesize\ttfamily bool Serial\+Flash\+Print\+::\+\_\+data\+\_\+to\+\_\+write\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_serial_flash_print_a92c30b40ce975e84b7dfd34352fb1469}\label{class_serial_flash_print_a92c30b40ce975e84b7dfd34352fb1469}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!\+\_\+file@{\+\_\+file}}
+\index{\+\_\+file@{\+\_\+file}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{\+\_\+file}{\_file}}
+{\footnotesize\ttfamily Serial\+Flash\+File$\ast$ Serial\+Flash\+Print\+::\+\_\+file\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_serial_flash_print_a78602cd3cd89f168abb493e36bb77190}\label{class_serial_flash_print_a78602cd3cd89f168abb493e36bb77190}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!\+\_\+file\+\_\+size@{\+\_\+file\+\_\+size}}
+\index{\+\_\+file\+\_\+size@{\+\_\+file\+\_\+size}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{\+\_\+file\+\_\+size}{\_file\_size}}
+{\footnotesize\ttfamily uint16\+\_\+t Serial\+Flash\+Print\+::\+\_\+file\+\_\+size\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_serial_flash_print_a876c496ebcda3b4489fdfbc15e475c04}\label{class_serial_flash_print_a876c496ebcda3b4489fdfbc15e475c04}} 
+\index{Serial\+Flash\+Print@{Serial\+Flash\+Print}!buf@{buf}}
+\index{buf@{buf}!Serial\+Flash\+Print@{Serial\+Flash\+Print}}
+\subsubsection{\texorpdfstring{buf}{buf}}
+{\footnotesize\ttfamily char Serial\+Flash\+Print\+::buf\mbox{[}\hyperlink{serial_flash_print_8h_a6b20d41d6252e9871430c242cb1a56e7}{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{serial_flash_print_8h}{serial\+Flash\+Print.\+h}\item 
+src/\hyperlink{serial_flash_print_8cpp}{serial\+Flash\+Print.\+cpp}\end{DoxyCompactItemize}

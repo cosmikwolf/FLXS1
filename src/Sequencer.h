@@ -25,7 +25,6 @@ class Sequencer
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
 		uint32_t 		calculateStepTimers();
-		void 		beatPulse(uint32_t beatLength);
 		void 		clockStart(elapsedMicros startTime);
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
@@ -75,11 +74,11 @@ class Sequencer
 		uint8_t	tempVar8_1;
 		uint8_t	tempVar8_2;
 		uint8_t	tempVar8_3;
-		uint32_t	tempVar32_4;
+		uint32_t	clockSinceLastPulse;
 
 		uint16_t  beatCount;
 
-		uint32_t 	beatLength;
+		uint32_t 	avgClocksPerPulse;
 //		uint32_t 	stepLength;
 		uint32_t 	tempoX100;
 		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval

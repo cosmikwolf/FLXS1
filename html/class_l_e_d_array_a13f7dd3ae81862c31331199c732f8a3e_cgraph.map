@@ -1,0 +1,8 @@
+<map id="LEDArray::loop" name="LEDArray::loop">
+<area shape="rect" id="node2" href="$class_l_e_d_array.html#a602c56fdb10d7bf66f8d681081a99b83" title="LEDArray::channelPitchMode\lLEDHandler" alt="" coords="165,38,361,76"/>
+<area shape="rect" id="node3" href="$global_8cpp.html#abe76ce51470a6735d5953441b7c3932f" title="getNote" alt="" coords="436,44,504,70"/>
+<area shape="rect" id="node4" href="$class_l_e_d_array.html#a783c6a0ef721d76b6b65aead2322e059" title="LEDArray::wheel" alt="" coords="409,164,531,190"/>
+<area shape="rect" id="node5" href="$class_l_e_d_array.html#ab90f5a669b0faf8853070e12b99c4b3d" title="LEDArray::channelGateMode\lLEDHandler" alt="" coords="165,100,361,139"/>
+<area shape="rect" id="node6" href="$class_l_e_d_array.html#a4fdfa734a42f2e2f577a0be7ce8953d5" title="LEDArray::channelEnvelope\lModeLEDHandler" alt="" coords="169,215,358,254"/>
+<area shape="rect" id="node7" href="$class_l_e_d_array.html#a81dfe62b22624f9f29d57da0298043fc" title="LEDArray::channelStepMode\lLEDHandler" alt="" coords="166,278,360,316"/>
+</map>

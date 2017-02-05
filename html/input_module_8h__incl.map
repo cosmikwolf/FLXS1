@@ -1,0 +1,11 @@
+<map id="src/inputModule.h" name="src/inputModule.h">
+<area shape="rect" id="node6" href="$_output_controller_8h.html" title="OutputController.h" alt="" coords="1011,152,1141,177"/>
+<area shape="rect" id="node17" href="$global_8h.html" title="global.h" alt="" coords="711,385,779,411"/>
+<area shape="rect" id="node18" href="$_sequencer_8h.html" title="Sequencer.h" alt="" coords="44,312,140,337"/>
+<area shape="rect" id="node24" href="$display_module_8h.html" title="DisplayModule.h" alt="" coords="655,232,775,257"/>
+<area shape="rect" id="node28" href="$master_clock_8h.html" title="MasterClock.h" alt="" coords="69,79,176,104"/>
+<area shape="rect" id="node11" href="$_flash_memory_8h.html" title="FlashMemory.h" alt="" coords="1454,232,1567,257"/>
+<area shape="rect" id="node23" href="$midi_module_8h.html" title="midiModule.h" alt="" coords="163,232,264,257"/>
+<area shape="rect" id="node15" href="$serial_flash_print_8h.html" title="serialFlashPrint.h" alt="" coords="1668,312,1793,337"/>
+<area shape="rect" id="node19" href="$_step_datum_8h.html" title="StepDatum.h" alt="" coords="473,385,572,411"/>
+</map>

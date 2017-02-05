@@ -1,0 +1,8 @@
+<map id="OutputController::outputMap" name="OutputController::outputMap">
+<area shape="rect" id="node2" href="$class_output_controller.html#a6c7741fe241177b6c0d1236df4c9d358" title="OutputController::initialize" alt="" coords="248,5,422,31"/>
+<area shape="rect" id="node4" href="$class_output_controller.html#aa841a26dfccb827a5d9896ea6a57d4ff" title="OutputController::noteOn" alt="" coords="250,55,420,80"/>
+<area shape="rect" id="node5" href="$class_output_controller.html#a561d7c84d91dcba6cfd9cd8b587b749f" title="OutputController::lfoUpdate" alt="" coords="243,104,427,129"/>
+<area shape="rect" id="node3" href="$class_time_controller.html#ae819298bde61b72b67b067b690032280" title="TimeController::initialize" alt="" coords="496,5,659,31"/>
+<area shape="rect" id="node6" href="$class_master_clock.html#a6d2a014da8caf9c4f39917ce4c09b83d" title="MasterClock::masterClockFunc" alt="" coords="475,104,681,129"/>
+<area shape="rect" id="node7" href="$class_time_controller.html#af3df3fed28e3d6a6a23da80b7d9e579e" title="TimeController::masterClock\lHandler" alt="" coords="729,97,919,136"/>
+</map>

@@ -1,0 +1,221 @@
+\hypertarget{class_time_controller}{}\section{Time\+Controller Class Reference}
+\label{class_time_controller}\index{Time\+Controller@{Time\+Controller}}
+
+
+{\ttfamily \#include $<$Time\+Controller.\+h$>$}
+
+
+
+Collaboration diagram for Time\+Controller\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_time_controller__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_time_controller_a556cfa71086ae3fb76cf79d9da0056e4}{Time\+Controller} ()
+\item 
+void \hyperlink{class_time_controller_ae819298bde61b72b67b067b690032280}{initialize} (midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$\hyperlink{class_time_controller_acb753f57965d145cdb399b83062513a5}{serial\+Midi}, \hyperlink{class_midi_module}{Midi\+Module} $\ast$\hyperlink{class_time_controller_ae937d8993e143f8c340d572b21db7541}{midi\+Control}, Sequencer $\ast$\hyperlink{class_time_controller_a90cd4f79debfe1959295b79842bd5e7c}{sequencer\+Array}, A\+DC $\ast$\hyperlink{class_time_controller_a1b19c7d0b6f30005ef064f75d6e88cfd}{adc})
+\item 
+void \hyperlink{class_time_controller_ae1e9001e3739f3e077f4679b98650e91}{run\+Loop\+Handler} ()
+\item 
+void \hyperlink{class_time_controller_af3df3fed28e3d6a6a23da80b7d9e579e}{master\+Clock\+Handler} ()
+\item 
+void \hyperlink{class_time_controller_a56442319aea3eaed083882a0f148fe26}{midi\+Clock\+Handler} ()
+\item 
+void \hyperlink{class_time_controller_af64bff39f4e51f75963ae6df9e374881}{cache\+Write\+Handler} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_master_clock}{Master\+Clock} \hyperlink{class_time_controller_a4bcd78ceb9cc4d1d1ecd15998aab84e3}{clock\+Master}
+\item 
+\hyperlink{class_output_controller}{Output\+Controller} \hyperlink{class_time_controller_ac717861ff746e969f35876842defaa85}{output\+Control}
+\item 
+\hyperlink{class_input_module}{Input\+Module} \hyperlink{class_time_controller_a26e73c837f0bc2b17751899674b53bf4}{button\+Io}
+\item 
+\hyperlink{class_display_module}{Display\+Module} \hyperlink{class_time_controller_afd3a65fca30ffddc7a109e207839b9ec}{display}
+\item 
+\hyperlink{class_l_e_d_array}{L\+E\+D\+Array} \hyperlink{class_time_controller_afebd23c56781eb22ddd1a82437726a56}{led\+Array}
+\item 
+Flash\+Memory \hyperlink{class_time_controller_a70cef24b984cab7fb2ecb93e2ac52a33}{save\+File}
+\item 
+Zetaohm\+\_\+\+M\+A\+X7301 \hyperlink{class_time_controller_ad66fe36ae69d7a8881d4a9aa5b3f34af}{midplane\+G\+P\+IO}
+\item 
+Zetaohm\+\_\+\+M\+A\+X7301 \hyperlink{class_time_controller_a3df18dcb913419302f4bbc92412bbeb9}{backplane\+G\+P\+IO}
+\item 
+\hyperlink{class_midi_module}{Midi\+Module} $\ast$ \hyperlink{class_time_controller_ae937d8993e143f8c340d572b21db7541}{midi\+Control}
+\item 
+midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$ \hyperlink{class_time_controller_acb753f57965d145cdb399b83062513a5}{serial\+Midi}
+\item 
+Sequencer $\ast$ \hyperlink{class_time_controller_a90cd4f79debfe1959295b79842bd5e7c}{sequencer\+Array}
+\item 
+A\+DC $\ast$ \hyperlink{class_time_controller_a1b19c7d0b6f30005ef064f75d6e88cfd}{adc}
+\item 
+elapsed\+Micros \hyperlink{class_time_controller_a3a032a3b03a56144fff907ae41d9797b}{cache\+Write\+Timer}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_time_controller_a556cfa71086ae3fb76cf79d9da0056e4}\label{class_time_controller_a556cfa71086ae3fb76cf79d9da0056e4}} 
+\index{Time\+Controller@{Time\+Controller}!Time\+Controller@{Time\+Controller}}
+\index{Time\+Controller@{Time\+Controller}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{Time\+Controller()}{TimeController()}}
+{\footnotesize\ttfamily Time\+Controller\+::\+Time\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_time_controller_af64bff39f4e51f75963ae6df9e374881}\label{class_time_controller_af64bff39f4e51f75963ae6df9e374881}} 
+\index{Time\+Controller@{Time\+Controller}!cache\+Write\+Handler@{cache\+Write\+Handler}}
+\index{cache\+Write\+Handler@{cache\+Write\+Handler}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{cache\+Write\+Handler()}{cacheWriteHandler()}}
+{\footnotesize\ttfamily void Time\+Controller\+::cache\+Write\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_time_controller_ae819298bde61b72b67b067b690032280}\label{class_time_controller_ae819298bde61b72b67b067b690032280}} 
+\index{Time\+Controller@{Time\+Controller}!initialize@{initialize}}
+\index{initialize@{initialize}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Time\+Controller\+::initialize (\begin{DoxyParamCaption}\item[{midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$}]{serial\+Midi,  }\item[{\hyperlink{class_midi_module}{Midi\+Module} $\ast$}]{midi\+Control,  }\item[{Sequencer $\ast$}]{sequencer\+Array,  }\item[{A\+DC $\ast$}]{adc }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_time_controller_ae819298bde61b72b67b067b690032280_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_time_controller_af3df3fed28e3d6a6a23da80b7d9e579e}\label{class_time_controller_af3df3fed28e3d6a6a23da80b7d9e579e}} 
+\index{Time\+Controller@{Time\+Controller}!master\+Clock\+Handler@{master\+Clock\+Handler}}
+\index{master\+Clock\+Handler@{master\+Clock\+Handler}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{master\+Clock\+Handler()}{masterClockHandler()}}
+{\footnotesize\ttfamily void Time\+Controller\+::master\+Clock\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_time_controller_af3df3fed28e3d6a6a23da80b7d9e579e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_time_controller_a56442319aea3eaed083882a0f148fe26}\label{class_time_controller_a56442319aea3eaed083882a0f148fe26}} 
+\index{Time\+Controller@{Time\+Controller}!midi\+Clock\+Handler@{midi\+Clock\+Handler}}
+\index{midi\+Clock\+Handler@{midi\+Clock\+Handler}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{midi\+Clock\+Handler()}{midiClockHandler()}}
+{\footnotesize\ttfamily void Time\+Controller\+::midi\+Clock\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_time_controller_a56442319aea3eaed083882a0f148fe26_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_time_controller_ae1e9001e3739f3e077f4679b98650e91}\label{class_time_controller_ae1e9001e3739f3e077f4679b98650e91}} 
+\index{Time\+Controller@{Time\+Controller}!run\+Loop\+Handler@{run\+Loop\+Handler}}
+\index{run\+Loop\+Handler@{run\+Loop\+Handler}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{run\+Loop\+Handler()}{runLoopHandler()}}
+{\footnotesize\ttfamily void Time\+Controller\+::run\+Loop\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_time_controller_ae1e9001e3739f3e077f4679b98650e91_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_time_controller_a1b19c7d0b6f30005ef064f75d6e88cfd}\label{class_time_controller_a1b19c7d0b6f30005ef064f75d6e88cfd}} 
+\index{Time\+Controller@{Time\+Controller}!adc@{adc}}
+\index{adc@{adc}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{adc}{adc}}
+{\footnotesize\ttfamily A\+DC$\ast$ Time\+Controller\+::adc\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_a3df18dcb913419302f4bbc92412bbeb9}\label{class_time_controller_a3df18dcb913419302f4bbc92412bbeb9}} 
+\index{Time\+Controller@{Time\+Controller}!backplane\+G\+P\+IO@{backplane\+G\+P\+IO}}
+\index{backplane\+G\+P\+IO@{backplane\+G\+P\+IO}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{backplane\+G\+P\+IO}{backplaneGPIO}}
+{\footnotesize\ttfamily Zetaohm\+\_\+\+M\+A\+X7301 Time\+Controller\+::backplane\+G\+P\+IO\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_a26e73c837f0bc2b17751899674b53bf4}\label{class_time_controller_a26e73c837f0bc2b17751899674b53bf4}} 
+\index{Time\+Controller@{Time\+Controller}!button\+Io@{button\+Io}}
+\index{button\+Io@{button\+Io}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{button\+Io}{buttonIo}}
+{\footnotesize\ttfamily \hyperlink{class_input_module}{Input\+Module} Time\+Controller\+::button\+Io\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_a3a032a3b03a56144fff907ae41d9797b}\label{class_time_controller_a3a032a3b03a56144fff907ae41d9797b}} 
+\index{Time\+Controller@{Time\+Controller}!cache\+Write\+Timer@{cache\+Write\+Timer}}
+\index{cache\+Write\+Timer@{cache\+Write\+Timer}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{cache\+Write\+Timer}{cacheWriteTimer}}
+{\footnotesize\ttfamily elapsed\+Micros Time\+Controller\+::cache\+Write\+Timer\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_a4bcd78ceb9cc4d1d1ecd15998aab84e3}\label{class_time_controller_a4bcd78ceb9cc4d1d1ecd15998aab84e3}} 
+\index{Time\+Controller@{Time\+Controller}!clock\+Master@{clock\+Master}}
+\index{clock\+Master@{clock\+Master}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{clock\+Master}{clockMaster}}
+{\footnotesize\ttfamily \hyperlink{class_master_clock}{Master\+Clock} Time\+Controller\+::clock\+Master\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_afd3a65fca30ffddc7a109e207839b9ec}\label{class_time_controller_afd3a65fca30ffddc7a109e207839b9ec}} 
+\index{Time\+Controller@{Time\+Controller}!display@{display}}
+\index{display@{display}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{display}{display}}
+{\footnotesize\ttfamily \hyperlink{class_display_module}{Display\+Module} Time\+Controller\+::display\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_afebd23c56781eb22ddd1a82437726a56}\label{class_time_controller_afebd23c56781eb22ddd1a82437726a56}} 
+\index{Time\+Controller@{Time\+Controller}!led\+Array@{led\+Array}}
+\index{led\+Array@{led\+Array}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{led\+Array}{ledArray}}
+{\footnotesize\ttfamily \hyperlink{class_l_e_d_array}{L\+E\+D\+Array} Time\+Controller\+::led\+Array\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_ae937d8993e143f8c340d572b21db7541}\label{class_time_controller_ae937d8993e143f8c340d572b21db7541}} 
+\index{Time\+Controller@{Time\+Controller}!midi\+Control@{midi\+Control}}
+\index{midi\+Control@{midi\+Control}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{midi\+Control}{midiControl}}
+{\footnotesize\ttfamily \hyperlink{class_midi_module}{Midi\+Module}$\ast$ Time\+Controller\+::midi\+Control\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_ad66fe36ae69d7a8881d4a9aa5b3f34af}\label{class_time_controller_ad66fe36ae69d7a8881d4a9aa5b3f34af}} 
+\index{Time\+Controller@{Time\+Controller}!midplane\+G\+P\+IO@{midplane\+G\+P\+IO}}
+\index{midplane\+G\+P\+IO@{midplane\+G\+P\+IO}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{midplane\+G\+P\+IO}{midplaneGPIO}}
+{\footnotesize\ttfamily Zetaohm\+\_\+\+M\+A\+X7301 Time\+Controller\+::midplane\+G\+P\+IO\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_ac717861ff746e969f35876842defaa85}\label{class_time_controller_ac717861ff746e969f35876842defaa85}} 
+\index{Time\+Controller@{Time\+Controller}!output\+Control@{output\+Control}}
+\index{output\+Control@{output\+Control}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{output\+Control}{outputControl}}
+{\footnotesize\ttfamily \hyperlink{class_output_controller}{Output\+Controller} Time\+Controller\+::output\+Control\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_a70cef24b984cab7fb2ecb93e2ac52a33}\label{class_time_controller_a70cef24b984cab7fb2ecb93e2ac52a33}} 
+\index{Time\+Controller@{Time\+Controller}!save\+File@{save\+File}}
+\index{save\+File@{save\+File}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{save\+File}{saveFile}}
+{\footnotesize\ttfamily Flash\+Memory Time\+Controller\+::save\+File\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_a90cd4f79debfe1959295b79842bd5e7c}\label{class_time_controller_a90cd4f79debfe1959295b79842bd5e7c}} 
+\index{Time\+Controller@{Time\+Controller}!sequencer\+Array@{sequencer\+Array}}
+\index{sequencer\+Array@{sequencer\+Array}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{sequencer\+Array}{sequencerArray}}
+{\footnotesize\ttfamily Sequencer$\ast$ Time\+Controller\+::sequencer\+Array\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_time_controller_acb753f57965d145cdb399b83062513a5}\label{class_time_controller_acb753f57965d145cdb399b83062513a5}} 
+\index{Time\+Controller@{Time\+Controller}!serial\+Midi@{serial\+Midi}}
+\index{serial\+Midi@{serial\+Midi}!Time\+Controller@{Time\+Controller}}
+\subsubsection{\texorpdfstring{serial\+Midi}{serialMidi}}
+{\footnotesize\ttfamily midi\+::\+Midi\+Interface$<$Hardware\+Serial$>$$\ast$ Time\+Controller\+::serial\+Midi\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{_time_controller_8h}{Time\+Controller.\+h}\item 
+src/\hyperlink{_time_controller_8cpp}{Time\+Controller.\+cpp}\end{DoxyCompactItemize}

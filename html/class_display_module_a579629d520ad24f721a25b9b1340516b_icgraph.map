@@ -1,0 +1,4 @@
+<map id="DisplayModule::channelTunerDisplay" name="DisplayModule::channelTunerDisplay">
+<area shape="rect" id="node2" href="$class_display_module.html#ab89f4bb8387cd4a0557b23ee14133568" title="DisplayModule::displayLoop" alt="" coords="251,12,438,37"/>
+<area shape="rect" id="node3" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="486,12,697,37"/>
+</map>

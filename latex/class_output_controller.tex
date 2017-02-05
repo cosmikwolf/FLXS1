@@ -1,0 +1,368 @@
+\hypertarget{class_output_controller}{}\section{Output\+Controller Class Reference}
+\label{class_output_controller}\index{Output\+Controller@{Output\+Controller}}
+
+
+{\ttfamily \#include $<$Output\+Controller.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_output_controller_a6c7741fe241177b6c0d1236df4c9d358}{initialize} (Zetaohm\+\_\+\+M\+A\+X7301 $\ast$\hyperlink{class_output_controller_ab0e2d4c6b94ea387857bd15cf8aec500}{backplane\+G\+P\+IO}, midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$\hyperlink{class_output_controller_a567ff7ec4d3681767234a68440e8f244}{serial\+Midi}, A\+DC $\ast$\hyperlink{class_output_controller_a9bfb0a095f159c515a688eb7883d8f2e}{adc})
+\item 
+void \hyperlink{class_output_controller_aa841a26dfccb827a5d9896ea6a57d4ff}{note\+On} (uint8\+\_\+t channel, uint8\+\_\+t note, uint8\+\_\+t velocity, uint8\+\_\+t velocity\+Type, uint8\+\_\+t lfo\+Speed\+Setting, uint8\+\_\+t glide, bool gate)
+\item 
+void \hyperlink{class_output_controller_afc6f2ff1d148a4ac60bc07b5829875eb}{note\+Off} (uint8\+\_\+t channel, uint8\+\_\+t note, bool gate\+Off)
+\item 
+void \hyperlink{class_output_controller_a561d7c84d91dcba6cfd9cd8b587b749f}{lfo\+Update} (uint8\+\_\+t channel)
+\item 
+void \hyperlink{class_output_controller_abd6a1e2af3b0e92a53f5e16292958c10}{all\+Notes\+Off} (uint8\+\_\+t channel)
+\item 
+void \hyperlink{class_output_controller_a4057f254aeb8e2d6eed51bc9f76eb2e2}{set\+Clock\+Output} (bool value)
+\item 
+void \hyperlink{class_output_controller_ab821df3ba8e657761c9ae53e4bda458a}{set\+Gate\+Output\+Debug} (uint8\+\_\+t index, bool value)
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_a0996e6ff4b474cc584d532f8b05416ac}{analog\+Input\+Transpose} (uint8\+\_\+t note)
+\item 
+void \hyperlink{class_output_controller_a858a11f23ccf69f351cefbb5b7cca8eb}{dac\+Test\+Loop} ()
+\item 
+void \hyperlink{class_output_controller_a08b99c2f97e05cebeab1cbc9f680d8a9}{calibration\+Routine} ()
+\item 
+void \hyperlink{class_output_controller_a3e855ce6665a2f127a2dc50d04ff0a1c}{input\+Loop\+Test} ()
+\item 
+void \hyperlink{class_output_controller_a67591d82e2c023450e42976bf68b1af1}{input\+Read} ()
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_af87eb8cce270ad31c3875208e36f9bc6}{output\+Map} (uint8\+\_\+t channel, uint8\+\_\+t map\+Type)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+elapsed\+Millis \hyperlink{class_output_controller_ae2c18806972641ba99a568229fd959c8}{clock\+Output\+Timer}
+\item 
+elapsed\+Millis \hyperlink{class_output_controller_a6c9e2379a0459e54320b7d40a8c0cef6}{lfo\+Timer}
+\item 
+elapsed\+Micros \hyperlink{class_output_controller_a8f6de2078236772ab7b8b032b8420eda}{debug\+Timer1}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_ad0849f7cac343b8d28a2fa3ddb40ea26}{lfo\+Type} \mbox{[}4\mbox{]}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_aba5f726ce0ca23a4b17777857b654365}{lfo\+Speed} \mbox{[}4\mbox{]}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_adfa35059f36969eabc3860a20848a7d2}{lfo\+Amplitude} \mbox{[}4\mbox{]}
+\item 
+bool \hyperlink{class_output_controller_a40f2b835564fc78ac3e41d45f9483929}{lfo\+Rheo\+Set} \mbox{[}4\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Zetaohm\+\_\+\+A\+D5676 \hyperlink{class_output_controller_a895d5d186e2cab670a646fe061f105a3}{ad5676}
+\item 
+Zetaohm\+\_\+\+M\+C\+P4352 \hyperlink{class_output_controller_a5f0d06bafea4383bf411331ebf144fa9}{mcp4352\+\_\+1}
+\item 
+Zetaohm\+\_\+\+M\+C\+P4352 \hyperlink{class_output_controller_a59791769507adace817d02c3d21851c2}{mcp4352\+\_\+2}
+\item 
+A\+DC $\ast$ \hyperlink{class_output_controller_a9bfb0a095f159c515a688eb7883d8f2e}{adc}
+\item 
+Zetaohm\+\_\+\+M\+A\+X7301 $\ast$ \hyperlink{class_output_controller_ab0e2d4c6b94ea387857bd15cf8aec500}{backplane\+G\+P\+IO}
+\item 
+midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$ \hyperlink{class_output_controller_a567ff7ec4d3681767234a68440e8f244}{serial\+Midi}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_a632829110f676c43b93bfe79c9698aab}{gate\+Map} \mbox{[}4\mbox{]} = \{0,1,2,3\}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_a4002b7d07abca1317566052b715323da}{dac\+Cv\+Map} \mbox{[}4\mbox{]} = \{7,0,5,3\}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_a87b184786d456a8e1a3312d68284c5a5}{dac\+Cc\+Map} \mbox{[}4\mbox{]} = \{1,6,2,4\}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_a51c8fb4ab13bbc249e0daef8284ceb1c}{slew\+Switch\+Map} \mbox{[}8\mbox{]} = \{9 , 10, 16, 14, 13, 15, 11, 12\}
+\item 
+uint8\+\_\+t \hyperlink{class_output_controller_a4fed4b94c4b8869b64e57c3244289947}{rheo\+Map} \mbox{[}8\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_output_controller_abd6a1e2af3b0e92a53f5e16292958c10}\label{class_output_controller_abd6a1e2af3b0e92a53f5e16292958c10}} 
+\index{Output\+Controller@{Output\+Controller}!all\+Notes\+Off@{all\+Notes\+Off}}
+\index{all\+Notes\+Off@{all\+Notes\+Off}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{all\+Notes\+Off()}{allNotesOff()}}
+{\footnotesize\ttfamily void Output\+Controller\+::all\+Notes\+Off (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{channel }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_abd6a1e2af3b0e92a53f5e16292958c10_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_a0996e6ff4b474cc584d532f8b05416ac}\label{class_output_controller_a0996e6ff4b474cc584d532f8b05416ac}} 
+\index{Output\+Controller@{Output\+Controller}!analog\+Input\+Transpose@{analog\+Input\+Transpose}}
+\index{analog\+Input\+Transpose@{analog\+Input\+Transpose}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{analog\+Input\+Transpose()}{analogInputTranspose()}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::analog\+Input\+Transpose (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{note }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_output_controller_a08b99c2f97e05cebeab1cbc9f680d8a9}\label{class_output_controller_a08b99c2f97e05cebeab1cbc9f680d8a9}} 
+\index{Output\+Controller@{Output\+Controller}!calibration\+Routine@{calibration\+Routine}}
+\index{calibration\+Routine@{calibration\+Routine}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{calibration\+Routine()}{calibrationRoutine()}}
+{\footnotesize\ttfamily void Output\+Controller\+::calibration\+Routine (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a08b99c2f97e05cebeab1cbc9f680d8a9_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_a858a11f23ccf69f351cefbb5b7cca8eb}\label{class_output_controller_a858a11f23ccf69f351cefbb5b7cca8eb}} 
+\index{Output\+Controller@{Output\+Controller}!dac\+Test\+Loop@{dac\+Test\+Loop}}
+\index{dac\+Test\+Loop@{dac\+Test\+Loop}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{dac\+Test\+Loop()}{dacTestLoop()}}
+{\footnotesize\ttfamily void Output\+Controller\+::dac\+Test\+Loop (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a858a11f23ccf69f351cefbb5b7cca8eb_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_a6c7741fe241177b6c0d1236df4c9d358}\label{class_output_controller_a6c7741fe241177b6c0d1236df4c9d358}} 
+\index{Output\+Controller@{Output\+Controller}!initialize@{initialize}}
+\index{initialize@{initialize}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Output\+Controller\+::initialize (\begin{DoxyParamCaption}\item[{Zetaohm\+\_\+\+M\+A\+X7301 $\ast$}]{backplane\+G\+P\+IO,  }\item[{midi\+::\+Midi\+Interface$<$ Hardware\+Serial $>$ $\ast$}]{serial\+Midi,  }\item[{A\+DC $\ast$}]{adc }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a6c7741fe241177b6c0d1236df4c9d358_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a6c7741fe241177b6c0d1236df4c9d358_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_a3e855ce6665a2f127a2dc50d04ff0a1c}\label{class_output_controller_a3e855ce6665a2f127a2dc50d04ff0a1c}} 
+\index{Output\+Controller@{Output\+Controller}!input\+Loop\+Test@{input\+Loop\+Test}}
+\index{input\+Loop\+Test@{input\+Loop\+Test}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{input\+Loop\+Test()}{inputLoopTest()}}
+{\footnotesize\ttfamily void Output\+Controller\+::input\+Loop\+Test (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_output_controller_a67591d82e2c023450e42976bf68b1af1}\label{class_output_controller_a67591d82e2c023450e42976bf68b1af1}} 
+\index{Output\+Controller@{Output\+Controller}!input\+Read@{input\+Read}}
+\index{input\+Read@{input\+Read}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{input\+Read()}{inputRead()}}
+{\footnotesize\ttfamily void Output\+Controller\+::input\+Read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a67591d82e2c023450e42976bf68b1af1_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_a561d7c84d91dcba6cfd9cd8b587b749f}\label{class_output_controller_a561d7c84d91dcba6cfd9cd8b587b749f}} 
+\index{Output\+Controller@{Output\+Controller}!lfo\+Update@{lfo\+Update}}
+\index{lfo\+Update@{lfo\+Update}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{lfo\+Update()}{lfoUpdate()}}
+{\footnotesize\ttfamily void Output\+Controller\+::lfo\+Update (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{channel }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a561d7c84d91dcba6cfd9cd8b587b749f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_a561d7c84d91dcba6cfd9cd8b587b749f_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_afc6f2ff1d148a4ac60bc07b5829875eb}\label{class_output_controller_afc6f2ff1d148a4ac60bc07b5829875eb}} 
+\index{Output\+Controller@{Output\+Controller}!note\+Off@{note\+Off}}
+\index{note\+Off@{note\+Off}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{note\+Off()}{noteOff()}}
+{\footnotesize\ttfamily void Output\+Controller\+::note\+Off (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{channel,  }\item[{uint8\+\_\+t}]{note,  }\item[{bool}]{gate\+Off }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_output_controller_aa841a26dfccb827a5d9896ea6a57d4ff}\label{class_output_controller_aa841a26dfccb827a5d9896ea6a57d4ff}} 
+\index{Output\+Controller@{Output\+Controller}!note\+On@{note\+On}}
+\index{note\+On@{note\+On}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{note\+On()}{noteOn()}}
+{\footnotesize\ttfamily void Output\+Controller\+::note\+On (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{channel,  }\item[{uint8\+\_\+t}]{note,  }\item[{uint8\+\_\+t}]{velocity,  }\item[{uint8\+\_\+t}]{velocity\+Type,  }\item[{uint8\+\_\+t}]{lfo\+Speed\+Setting,  }\item[{uint8\+\_\+t}]{glide,  }\item[{bool}]{gate }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_aa841a26dfccb827a5d9896ea6a57d4ff_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_af87eb8cce270ad31c3875208e36f9bc6}\label{class_output_controller_af87eb8cce270ad31c3875208e36f9bc6}} 
+\index{Output\+Controller@{Output\+Controller}!output\+Map@{output\+Map}}
+\index{output\+Map@{output\+Map}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{output\+Map()}{outputMap()}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::output\+Map (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{channel,  }\item[{uint8\+\_\+t}]{map\+Type }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_output_controller_af87eb8cce270ad31c3875208e36f9bc6_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_output_controller_a4057f254aeb8e2d6eed51bc9f76eb2e2}\label{class_output_controller_a4057f254aeb8e2d6eed51bc9f76eb2e2}} 
+\index{Output\+Controller@{Output\+Controller}!set\+Clock\+Output@{set\+Clock\+Output}}
+\index{set\+Clock\+Output@{set\+Clock\+Output}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{set\+Clock\+Output()}{setClockOutput()}}
+{\footnotesize\ttfamily void Output\+Controller\+::set\+Clock\+Output (\begin{DoxyParamCaption}\item[{bool}]{value }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_output_controller_ab821df3ba8e657761c9ae53e4bda458a}\label{class_output_controller_ab821df3ba8e657761c9ae53e4bda458a}} 
+\index{Output\+Controller@{Output\+Controller}!set\+Gate\+Output\+Debug@{set\+Gate\+Output\+Debug}}
+\index{set\+Gate\+Output\+Debug@{set\+Gate\+Output\+Debug}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{set\+Gate\+Output\+Debug()}{setGateOutputDebug()}}
+{\footnotesize\ttfamily void Output\+Controller\+::set\+Gate\+Output\+Debug (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{index,  }\item[{bool}]{value }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_output_controller_a895d5d186e2cab670a646fe061f105a3}\label{class_output_controller_a895d5d186e2cab670a646fe061f105a3}} 
+\index{Output\+Controller@{Output\+Controller}!ad5676@{ad5676}}
+\index{ad5676@{ad5676}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{ad5676}{ad5676}}
+{\footnotesize\ttfamily Zetaohm\+\_\+\+A\+D5676 Output\+Controller\+::ad5676\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_a9bfb0a095f159c515a688eb7883d8f2e}\label{class_output_controller_a9bfb0a095f159c515a688eb7883d8f2e}} 
+\index{Output\+Controller@{Output\+Controller}!adc@{adc}}
+\index{adc@{adc}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{adc}{adc}}
+{\footnotesize\ttfamily A\+DC$\ast$ Output\+Controller\+::adc\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_ab0e2d4c6b94ea387857bd15cf8aec500}\label{class_output_controller_ab0e2d4c6b94ea387857bd15cf8aec500}} 
+\index{Output\+Controller@{Output\+Controller}!backplane\+G\+P\+IO@{backplane\+G\+P\+IO}}
+\index{backplane\+G\+P\+IO@{backplane\+G\+P\+IO}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{backplane\+G\+P\+IO}{backplaneGPIO}}
+{\footnotesize\ttfamily Zetaohm\+\_\+\+M\+A\+X7301$\ast$ Output\+Controller\+::backplane\+G\+P\+IO\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_ae2c18806972641ba99a568229fd959c8}\label{class_output_controller_ae2c18806972641ba99a568229fd959c8}} 
+\index{Output\+Controller@{Output\+Controller}!clock\+Output\+Timer@{clock\+Output\+Timer}}
+\index{clock\+Output\+Timer@{clock\+Output\+Timer}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{clock\+Output\+Timer}{clockOutputTimer}}
+{\footnotesize\ttfamily elapsed\+Millis Output\+Controller\+::clock\+Output\+Timer}
+
+\mbox{\Hypertarget{class_output_controller_a87b184786d456a8e1a3312d68284c5a5}\label{class_output_controller_a87b184786d456a8e1a3312d68284c5a5}} 
+\index{Output\+Controller@{Output\+Controller}!dac\+Cc\+Map@{dac\+Cc\+Map}}
+\index{dac\+Cc\+Map@{dac\+Cc\+Map}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{dac\+Cc\+Map}{dacCcMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::dac\+Cc\+Map\mbox{[}4\mbox{]} = \{1,6,2,4\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_a4002b7d07abca1317566052b715323da}\label{class_output_controller_a4002b7d07abca1317566052b715323da}} 
+\index{Output\+Controller@{Output\+Controller}!dac\+Cv\+Map@{dac\+Cv\+Map}}
+\index{dac\+Cv\+Map@{dac\+Cv\+Map}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{dac\+Cv\+Map}{dacCvMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::dac\+Cv\+Map\mbox{[}4\mbox{]} = \{7,0,5,3\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_a8f6de2078236772ab7b8b032b8420eda}\label{class_output_controller_a8f6de2078236772ab7b8b032b8420eda}} 
+\index{Output\+Controller@{Output\+Controller}!debug\+Timer1@{debug\+Timer1}}
+\index{debug\+Timer1@{debug\+Timer1}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{debug\+Timer1}{debugTimer1}}
+{\footnotesize\ttfamily elapsed\+Micros Output\+Controller\+::debug\+Timer1}
+
+\mbox{\Hypertarget{class_output_controller_a632829110f676c43b93bfe79c9698aab}\label{class_output_controller_a632829110f676c43b93bfe79c9698aab}} 
+\index{Output\+Controller@{Output\+Controller}!gate\+Map@{gate\+Map}}
+\index{gate\+Map@{gate\+Map}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{gate\+Map}{gateMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::gate\+Map\mbox{[}4\mbox{]} = \{0,1,2,3\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_adfa35059f36969eabc3860a20848a7d2}\label{class_output_controller_adfa35059f36969eabc3860a20848a7d2}} 
+\index{Output\+Controller@{Output\+Controller}!lfo\+Amplitude@{lfo\+Amplitude}}
+\index{lfo\+Amplitude@{lfo\+Amplitude}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{lfo\+Amplitude}{lfoAmplitude}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::lfo\+Amplitude\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_output_controller_a40f2b835564fc78ac3e41d45f9483929}\label{class_output_controller_a40f2b835564fc78ac3e41d45f9483929}} 
+\index{Output\+Controller@{Output\+Controller}!lfo\+Rheo\+Set@{lfo\+Rheo\+Set}}
+\index{lfo\+Rheo\+Set@{lfo\+Rheo\+Set}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{lfo\+Rheo\+Set}{lfoRheoSet}}
+{\footnotesize\ttfamily bool Output\+Controller\+::lfo\+Rheo\+Set\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_output_controller_aba5f726ce0ca23a4b17777857b654365}\label{class_output_controller_aba5f726ce0ca23a4b17777857b654365}} 
+\index{Output\+Controller@{Output\+Controller}!lfo\+Speed@{lfo\+Speed}}
+\index{lfo\+Speed@{lfo\+Speed}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{lfo\+Speed}{lfoSpeed}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::lfo\+Speed\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_output_controller_a6c9e2379a0459e54320b7d40a8c0cef6}\label{class_output_controller_a6c9e2379a0459e54320b7d40a8c0cef6}} 
+\index{Output\+Controller@{Output\+Controller}!lfo\+Timer@{lfo\+Timer}}
+\index{lfo\+Timer@{lfo\+Timer}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{lfo\+Timer}{lfoTimer}}
+{\footnotesize\ttfamily elapsed\+Millis Output\+Controller\+::lfo\+Timer}
+
+\mbox{\Hypertarget{class_output_controller_ad0849f7cac343b8d28a2fa3ddb40ea26}\label{class_output_controller_ad0849f7cac343b8d28a2fa3ddb40ea26}} 
+\index{Output\+Controller@{Output\+Controller}!lfo\+Type@{lfo\+Type}}
+\index{lfo\+Type@{lfo\+Type}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{lfo\+Type}{lfoType}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::lfo\+Type\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{class_output_controller_a5f0d06bafea4383bf411331ebf144fa9}\label{class_output_controller_a5f0d06bafea4383bf411331ebf144fa9}} 
+\index{Output\+Controller@{Output\+Controller}!mcp4352\+\_\+1@{mcp4352\+\_\+1}}
+\index{mcp4352\+\_\+1@{mcp4352\+\_\+1}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{mcp4352\+\_\+1}{mcp4352\_1}}
+{\footnotesize\ttfamily Zetaohm\+\_\+\+M\+C\+P4352 Output\+Controller\+::mcp4352\+\_\+1\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_a59791769507adace817d02c3d21851c2}\label{class_output_controller_a59791769507adace817d02c3d21851c2}} 
+\index{Output\+Controller@{Output\+Controller}!mcp4352\+\_\+2@{mcp4352\+\_\+2}}
+\index{mcp4352\+\_\+2@{mcp4352\+\_\+2}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{mcp4352\+\_\+2}{mcp4352\_2}}
+{\footnotesize\ttfamily Zetaohm\+\_\+\+M\+C\+P4352 Output\+Controller\+::mcp4352\+\_\+2\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_a4fed4b94c4b8869b64e57c3244289947}\label{class_output_controller_a4fed4b94c4b8869b64e57c3244289947}} 
+\index{Output\+Controller@{Output\+Controller}!rheo\+Map@{rheo\+Map}}
+\index{rheo\+Map@{rheo\+Map}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{rheo\+Map}{rheoMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::rheo\+Map\mbox{[}8\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+    0x00 | 3, 
+    0x00 | 1, 
+    0x10 | 2, 
+    0x10 | 1, 
+    0x10 | 0, 
+    0x10 | 3, 
+    0x00 | 2, 
+    0x00 | 0  
+  \}
+\end{DoxyCode}
+\mbox{\Hypertarget{class_output_controller_a567ff7ec4d3681767234a68440e8f244}\label{class_output_controller_a567ff7ec4d3681767234a68440e8f244}} 
+\index{Output\+Controller@{Output\+Controller}!serial\+Midi@{serial\+Midi}}
+\index{serial\+Midi@{serial\+Midi}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{serial\+Midi}{serialMidi}}
+{\footnotesize\ttfamily midi\+::\+Midi\+Interface$<$Hardware\+Serial$>$$\ast$ Output\+Controller\+::serial\+Midi\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_output_controller_a51c8fb4ab13bbc249e0daef8284ceb1c}\label{class_output_controller_a51c8fb4ab13bbc249e0daef8284ceb1c}} 
+\index{Output\+Controller@{Output\+Controller}!slew\+Switch\+Map@{slew\+Switch\+Map}}
+\index{slew\+Switch\+Map@{slew\+Switch\+Map}!Output\+Controller@{Output\+Controller}}
+\subsubsection{\texorpdfstring{slew\+Switch\+Map}{slewSwitchMap}}
+{\footnotesize\ttfamily uint8\+\_\+t Output\+Controller\+::slew\+Switch\+Map\mbox{[}8\mbox{]} = \{9 , 10, 16, 14, 13, 15, 11, 12\}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{_output_controller_8h}{Output\+Controller.\+h}\item 
+src/\hyperlink{_output_controller_8cpp}{Output\+Controller.\+cpp}\end{DoxyCompactItemize}

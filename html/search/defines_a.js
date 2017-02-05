@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['major',['MAJOR',['../global_8h.html#a877cce34f3e58fd7f9194fab90724cb8',1,'global.h']]],
+  ['majorminor',['MAJORMINOR',['../global_8h.html#ade2086d66aa8e80238260dbcd9f390e0',1,'global.h']]],
+  ['maroon',['MAROON',['../display_module_8h.html#acb94f6551a49a0687321b68cc5ff5ae7',1,'displayModule.h']]],
+  ['max7301pin',['MAX7301PIN',['../input_module_8h.html#a62e7eb070209bb4c3c650bc6e299297c',1,'inputModule.h']]],
+  ['max_5fdisplay_5felements',['MAX_DISPLAY_ELEMENTS',['../display_module_8h.html#a6114392da1243b69a45b549bd4ddfd39',1,'displayModule.h']]],
+  ['max_5fstepmode_5fcount',['MAX_STEPMODE_COUNT',['../global_8h.html#acb475a3714aad5e73b1b2ea20f807659',1,'global.h']]],
+  ['max_5fsteps_5fper_5fsequence',['MAX_STEPS_PER_SEQUENCE',['../_step_datum_8h.html#ac969399794b829877d00dff2cdd54ad3',1,'StepDatum.h']]],
+  ['midi_5fclock',['MIDI_CLOCK',['../global_8h.html#afa5e4e295aafd15ab7893344599b3b89',1,'global.h']]],
+  ['midi_5fcontine',['MIDI_CONTINE',['../global_8h.html#ae5033d0fddcdb6c59d2672e65f75ca06',1,'global.h']]],
+  ['midi_5fpulse_5fcount',['MIDI_PULSE_COUNT',['../midi_module_8h.html#ad1b22d84396fe7dc5a600f770c6419fc',1,'midiModule.h']]],
+  ['midi_5fpulse_5ftimeout',['MIDI_PULSE_TIMEOUT',['../midi_module_8h.html#ad22a8dcecbb76e3ae07b35395c90e5b7',1,'midiModule.h']]],
+  ['midi_5fstart',['MIDI_START',['../global_8h.html#a8233631c85823aa546f932ad8975caa4',1,'global.h']]],
+  ['midi_5fstop',['MIDI_STOP',['../global_8h.html#a3af9271d4b1f0d22904a0b055f48cf62',1,'global.h']]],
+  ['midplane_5fmax7301_5fcs_5fpin',['MIDPLANE_MAX7301_CS_PIN',['../global_8h.html#ab7ab83fb0564015686a535e8419a5b26',1,'global.h']]],
+  ['minor',['MINOR',['../global_8h.html#a4e10915d93013542d442d78de0e02e9a',1,'global.h']]],
+  ['mixolydian',['MIXOLYDIAN',['../global_8h.html#aed6a54cf45f00b727e3782256af62cce',1,'global.h']]]
+];

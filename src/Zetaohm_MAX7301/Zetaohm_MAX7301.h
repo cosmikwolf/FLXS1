@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <SPI.h>//this chip needs SPI
 
-#define DEBOUNCE_THRESHOLD 	20000
+#define DEBOUNCE_THRESHOLD 	500
 
 #if defined(SPI_HAS_TRANSACTION)
 	static SPISettings MAX7301_SPI;

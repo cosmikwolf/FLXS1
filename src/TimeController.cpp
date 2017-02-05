@@ -2,9 +2,9 @@
 #include "TimeController.h"
 #include "midiModule.h"
 
-#define DISPLAY_FREQUENCY 50000
-#define INPUT_FREQUENCY 50000
-#define LED_FREQUENCY 10000
+#define DISPLAY_FREQUENCY 70000
+#define INPUT_FREQUENCY 60000
+#define LED_FREQUENCY 5000
 
 
 TimeController::TimeController(){ };
@@ -123,7 +123,6 @@ void TimeController::runLoopHandler() {
 
 	//Serial.println("Display Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
-	outputControl.inputRead();
 	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* INPUTREDLOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
 	if(currentState == CALIBRATION_MENU){

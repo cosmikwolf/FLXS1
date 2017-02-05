@@ -1,0 +1,283 @@
+\hypertarget{class_l_e_d_array}{}\section{L\+E\+D\+Array Class Reference}
+\label{class_l_e_d_array}\index{L\+E\+D\+Array@{L\+E\+D\+Array}}
+
+
+{\ttfamily \#include $<$L\+E\+D\+Array.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_l_e_d_array_a38e049928e05c44035bf47ed888c319f}{L\+E\+D\+Array} ()
+\item 
+void \hyperlink{class_l_e_d_array_affcc24a132375e42e76f231da3744542}{initialize} (Sequencer $\ast$\hyperlink{class_l_e_d_array_a93c18ec03393f639c7e0a11a3324c922}{sequence\+Array})
+\item 
+void \hyperlink{class_l_e_d_array_a13f7dd3ae81862c31331199c732f8a3e}{loop} (uint16\+\_\+t \hyperlink{global_8h_acdfc8898c9e67fbcec81f3b04ae61bd9}{frequency})
+\item 
+void \hyperlink{class_l_e_d_array_aa9d1531481da8b4f236a8c187f986b0d}{fadeall} ()
+\item 
+void \hyperlink{class_l_e_d_array_af787dadd33b8c2049de93f8e91bc60ab}{rainbow\+Cycle} (uint8\+\_\+t wait)
+\item 
+uint32\+\_\+t \hyperlink{class_l_e_d_array_a783c6a0ef721d76b6b65aead2322e059}{wheel} (byte Wheel\+Pos)
+\item 
+void \hyperlink{class_l_e_d_array_a602c56fdb10d7bf66f8d681081a99b83}{channel\+Pitch\+Mode\+L\+E\+D\+Handler} ()
+\item 
+void \hyperlink{class_l_e_d_array_ab90f5a669b0faf8853070e12b99c4b3d}{channel\+Gate\+Mode\+L\+E\+D\+Handler} ()
+\item 
+void \hyperlink{class_l_e_d_array_a4fdfa734a42f2e2f577a0be7ce8953d5}{channel\+Envelope\+Mode\+L\+E\+D\+Handler} ()
+\item 
+void \hyperlink{class_l_e_d_array_a81dfe62b22624f9f29d57da0298043fc}{channel\+Step\+Mode\+L\+E\+D\+Handler} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Sequencer $\ast$ \hyperlink{class_l_e_d_array_a93c18ec03393f639c7e0a11a3324c922}{sequence\+Array}
+\item 
+elapsed\+Micros \hyperlink{class_l_e_d_array_a72681582a31026c79a8021cead72d51e}{pixel\+Timer}
+\item 
+Adafruit\+\_\+\+Neo\+Pixel \hyperlink{class_l_e_d_array_ae781b0d4364e6789f618e9d73fe69198}{leds} = Adafruit\+\_\+\+Neo\+Pixel(\hyperlink{_l_e_d_array_8h_a4c4ae9a4146ce8d6a5debc90300d9abd}{N\+U\+M\+\_\+\+L\+E\+DS}, \hyperlink{_l_e_d_array_8h_adad67fe595ea440c8f8247ec2cddf070}{D\+A\+T\+A\+\_\+\+P\+IN}, N\+E\+O\+\_\+\+G\+R\+BW + N\+E\+O\+\_\+\+K\+H\+Z800)
+\item 
+uint8\+\_\+t \hyperlink{class_l_e_d_array_a9a675b5ebd4e5b0034ef944f204871fe}{led\+Mapping} \mbox{[}\hyperlink{_l_e_d_array_8h_a4c4ae9a4146ce8d6a5debc90300d9abd}{N\+U\+M\+\_\+\+L\+E\+DS}\mbox{]} = \{1,2,3,4,6,7,8,9,11,12,13,14,16,17,18,19,0,5,10,15\}
+\item 
+uint8\+\_\+t \hyperlink{class_l_e_d_array_add6bd6e431a7e4a8b7e33c96b0bf7578}{led\+Main\+Matrix} \mbox{[}16\mbox{]} = \{2,3,4,5,7,8,9,10,12,13,14,15,17,18,19,20\}
+\item 
+uint8\+\_\+t \hyperlink{class_l_e_d_array_a64d8cc06323de69ccad888f63a231c5f}{led\+Channel\+Buttons} \mbox{[}4\mbox{]} = \{1,6,11,16\}
+\item 
+uint8\+\_\+t \hyperlink{class_l_e_d_array_a22ca5391b4ad6c8b7b44e3aaf73c9429}{led\+Aux\+Buttons} \mbox{[}3\mbox{]} = \{0,21,22\}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_l_e_d_array_a38e049928e05c44035bf47ed888c319f}\label{class_l_e_d_array_a38e049928e05c44035bf47ed888c319f}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{L\+E\+D\+Array()}{LEDArray()}}
+{\footnotesize\ttfamily L\+E\+D\+Array\+::\+L\+E\+D\+Array (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_l_e_d_array_a4fdfa734a42f2e2f577a0be7ce8953d5}\label{class_l_e_d_array_a4fdfa734a42f2e2f577a0be7ce8953d5}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!channel\+Envelope\+Mode\+L\+E\+D\+Handler@{channel\+Envelope\+Mode\+L\+E\+D\+Handler}}
+\index{channel\+Envelope\+Mode\+L\+E\+D\+Handler@{channel\+Envelope\+Mode\+L\+E\+D\+Handler}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{channel\+Envelope\+Mode\+L\+E\+D\+Handler()}{channelEnvelopeModeLEDHandler()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::channel\+Envelope\+Mode\+L\+E\+D\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{class_l_e_d_array_a4fdfa734a42f2e2f577a0be7ce8953d5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a4fdfa734a42f2e2f577a0be7ce8953d5_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_ab90f5a669b0faf8853070e12b99c4b3d}\label{class_l_e_d_array_ab90f5a669b0faf8853070e12b99c4b3d}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!channel\+Gate\+Mode\+L\+E\+D\+Handler@{channel\+Gate\+Mode\+L\+E\+D\+Handler}}
+\index{channel\+Gate\+Mode\+L\+E\+D\+Handler@{channel\+Gate\+Mode\+L\+E\+D\+Handler}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{channel\+Gate\+Mode\+L\+E\+D\+Handler()}{channelGateModeLEDHandler()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::channel\+Gate\+Mode\+L\+E\+D\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_ab90f5a669b0faf8853070e12b99c4b3d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_ab90f5a669b0faf8853070e12b99c4b3d_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_a602c56fdb10d7bf66f8d681081a99b83}\label{class_l_e_d_array_a602c56fdb10d7bf66f8d681081a99b83}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!channel\+Pitch\+Mode\+L\+E\+D\+Handler@{channel\+Pitch\+Mode\+L\+E\+D\+Handler}}
+\index{channel\+Pitch\+Mode\+L\+E\+D\+Handler@{channel\+Pitch\+Mode\+L\+E\+D\+Handler}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{channel\+Pitch\+Mode\+L\+E\+D\+Handler()}{channelPitchModeLEDHandler()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::channel\+Pitch\+Mode\+L\+E\+D\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a602c56fdb10d7bf66f8d681081a99b83_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a602c56fdb10d7bf66f8d681081a99b83_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_a81dfe62b22624f9f29d57da0298043fc}\label{class_l_e_d_array_a81dfe62b22624f9f29d57da0298043fc}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!channel\+Step\+Mode\+L\+E\+D\+Handler@{channel\+Step\+Mode\+L\+E\+D\+Handler}}
+\index{channel\+Step\+Mode\+L\+E\+D\+Handler@{channel\+Step\+Mode\+L\+E\+D\+Handler}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{channel\+Step\+Mode\+L\+E\+D\+Handler()}{channelStepModeLEDHandler()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::channel\+Step\+Mode\+L\+E\+D\+Handler (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a81dfe62b22624f9f29d57da0298043fc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a81dfe62b22624f9f29d57da0298043fc_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_aa9d1531481da8b4f236a8c187f986b0d}\label{class_l_e_d_array_aa9d1531481da8b4f236a8c187f986b0d}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!fadeall@{fadeall}}
+\index{fadeall@{fadeall}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{fadeall()}{fadeall()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::fadeall (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_l_e_d_array_affcc24a132375e42e76f231da3744542}\label{class_l_e_d_array_affcc24a132375e42e76f231da3744542}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!initialize@{initialize}}
+\index{initialize@{initialize}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::initialize (\begin{DoxyParamCaption}\item[{Sequencer $\ast$}]{sequence\+Array }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_affcc24a132375e42e76f231da3744542_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{class_l_e_d_array_affcc24a132375e42e76f231da3744542_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_a13f7dd3ae81862c31331199c732f8a3e}\label{class_l_e_d_array_a13f7dd3ae81862c31331199c732f8a3e}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!loop@{loop}}
+\index{loop@{loop}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{loop()}{loop()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::loop (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{frequency }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a13f7dd3ae81862c31331199c732f8a3e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a13f7dd3ae81862c31331199c732f8a3e_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_af787dadd33b8c2049de93f8e91bc60ab}\label{class_l_e_d_array_af787dadd33b8c2049de93f8e91bc60ab}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!rainbow\+Cycle@{rainbow\+Cycle}}
+\index{rainbow\+Cycle@{rainbow\+Cycle}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{rainbow\+Cycle()}{rainbowCycle()}}
+{\footnotesize\ttfamily void L\+E\+D\+Array\+::rainbow\+Cycle (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{wait }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{class_l_e_d_array_af787dadd33b8c2049de93f8e91bc60ab_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_af787dadd33b8c2049de93f8e91bc60ab_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{class_l_e_d_array_a783c6a0ef721d76b6b65aead2322e059}\label{class_l_e_d_array_a783c6a0ef721d76b6b65aead2322e059}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!wheel@{wheel}}
+\index{wheel@{wheel}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{wheel()}{wheel()}}
+{\footnotesize\ttfamily uint32\+\_\+t L\+E\+D\+Array\+::wheel (\begin{DoxyParamCaption}\item[{byte}]{Wheel\+Pos }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_l_e_d_array_a783c6a0ef721d76b6b65aead2322e059_icgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_l_e_d_array_a22ca5391b4ad6c8b7b44e3aaf73c9429}\label{class_l_e_d_array_a22ca5391b4ad6c8b7b44e3aaf73c9429}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!led\+Aux\+Buttons@{led\+Aux\+Buttons}}
+\index{led\+Aux\+Buttons@{led\+Aux\+Buttons}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{led\+Aux\+Buttons}{ledAuxButtons}}
+{\footnotesize\ttfamily uint8\+\_\+t L\+E\+D\+Array\+::led\+Aux\+Buttons\mbox{[}3\mbox{]} = \{0,21,22\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_l_e_d_array_a64d8cc06323de69ccad888f63a231c5f}\label{class_l_e_d_array_a64d8cc06323de69ccad888f63a231c5f}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!led\+Channel\+Buttons@{led\+Channel\+Buttons}}
+\index{led\+Channel\+Buttons@{led\+Channel\+Buttons}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{led\+Channel\+Buttons}{ledChannelButtons}}
+{\footnotesize\ttfamily uint8\+\_\+t L\+E\+D\+Array\+::led\+Channel\+Buttons\mbox{[}4\mbox{]} = \{1,6,11,16\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_l_e_d_array_add6bd6e431a7e4a8b7e33c96b0bf7578}\label{class_l_e_d_array_add6bd6e431a7e4a8b7e33c96b0bf7578}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!led\+Main\+Matrix@{led\+Main\+Matrix}}
+\index{led\+Main\+Matrix@{led\+Main\+Matrix}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{led\+Main\+Matrix}{ledMainMatrix}}
+{\footnotesize\ttfamily uint8\+\_\+t L\+E\+D\+Array\+::led\+Main\+Matrix\mbox{[}16\mbox{]} = \{2,3,4,5,7,8,9,10,12,13,14,15,17,18,19,20\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_l_e_d_array_a9a675b5ebd4e5b0034ef944f204871fe}\label{class_l_e_d_array_a9a675b5ebd4e5b0034ef944f204871fe}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!led\+Mapping@{led\+Mapping}}
+\index{led\+Mapping@{led\+Mapping}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{led\+Mapping}{ledMapping}}
+{\footnotesize\ttfamily uint8\+\_\+t L\+E\+D\+Array\+::led\+Mapping\mbox{[}\hyperlink{_l_e_d_array_8h_a4c4ae9a4146ce8d6a5debc90300d9abd}{N\+U\+M\+\_\+\+L\+E\+DS}\mbox{]} = \{1,2,3,4,6,7,8,9,11,12,13,14,16,17,18,19,0,5,10,15\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_l_e_d_array_ae781b0d4364e6789f618e9d73fe69198}\label{class_l_e_d_array_ae781b0d4364e6789f618e9d73fe69198}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!leds@{leds}}
+\index{leds@{leds}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{leds}{leds}}
+{\footnotesize\ttfamily Adafruit\+\_\+\+Neo\+Pixel L\+E\+D\+Array\+::leds = Adafruit\+\_\+\+Neo\+Pixel(\hyperlink{_l_e_d_array_8h_a4c4ae9a4146ce8d6a5debc90300d9abd}{N\+U\+M\+\_\+\+L\+E\+DS}, \hyperlink{_l_e_d_array_8h_adad67fe595ea440c8f8247ec2cddf070}{D\+A\+T\+A\+\_\+\+P\+IN}, N\+E\+O\+\_\+\+G\+R\+BW + N\+E\+O\+\_\+\+K\+H\+Z800)\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_l_e_d_array_a72681582a31026c79a8021cead72d51e}\label{class_l_e_d_array_a72681582a31026c79a8021cead72d51e}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!pixel\+Timer@{pixel\+Timer}}
+\index{pixel\+Timer@{pixel\+Timer}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{pixel\+Timer}{pixelTimer}}
+{\footnotesize\ttfamily elapsed\+Micros L\+E\+D\+Array\+::pixel\+Timer\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_l_e_d_array_a93c18ec03393f639c7e0a11a3324c922}\label{class_l_e_d_array_a93c18ec03393f639c7e0a11a3324c922}} 
+\index{L\+E\+D\+Array@{L\+E\+D\+Array}!sequence\+Array@{sequence\+Array}}
+\index{sequence\+Array@{sequence\+Array}!L\+E\+D\+Array@{L\+E\+D\+Array}}
+\subsubsection{\texorpdfstring{sequence\+Array}{sequenceArray}}
+{\footnotesize\ttfamily Sequencer$\ast$ L\+E\+D\+Array\+::sequence\+Array\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{_l_e_d_array_8h}{L\+E\+D\+Array.\+h}\item 
+src/\hyperlink{_l_e_d_array_8cpp}{L\+E\+D\+Array.\+cpp}\end{DoxyCompactItemize}

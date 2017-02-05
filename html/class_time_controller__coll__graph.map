@@ -1,0 +1,8 @@
+<map id="TimeController" name="TimeController">
+<area shape="rect" id="node2" href="$class_midi_module.html" title="MidiModule" alt="" coords="5,5,95,31"/>
+<area shape="rect" id="node7" href="$class_master_clock.html" title="MasterClock" alt="" coords="108,92,203,117"/>
+<area shape="rect" id="node3" href="$class_display_module.html" title="DisplayModule" alt="" coords="436,179,544,204"/>
+<area shape="rect" id="node4" href="$class_output_controller.html" title="OutputController" alt="" coords="217,5,336,31"/>
+<area shape="rect" id="node6" href="$class_input_module.html" title="InputModule" alt="" coords="237,179,332,204"/>
+<area shape="rect" id="node5" href="$class_l_e_d_array.html" title="LEDArray" alt="" coords="568,179,647,204"/>
+</map>

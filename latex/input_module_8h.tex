@@ -1,0 +1,302 @@
+\hypertarget{input_module_8h}{}\section{src/input\+Module.h File Reference}
+\label{input_module_8h}\index{src/input\+Module.\+h@{src/input\+Module.\+h}}
+{\ttfamily \#include $<$Arduino.\+h$>$}\newline
+{\ttfamily \#include $<$S\+P\+I.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}Zetaohm\+\_\+\+M\+A\+X7301/\+Zetaohm\+\_\+\+M\+A\+X7301.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$Encoder.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}Output\+Controller.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Display\+Module.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Sequencer.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Master\+Clock.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}global.\+h\char`\"{}}\newline
+Include dependency graph for input\+Module.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{input_module_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{input_module_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_input_module}{Input\+Module}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{input_module_8h_abade2499e97e4f49e95c5cefd95422a2}{E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS}
+\item 
+\#define \hyperlink{input_module_8h_a345154e5d6356bd9c04f5b4948256508}{\+\_\+\+Input\+Module\+\_\+h\+\_\+}
+\item 
+\#define \hyperlink{input_module_8h_a3ce18f9881041b6851e5777bdf8e45f9}{S\+W\+\_\+00}~0
+\item 
+\#define \hyperlink{input_module_8h_afd7ae2c8369e99fb418e6b540e4289fe}{S\+W\+\_\+01}~1
+\item 
+\#define \hyperlink{input_module_8h_a141b0a477104eb8da187c28e2c0f7bfb}{S\+W\+\_\+02}~2
+\item 
+\#define \hyperlink{input_module_8h_a4a68c658a048fe567dec383fea5f7bc9}{S\+W\+\_\+03}~3
+\item 
+\#define \hyperlink{input_module_8h_a004df0fa7507074f1a0769f5af9a1e65}{S\+W\+\_\+04}~4
+\item 
+\#define \hyperlink{input_module_8h_aeb5ad5fa0bf02d40d80aab9ad1d3f812}{S\+W\+\_\+05}~5
+\item 
+\#define \hyperlink{input_module_8h_a4aff0c3e238ca35181e5e7167f31505d}{S\+W\+\_\+06}~6
+\item 
+\#define \hyperlink{input_module_8h_af51609bc0dfce279638c97f31aa84a4d}{S\+W\+\_\+07}~7
+\item 
+\#define \hyperlink{input_module_8h_af37881eb029e08a5071d88b87f57536d}{S\+W\+\_\+08}~8
+\item 
+\#define \hyperlink{input_module_8h_a2a1f8d59fd53b30c793cbaa329abe9bd}{S\+W\+\_\+09}~9
+\item 
+\#define \hyperlink{input_module_8h_a1ab3d0d68d52dbbe70bed2f86b069d95}{S\+W\+\_\+10}~10
+\item 
+\#define \hyperlink{input_module_8h_a93a623a433593b9fd127346f6661d7b2}{S\+W\+\_\+11}~11
+\item 
+\#define \hyperlink{input_module_8h_a30d09e86d40272e04862e16996e190cf}{S\+W\+\_\+12}~12
+\item 
+\#define \hyperlink{input_module_8h_a0da1eec64cbf4bfb0d64aa51e671e650}{S\+W\+\_\+13}~13
+\item 
+\#define \hyperlink{input_module_8h_ae4171372674dc51b7315224f443b3472}{S\+W\+\_\+14}~14
+\item 
+\#define \hyperlink{input_module_8h_a62cc087aa9bf311476183983cfbb000e}{S\+W\+\_\+15}~15
+\item 
+\#define \hyperlink{input_module_8h_afc82deeefb659b0b3bea44394392bd5e}{S\+W\+\_\+\+P\+L\+AY}~16
+\item 
+\#define \hyperlink{input_module_8h_aa6834bd56b5cfb03e3a1162f50c144d8}{S\+W\+\_\+\+R\+EC}~17
+\item 
+\#define \hyperlink{input_module_8h_a6a4229af238e4d5089af58eecee10d34}{S\+W\+\_\+\+S\+T\+OP}~18
+\item 
+\#define \hyperlink{input_module_8h_ac8b677da651111a7152694bed339183d}{S\+W\+\_\+\+M0}~19
+\item 
+\#define \hyperlink{input_module_8h_a92a25dfa4a4bfbd5c32265be61761cf6}{S\+W\+\_\+\+M1}~20
+\item 
+\#define \hyperlink{input_module_8h_a1cc41b4dc33c780f21c293d61f661b03}{S\+W\+\_\+\+M2}~21
+\item 
+\#define \hyperlink{input_module_8h_a7500acba270428dbef3dc381f269f573}{S\+W\+\_\+\+M3}~22
+\item 
+\#define \hyperlink{input_module_8h_a4adc8a5c9001dcc4b83e4a3b4fa6bcd7}{S\+W\+\_\+\+P\+G\+DN}~23
+\item 
+\#define \hyperlink{input_module_8h_a5ebb5f321180986d33ea95e48f038b4e}{S\+W\+\_\+\+P\+G\+UP}~24
+\item 
+\#define \hyperlink{input_module_8h_ae4450d44076674ce65894a756a41f88f}{S\+W\+\_\+\+P\+A\+T\+T\+E\+RN}~25
+\item 
+\#define \hyperlink{input_module_8h_a5a1dee68a578a6d1563e4e60d12ef659}{S\+W\+\_\+\+M\+E\+NU}~26
+\item 
+\#define \hyperlink{input_module_8h_aa5da0aaec9caa74fc368f6e3c0eb3fd8}{S\+W\+\_\+\+S\+H\+I\+FT}~27
+\item 
+\#define \hyperlink{input_module_8h_a45945b63e59303d6d2ad68fd7e85c2bd}{E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN}~16
+\item 
+\#define \hyperlink{input_module_8h_abd00438475e1a5e36e63ced3fc730d65}{E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN}~25
+\item 
+\#define \hyperlink{input_module_8h_a62e7eb070209bb4c3c650bc6e299297c}{M\+A\+X7301\+P\+IN}~5
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{input_module_8h_a345154e5d6356bd9c04f5b4948256508}\label{input_module_8h_a345154e5d6356bd9c04f5b4948256508}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!\+\_\+\+Input\+Module\+\_\+h\+\_\+@{\+\_\+\+Input\+Module\+\_\+h\+\_\+}}
+\index{\+\_\+\+Input\+Module\+\_\+h\+\_\+@{\+\_\+\+Input\+Module\+\_\+h\+\_\+}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+Input\+Module\+\_\+h\+\_\+}{\_InputModule\_h\_}}
+{\footnotesize\ttfamily \#define \+\_\+\+Input\+Module\+\_\+h\+\_\+}
+
+\mbox{\Hypertarget{input_module_8h_a45945b63e59303d6d2ad68fd7e85c2bd}\label{input_module_8h_a45945b63e59303d6d2ad68fd7e85c2bd}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN@{E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN}}
+\index{E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN@{E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN}{ENCODER1LEFTPIN}}
+{\footnotesize\ttfamily \#define E\+N\+C\+O\+D\+E\+R1\+L\+E\+F\+T\+P\+IN~16}
+
+\mbox{\Hypertarget{input_module_8h_abd00438475e1a5e36e63ced3fc730d65}\label{input_module_8h_abd00438475e1a5e36e63ced3fc730d65}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN@{E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN}}
+\index{E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN@{E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN}{ENCODER1RIGHTPIN}}
+{\footnotesize\ttfamily \#define E\+N\+C\+O\+D\+E\+R1\+R\+I\+G\+H\+T\+P\+IN~25}
+
+\mbox{\Hypertarget{input_module_8h_abade2499e97e4f49e95c5cefd95422a2}\label{input_module_8h_abade2499e97e4f49e95c5cefd95422a2}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS@{E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS}}
+\index{E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS@{E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS}{ENCODER\_OPTIMIZE\_INTERRUPTS}}
+{\footnotesize\ttfamily \#define E\+N\+C\+O\+D\+E\+R\+\_\+\+O\+P\+T\+I\+M\+I\+Z\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+TS}
+
+\mbox{\Hypertarget{input_module_8h_a62e7eb070209bb4c3c650bc6e299297c}\label{input_module_8h_a62e7eb070209bb4c3c650bc6e299297c}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!M\+A\+X7301\+P\+IN@{M\+A\+X7301\+P\+IN}}
+\index{M\+A\+X7301\+P\+IN@{M\+A\+X7301\+P\+IN}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X7301\+P\+IN}{MAX7301PIN}}
+{\footnotesize\ttfamily \#define M\+A\+X7301\+P\+IN~5}
+
+\mbox{\Hypertarget{input_module_8h_a3ce18f9881041b6851e5777bdf8e45f9}\label{input_module_8h_a3ce18f9881041b6851e5777bdf8e45f9}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+00@{S\+W\+\_\+00}}
+\index{S\+W\+\_\+00@{S\+W\+\_\+00}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+00}{SW\_00}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+00~0}
+
+\mbox{\Hypertarget{input_module_8h_afd7ae2c8369e99fb418e6b540e4289fe}\label{input_module_8h_afd7ae2c8369e99fb418e6b540e4289fe}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+01@{S\+W\+\_\+01}}
+\index{S\+W\+\_\+01@{S\+W\+\_\+01}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+01}{SW\_01}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+01~1}
+
+\mbox{\Hypertarget{input_module_8h_a141b0a477104eb8da187c28e2c0f7bfb}\label{input_module_8h_a141b0a477104eb8da187c28e2c0f7bfb}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+02@{S\+W\+\_\+02}}
+\index{S\+W\+\_\+02@{S\+W\+\_\+02}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+02}{SW\_02}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+02~2}
+
+\mbox{\Hypertarget{input_module_8h_a4a68c658a048fe567dec383fea5f7bc9}\label{input_module_8h_a4a68c658a048fe567dec383fea5f7bc9}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+03@{S\+W\+\_\+03}}
+\index{S\+W\+\_\+03@{S\+W\+\_\+03}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+03}{SW\_03}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+03~3}
+
+\mbox{\Hypertarget{input_module_8h_a004df0fa7507074f1a0769f5af9a1e65}\label{input_module_8h_a004df0fa7507074f1a0769f5af9a1e65}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+04@{S\+W\+\_\+04}}
+\index{S\+W\+\_\+04@{S\+W\+\_\+04}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+04}{SW\_04}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+04~4}
+
+\mbox{\Hypertarget{input_module_8h_aeb5ad5fa0bf02d40d80aab9ad1d3f812}\label{input_module_8h_aeb5ad5fa0bf02d40d80aab9ad1d3f812}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+05@{S\+W\+\_\+05}}
+\index{S\+W\+\_\+05@{S\+W\+\_\+05}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+05}{SW\_05}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+05~5}
+
+\mbox{\Hypertarget{input_module_8h_a4aff0c3e238ca35181e5e7167f31505d}\label{input_module_8h_a4aff0c3e238ca35181e5e7167f31505d}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+06@{S\+W\+\_\+06}}
+\index{S\+W\+\_\+06@{S\+W\+\_\+06}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+06}{SW\_06}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+06~6}
+
+\mbox{\Hypertarget{input_module_8h_af51609bc0dfce279638c97f31aa84a4d}\label{input_module_8h_af51609bc0dfce279638c97f31aa84a4d}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+07@{S\+W\+\_\+07}}
+\index{S\+W\+\_\+07@{S\+W\+\_\+07}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+07}{SW\_07}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+07~7}
+
+\mbox{\Hypertarget{input_module_8h_af37881eb029e08a5071d88b87f57536d}\label{input_module_8h_af37881eb029e08a5071d88b87f57536d}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+08@{S\+W\+\_\+08}}
+\index{S\+W\+\_\+08@{S\+W\+\_\+08}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+08}{SW\_08}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+08~8}
+
+\mbox{\Hypertarget{input_module_8h_a2a1f8d59fd53b30c793cbaa329abe9bd}\label{input_module_8h_a2a1f8d59fd53b30c793cbaa329abe9bd}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+09@{S\+W\+\_\+09}}
+\index{S\+W\+\_\+09@{S\+W\+\_\+09}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+09}{SW\_09}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+09~9}
+
+\mbox{\Hypertarget{input_module_8h_a1ab3d0d68d52dbbe70bed2f86b069d95}\label{input_module_8h_a1ab3d0d68d52dbbe70bed2f86b069d95}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+10@{S\+W\+\_\+10}}
+\index{S\+W\+\_\+10@{S\+W\+\_\+10}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+10}{SW\_10}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+10~10}
+
+\mbox{\Hypertarget{input_module_8h_a93a623a433593b9fd127346f6661d7b2}\label{input_module_8h_a93a623a433593b9fd127346f6661d7b2}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+11@{S\+W\+\_\+11}}
+\index{S\+W\+\_\+11@{S\+W\+\_\+11}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+11}{SW\_11}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+11~11}
+
+\mbox{\Hypertarget{input_module_8h_a30d09e86d40272e04862e16996e190cf}\label{input_module_8h_a30d09e86d40272e04862e16996e190cf}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+12@{S\+W\+\_\+12}}
+\index{S\+W\+\_\+12@{S\+W\+\_\+12}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+12}{SW\_12}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+12~12}
+
+\mbox{\Hypertarget{input_module_8h_a0da1eec64cbf4bfb0d64aa51e671e650}\label{input_module_8h_a0da1eec64cbf4bfb0d64aa51e671e650}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+13@{S\+W\+\_\+13}}
+\index{S\+W\+\_\+13@{S\+W\+\_\+13}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+13}{SW\_13}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+13~13}
+
+\mbox{\Hypertarget{input_module_8h_ae4171372674dc51b7315224f443b3472}\label{input_module_8h_ae4171372674dc51b7315224f443b3472}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+14@{S\+W\+\_\+14}}
+\index{S\+W\+\_\+14@{S\+W\+\_\+14}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+14}{SW\_14}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+14~14}
+
+\mbox{\Hypertarget{input_module_8h_a62cc087aa9bf311476183983cfbb000e}\label{input_module_8h_a62cc087aa9bf311476183983cfbb000e}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+15@{S\+W\+\_\+15}}
+\index{S\+W\+\_\+15@{S\+W\+\_\+15}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+15}{SW\_15}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+15~15}
+
+\mbox{\Hypertarget{input_module_8h_ac8b677da651111a7152694bed339183d}\label{input_module_8h_ac8b677da651111a7152694bed339183d}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+M0@{S\+W\+\_\+\+M0}}
+\index{S\+W\+\_\+\+M0@{S\+W\+\_\+\+M0}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+M0}{SW\_M0}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+M0~19}
+
+\mbox{\Hypertarget{input_module_8h_a92a25dfa4a4bfbd5c32265be61761cf6}\label{input_module_8h_a92a25dfa4a4bfbd5c32265be61761cf6}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+M1@{S\+W\+\_\+\+M1}}
+\index{S\+W\+\_\+\+M1@{S\+W\+\_\+\+M1}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+M1}{SW\_M1}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+M1~20}
+
+\mbox{\Hypertarget{input_module_8h_a1cc41b4dc33c780f21c293d61f661b03}\label{input_module_8h_a1cc41b4dc33c780f21c293d61f661b03}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+M2@{S\+W\+\_\+\+M2}}
+\index{S\+W\+\_\+\+M2@{S\+W\+\_\+\+M2}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+M2}{SW\_M2}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+M2~21}
+
+\mbox{\Hypertarget{input_module_8h_a7500acba270428dbef3dc381f269f573}\label{input_module_8h_a7500acba270428dbef3dc381f269f573}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+M3@{S\+W\+\_\+\+M3}}
+\index{S\+W\+\_\+\+M3@{S\+W\+\_\+\+M3}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+M3}{SW\_M3}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+M3~22}
+
+\mbox{\Hypertarget{input_module_8h_a5a1dee68a578a6d1563e4e60d12ef659}\label{input_module_8h_a5a1dee68a578a6d1563e4e60d12ef659}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+M\+E\+NU@{S\+W\+\_\+\+M\+E\+NU}}
+\index{S\+W\+\_\+\+M\+E\+NU@{S\+W\+\_\+\+M\+E\+NU}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+M\+E\+NU}{SW\_MENU}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+M\+E\+NU~26}
+
+\mbox{\Hypertarget{input_module_8h_ae4450d44076674ce65894a756a41f88f}\label{input_module_8h_ae4450d44076674ce65894a756a41f88f}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+P\+A\+T\+T\+E\+RN@{S\+W\+\_\+\+P\+A\+T\+T\+E\+RN}}
+\index{S\+W\+\_\+\+P\+A\+T\+T\+E\+RN@{S\+W\+\_\+\+P\+A\+T\+T\+E\+RN}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+P\+A\+T\+T\+E\+RN}{SW\_PATTERN}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+P\+A\+T\+T\+E\+RN~25}
+
+\mbox{\Hypertarget{input_module_8h_a4adc8a5c9001dcc4b83e4a3b4fa6bcd7}\label{input_module_8h_a4adc8a5c9001dcc4b83e4a3b4fa6bcd7}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+P\+G\+DN@{S\+W\+\_\+\+P\+G\+DN}}
+\index{S\+W\+\_\+\+P\+G\+DN@{S\+W\+\_\+\+P\+G\+DN}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+P\+G\+DN}{SW\_PGDN}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+P\+G\+DN~23}
+
+\mbox{\Hypertarget{input_module_8h_a5ebb5f321180986d33ea95e48f038b4e}\label{input_module_8h_a5ebb5f321180986d33ea95e48f038b4e}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+P\+G\+UP@{S\+W\+\_\+\+P\+G\+UP}}
+\index{S\+W\+\_\+\+P\+G\+UP@{S\+W\+\_\+\+P\+G\+UP}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+P\+G\+UP}{SW\_PGUP}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+P\+G\+UP~24}
+
+\mbox{\Hypertarget{input_module_8h_afc82deeefb659b0b3bea44394392bd5e}\label{input_module_8h_afc82deeefb659b0b3bea44394392bd5e}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+P\+L\+AY@{S\+W\+\_\+\+P\+L\+AY}}
+\index{S\+W\+\_\+\+P\+L\+AY@{S\+W\+\_\+\+P\+L\+AY}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+P\+L\+AY}{SW\_PLAY}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+P\+L\+AY~16}
+
+\mbox{\Hypertarget{input_module_8h_aa6834bd56b5cfb03e3a1162f50c144d8}\label{input_module_8h_aa6834bd56b5cfb03e3a1162f50c144d8}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+R\+EC@{S\+W\+\_\+\+R\+EC}}
+\index{S\+W\+\_\+\+R\+EC@{S\+W\+\_\+\+R\+EC}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+R\+EC}{SW\_REC}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+R\+EC~17}
+
+\mbox{\Hypertarget{input_module_8h_aa5da0aaec9caa74fc368f6e3c0eb3fd8}\label{input_module_8h_aa5da0aaec9caa74fc368f6e3c0eb3fd8}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+S\+H\+I\+FT@{S\+W\+\_\+\+S\+H\+I\+FT}}
+\index{S\+W\+\_\+\+S\+H\+I\+FT@{S\+W\+\_\+\+S\+H\+I\+FT}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+S\+H\+I\+FT}{SW\_SHIFT}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+S\+H\+I\+FT~27}
+
+\mbox{\Hypertarget{input_module_8h_a6a4229af238e4d5089af58eecee10d34}\label{input_module_8h_a6a4229af238e4d5089af58eecee10d34}} 
+\index{input\+Module.\+h@{input\+Module.\+h}!S\+W\+\_\+\+S\+T\+OP@{S\+W\+\_\+\+S\+T\+OP}}
+\index{S\+W\+\_\+\+S\+T\+OP@{S\+W\+\_\+\+S\+T\+OP}!input\+Module.\+h@{input\+Module.\+h}}
+\subsubsection{\texorpdfstring{S\+W\+\_\+\+S\+T\+OP}{SW\_STOP}}
+{\footnotesize\ttfamily \#define S\+W\+\_\+\+S\+T\+OP~18}
+

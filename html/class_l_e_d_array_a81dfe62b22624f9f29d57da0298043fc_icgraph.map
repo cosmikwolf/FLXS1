@@ -1,0 +1,4 @@
+<map id="LEDArray::channelStepModeLEDHandler" name="LEDArray::channelStepModeLEDHandler">
+<area shape="rect" id="node2" href="$class_l_e_d_array.html#a13f7dd3ae81862c31331199c732f8a3e" title="LEDArray::loop" alt="" coords="247,12,359,37"/>
+<area shape="rect" id="node3" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="407,12,618,37"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="getNote" name="getNote">
+<area shape="rect" id="node2" href="$class_input_module.html#af8193a3e5f84adb8a139d624742b8c6a" title="InputModule::channelPitch\lModeInputHandler" alt="" coords="130,5,309,44"/>
+<area shape="rect" id="node5" href="$class_input_module.html#a30c140bcc298b2c7c382ef290e77071f" title="InputModule::channelVelocity\lModeInputHandler" alt="" coords="122,68,317,107"/>
+<area shape="rect" id="node6" href="$class_l_e_d_array.html#a13f7dd3ae81862c31331199c732f8a3e" title="LEDArray::loop" alt="" coords="373,160,485,185"/>
+<area shape="rect" id="node7" href="$class_l_e_d_array.html#a602c56fdb10d7bf66f8d681081a99b83" title="LEDArray::channelPitchMode\lLEDHandler" alt="" coords="121,183,318,221"/>
+<area shape="rect" id="node8" href="$class_l_e_d_array.html#ab90f5a669b0faf8853070e12b99c4b3d" title="LEDArray::channelGateMode\lLEDHandler" alt="" coords="122,245,317,284"/>
+<area shape="rect" id="node3" href="$class_input_module.html#ad481ab7241ffe3a168e063a5afd6d892" title="InputModule::loop" alt="" coords="366,75,493,100"/>
+<area shape="rect" id="node4" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="541,132,752,157"/>
+</map>

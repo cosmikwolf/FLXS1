@@ -27,16 +27,17 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 
 void MasterClock::masterClockFunc(void){
 
+	outputControl->inputRead();
+	//	outputControl->setClockOutput(gateInputRaw[0]);
+	//  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
+	//  timerAvg = (lastTimer + 9*timerAvg) /10;
+	//  lastMicros = micros();
+	//
+	//  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
+	//  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
+	//  lastAvgInterval = avgInterval;
 
-//  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
-//  timerAvg = (lastTimer + 9*timerAvg) /10;
-//  lastMicros = micros();
-//
-//  intervalJitter = (abs(int(avgInterval) - int(lastAvgInterval)));
-//  avgIntervalJitter = (intervalJitter * 9 + avgIntervalJitter) / 10;
-//  lastAvgInterval = avgInterval;
-
-//	midiControl->midiClockSyncFunc(serialMidi);
+	//	midiControl->midiClockSyncFunc(serialMidi);
 
   if(playing){
 		switch(clockMode){
@@ -66,12 +67,11 @@ void MasterClock::masterClockFunc(void){
 			}
 			lfoTimer = 0;
 		}
-    //noteOffSwitch();
-    //noteOnSwitch();
+
   }
 
 	if (outputControl->clockOutputTimer > 2) {
-//		outputControl->setClockOutput(LOW);
+		outputControl->setClockOutput(LOW);
 	}
   wasPlaying = playing;
 
@@ -88,6 +88,8 @@ void MasterClock::masterClockFunc(void){
 		masterClockDebugHigh = 0;
 	}
 	*/
+//	outputControl->setClockOutput(LOW);
+
 }
 
 bool MasterClock::gateTrigger(uint8_t gateNum){
@@ -95,7 +97,7 @@ bool MasterClock::gateTrigger(uint8_t gateNum){
 
 void MasterClock::checkGateClock(){
 	for (int i =0; i <4; i++){
-		if (gateInputRaw[i] == 0 && gatePrevState[i] != gateInputRaw[i] ){
+		if (gateInputRaw[i] == 0 && gatePrevState[i] == 1 ){
 			gateTrig[i] = true;
 		} else {
 			gateTrig[i] = false;
@@ -105,55 +107,28 @@ void MasterClock::checkGateClock(){
 }
 
 void MasterClock::externalClockTick(uint8_t gateNum){
-
 	checkGateClock();
 
-	if (gateTrig[gateNum]){
-			Serial.println("gate trig!");
-	    // If the time since the last midi pulse is too long, beatLength should not be changed.
-	    if (pulseTimer > GATE_CLOCK_TIMEOUT) {
-	      masterPulseCount = 4;
-	      masterTempoTimer = beatLength;
-	      Serial.println("pulse Timer exceeded timeout: " + String(pulseTimer));
-	    }
-	    pulseTimer = 0; // pulse timer needs to be reset after beatLength calculations
-
-	    // Keep track of how many midi clock pulses have been received since the last beat -> 1 beat = 24 pulses
-	    masterPulseCount = (masterPulseCount + 1) % 4;
-
-	    if (firstRun){
-	        firstRun = false;
-	        beatPulseIndex = masterPulseCount;
-    			masterTempoTimer = 0;
-	        for (int i=0; i< SEQUENCECOUNT; i++){
-	          sequenceArray[i].clockStart(startTime);
-	          sequenceArray[i].beatPulse(beatLength);
-	        }
-	    } else {
-	      if (masterPulseCount == beatPulseIndex){
-	        //this gets triggered every quarter note
-					beatLength = (masterTempoTimer + beatLength) / 2;
-					Serial.println("setting beatlength: " + String(beatLength ));
-					masterTempoTimer = 0;
-
-	        if (queuePattern != currentPattern) {
-	  //          changePattern(queuePattern, true, true);
-	        }
-
-	        for (int i=0; i< SEQUENCECOUNT; i++){
-	          sequenceArray[i].beatPulse(beatLength);
-	        }
-
-	      }
-	    }
-
-
+	if (playing){
+		if (wasPlaying == false){
+				for (int i=0; i< SEQUENCECOUNT; i++){
+					outputControl->allNotesOff(i);
+					sequenceArray[i].clockStart(startTime);
+					Serial.println("Starting sequence: " + String(i));
+				}
 		}
 
-		for (int i=0; i< SEQUENCECOUNT; i++){
-			sequenceArray[i].runSequence();
+		if (gateTrig[gateNum]){
+			//Serial.print("PPQPULSE: ");
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				sequenceArray[i].ppqPulse(24);
+			}
 		}
+	}
 
+	for (int i=0; i< SEQUENCECOUNT; i++){
+		sequenceArray[i].runSequence();
+	}
 }
 
 void MasterClock::internalClockTick(){
@@ -168,40 +143,28 @@ void MasterClock::internalClockTick(){
     internalClockTimer = 0;
     startTime = 0;
 
-   for (int i=0; i<4; i++){
- 		 outputControl->allNotesOff(i);
- 	//	 noteData[i].noteOn = false;
- 	//	 noteData[i].noteOff = false;
- 		 for (int n=0; n<MAX_STEPS_PER_SEQUENCE; n++){
- 		//   	noteData[i].noteOffArray[n] = NULL;
- 		//		noteData[i].noteOnArray[n] = NULL;
- 		 }
- 	 }
-		//outputControl->setClockOutput(HIGH);
-
     for (int i=0; i< SEQUENCECOUNT; i++){
-    sequenceArray[i].clockStart(startTime);
-      sequenceArray[i].beatPulse(beatLength);
-      sequenceArray[i].runSequence();
+			outputControl->allNotesOff(i);
+    	sequenceArray[i].clockStart(startTime);
     }
-  } else if (internalClockTimer > 60000000/(tempoX100/100)){
+  } else if (internalClockTimer > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT) ){
        // Serial.print(" b4 ");
 	  masterTempoTimer = 0;
     if (queuePattern != currentPattern) {
       //changePattern(queuePattern, true, true);
     }
-    for (int i=0; i< SEQUENCECOUNT; i++){
-			sequenceArray[i].beatPulse(beatLength);
-      sequenceArray[i].runSequence();
-    }
 	//	outputControl->setClockOutput(HIGH);
     internalClockTimer = 0;
+		for (int i=0; i< SEQUENCECOUNT; i++){
+			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
+		}
 
-  }  else {
-    for (int i=0; i< SEQUENCECOUNT; i++){
-      sequenceArray[i].runSequence();
-    }
   }
+
+  for (int i=0; i< SEQUENCECOUNT; i++){
+    sequenceArray[i].runSequence();
+  }
+
 
 	debug("end internal clock tick");
 
@@ -210,9 +173,6 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::midiClockTick(){
   // ext clock sync
-		clickCounter = (clickCounter + 1) % SEQUENCECOUNT;
-	//	sequenceArray[clickCounter].runSequence(&noteData[clickCounter]);
-
 	  for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].runSequence();
 	  }

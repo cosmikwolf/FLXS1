@@ -190,7 +190,6 @@ void OutputController::inputLoopTest(){
 }
 
 void OutputController::inputRead(){
-
   backplaneGPIO->update();
 
   cvInputRaw[0] = adc->analogRead(A3, ADC_1);
@@ -201,19 +200,9 @@ void OutputController::inputRead(){
   gateInputRaw[1]  = backplaneGPIO->pressed(5);
   gateInputRaw[2]  = backplaneGPIO->pressed(6);
   gateInputRaw[3]  = backplaneGPIO->pressed(7);
-  //  for (int i=0; i<28; i++){
-  //    Serial.println("Backplane input: " + String(i) + "--" + String(backplaneGPIO->digitalRead(i)));
-  //  }
-/*    for (int i=0; i<4; i++){
-      Serial.println("GATE input: " + String(i) + "--" + String(gateInputRaw[i]));
-    }
-    for (int i=0; i<4; i++){
-      Serial.println("CV input: " + String(i) + "--" + String(cvInputRaw[i]));
-    } */
-    backplaneGPIO->digitalWrite(8, 1);
-    backplaneGPIO->digitalWrite(8, 0);
-
-
+  //reset SR Latch
+  backplaneGPIO->digitalWrite(8, 1);
+  backplaneGPIO->digitalWrite(8, 0);
 }
 
 void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate){

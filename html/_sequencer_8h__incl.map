@@ -1,0 +1,8 @@
+<map id="src/Sequencer.h" name="src/Sequencer.h">
+<area shape="rect" id="node3" href="$_output_controller_8h.html" title="OutputController.h" alt="" coords="410,79,539,104"/>
+<area shape="rect" id="node16" href="$global_8h.html" title="global.h" alt="" coords="487,239,555,264"/>
+<area shape="rect" id="node21" href="$_step_datum_8h.html" title="StepDatum.h" alt="" coords="70,79,169,104"/>
+<area shape="rect" id="node9" href="$_flash_memory_8h.html" title="FlashMemory.h" alt="" coords="1070,159,1183,184"/>
+<area shape="rect" id="node20" href="$midi_module_8h.html" title="midiModule.h" alt="" coords="40,159,141,184"/>
+<area shape="rect" id="node14" href="$serial_flash_print_8h.html" title="serialFlashPrint.h" alt="" coords="1180,239,1305,264"/>
+</map>

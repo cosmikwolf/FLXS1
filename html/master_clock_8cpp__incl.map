@@ -1,0 +1,10 @@
+<map id="src/masterClock.cpp" name="src/masterClock.cpp">
+<area shape="rect" id="node3" href="$master_clock_8h.html" title="MasterClock.h" alt="" coords="328,79,435,104"/>
+<area shape="rect" id="node4" href="$_output_controller_8h.html" title="OutputController.h" alt="" coords="478,152,608,177"/>
+<area shape="rect" id="node17" href="$global_8h.html" title="global.h" alt="" coords="137,385,205,411"/>
+<area shape="rect" id="node18" href="$_sequencer_8h.html" title="Sequencer.h" alt="" coords="202,312,298,337"/>
+<area shape="rect" id="node23" href="$midi_module_8h.html" title="midiModule.h" alt="" coords="31,232,132,257"/>
+<area shape="rect" id="node10" href="$_flash_memory_8h.html" title="FlashMemory.h" alt="" coords="580,232,692,257"/>
+<area shape="rect" id="node15" href="$serial_flash_print_8h.html" title="serialFlashPrint.h" alt="" coords="982,312,1107,337"/>
+<area shape="rect" id="node19" href="$_step_datum_8h.html" title="StepDatum.h" alt="" coords="471,385,570,411"/>
+</map>

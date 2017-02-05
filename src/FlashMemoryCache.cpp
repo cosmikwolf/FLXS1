@@ -150,7 +150,6 @@ int FlashMemory::cacheWriteLoop(){
           break;
 
           case COPY_CACHE_TO_SAVE_SECTOR:
-          outputControl->setClockOutput(HIGH);
 
           Serial.println(")))))) ____ ===== > > > erasing cache sector CH:" + String(channel) + "\tPT:" + String(pattern));
             // next step is to erase the cache sector.
@@ -195,7 +194,6 @@ int FlashMemory::cacheWriteLoop(){
       fileName = NULL;
       free(cacheFileName);
       cacheFileName = NULL;
-      outputControl->setClockOutput(LOW);
 
       uint8_t count = 0;
       for(int ci=0; ci< CACHE_COUNT; ci++){

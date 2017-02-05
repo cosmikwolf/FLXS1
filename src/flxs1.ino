@@ -16,16 +16,14 @@
 #include "DisplayModule.h"
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 750
-#define kMidiClockInterval  100
+#define kMasterClockInterval 1000
+#define kMidiClockInterval  600
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
-IntervalTimer CacheTimer;
-IntervalTimer MIDITimer;
 
 MidiModule midiControl;
 Sequencer sequence[SEQUENCECOUNT];
@@ -46,14 +44,11 @@ void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
 //  while (!Serial) ; // wait for serial monitor window to open
-
-  printHeapStats();
   AudioMemory(25);
   notefreq.begin(.15);
   //delay(1500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
-
   Serial.println("Sizeof Sequencer object: " + String(sizeof(sequence[0])));
 
   SPI.begin();
@@ -87,10 +82,10 @@ void setup() {
   timeControl.initialize(&serialMidi, &midiControl, sequence, adc);
 
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
-  MasterClockTimer.priority(4);
+  MasterClockTimer.priority(0);
 
-  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
-  MIDITimer.priority(0);
+//  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
+//  MIDITimer.priority(0);
 
 //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
 //  LEDTimer.priority(1);
@@ -99,8 +94,6 @@ void setup() {
   //CacheTimer.priority(2);
 
   SPI.usingInterrupt(MasterClockTimer);
-  SPI.usingInterrupt(MIDITimer);
-  //SPI.usingInterrupt(CacheTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
@@ -110,7 +103,6 @@ void setup() {
   pinMode(24,OUTPUT);
   digitalWrite(3, LOW);
   digitalWrite(24, LOW);
-  printHeapStats();
   Serial.println("Freeram: " + String(FreeRam2()));
 
   pinMode(1,OUTPUT);
@@ -131,36 +123,7 @@ void setup() {
 }
 
 void loop() {
-  //digitalWriteFast(26, HIGH);
   timeControl.runLoopHandler();
-
-  //digitalWriteFast(26, LOW);
-//  if (millis()%1000 == 0){
-//    Serial.println("1:\t" + String(adc->analogRead(A3, ADC_1)) + "\t2:\t" +// String(adc->analogRead(A12, ADC_1)) + "\t3:\t" + String(adc->analogRead(A13, ADC_1)) +// "\t4:\t" + String(adc->analogRead(A10, ADC_1)));
-//  };
-
-/*  if (!playing){
-    if (notefreq.available()) {
-    //  Serial
-              frequency = notefreq.read();
-              probability = notefreq.probability();
-        //      Serial.println("Note: "+ String(frequency) + " | Probability: " + String(probability) + " mem use max: " + String(AudioMemoryUsageMax()));
-    }
-  }
-  */
-  //if (noteFreqTimer > 10000){
-    //noteFreqTimer = 0;
-//  }
-
-}
-
-void printHeapStats()
-{
-//  Serial.print("                  arena: ");Serial.println(mallinfo().arena);
-//  Serial.print("  total allocated space: ");Serial.println(mallinfo().uordblks);
-//  Serial.print("  total non-inuse space: ");Serial.println(mallinfo().fordblks);
-//  Serial.print("   top releasable space: ");Serial.println(mallinfo().keepcost);
-//  Serial.println("");
 }
 
 void usbNoteOff(){
@@ -176,12 +139,12 @@ void usbNoteOn(byte channel, byte note, byte velocity){
 // https://isocpp.org/wiki/faq/pointers-to-members
 void masterLoop(){
   usbMIDI.read();
+  timeControl.midiClockHandler();
   timeControl.masterClockHandler();
-  usbMIDI.read();
 }
 
 void midiTimerLoop(){
-  usbMIDI.read();
+//  usbMIDI.read();
   timeControl.midiClockHandler();
 }
 
