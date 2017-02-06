@@ -188,7 +188,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
     stepDataBuf.velocityType =   0;
     stepDataBuf.lfoSpeed		 =  16;
     stepDataBuf.offset       =   0;
-    stepDataBuf.noteStatus   =  NOTPLAYING_NOTQUEUED;
+    stepDataBuf.noteStatus   =  AWAITING_TRIGGER;
     stepDataBuf.notePlaying  =   0;
     stepDataBuf.stepTimer    =   0;
     sequenceArray[channel].stepData[n] = stepDataBuf;
@@ -367,7 +367,7 @@ bool FlashMemory::deserializeHash(uint8_t channel, char* json){
     stepDataBuf.velocityType =   0;
     stepDataBuf.lfoSpeed		 =  16;
     stepDataBuf.offset       =   0;
-    stepDataBuf.noteStatus   =  NOTPLAYING_NOTQUEUED;
+    stepDataBuf.noteStatus   =  AWAITING_TRIGGER;
     stepDataBuf.notePlaying  =   0;
     stepDataBuf.stepTimer    =   0;
     sequenceArray[channel].stepData[n] = stepDataBuf;

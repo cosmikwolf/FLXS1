@@ -59,13 +59,6 @@ void DisplayModule::clearDisplay(){
 }
 
 void DisplayModule::freeDisplayCache(){
-/*  delete [] displayCache;
-  delete [] displayElement;
-  for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
-    displayCache[i] = NULL;
-    displayElement[i] = NULL;
-  }
-  */
   for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
     //clear displaycache so all data redraws.
       free(displayCache[i]);
@@ -76,16 +69,6 @@ void DisplayModule::freeDisplayCache(){
 }
 
 void DisplayModule::cleanupTextBuffers(){
-/*  delete [] displayCache;
-  for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
-    displayCache[i] = strdup(displayElement[i]);
-  }
-  delete [] displayElement;
-  for (int i=0; i< MAX_DISPLAY_ELEMENTS; i++){
-    displayCache[i] = NULL;
-    displayElement[i] = NULL;
-  }
-*/
   for( int i=0; i< MAX_DISPLAY_ELEMENTS; i++ ){
     if (displayElement[i] == nullptr) {
       displayElement[i] = strdup("-");
@@ -102,8 +85,6 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
   if( displayTimer > frequency){
 	  displayTimer = 0;
-
-   // if (previousState != currentState) { memset(displayCache, 0, sizeof(displayCache));}
 
     switch (selectedChannel){
       case 0:
@@ -126,7 +107,6 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     if (previousState != currentState || previouslySelectedChannel != selectedChannel){
        Serial.println("about to display a new state");
        freeDisplayCache();
-//       oled.clearScreen();
        oled.fillScreen(background);
     }
 
@@ -148,6 +128,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
       case CHANNEL_TUNER_MODE:
         channelTunerDisplay(buf);
+      break;
+
+      case CHANNEL_INPUT_MODE:
+        channelInputDisplay(buf);
       break;
 
       case PATTERN_SELECT:
@@ -813,9 +797,31 @@ void DisplayModule::channelTunerDisplay(char *buf){
     renderOnce_StringBox(2, highlight, previousHighlight,  0,  32, 128, 16, false, 2,  background, foreground);
     renderOnce_StringBox(3, highlight, previousHighlight,  0,  48, 128, 16, false, 2,  background, foreground);
 
-
 }
 
+void DisplayModule::channelInputDisplay(char *buf){
+  uint8_t previousHighlight = highlight;
+  highlight = 4;
+  int freq1 = frequency;
+  int freq2 = trunc(frequency*100)-trunc(freq1*100);
+  int prob1 = probability;
+  int prob2 = trunc(probability*100)-trunc(prob1*100);
+
+    displayElement[0] = strdup("Tuner");
+  sprintf(buf, "INPUT: %d", selectedChannel );
+    displayElement[1] = strdup(buf);
+  sprintf(buf, "FREQ: %d.%02d", freq1, freq2 );
+    displayElement[2] = strdup(buf);
+  sprintf(buf, "PROB: %d.%02d", prob1, prob2);
+    displayElement[3] = strdup(buf);
+
+    renderOnce_StringBox(0, highlight, previousHighlight,  0,  0, 128, 16, false, 1,  background, foreground);
+    renderOnce_StringBox(1, highlight, previousHighlight,  0,  16, 128, 16, false, 2,  background, foreground);
+    renderOnce_StringBox(2, highlight, previousHighlight,  0,  32, 128, 16, false, 2,  background, foreground);
+    renderOnce_StringBox(3, highlight, previousHighlight,  0,  48, 128, 16, false, 2,  background, foreground);
+
+
+}
 void DisplayModule::channelStepMenuDisplay(char *buf) {
   uint8_t previousHighlight = highlight;
   displayElement[0] = strdup("STEP SET");

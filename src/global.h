@@ -5,6 +5,13 @@
 
 #define SEQUENCECOUNT         4
 
+#define kSerialSpeed 115200
+#define kMasterClockInterval 350
+#define kMidiClockInterval  600
+#define kCacheClockInterval 10000
+#define kMosiPin 11
+#define kSpiClockPin 13
+
 #define PIMILLION             3141593
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		     	 7
@@ -34,6 +41,7 @@
 #define	CHANNEL_ENVELOPE_MODE	 99
 #define	CHANNEL_STEP_MODE		   100
 #define	CHANNEL_TUNER_MODE		 102
+#define	CHANNEL_INPUT_MODE		 103
 #define	DELETE_MENU			    	 101
 #define	DEBUG_SCREEN		       127
 #define	CALIBRATION_MENU		   126

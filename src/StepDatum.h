@@ -5,12 +5,13 @@
 
 // noteStatus indicates the status of the next note
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
-#define NOTPLAYING_NOTQUEUED 								0   // 0 indicates not playing, not queued
+#define AWAITING_TRIGGER 								0   // 0 indicates not playing, not queued
 #define CURRENTLY_PLAYING 									1		// 1 indicates the note is currently playing
 #define CURRENTLY_QUEUED 										2   // 2 indicates the note is currently queued.
 #define CURRENTLY_PLAYING_AND_QUEUED				3   // 3 indicates that the note is currently playing and currently queued
 #define NOTE_HAS_BEEN_PLAYED_THIS_ITERATION	4   // 4 indicates that the note has been played this iteration
 #define CURRENTLY_ARPEGGIATING							5   // 4 indicates that the note has been played this iteration
+#define BETWEEN_APEGGIATIONS								6
 #define CURRENT_ARP_OFFSET									63	// difference between notestatus value and the current Arpeggiation note
 
 #define MAX_STEPS_PER_SEQUENCE							64

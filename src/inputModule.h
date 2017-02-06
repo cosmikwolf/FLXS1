@@ -70,7 +70,7 @@ public:
   void channelVelocityModeInputHandler();
   void channelEnvelopeModeInputHandler();
   void channelStepModeInputHandler();
-
+  void channelInputInputHandler();
 
   void sequenceMenuHandler();
   void globalMenuHandler();

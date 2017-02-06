@@ -65,6 +65,7 @@ class DisplayModule
     void channelStepMenuDisplay(char *buf);
 
     void channelTunerDisplay(char *buf);
+    void channelInputDisplay(char *buf);
 
     void sequenceMenuDisplay();
     void globalMenuDisplay();

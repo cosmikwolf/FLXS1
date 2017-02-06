@@ -26,6 +26,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 }
 
 void MasterClock::masterClockFunc(void){
+	outputControl->setClockOutput(HIGH);
 
 	outputControl->inputRead();
 	//	outputControl->setClockOutput(gateInputRaw[0]);
@@ -88,7 +89,7 @@ void MasterClock::masterClockFunc(void){
 		masterClockDebugHigh = 0;
 	}
 	*/
-//	outputControl->setClockOutput(LOW);
+	outputControl->setClockOutput(LOW);
 
 }
 
@@ -135,26 +136,20 @@ void MasterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
   debug("begin internal clock tick");
         // int clock
+				clockCounter++;
+
   if (wasPlaying == false){
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
-    masterTempoTimer = 0;
     masterPulseCount = 0;
-    internalClockTimer = 0;
     startTime = 0;
 
     for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->allNotesOff(i);
     	sequenceArray[i].clockStart(startTime);
     }
-  } else if (internalClockTimer > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT) ){
-       // Serial.print(" b4 ");
-	  masterTempoTimer = 0;
-    if (queuePattern != currentPattern) {
-      //changePattern(queuePattern, true, true);
-    }
-	//	outputControl->setClockOutput(HIGH);
-    internalClockTimer = 0;
+  } else if (		clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT) ){
+		clockCounter = 0;
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
 		}

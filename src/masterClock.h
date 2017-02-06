@@ -31,7 +31,7 @@ public:
   bool gateTrig[4];
   bool gatePrevState[4];
   elapsedMicros pulseTimer;
-  uint32_t avgPulseTimer;
+  uint32_t clockCounter;
   elapsedMicros masterClockDebugTimer;
   elapsedMicros masterClockDebugTimer2;
   int masterClockDebugValue;

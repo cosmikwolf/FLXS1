@@ -26,6 +26,7 @@ class Sequencer
 
 		uint32_t 		calculateStepTimers();
 		void 		clockStart(elapsedMicros startTime);
+		void 		clockReset();
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
 
@@ -50,7 +51,7 @@ class Sequencer
 
 		boolean  	monophonic;
 		boolean  	beatPulseResyncFlag;
-		boolean	 	firstBeat;		// this signal is sent when midi clock starts.
+		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
 
 		uint8_t	 	activeStep;
 		uint8_t	 	zeroBeat;

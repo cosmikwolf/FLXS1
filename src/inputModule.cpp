@@ -109,6 +109,10 @@ void InputModule::loop(uint16_t frequency){
         channelVelocityModeInputHandler();
       break;
 
+      case CHANNEL_INPUT_MODE:
+        channelInputInputHandler();
+      break;
+
       case CHANNEL_ENVELOPE_MODE:
         channelEnvelopeModeInputHandler();
       break;
@@ -258,6 +262,13 @@ void InputModule::globalMenuHandler(){
     changeState(CHANNEL_PITCH_MODE);
   }
 }
+
+
+void InputModule::channelInputInputHandler(){
+
+  
+}
+
 
 void InputModule::channelButtonShiftHandler(uint8_t channel){
   if (selectedChannel != channel){
@@ -416,8 +427,9 @@ void InputModule::altButtonHandler(){
             }
           }
           playing = false;
+
           for(int s = 0; s < SEQUENCECOUNT; s++){
-            sequenceArray[s].activeStep = 0;
+            sequenceArray[s].clockReset();
            // sam2695.allNotesOff(s);
           }
           break;

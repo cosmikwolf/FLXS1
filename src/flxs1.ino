@@ -15,12 +15,6 @@
 #include "global.h"
 #include "DisplayModule.h"
 
-#define kSerialSpeed 115200
-#define kMasterClockInterval 1000
-#define kMidiClockInterval  600
-#define kCacheClockInterval 10000
-#define kMosiPin 11
-#define kSpiClockPin 13
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
@@ -145,7 +139,7 @@ void masterLoop(){
 
 void midiTimerLoop(){
 //  usbMIDI.read();
-  timeControl.midiClockHandler();
+  //timeControl.midiClockHandler();
 }
 
 void cacheLoop(){
