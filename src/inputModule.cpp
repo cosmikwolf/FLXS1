@@ -266,7 +266,7 @@ void InputModule::globalMenuHandler(){
 
 void InputModule::channelInputInputHandler(){
 
-  
+
 }
 
 
@@ -457,7 +457,7 @@ void InputModule::altButtonHandler(){
         if(selectedStep == getNote(i)){
           // if currentstep is already selected, change stepMode
           stepMode = (stepMode + 1) % 11;
-
+          Serial.println("Stepmode: " + String(stepMode));
           switch( stepMode ){
             case STEPMODE_GATELENGTH:
               knobBuffer = sequenceArray[selectedChannel].stepData[getNote(i)].gateLength - knobRead;

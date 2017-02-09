@@ -1,4 +1,4 @@
-#include "Arduino.h"
+ #include "Arduino.h"
 #include "Sequencer.h"
 
 // noteStatus indicates the status of the next note

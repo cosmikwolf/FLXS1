@@ -2,8 +2,8 @@
 #include "TimeController.h"
 #include "midiModule.h"
 
-#define DISPLAY_FREQUENCY 70000
-#define INPUT_FREQUENCY 60000
+#define DISPLAY_FREQUENCY 10000
+#define INPUT_FREQUENCY 20000
 #define LED_FREQUENCY 5000
 
 
@@ -64,7 +64,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
     while(saveFile.cacheWriteSwitch){
       saveFile.cacheWriteLoop();
     }
-    delay(1000);
+    delay(100);
 //    saveFile.loadPattern(0, 0b1111);
     saveFile.listFiles();
   //  changeState(CHANNEL_PITCH_MODE);

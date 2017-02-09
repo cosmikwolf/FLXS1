@@ -41,9 +41,9 @@
 		//Teensy LC,				Teensy 3.0,				Teensy 3.1,				Teensy xx,					superTeensy
 	#elif defined(__MKL26Z64__)	|| defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 		//#include <avr/pgmspace.h>
-		//#define _FORCE_PROGMEM__
+		#define _FORCE_PROGMEM__
 		#define _smCharType	unsigned char
-		static const uint32_t _common_max_SPI_speed 		= 12000000;
+		static const uint32_t _common_max_SPI_speed 		= 16000000;
 		#if !defined(__MKL26Z64__)
 			#define _SPI_MULTITRANSFER	//enable burst multy byte transfer
 		#endif

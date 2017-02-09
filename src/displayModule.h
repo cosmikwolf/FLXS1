@@ -4,7 +4,15 @@
 #include "global.h"
 #include <SSD_13XX.h>
 #include "_fonts/unborn_small.c"
-#include "_fonts/orbitron14.c"
+//#include "_fonts/msShell14.c"
+#include "_fonts/Visitor_18.c"
+#include "_fonts/F_Zero_18.c"
+#include "_fonts/LadyRadical_12.c"
+#include "_fonts/akashi20.c"
+#include "_fonts/PixelSquare_10.c"
+#include "_fonts/PixelSquareBold_10.c"
+#include "_fonts/PixelTech_14.c"
+//#include "_fonts/mono_mid.c"
 
 #ifndef _display_h_
 #define _display_h_
@@ -32,6 +40,18 @@
 #define LCD_CS        6//out (SSD1351/sharp) OK
 #define LCD_RST       9//out (SSD1351)/sharp disp todo) OK
 
+#define DISPLAY_LABEL  255
+
+#define REGULAR1X      0
+#define BOLD1X         1
+#define REGULAR2X      2
+#define BOLD2X         3
+#define REGULAR3X      4
+#define BOLD3X         5
+#define REGULAR4X      6
+#define BOLD4X         7
+#define STYLE1X         8
+
 class DisplayModule
 {
   public:
@@ -46,6 +66,7 @@ class DisplayModule
 
     uint8_t highlight;
     uint8_t previouslySelectedChannel;
+    uint8_t previousStepMode;
     SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
@@ -57,6 +78,19 @@ class DisplayModule
 
     void stepDisplay(char *buf);
     void patternSelectDisplay();
+
+    void channelSequenceDisplay(char *buf);
+    void stepMode_pitch(char*buf);
+    void stepMode_gateLength(char *buf);
+    void stepMode_chord(char *buf);
+    void stepMode_glide(char *buf);
+    void stepMode_stepCount(char *buf);
+    void stepMode_beatCount(char *buf);
+    void stepMode_gateType(char *buf);
+    void stepMode_arpType(char *buf);
+    void stepMode_arpSpeed(char *buf);
+    void stepMode_common(char *buf);
+    void stepMode_arpOctave(char *buf);
 
     void channelPitchMenuDisplay(char *buf);
     void channelPitchMenuDisplay2(char *buf);
@@ -80,6 +114,8 @@ class DisplayModule
     uint16_t foreground, background;
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
+
+    void renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 
     //void renderOnce_StringBox(Element element);
 private:
@@ -105,15 +141,15 @@ private:
     const char* midiNotes[128] = {
     "C -2","C#-2","D -2","D#-2","E -2","F -2","F#-2","G -2","G#-2","A -2","A#-2","B -2",
     "C -1","C#-1","D -1","D#-1","E -1","F -1","F#-1","G -1","G#-1","A -1","A#-1","B -1",
-    "C  0","C# 0","D  0","D# 0","E  0","F  0","F# 0","G  0","G# 0","A  0","A# 0","B  0",
-    "C  1","C# 1","D  1","D# 1","E  1","F  1","F# 1","G  1","G# 1","A  1","A# 1","B  1",
-    "C  2","C# 2","D  2","D# 2","E  2","F  2","F# 2","G  2","G# 2","A  2","A# 2","B  2",
-    "C  3","C# 3","D  3","D# 3","E  3","F  3","F# 3","G  3","G# 3","A  3","A# 3","B  3",
-    "C  4","C# 4","D  4","D# 4","E  4","F  4","F# 4","G  4","G# 4","A  4","A# 4","B  4",
-    "C  5","C# 5","D  5","D# 5","E  5","F  5","F# 5","G  5","G# 5","A  5","A# 5","B  5",
-    "C  6","C# 6","D  6","D# 6","E  6","F  6","F# 6","G  6","G# 6","A  6","A# 6","B  6",
-    "C  7","C# 7","D  7","D# 7","E  7","F  7","F# 7","G  7","G# 7","A  7","A# 7","B  7",
-    "C  8","C# 8","D  8","D# 8","E  8","F  8","F# 8","G  8" };
+    "C  0","C# 0","D  0","D# 0","E   0","F  0","F# 0","G  0","G# 0","A  0","A# 0","B  0",
+    "C  1","C# 1","D  1","D# 1","E   1","F  1","F# 1","G  1","G# 1","A  1","A# 1","B  1",
+    "C  2","C# 2","D  2","D# 2","E   2","F  2","F# 2","G  2","G# 2","A  2","A# 2","B  2",
+    "C  3","C# 3","D  3","D# 3","E   3","F  3","F# 3","G  3","G# 3","A  3","A# 3","B  3",
+    "C  4","C# 4","D  4","D# 4","E   4","F  4","F# 4","G  4","G# 4","A  4","A# 4","B  4",
+    "C  5","C# 5","D  5","D# 5","E   5","F  5","F# 5","G  5","G# 5","A  5","A# 5","B  5",
+    "C  6","C# 6","D  6","D# 6","E   6","F  6","F# 6","G  6","G# 6","A  6","A# 6","B  6",
+    "C  7","C# 7","D  7","D# 7","E   7","F  7","F# 7","G  7","G# 7","A  7","A# 7","B  7",
+    "C  8","C# 8","D  8","D# 8","E   8","F  8","F# 8","G  8" };
 
 
 };
