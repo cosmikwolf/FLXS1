@@ -87,7 +87,7 @@ class DisplayModule
     void stepMode_stepCount(char *buf);
     void stepMode_beatCount(char *buf);
     void stepMode_gateType(char *buf);
-    void stepMode_arpType(char *buf);
+    void stepMode_arp(char *buf);
     void stepMode_arpSpeed(char *buf);
     void stepMode_common(char *buf);
     void stepMode_arpOctave(char *buf);

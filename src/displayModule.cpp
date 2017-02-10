@@ -36,51 +36,24 @@ void DisplayModule::initialize(Sequencer *sequenceArray){
   oled.fillScreen(BLUE);      delay(10);
   oled.fillScreen(NAVY);      delay(10);
   oled.fillScreen(PURPLE);       delay(100);
-  oled.fillScreen(RED);
-  oled.setCursor(0, 5);
-  oled.setTextColor(BLACK);
-  oled.setFont(&PixelSquareBold_10);//this will load the font
-  oled.setTextScale(3);
-
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(500);
-  oled.setCursor(0, 5);
+  oled.fillScreen(BLACK);
+  oled.setCursor(CENTER,CENTER);
+  oled.setTextColor(RED);
+  oled.setFont(&LadyRadical_12);//this will load the font
+  oled.setTextScale(2);
+  oled.println("Zetaohm");
+  delay(1000);
+  oled.setCursor(CENTER,CENTER);
   oled.setTextColor(BLACK);
   oled.fillScreen(YELLOW);      delay(10);
   oled.setTextScale(1);
 
-  oled.setFont(&PixelTech_14);//this will load the font
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(100);
-  oled.println("ZETAOHM");
-  delay(500);
   oled.fillScreen(GREEN);
-  oled.setCursor(0, 5);
+  oled.setCursor(CENTER,CENTER);
   oled.setTextColor(PINK);
-  oled.setTextScale(3);
-  oled.println("FLXS1");    delay(500);
-  oled.setTextColor(ORANGE);
-  oled.println("FLXS1");    delay(500);
-  oled.setTextColor(PINK);
-  oled.println("FLXS1");    delay(500);
+  oled.setTextScale(2);
   oled.setTextColor(BLUE);
   oled.println("FLXS1");    delay(500);
-  oled.fillScreen(RED);
-
   Serial.println("Display Initialization Complete");
 }
 
@@ -144,7 +117,6 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     switch(currentState) {
 
       case CHANNEL_PITCH_MODE:
-
       channelSequenceDisplay(buf);
         //channelPitchMenuDisplay2(buf);
       break;
@@ -273,7 +245,7 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
     }
 
     oled.fillRect(x,y,w,h, color2);
-    oled.setCursor(x+1, y+1);
+    oled.setCursor(x, y);
 
     switch(textSize){
       case REGULAR1X:
@@ -293,11 +265,11 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
         oled.setTextScale(2);
         break;
       case BOLD4X:
+        oled.setCursor(CENTER,y+1);
         oled.setFont(&PixelSquareBold_10);
         oled.setTextScale(4);
         break;
       case STYLE1X:
-        oled.setCursor(x+1, y+1);
         oled.setFont(&PixelTech_14);
         oled.setTextScale(1);
         break;
@@ -321,7 +293,7 @@ void DisplayModule::channelSequenceDisplay(char *buf){
       stepMode_pitch(buf);
       break;
     case STEPMODE_CHORD:
-      stepMode_chord(buf);
+      stepMode_arp(buf);
       break;
     case STEPMODE_GLIDE:
       stepMode_pitch(buf);
@@ -333,19 +305,19 @@ void DisplayModule::channelSequenceDisplay(char *buf){
       stepMode_beatCount(buf);
       break;
     case STEPMODE_GATETYPE:
-      stepMode_gateType(buf);
+      stepMode_pitch(buf);
       break;
     case STEPMODE_ARPTYPE:
-      stepMode_arpType(buf);
+      stepMode_arp(buf);
       break;
     case STEPMODE_ARPSPEEDNUM:
-      stepMode_arpSpeed(buf);
+    stepMode_arp(buf);
       break;
     case STEPMODE_ARPSPEEDDEN:
-      stepMode_arpSpeed(buf);
+    stepMode_arp(buf);
       break;
     case STEPMODE_ARPOCTAVE:
-      stepMode_arpOctave(buf);
+    stepMode_arp(buf);
       break;
   }
 }
@@ -353,7 +325,7 @@ void DisplayModule::channelSequenceDisplay(char *buf){
 void DisplayModule::stepMode_pitch(char*buf){
   uint8_t previousHighlight = highlight;      highlight = 1;
 
-  displayElement[0] = strdup("STEP PITCH");
+  displayElement[0] = strdup("PITCH+GATE");
 
   displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
   displayElement[4] = strdup("GATE");
@@ -370,42 +342,73 @@ void DisplayModule::stepMode_pitch(char*buf){
   } else {
     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].glide);
   }
-  displayElement[7] = strdup(buf);
+  displayElement[9] = strdup(buf);
 
+  displayElement[8] = strdup("Type:");
+  String gateTypeArray[] = { "off", "on", "1hit","hold" };
+  displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
 
-  renderStringBox(0,  DISPLAY_LABEL,  0,  1, 128, 20, false, STYLE1X, background , foreground);
+  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , foreground);
 
-  renderStringBox(1,  STEPMODE_PITCH0, 0, 20 , 128, 32, false, BOLD4X, background , foreground);
-  renderStringBox(4,  DISPLAY_LABEL, 0,  52,64,24, false, STYLE1X, background , foreground);
-  renderStringBox(5,  STEPMODE_GATELENGTH, 0, 72,64,22, false, BOLD2X, background , foreground);
-  renderStringBox(6,  DISPLAY_LABEL, 64,  52,64,24, false, STYLE1X, background , foreground);
-  renderStringBox(7,  STEPMODE_GLIDE, 64, 72,64,22, false, BOLD2X, background , foreground);
+  renderStringBox(1,  STEPMODE_PITCH0, 0, 15 , 128, 29, false, BOLD4X, background , foreground);
 
-};
-void DisplayModule::stepMode_gateLength(char *buf){
-  uint8_t previousHighlight = highlight;     highlight = 1;
+  renderStringBox(4,  DISPLAY_LABEL, 0,  45,64,17, false, STYLE1X, background , foreground);
+  renderStringBox(8,  DISPLAY_LABEL, 0,  62,64,17, false, STYLE1X, background , foreground);
+  renderStringBox(6,  DISPLAY_LABEL, 0,  79,64,17, false, STYLE1X, background , foreground);
 
-
-    displayElement[5] = strdup("Gate\nTime:");
-    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-      displayElement[6] = strdup("RST");
-    } else {
-      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
-      displayElement[6] = strdup(buf);
-    }
-
-    renderOnce_StringBox(5,  highlight, previousHighlight, 0,   39, 26, 16, false, 1, background , foreground);
-    renderOnce_StringBox(6,  highlight, previousHighlight, 26,  39, 38, 16, false, 2, background , foreground);
+  renderStringBox(5,  STEPMODE_GATELENGTH,60, 45,68,17, false, BOLD2X, background , foreground);
+  renderStringBox(7,  STEPMODE_GATETYPE,  60, 62,68,17, false, BOLD2X, background , foreground);
+  renderStringBox(9,  STEPMODE_GLIDE,     60, 79,68,17, false, BOLD1X, background , foreground);
 
 };
-void DisplayModule::stepMode_chord(char *buf){
-  uint8_t previousHighlight = highlight;
-};
-void DisplayModule::stepMode_glide(char *buf){
 
-};
-void DisplayModule::stepMode_stepCount(char *buf){
-  uint8_t previousHighlight = highlight;
+
+
+void DisplayModule::stepMode_arp(char *buf){
+  displayElement[0] = strdup("ARPEGGIO");
+  displayElement[1]  = strdup("TYPE");
+  const char*  arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
+  displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
+
+  displayElement[4] = strdup("SPEED");
+  sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
+  displayElement[5] = strdup(buf);
+  sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
+  displayElement[6] = strdup(buf);
+
+  displayElement[8] = strdup("OCTVE");
+  sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
+  displayElement[9] = strdup(buf);
+
+
+  displayElement[10] = strdup("INTVL");
+
+    const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
+
+      //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
+   displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+
+   renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STEPMODE_ARPTYPE,     60, 20,68,17, false, REGULAR2X, background , foreground);
+   renderStringBox(4,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(5,  STEPMODE_ARPSPEEDNUM, 60, 37,34,17, false, REGULAR2X, background , foreground);
+   renderStringBox(6,  STEPMODE_ARPSPEEDDEN, 94, 37,34,17, false, REGULAR2X, background , foreground);
+
+   renderStringBox(8,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(9,  STEPMODE_ARPOCTAVE, 60, 54,68,17, false, REGULAR2X, background , foreground);
+
+
+   renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(11,  STEPMODE_CHORD,    60, 71,68,17, false, REGULAR2X, background , foreground);
+
+
+
+ };
+
+ void DisplayModule::stepMode_stepCount(char *buf){
+   uint8_t previousHighlight = highlight;
 
   sprintf(buf, "last: %d", sequenceArray[selectedChannel].stepCount, sequenceArray[selectedChannel].beatCount);
   displayElement[12] = strdup(buf);
@@ -429,57 +432,7 @@ void DisplayModule::stepMode_beatCount(char *buf){
 
 
 };
-void DisplayModule::stepMode_gateType(char *buf){
-  uint8_t previousHighlight = highlight;
-  displayElement[0] = strdup("GateType:");
-  String gateTypeArray[] = { "off", "on", "1hit","hold" };
-  displayElement[1] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
-  renderStringBox(0,  highlight, 0, 0, 84, 36, false, 3 ,background , foreground);
-  renderStringBox(1,  highlight, 84, 0,44 , 30, false, 3 ,background , foreground);
 
-};
-
-void DisplayModule::stepMode_arpType(char *buf){
-  uint8_t previousHighlight = highlight;
-  displayElement[16] = strdup("arp");
-  displayElement[0]  = strdup("typ:");
-  const char*  arpTypeArray[] = { "off","up","dn","ud1","ud2","rndm" };
-  displayElement[17] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
-
-  renderOnce_StringBox(16,  highlight, previousHighlight, 64,  39, 26, 8, false, 1, background , foreground);
-  renderOnce_StringBox(0,  highlight, previousHighlight, 64,  47, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(17,  highlight, previousHighlight, 84, 39, 44, 16, false, 2 ,background , foreground);
-
-};
-
-void DisplayModule::stepMode_arpSpeed(char *buf){
-  uint8_t previousHighlight = highlight;
-
-  displayElement[18] = strdup("arp");
-  displayElement[23] = strdup("spd:");
-  sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
-  displayElement[19] = strdup(buf);
-  sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
-  displayElement[25] = strdup(buf);
-
-  renderOnce_StringBox(18,  highlight, previousHighlight, 64,  55, 26, 8, false, 1, background , foreground);
-  renderOnce_StringBox(23,  highlight, previousHighlight, 64,  63, 26, 16, false, 1, background , foreground);
-  renderOnce_StringBox(19,  highlight, previousHighlight, 84,  55, 22, 16, false, 2 ,background , foreground);
-  renderOnce_StringBox(25,  highlight, previousHighlight, 106,  55, 22, 16, false, 2 ,background , foreground);
-};
-
-void DisplayModule::stepMode_arpOctave(char *buf){
-  uint8_t previousHighlight = highlight;
-
-    displayElement[20] = strdup("arp");
-    displayElement[24] = strdup("oct:");
-    sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
-    displayElement[21] = strdup(buf);
-    renderOnce_StringBox(20,  highlight, previousHighlight,64,  72, 26, 8, false, 1, background , foreground);
-    renderOnce_StringBox(24,  highlight, previousHighlight,64,  80, 26, 8, false, 1, background , foreground);
-    renderOnce_StringBox(21,  highlight, previousHighlight, 84, 72, 44, 16, false, 2 ,background , foreground);
-
-};
 
 void DisplayModule::stepMode_common(char *buf){
   uint8_t previousHighlight = highlight;

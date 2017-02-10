@@ -100,7 +100,7 @@ void setup() {
   Serial.println("Freeram: " + String(FreeRam2()));
 
   pinMode(1,OUTPUT);
-  digitalWrite(1, HIGH);
+  digitalWrite(1, LOW);
 
   adc->enableInterrupts(ADC_0);
 
