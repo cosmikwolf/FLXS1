@@ -6,7 +6,8 @@
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 350
+#define kMasterClockInterval 500
+#define kPeripheralLoopTimer 15000
 #define kMidiClockInterval  600
 #define kCacheClockInterval 10000
 #define kMosiPin 11
@@ -91,6 +92,10 @@
 
 
 #define DEBUG_PIN				    	 31
+#define PIN_EXT_AD_1   27
+#define PIN_EXT_AD_2   30
+#define PIN_EXT_RX     26
+
 #define SD_CS_PIN				    	  15
 #define LED_PIN                 5
 #define MIDPLANE_MAX7301_CS_PIN  0

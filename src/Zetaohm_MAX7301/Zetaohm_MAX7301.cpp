@@ -159,15 +159,15 @@ void Zetaohm_MAX7301::update(){
 
 
 void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
-    noInterrupts();
+  //  noInterrupts();
     writeByte(0x24 + indexMap[index], value);
-    interrupts();
+  //  interrupts();
 }
 
 void Zetaohm_MAX7301::digitalWritePrint(uint8_t index, bool value){
-    noInterrupts();
+  //  noInterrupts();
     Serial.println("digitalWrite return: " + String( writeByte(0x24 + indexMap[index], value) , BIN) );
-    interrupts();
+  //  interrupts();
 }
 
 uint16_t Zetaohm_MAX7301::digitalRead(uint8_t index){

@@ -118,10 +118,10 @@ void LEDArray::loop(uint16_t frequency){
         }
       break;
     }
-    noInterrupts();
+//    noInterrupts();
     leds.show();
     //FastLED.show();
-    interrupts();
+//    interrupts();
   }
 }
 

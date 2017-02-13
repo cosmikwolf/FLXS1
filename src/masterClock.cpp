@@ -26,7 +26,7 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 }
 
 void MasterClock::masterClockFunc(void){
-	outputControl->setClockOutput(HIGH);
+	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
 	outputControl->inputRead();
 	//	outputControl->setClockOutput(gateInputRaw[0]);
@@ -73,6 +73,7 @@ void MasterClock::masterClockFunc(void){
 
 	if (outputControl->clockOutputTimer > 2) {
 		outputControl->setClockOutput(LOW);
+		digitalWriteFast(PIN_EXT_AD_1, LOW);
 	}
   wasPlaying = playing;
 
@@ -89,7 +90,7 @@ void MasterClock::masterClockFunc(void){
 		masterClockDebugHigh = 0;
 	}
 	*/
-	outputControl->setClockOutput(LOW);
+	digitalWriteFast(PIN_EXT_AD_2, LOW);
 
 }
 
@@ -136,7 +137,7 @@ void MasterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
   debug("begin internal clock tick");
         // int clock
-				clockCounter++;
+	clockCounter++;
 
   if (wasPlaying == false){
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
@@ -149,6 +150,8 @@ void MasterClock::internalClockTick(){
     	sequenceArray[i].clockStart(startTime);
     }
   } else if (		clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT) ){
+		outputControl->setClockOutput(HIGH);
+		digitalWriteFast(PIN_EXT_AD_1, HIGH);
 		clockCounter = 0;
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);

@@ -18,6 +18,7 @@
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
+IntervalTimer PeripheralLoopTimer;
 
 MidiModule midiControl;
 Sequencer sequence[SEQUENCECOUNT];
@@ -38,8 +39,8 @@ void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
 //  while (!Serial) ; // wait for serial monitor window to open
-  AudioMemory(25);
-  notefreq.begin(.15);
+//  AudioMemory(25);
+//  notefreq.begin(.15);
   //delay(1500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
@@ -75,8 +76,14 @@ void setup() {
 
   timeControl.initialize(&serialMidi, &midiControl, sequence, adc);
 
+  PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
+  PeripheralLoopTimer.priority(64);
+
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
-  MasterClockTimer.priority(0);
+  MasterClockTimer.priority(1);
+
+  SPI.usingInterrupt(PeripheralLoopTimer);
+  SPI.usingInterrupt(MasterClockTimer);
 
 //  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
 //  MIDITimer.priority(0);
@@ -87,12 +94,10 @@ void setup() {
   //CacheTimer.begin(cacheLoop,kCacheClockInterval);
   //CacheTimer.priority(2);
 
-  SPI.usingInterrupt(MasterClockTimer);
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
   pinMode(31, OUTPUT); // debug pin - EXT_TX - exp pin 5
-  pinMode(26, OUTPUT); // debug pin - EXT_RX - exp pin 6
   pinMode(3, OUTPUT);
   pinMode(24,OUTPUT);
   digitalWrite(3, LOW);
@@ -104,11 +109,17 @@ void setup() {
 
   adc->enableInterrupts(ADC_0);
 
+  // CLOCK PIN SETUP
+  pinMode(A9, OUTPUT);
+  digitalWrite(A9, LOW);
+
   pinMode(A3, INPUT);
   pinMode(A12, INPUT);
   pinMode(A13, INPUT);
   pinMode(A10, INPUT);
-
+  pinMode(PIN_EXT_AD_1, OUTPUT);
+  pinMode(PIN_EXT_AD_2, OUTPUT);
+  pinMode(PIN_EXT_RX, OUTPUT);
 
 //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
@@ -117,7 +128,7 @@ void setup() {
 }
 
 void loop() {
-  timeControl.runLoopHandler();
+//  timeControl.runLoopHandler();
 }
 
 void usbNoteOff(){
@@ -137,6 +148,9 @@ void masterLoop(){
   timeControl.masterClockHandler();
 }
 
+void peripheralLoop(){
+  timeControl.runLoopHandler();
+}
 void midiTimerLoop(){
 //  usbMIDI.read();
   //timeControl.midiClockHandler();

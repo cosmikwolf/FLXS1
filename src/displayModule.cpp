@@ -88,6 +88,7 @@ void DisplayModule::cleanupTextBuffers(){
 void DisplayModule::displayLoop(uint16_t frequency) {
 
   if( displayTimer > frequency){
+
 	  displayTimer = 0;
 
     switch (selectedChannel){
@@ -117,7 +118,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     switch(currentState) {
 
       case CHANNEL_PITCH_MODE:
-      channelSequenceDisplay(buf);
+        channelSequenceDisplay(buf);
         //channelPitchMenuDisplay2(buf);
       break;
       case CHANNEL_VELOCITY_MODE:
@@ -187,6 +188,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     previousState = currentState;
     previouslySelectedChannel = selectedChannel;
     previousStepMode = stepMode;
+
   };
 };
 
@@ -348,18 +350,19 @@ void DisplayModule::stepMode_pitch(char*buf){
   String gateTypeArray[] = { "off", "on", "1hit","hold" };
   displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
 
-  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , foreground);
+  //digitalWriteFast(PIN_EXT_RX, HIGH);
+  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
 
-  renderStringBox(1,  STEPMODE_PITCH0, 0, 15 , 128, 29, false, BOLD4X, background , foreground);
+  renderStringBox(1,  STEPMODE_PITCH0, 0, 15 , 128, 29, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
 
-  renderStringBox(4,  DISPLAY_LABEL, 0,  45,64,17, false, STYLE1X, background , foreground);
-  renderStringBox(8,  DISPLAY_LABEL, 0,  62,64,17, false, STYLE1X, background , foreground);
-  renderStringBox(6,  DISPLAY_LABEL, 0,  79,64,17, false, STYLE1X, background , foreground);
+  renderStringBox(4,  DISPLAY_LABEL, 0,  45,64,17, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  renderStringBox(8,  DISPLAY_LABEL, 0,  62,64,17, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+  renderStringBox(6,  DISPLAY_LABEL, 0,  79,64,17, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
 
-  renderStringBox(5,  STEPMODE_GATELENGTH,60, 45,68,17, false, BOLD2X, background , foreground);
-  renderStringBox(7,  STEPMODE_GATETYPE,  60, 62,68,17, false, BOLD2X, background , foreground);
-  renderStringBox(9,  STEPMODE_GLIDE,     60, 79,68,17, false, BOLD1X, background , foreground);
-
+  renderStringBox(5,  STEPMODE_GATELENGTH,60, 45,68,17, false, BOLD2X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+  renderStringBox(7,  STEPMODE_GATETYPE,  60, 62,68,17, false, BOLD2X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  renderStringBox(9,  STEPMODE_GLIDE,     60, 79,68,17, false, BOLD1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+  //digitalWriteFast(PIN_EXT_RX, LOW);
 };
 
 
@@ -399,11 +402,8 @@ void DisplayModule::stepMode_arp(char *buf){
    renderStringBox(8,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
    renderStringBox(9,  STEPMODE_ARPOCTAVE, 60, 54,68,17, false, REGULAR2X, background , foreground);
 
-
    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
    renderStringBox(11,  STEPMODE_CHORD,    60, 71,68,17, false, REGULAR2X, background , foreground);
-
-
 
  };
 

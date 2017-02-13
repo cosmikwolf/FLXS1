@@ -149,7 +149,6 @@ void Sequencer::ppqPulse(uint8_t maxPulseCount){
 	if(channel == 0 && ppqPulseIndex == 0){
 	//	Serial.println("activestep: " + String(activeStep) + "\tzeroBeat: " + String(zeroBeat) + "\t|CF: " +String(getCurrentFrame()) + "\toffset: " + String(stepData[activeStep].offset) + "\tavgPulseLength: " + String(avgPulseLength) + "\tppqPulseIndex: " + String(ppqPulseIndex) + "\tbeatsSinceZero: " + String(beatsSinceZero) + "\tzeroSequenceCount" + String(zeroSequenceCount));
 	}
-	outputControl->setClockOutput(LOW);
 
 };
 
