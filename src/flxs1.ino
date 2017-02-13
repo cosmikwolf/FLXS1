@@ -14,7 +14,14 @@
 #include "midiModule.h"
 #include "global.h"
 #include "DisplayModule.h"
+#include <OctoSK6812.h>
 
+#define NUMLEDS  23
+
+DMAMEM int displayMemory[NUMLEDS*8];
+int drawingMemory[NUMLEDS*8];
+
+OctoSK6812 octoLeds(NUMLEDS, displayMemory, drawingMemory, SK6812_GRBW);
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
@@ -121,13 +128,43 @@ void setup() {
   pinMode(PIN_EXT_AD_2, OUTPUT);
   pinMode(PIN_EXT_RX, OUTPUT);
 
+  pinMode(2, OUTPUT);  // strip #1
+  pinMode(14, OUTPUT);  // strip #2
+  pinMode(7, OUTPUT);  // strip #3
+  pinMode(8, OUTPUT);  // strip #4
+  pinMode(6, OUTPUT);  // strip #5
+  pinMode(20, OUTPUT);  // strip #6
+  pinMode(21, OUTPUT);  // strip #7
+
+
+  octoLeds.begin();
+  colorWipe(0xFF000000, 5);delay(1000);
+  colorWipe(0x00FF0000, 5);delay(1000);
+  colorWipe(0x0000FF00, 5);delay(1000);
+  colorWipe(0x000000FF, 5);delay(1000);
 //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
   delay(100);
 }
 
+
+void colorWipe(int color, int wait)
+{
+  for (int i=0; i < octoLeds.numPixels(); i++) {
+    octoLeds.setPixel(i, color);
+    octoLeds.show();
+    Serial.println("setting pixel num: " + String(i));
+    delay(wait);
+  }
+}
+
 void loop() {
+  colorWipe(0xFF000000, 5);delay(1000);
+  colorWipe(0x00FF0000, 5);delay(1000);
+  colorWipe(0x0000FF00, 5);delay(1000);
+  colorWipe(0x000000FF, 5);delay(1000);
+
 //  timeControl.runLoopHandler();
 }
 
