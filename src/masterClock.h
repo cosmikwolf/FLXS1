@@ -17,8 +17,10 @@ public:
   void initialize(OutputController* outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl);
   void changeTempo(uint32_t newTempoX100);
   void masterClockFunc();
+  void sequencerFunc();
   void internalClockTick();
   void midiClockTick();
+  void clockRunCheck();
   void externalClockTick(uint8_t gateNum);
 //  void noteOffSwitch();
 //  void noteOnSwitch();
@@ -32,10 +34,13 @@ public:
   bool gatePrevState[4];
   elapsedMicros pulseTimer;
   uint32_t clockCounter;
-  elapsedMicros masterClockDebugTimer;
-  elapsedMicros masterClockDebugTimer2;
-  int masterClockDebugValue;
-  int masterClockDebugHigh;
+
+  uint32_t masterLooptimeMin;
+  uint32_t masterLooptimeMax;
+  uint32_t masterLooptimeAvg;
+  elapsedMicros masterLoopTimer;
+  boolean pulseTrigger;
+  boolean ledRunSwitch;
   uint8_t beatPulseIndex;
   uint8_t clickCounter;
   boolean firstRun;

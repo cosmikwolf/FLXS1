@@ -25,8 +25,54 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
   }
 }
 
-void MasterClock::masterClockFunc(void){
+void MasterClock::clockRunCheck(){
+	if ((int)masterLoopTimer > kMasterClockInterval + 100){
+		masterClockFunc();
+	}
+}
+
+void MasterClock::masterClockFunc(){
 	digitalWriteFast(PIN_EXT_AD_2, HIGH);
+
+//	Serial.println(String((int)masterLoopTimer));
+//  masterLooptimeMin
+//  masterLooptimeMax
+if (clockMode == INTERNAL_CLOCK){
+
+	if ((int)masterLoopTimer > kMasterClockInterval + 100){
+		uint8_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
+		clockCounter = clockCounter + countToAdd;
+		//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
+		for(int i=0;  i< countToAdd; i++){
+			digitalWriteFast(PIN_EXT_AD_2, LOW);delayMicroseconds(10);
+			digitalWriteFast(PIN_EXT_AD_2, HIGH);delayMicroseconds(10);
+		}
+	} else {
+		clockCounter++;
+	}
+
+	if (clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT)){
+		outputControl->setClockOutput(HIGH);
+
+		clockCounter = 0;
+		pulseTrigger = 1;
+	}
+}
+masterLoopTimer = 0;
+
+if (clockCounter > INTERNAL_PPQ_COUNT/2 && outputControl->clockValue) {
+	outputControl->setClockOutput(LOW);
+	ledRunSwitch = true;
+}
+
+	digitalWriteFast(PIN_EXT_AD_2, LOW);
+
+//  masterLooptimeAvg
+
+};
+
+void MasterClock::sequencerFunc(void){
+//	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
 	outputControl->inputRead();
 	//	outputControl->setClockOutput(gateInputRaw[0]);
@@ -71,26 +117,9 @@ void MasterClock::masterClockFunc(void){
 
   }
 
-	if (outputControl->clockOutputTimer > 2) {
-		outputControl->setClockOutput(LOW);
-		digitalWriteFast(PIN_EXT_AD_1, LOW);
-	}
   wasPlaying = playing;
 
-
-  //lastTimer = loopTimer;
-/*
-  masterClockDebugValue = ((int)masterClockDebugTimer + masterClockDebugValue*9)/10 ;
-	if ( (int)masterClockDebugTimer > masterClockDebugHigh){
-		masterClockDebugHigh = (int)masterClockDebugTimer;
-	}
-	if (masterClockDebugTimer2 > 3000000){
-		masterClockDebugTimer2 = 0;
-		Serial.println("$%^&^%$%^&^%$%^%$#$%^&^%$#$%^&  Masterclock interval: " + String(masterClockDebugValue) + "\thigh val; " + String(masterClockDebugHigh));
-		masterClockDebugHigh = 0;
-	}
-	*/
-	digitalWriteFast(PIN_EXT_AD_2, LOW);
+//	digitalWriteFast(PIN_EXT_AD_2, LOW);
 
 }
 
@@ -137,7 +166,6 @@ void MasterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
   debug("begin internal clock tick");
         // int clock
-	clockCounter++;
 
   if (wasPlaying == false){
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
@@ -149,14 +177,11 @@ void MasterClock::internalClockTick(){
 			outputControl->allNotesOff(i);
     	sequenceArray[i].clockStart(startTime);
     }
-  } else if (		clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT) ){
-		outputControl->setClockOutput(HIGH);
-		digitalWriteFast(PIN_EXT_AD_1, HIGH);
-		clockCounter = 0;
+  } else if (	pulseTrigger ){
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
 		}
-
+		pulseTrigger = 0;
   }
 
   for (int i=0; i< SEQUENCECOUNT; i++){

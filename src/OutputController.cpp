@@ -409,7 +409,11 @@ void OutputController::allNotesOff(uint8_t channel){
 }
 
 void OutputController::setClockOutput(bool value){
-    backplaneGPIO->digitalWrite(17, value);
+    //backplaneGPIO->digitalWrite(17, value);
+    digitalWriteFast(PIN_EXT_AD_1, value);
+    digitalWrite(CLOCK_PIN, value);
+
+    clockValue = value;
     if (value == HIGH){
       clockOutputTimer = 0;
     }

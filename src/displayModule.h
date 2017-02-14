@@ -2,6 +2,8 @@
 #include <SPI.h>
 #include "Sequencer.h"
 #include "global.h"
+#include "MasterClock.h"
+
 #include <SSD_13XX.h>
 #include "_fonts/unborn_small.c"
 //#include "_fonts/msShell14.c"
@@ -70,7 +72,7 @@ class DisplayModule
     SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
-    void initialize(Sequencer *sequenceArray);
+    void initialize(Sequencer *sequenceArray, MasterClock* clockMaster);
     void displayLoop(uint16_t frequency);
 
     void clearDisplay();
@@ -121,6 +123,7 @@ class DisplayModule
 private:
 
     Sequencer *sequenceArray;
+    MasterClock* clockMaster;
 
   /*  struct element {
       uint8_t index;

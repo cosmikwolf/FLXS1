@@ -16,16 +16,17 @@
 #include "DisplayModule.h"
 #include <OctoSK6812.h>
 
-#define NUMLEDS  23
+//#define NUMLEDS  23
 
-DMAMEM int displayMemory[NUMLEDS*8];
-int drawingMemory[NUMLEDS*8];
+//DMAMEM int displayMemory[NUMLEDS*8];
+//int drawingMemory[NUMLEDS*8];
 
-OctoSK6812 octoLeds(NUMLEDS, displayMemory, drawingMemory, SK6812_GRBW);
+//OctoSK6812 octoLeds(NUMLEDS, displayMemory, drawingMemory, SK6812_GRBW);
 
 TimeController timeControl;
 IntervalTimer MasterClockTimer;
 IntervalTimer PeripheralLoopTimer;
+IntervalTimer SequencerTimer;
 
 MidiModule midiControl;
 Sequencer sequence[SEQUENCECOUNT];
@@ -39,8 +40,6 @@ ADC *adc = new ADC(); // adc object
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
-uint8_t masterLooptime;
-elapsedMicros masterLoopTimer;
 
 void setup() {
   Serial.begin(kSerialSpeed);
@@ -83,20 +82,23 @@ void setup() {
 
   timeControl.initialize(&serialMidi, &midiControl, sequence, adc);
 
-  PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
-  PeripheralLoopTimer.priority(64);
+  //PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
+  //PeripheralLoopTimer.priority(64);
 
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
-  MasterClockTimer.priority(1);
+  MasterClockTimer.priority(0);
 
-  SPI.usingInterrupt(PeripheralLoopTimer);
-  SPI.usingInterrupt(MasterClockTimer);
+  SequencerTimer.begin(sequencerLoop,kSequenceTimerInterval);
+  SequencerTimer.priority(1);
 
-//  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
-//  MIDITimer.priority(0);
+  //SPI.usingInterrupt(PeripheralLoopTimer);
+  SPI.usingInterrupt(SequencerTimer);
 
-//  LEDTimer.begin(ledLoop, kLEDTimerInterval);
-//  LEDTimer.priority(1);
+  //  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
+  //  MIDITimer.priority(0);
+
+  //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
+  //  LEDTimer.priority(1);
 
   //CacheTimer.begin(cacheLoop,kCacheClockInterval);
   //CacheTimer.priority(2);
@@ -117,8 +119,8 @@ void setup() {
   adc->enableInterrupts(ADC_0);
 
   // CLOCK PIN SETUP
-  pinMode(A9, OUTPUT);
-  digitalWrite(A9, LOW);
+  pinMode(CLOCK_PIN, OUTPUT);
+  digitalWrite(CLOCK_PIN, LOW);
 
   pinMode(A3, INPUT);
   pinMode(A12, INPUT);
@@ -127,7 +129,7 @@ void setup() {
   pinMode(PIN_EXT_AD_1, OUTPUT);
   pinMode(PIN_EXT_AD_2, OUTPUT);
   pinMode(PIN_EXT_RX, OUTPUT);
-
+/* OctoSK6812 testing stuff
   pinMode(2, OUTPUT);  // strip #1
   pinMode(14, OUTPUT);  // strip #2
   pinMode(7, OUTPUT);  // strip #3
@@ -142,13 +144,14 @@ void setup() {
   colorWipe(0x00FF0000, 5);delay(1000);
   colorWipe(0x0000FF00, 5);delay(1000);
   colorWipe(0x000000FF, 5);delay(1000);
+  */
 //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
   delay(100);
 }
 
-
+/*
 void colorWipe(int color, int wait)
 {
   for (int i=0; i < octoLeds.numPixels(); i++) {
@@ -166,7 +169,12 @@ void loop() {
   colorWipe(0x000000FF, 5);delay(1000);
 
 //  timeControl.runLoopHandler();
-}
+}*/
+
+void loop() {
+  timeControl.runLoopHandler();
+
+};
 
 void usbNoteOff(){
 //  Serial.println("note off!:\t" + String(note));
@@ -179,15 +187,19 @@ void usbNoteOn(byte channel, byte note, byte velocity){
 
 // global wrapper to create pointer to ClockMaster member function
 // https://isocpp.org/wiki/faq/pointers-to-members
-void masterLoop(){
+void sequencerLoop(){
   usbMIDI.read();
   timeControl.midiClockHandler();
+  timeControl.sequencerHandler();
+}
+
+void masterLoop(){
   timeControl.masterClockHandler();
 }
 
 void peripheralLoop(){
-  timeControl.runLoopHandler();
 }
+
 void midiTimerLoop(){
 //  usbMIDI.read();
   //timeControl.midiClockHandler();

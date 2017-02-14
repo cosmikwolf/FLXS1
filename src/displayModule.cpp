@@ -10,10 +10,10 @@ elapsedMicros displayTimer;
 DisplayModule::DisplayModule(){
 };
 
-void DisplayModule::initialize(Sequencer *sequenceArray){
+void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaster){
 
   Serial.println("Initializing Display");
-
+  this->clockMaster = clockMaster;
   this->sequenceArray = sequenceArray;
   oled.begin();
   delay(100);
@@ -230,6 +230,7 @@ void DisplayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8
       oled.drawRect(x,y,w,h, color1);
     }
   }
+  clockMaster->clockRunCheck();
 }
 
 void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {

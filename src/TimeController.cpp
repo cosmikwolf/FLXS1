@@ -4,7 +4,7 @@
 
 #define DISPLAY_FREQUENCY 10000
 #define INPUT_FREQUENCY 20000
-#define LED_FREQUENCY 5000
+#define LED_FREQUENCY 10000
 
 
 TimeController::TimeController(){ };
@@ -27,7 +27,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
 	buttonIo.changeState(CHANNEL_PITCH_MODE);
 
-	display.initialize(sequencerArray);
+	display.initialize(sequencerArray, &clockMaster);
 
 	ledArray.initialize(sequencerArray);
 
@@ -98,32 +98,36 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 }
 
 void TimeController::runLoopHandler() {
-	digitalWriteFast(PIN_EXT_RX, HIGH);
+	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	elapsedMicros timeControlTimer = 0;
-	ledArray.loop(LED_FREQUENCY);
+	if (clockMaster.ledRunSwitch){
+		ledArray.loop(LED_FREQUENCY);
+		clockMaster.ledRunSwitch = false;
+
+	}
 	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
-	digitalWriteFast(PIN_EXT_RX, LOW);
+	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 //	Serial.println("LED Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	buttonIo.loop(INPUT_FREQUENCY);
 	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
 	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
-	digitalWriteFast(PIN_EXT_RX, HIGH);
+	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch){
-		digitalWriteFast(DEBUG_PIN, HIGH);
+		// digitalWriteFast(DEBUG_PIN, HIGH);
 		saveFile.cacheWriteLoop();
-		digitalWriteFast(DEBUG_PIN, LOW);
+		// digitalWriteFast(DEBUG_PIN, LOW);
 		cacheWriteTimer=0;
 		if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 	}
-	digitalWriteFast(PIN_EXT_RX, LOW);
+	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 	//Serial.println("Cache Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	display.displayLoop(DISPLAY_FREQUENCY);
-	digitalWriteFast(PIN_EXT_RX, HIGH);
+	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* DISPLAY LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
@@ -134,13 +138,16 @@ void TimeController::runLoopHandler() {
 		outputControl.dacTestLoop();
 		return;
 	}
-	digitalWriteFast(PIN_EXT_RX, LOW);
+	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 }
 
 void TimeController::masterClockHandler(){
-//	saveFile.cacheWriteLoop();``
 	clockMaster.masterClockFunc();
+}
+
+void TimeController::sequencerHandler(){
+	clockMaster.sequencerFunc();
 }
 
 void TimeController::midiClockHandler(){

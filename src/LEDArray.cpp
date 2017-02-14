@@ -66,6 +66,7 @@ void LEDArray::initialize(Sequencer *sequenceArray){
 void LEDArray::loop(uint16_t frequency){
 
   if (pixelTimer > frequency){
+
     pixelTimer = 0;
 
     switch (currentState ){
@@ -118,10 +119,10 @@ void LEDArray::loop(uint16_t frequency){
         }
       break;
     }
-//    noInterrupts();
+    digitalWriteFast(PIN_EXT_RX, HIGH);
     leds.show();
-    //FastLED.show();
-//    interrupts();
+    digitalWriteFast(PIN_EXT_RX, LOW);
+
   }
 }
 
