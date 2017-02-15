@@ -72,30 +72,14 @@ void LEDArray::loop(uint16_t frequency){
     switch (currentMenu ){
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
+      case SEQUENCE_MENU_1:
         channelPitchModeLEDHandler();
       break;
       case VELOCITY_MENU:
         channelGateModeLEDHandler();
       break;
-      case CHANNEL_ENVELOPE_MODE:
-        channelEnvelopeModeLEDHandler();
-      break;
       case CHANNEL_STEP_MODE:
         channelStepModeLEDHandler();
-      break;
-
-      case SEQUENCE_MENU:
-        for (int i=0; i < 16; i++){
-          /*if (i%4==0 || i == 3){
-          //  leds[ledMapping[i]] = CHSV(int(millis()/3)%r2g255, 255, 255);
-          } else{
-        //    leds[ledMapping[i]] = CHSV(0,0,0);
-      }*/
-          leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
-        };
-        for (int i=0;i<4;i++){
-          leds.setPixelColor(ledChannelButtons[i], 0,0,0);
-        }
       break;
 
       case PATTERN_SELECT:

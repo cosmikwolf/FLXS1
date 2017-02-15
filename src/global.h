@@ -41,11 +41,10 @@
 
 
 #define	CHANNEL_ENVELOPE_MODE	 99
-#define	CHANNEL_STEP_MODE		   100
-#define	CHANNEL_INPUT_MODE		 103
-#define	DELETE_MENU			    	 101
+#define	CHANNEL_STEP_MODE		   241
+#define	CHANNEL_INPUT_MODE		 243
+#define	DELETE_MENU			    	 242
 #define	DEBUG_SCREEN		       127
-#define	CALIBRATION_MENU		   126
 #define	INPUT_DEBUG_MENU		     125
 
 // MENUS
@@ -55,6 +54,7 @@
 #define	SEQUENCE_MENU_2        100
 #define	TUNER_MENU	         	 101
 #define	VELOCITY_MENU          102
+#define	CALIBRATION_MENU       103
 
 
 //PITCH PAGE STEPMODES
@@ -62,31 +62,36 @@
 #define STATE_GATELENGTH   1
 #define STATE_GATETYPE     2
 #define STATE_GLIDE        3
+
+//ARPEGGIO MENU
 #define STATE_ARPTYPE      4
 #define STATE_ARPSPEEDNUM  5
 #define STATE_ARPSPEEDDEN  6
 #define STATE_ARPOCTAVE    7
 #define STATE_CHORD        8
+
+//SEQUENCE MENU
 #define STATE_STEPCOUNT    9
 #define STATE_BEATCOUNT    10
-#define STATE_PITCH1       11
-#define STATE_PITCH2       12
-#define STATE_PITCH3       13
+#define STATE_QUANTIZEKEY     11
+#define STATE_QUANTIZESCALE   12
 
-#define STATE_TUNER         14
+#define STATE_PITCH1       13
+#define STATE_PITCH2       14
+#define STATE_PITCH3       15
+
+#define STATE_TUNER         16
 //VELOCITY PAGE STEP MODES
-#define STATE_VELOCITY       15
-#define STATE_VELOCITYTYPE   16
-#define STATE_LFOSPEED       17
+#define STATE_VELOCITY       17
+#define STATE_VELOCITYTYPE   18
+#define STATE_LFOSPEED       19
 
-//STEP PAGE STEP MODES:
-#define STATE_QUANTIZEKEY     18
-#define STATE_QUANTIZESCALE   19
 
 #define STATE_TEMPO          20
 #define STATE_EXTCLOCK       21
 
 #define STATE_PATTERNSELECT   22
+#define STATE_CALIBRATION    23
 
 
 
@@ -224,6 +229,7 @@ void debug(const char* text);
 int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);
+int min_max_cycle(int value, int min, int max);
 uint8_t getNote(uint8_t index);
 uint32_t FreeRam2();
 

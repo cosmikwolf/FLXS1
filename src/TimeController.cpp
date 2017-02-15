@@ -25,7 +25,6 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   sequencerArray[3].initialize(3, 16, 4, (tempoX100/100), &outputControl);
 
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
-	buttonIo.changeState(STATE_PITCH0);
 
 	display.initialize(sequencerArray, &clockMaster);
 
@@ -78,6 +77,9 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	saveFile.initializeCache();
 	saveFile.loadPattern(0, 0b1111);
+
+	buttonIo.changeState(STATE_PITCH0);
+
 
 //
 

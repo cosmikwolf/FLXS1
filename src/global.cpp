@@ -105,6 +105,17 @@ int min_max(int value, int min, int max){
 	}
 }
 
+int min_max_cycle(int value, int min, int max){
+	//cycle through back to
+	if (value < min){
+		return max;
+	} else if( value > max){
+		return min;
+	} else {
+		return value;
+	}
+}
+
 uint8_t getNote(uint8_t index){
 	return index + notePage * 16;
 }

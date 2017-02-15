@@ -122,6 +122,16 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         stateDisplay_arp(buf);
       break;
 
+      case SEQUENCE_MENU_1:
+        sequenceMenuDisplay();
+      break;
+
+      case PATTERN_SELECT:
+        patternSelectDisplay();
+      break;
+
+
+
       case VELOCITY_MENU:
         channelVelocityMenuDisplay(buf);
       break;
@@ -132,14 +142,6 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
       case CHANNEL_INPUT_MODE:
         channelInputDisplay(buf);
-      break;
-
-      case PATTERN_SELECT:
-        patternSelectDisplay();
-      break;
-
-      case SEQUENCE_MENU:
-        sequenceMenuDisplay();
       break;
 
       case GLOBAL_MENU:
@@ -317,29 +319,47 @@ void DisplayModule::stateDisplay_arp(char *buf){
  void DisplayModule::sequenceMenuDisplay(){
    uint8_t previousHighlight = highlight;
 
-   switch (stepMode) {
-     case STATE_QUANTIZEKEY:
-       highlight = 2;
-     break;
-     case STATE_QUANTIZESCALE:
-       highlight = 3;
-     break;
-     default:
-       highlight = 2;
-     break;
+   displayElement[0] = strdup("SEQUENCE");
+
+   displayElement[1] = strdup("LAST:");
+
+   sprintf(buf, "%d", sequenceArray[selectedChannel].stepCount);
+   displayElement[2] = strdup(buf);
+
+   displayElement[3] = strdup("LENGTH:");
+
+   if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv == 1){
+     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
+   } else if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv > 0){
+     sprintf(buf, "1/%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
+   } else {
+     sprintf(buf, "%d", abs(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv)+2 );
    }
+   displayElement[4] = strdup(buf);
 
-   displayElement[0] = strdup("SEQUENCE MENU");
-   renderOnce_StringBox(0, highlight, previousHighlight, 0 , 0  , 128 , 16, false, 1,  BLACK, WHITE);
-
-   displayElement[1] = strdup("Scale Quantization:");
+   displayElement[5] = strdup("KEY:");
    char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
    char *scaleArray[] = { "OFF", "CHROMATIC", "MAJOR", "MINOR", "MAJORMINOR", "PENTATONIC_MAJOR", "PENTATONIC_MINOR", "PENTATONIC_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDIAN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
 
-   displayElement[2] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
-   displayElement[3] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
+   displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
+   displayElement[7] = strdup("SCALE:");
 
-   renderOnce_StringBox(1,  highlight, previousHighlight, 0,  16, 128, 8, false, 0, BLACK, WHITE);
-   renderOnce_StringBox(2,  highlight, previousHighlight, 0,  24, 128, 15, false, 2, BLACK, WHITE);
-   renderOnce_StringBox(3,  highlight, previousHighlight, 0,  36, 128, 15, false, 2, BLACK, WHITE);
+   displayElement[8] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
+
+
+
+
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+
+   renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_STEPCOUNT,     68, 20,60,17, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_BEATCOUNT,     68, 37,60,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_QUANTIZEKEY,     68, 54,60,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(7,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_QUANTIZESCALE,    68, 71,60,17, false, STYLE1X, background , foreground);
+
  }

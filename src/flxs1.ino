@@ -103,7 +103,6 @@ void setup() {
   //CacheTimer.begin(cacheLoop,kCacheClockInterval);
   //CacheTimer.priority(2);
 
-
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
   pinMode(31, OUTPUT); // debug pin - EXT_TX - exp pin 5
