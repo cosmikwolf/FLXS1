@@ -6,7 +6,7 @@
 uint32_t tempoX100 = 12000;
 uint8_t stepMode = 0;
 uint8_t notePage;
-uint8_t	currentState = STEP_DISPLAY;       // Display module + LED module
+uint8_t	currentMenu = STEP_DISPLAY;       // Display module + LED module
 uint8_t previousState = 0;      // Display module + LED moduleextern
 
 uint8_t selectedChannel = 0;

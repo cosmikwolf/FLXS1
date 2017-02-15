@@ -10,7 +10,8 @@
 #include "_fonts/Visitor_18.c"
 #include "_fonts/F_Zero_18.c"
 #include "_fonts/LadyRadical_12.c"
-#include "_fonts/akashi20.c"
+#include "_fonts/OrbitB_12.c"
+#include "_fonts/OrbitBold_14.c"
 #include "_fonts/PixelSquare_10.c"
 #include "_fonts/PixelSquareBold_10.c"
 #include "_fonts/PixelTech_14.c"
@@ -67,6 +68,7 @@ class DisplayModule
     char *buf = new char[51]; // sprintf buffer
 
     uint8_t highlight;
+    uint8_t previousMenu;
     uint8_t previouslySelectedChannel;
     uint8_t previousStepMode;
     SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
@@ -82,14 +84,15 @@ class DisplayModule
     void patternSelectDisplay();
 
     void channelSequenceDisplay(char *buf);
-    void stepMode_pitch(char*buf);
+    void stateDisplay_pitch(char*buf);
+    void stateDisplay_arp(char *buf);
+
     void stepMode_gateLength(char *buf);
     void stepMode_chord(char *buf);
     void stepMode_glide(char *buf);
     void stepMode_stepCount(char *buf);
     void stepMode_beatCount(char *buf);
     void stepMode_gateType(char *buf);
-    void stepMode_arp(char *buf);
     void stepMode_arpSpeed(char *buf);
     void stepMode_common(char *buf);
     void stepMode_arpOctave(char *buf);

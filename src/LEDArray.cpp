@@ -11,7 +11,7 @@ void LEDArray::initialize(Sequencer *sequenceArray){
 
   //LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
-  leds.setBrightness(255);
+  leds.setBrightness(200);
   leds.begin();
   leds.show(); // Initialize all pixels to 'off'
 
@@ -69,11 +69,12 @@ void LEDArray::loop(uint16_t frequency){
 
     pixelTimer = 0;
 
-    switch (currentState ){
-      case CHANNEL_PITCH_MODE:
+    switch (currentMenu ){
+      case PITCH_GATE_MENU:
+      case ARPEGGIO_MENU:
         channelPitchModeLEDHandler();
       break;
-      case CHANNEL_VELOCITY_MODE:
+      case VELOCITY_MENU:
         channelGateModeLEDHandler();
       break;
       case CHANNEL_ENVELOPE_MODE:
@@ -269,7 +270,7 @@ void ledSetup(){
 void ledLoop(){
   noInterrupts();
   if (pixelTimer > 20000){
-    switch (currentState ){
+    switch (currentMenu ){
       case STEP_DISPLAY:
         for (int i=0; i < 16; i++){
           if (getNote(i) == sequenceArray[selectedChannel]->activeStep ){
@@ -293,7 +294,7 @@ void ledLoop(){
         }
 
       break;
-      case CHANNEL_PITCH_MODE:
+      case PITCH_GATE_MENU:
         for (int i=0; i < 20; i++){
           if (i%4==0 || i == 3){
             pixels.setPixelColor(ledMapping[i], Wheel((millis()/10 + i*64) % 255));

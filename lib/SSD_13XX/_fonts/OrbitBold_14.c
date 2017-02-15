@@ -1,0 +1,1385 @@
+
+/*******************************************************************************
+
+* name: OrbitBold_14
+* family: Orbit-B BT
+* size: 14
+* style: Bold
+* --------------------------------------
+* included characters:  !"#$%&'()*+,-./0123456789:;<=>?\x0040ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+* --------------------------------------
+* antialiasing: no
+* type: proportional
+* encoding: latin1
+* unicode bom: no
+*
+* data block size: 8 bit(s), uint8_t
+* RLE compression enabled: no
+* conversion type: Monochrome, Edge 144
+* bits per pixel: 1
+*
+* preprocess:
+*  main scan direction: top_to_bottom
+*  line scan direction: forward
+*  inverse: yes
+* ------------------------------------------------------------------------------
+* Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y.
+* Font template version: 2.4
+* Note: Font height should be fixed and all glyps must have the same height!
+* ------------------------------------------------------------------------------
+*******************************************************************************/
+
+#if !defined(SUMO_FNT_LIB_OrbitBold_14)
+#define SUMO_FNT_LIB_OrbitBold_14
+
+#include <stdint.h>
+
+
+
+const _smCharType image_data_OrbitBold_14_0x20[12] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: ' '
+
+const tImage OrbitBold_14_0x20 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x20, 6, 12};//character: ' ' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x21[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x06, 0x66, 0x67, 0x77, 0x07, 0x70, 0x00 };//character: '!'
+
+const tImage OrbitBold_14_0x21 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x21, 4, 8};//character: '!' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x22[10] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0xf7, 0xbd, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '"'
+
+const tImage OrbitBold_14_0x22 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x22, 5, 10};//character: '"' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x23[24] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x06, 0xc0, 0x6c, 0x3f, 0xf0, 0xd8, 0x0d, 0x87, 0xfe, 0x1b, 0x01, 0xb0, 0x36, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '#'
+
+const tImage OrbitBold_14_0x23 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x23, 12, 24};//character: '#' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x24[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x18, 0x3f, 0xe6, 0x6c, 0xcd, 0x99, 0x83, 0xfe, 0x07, 0xc0, 0xf9, 0x9f, 0x33, 0xe7, 0xfc, 0x0c, 0x00, 0x00, 0x00 };//character: '$'
+
+const tImage OrbitBold_14_0x24 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x24, 11, 22};//character: '$' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x25[14] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x01, 0xf3, 0xc1, 0x86, 0x0c, 0x18, 0x70, 0xe3, 0xf7, 0xe0, 0x00, 0x00 };//character: '%'
+
+const tImage OrbitBold_14_0x25 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x25, 7, 14};//character: '%' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x26[24] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x03, 0xfc, 0x30, 0xc3, 0x3c, 0x3f, 0x07, 0xde, 0x76, 0x66, 0x76, 0x73, 0xf7, 0x06, 0x7f, 0xe0, 0x00, 0x00, 0x00, 0x00 };//character: '&'
+
+const tImage OrbitBold_14_0x26 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x26, 12, 24};//character: '&' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x27[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x36, 0xd8, 0x00, 0x00, 0x00 };//character: '''
+
+const tImage OrbitBold_14_0x27 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x27, 3, 6};//character: ''' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x28[10] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x63, 0x31, 0x8c, 0x63, 0x18, 0xc3, 0x00, 0x00 };//character: '('
+
+const tImage OrbitBold_14_0x28 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x28, 5, 10};//character: '(' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x29[10] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0xc6, 0x18, 0xc6, 0x31, 0x8c, 0xc6, 0x00, 0x00 };//character: ')'
+
+const tImage OrbitBold_14_0x29 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x29, 5, 10};//character: ')' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x2a[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x18, 0x7e, 0x3c, 0x3c, 0x3c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '*'
+
+const tImage OrbitBold_14_0x2a 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x2a, 8, 16};//character: '*' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x2b[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x03, 0x00, 0x18, 0x00, 0xc0, 0x7f, 0xe0, 0x30, 0x01, 0x80, 0x0c, 0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '+'
+
+const tImage OrbitBold_14_0x2b 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x2b, 13, 26};//character: '+' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x2c[12] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0xc0, 0x00 };//character: ','
+
+const tImage OrbitBold_14_0x2c 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x2c, 6, 12};//character: ',' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x2d[14] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '-'
+
+const tImage OrbitBold_14_0x2d 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x2d, 7, 14};//character: '-' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x2e[12] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00 };//character: '.'
+
+const tImage OrbitBold_14_0x2e 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x2e, 6, 12};//character: '.' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x2f[14] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x30, 0xe1, 0x87, 0x0c, 0x38, 0x71, 0xe3, 0xcf, 0x1c, 0x00, 0x00 };//character: '/'
+
+const tImage OrbitBold_14_0x2f 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x2f, 7, 14};//character: '/' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x30[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x33, 0x06, 0x61, 0xcc, 0x39, 0x87, 0x30, 0xe7, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: '0'
+
+const tImage OrbitBold_14_0x30 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x30, 11, 22};//character: '0' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x31[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0xc0, 0x18, 0x03, 0x00, 0x60, 0x0c, 0x01, 0x80, 0x30, 0x0f, 0x01, 0xe0, 0x00, 0x00, 0x00, 0x00 };//character: '1'
+
+const tImage OrbitBold_14_0x31 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x31, 11, 22};//character: '1' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x32[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe0, 0x0c, 0x01, 0x80, 0x33, 0xfe, 0x60, 0x0c, 0x01, 0x80, 0x30, 0x07, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: '2'
+
+const tImage OrbitBold_14_0x32 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x32, 11, 22};//character: '2' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x33[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xc0, 0x18, 0x03, 0x00, 0x63, 0xfe, 0x01, 0xc0, 0x38, 0x07, 0x00, 0xe7, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: '3'
+
+const tImage OrbitBold_14_0x33 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x33, 11, 22};//character: '3' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x34[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x38, 0x07, 0x00, 0xe0, 0x1c, 0x03, 0x80, 0x70, 0x0e, 0x39, 0xff, 0x00, 0xe0, 0x1c, 0x00, 0x00, 0x00, 0x00 };//character: '4'
+
+const tImage OrbitBold_14_0x34 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x34, 11, 22};//character: '4' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x35[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x00, 0xc0, 0x18, 0x03, 0xfe, 0x00, 0xc0, 0x18, 0x03, 0x00, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: '5'
+
+const tImage OrbitBold_14_0x35 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x35, 11, 22};//character: '5' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x36[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xc6, 0x18, 0xc3, 0x18, 0x03, 0x00, 0x7f, 0xcc, 0x19, 0x83, 0x30, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: '6'
+
+const tImage OrbitBold_14_0x36 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x36, 11, 22};//character: '6' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x37[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x1c, 0xc3, 0x00, 0xc0, 0x38, 0x0e, 0x03, 0x80, 0x70, 0x1c, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '7'
+
+const tImage OrbitBold_14_0x37 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x37, 11, 22};//character: '7' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x38[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x1f, 0xe3, 0x0c, 0x61, 0x8c, 0x31, 0xfe, 0x70, 0xee, 0x1d, 0xc3, 0xb8, 0x77, 0xfe, 0x00, 0x00, 0x00, 0x00 };//character: '8'
+
+const tImage OrbitBold_14_0x38 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x38, 11, 22};//character: '8' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x39[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x33, 0xfe, 0x01, 0xc0, 0x38, 0x07, 0x00, 0xe0, 0x1c, 0x00, 0x00, 0x00, 0x00 };//character: '9'
+
+const tImage OrbitBold_14_0x39 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x39, 11, 22};//character: '9' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x3a[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x60, 0x00 };//character: ':'
+
+const tImage OrbitBold_14_0x3a 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x3a, 4, 8};//character: ':' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x3b[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x66, 0x00 };//character: ';'
+
+const tImage OrbitBold_14_0x3b 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x3b, 4, 8};//character: ';' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x3c[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x07, 0x01, 0xe0, 0x3c, 0x01, 0xe0, 0x03, 0xc0, 0x03, 0x80, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '<'
+
+const tImage OrbitBold_14_0x3c 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x3c, 13, 26};//character: '<' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x3d[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0xfc, 0x00, 0x00, 0x00, 0x0f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '='
+
+const tImage OrbitBold_14_0x3d 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x3d, 13, 26};//character: '=' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x3e[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x70, 0x00, 0xf0, 0x01, 0xe0, 0x0f, 0x01, 0xe0, 0x38, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '>'
+
+const tImage OrbitBold_14_0x3e 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x3e, 13, 26};//character: '>' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x3f[18] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x0f, 0xf7, 0x1b, 0x8c, 0x1e, 0x38, 0x1c, 0x0e, 0x00, 0x03, 0x81, 0xc0, 0x00, 0x00, 0x00 };//character: '?'
+
+const tImage OrbitBold_14_0x3f 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x3f, 9, 18};//character: '?' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x40[30] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3f, 0x81, 0xc1, 0xc7, 0x01, 0x8c, 0xfd, 0xb3, 0x33, 0x6c, 0x66, 0xd9, 0xdd, 0xb3, 0x73, 0x3f, 0xc3, 0x00, 0x03, 0x87, 0x01, 0xf8, 0x00, 0x00 };//character: '\x0040'
+
+const tImage OrbitBold_14_0x40 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x40, 15, 30};//character: '\x0040' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x41[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x1f, 0xe3, 0x0c, 0x61, 0x8c, 0x33, 0xff, 0x70, 0xee, 0x1d, 0xc3, 0xb8, 0x77, 0x0e, 0x00, 0x00, 0x00, 0x00 };//character: 'A'
+
+const tImage OrbitBold_14_0x41 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x41, 11, 22};//character: 'A' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x42[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xc6, 0x18, 0xc3, 0x18, 0x63, 0xfe, 0x70, 0xce, 0x19, 0xc3, 0x38, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: 'B'
+
+const tImage OrbitBold_14_0x42 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x42, 11, 22};//character: 'B' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x43[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x1c, 0xc3, 0x98, 0x03, 0x00, 0x60, 0x0c, 0x19, 0x83, 0x30, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: 'C'
+
+const tImage OrbitBold_14_0x43 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x43, 11, 22};//character: 'C' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x44[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x33, 0x06, 0x70, 0xce, 0x19, 0xc3, 0x38, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: 'D'
+
+const tImage OrbitBold_14_0x44 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x44, 11, 22};//character: 'D' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x45[18] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x0f, 0xe6, 0x03, 0x01, 0x80, 0xfe, 0x70, 0x38, 0x1c, 0x0e, 0x07, 0xf0, 0x00, 0x00, 0x00 };//character: 'E'
+
+const tImage OrbitBold_14_0x45 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x45, 9, 18};//character: 'E' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x46[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x7f, 0x60, 0x60, 0x60, 0x7f, 0x70, 0x70, 0x70, 0x70, 0x70, 0x00, 0x00, 0x00 };//character: 'F'
+
+const tImage OrbitBold_14_0x46 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x46, 8, 16};//character: 'F' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x47[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x03, 0x00, 0x73, 0xce, 0x19, 0xc3, 0x38, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: 'G'
+
+const tImage OrbitBold_14_0x47 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x47, 11, 22};//character: 'G' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x48[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x18, 0x63, 0x0c, 0x61, 0x8c, 0x33, 0xff, 0x70, 0xee, 0x1d, 0xc3, 0xb8, 0x77, 0x0e, 0x00, 0x00, 0x00, 0x00 };//character: 'H'
+
+const tImage OrbitBold_14_0x48 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x48, 11, 22};//character: 'H' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x49[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x06, 0x66, 0x66, 0x77, 0x77, 0x70, 0x00 };//character: 'I'
+
+const tImage OrbitBold_14_0x49 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x49, 4, 8};//character: 'I' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x4a[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x80, 0x60, 0x18, 0x06, 0x03, 0x98, 0xe6, 0x39, 0x8e, 0x7f, 0x80, 0x00, 0x00, 0x00 };//character: 'J'
+
+const tImage OrbitBold_14_0x4a 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x4a, 10, 20};//character: 'J' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x4b[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0xc3, 0x30, 0xcc, 0x33, 0x0d, 0xff, 0x70, 0xdc, 0x37, 0x0d, 0xc3, 0x70, 0xc0, 0x00, 0x00, 0x00 };//character: 'K'
+
+const tImage OrbitBold_14_0x4b 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x4b, 10, 20};//character: 'K' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x4c[18] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x06, 0x03, 0x01, 0x80, 0xc0, 0x60, 0x70, 0x38, 0x1c, 0x0e, 0x07, 0xf8, 0x00, 0x00, 0x00 };//character: 'L'
+
+const tImage OrbitBold_14_0x4c 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x4c, 9, 18};//character: 'L' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x4d[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xf6, 0x31, 0xb1, 0x8d, 0x8c, 0x6c, 0x63, 0x73, 0x1b, 0x98, 0xdc, 0xc6, 0xe6, 0x37, 0x31, 0x80, 0x00, 0x00, 0x00, 0x00 };//character: 'M'
+
+const tImage OrbitBold_14_0x4d 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x4d, 13, 26};//character: 'M' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x4e[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x38, 0x67, 0x0c, 0xf1, 0x9f, 0x33, 0x66, 0x76, 0xce, 0xf9, 0xcf, 0x38, 0xe7, 0x1c, 0x00, 0x00, 0x00, 0x00 };//character: 'N'
+
+const tImage OrbitBold_14_0x4e 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x4e, 11, 22};//character: 'N' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x4f[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x33, 0x06, 0x61, 0xcc, 0x39, 0x87, 0x30, 0xe7, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: 'O'
+
+const tImage OrbitBold_14_0x4f 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x4f, 11, 22};//character: 'O' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x50[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x33, 0xfe, 0x70, 0x0e, 0x01, 0xc0, 0x38, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: 'P'
+
+const tImage OrbitBold_14_0x50 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x50, 11, 22};//character: 'P' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x51[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xe6, 0x0c, 0xc1, 0x98, 0x33, 0x06, 0x60, 0xcc, 0x19, 0x83, 0x31, 0xe7, 0xfc, 0x07, 0x00, 0x00, 0x00 };//character: 'Q'
+
+const tImage OrbitBold_14_0x51 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x51, 11, 22};//character: 'Q' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x52[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x3f, 0xc6, 0x18, 0xc3, 0x18, 0x63, 0xfe, 0x70, 0xce, 0x19, 0xc3, 0x38, 0x67, 0x0c, 0x00, 0x00, 0x00, 0x00 };//character: 'R'
+
+const tImage OrbitBold_14_0x52 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x52, 11, 22};//character: 'R' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x53[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x01, 0xff, 0x60, 0xd8, 0x36, 0x01, 0xff, 0x01, 0xc0, 0x76, 0x1d, 0x87, 0x7f, 0xc0, 0x00, 0x00, 0x00 };//character: 'S'
+
+const tImage OrbitBold_14_0x53 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x53, 10, 20};//character: 'S' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x54[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x03, 0xff, 0x0f, 0xc3, 0x00, 0xc0, 0x30, 0x0c, 0x03, 0x00, 0xc0, 0x30, 0x0c, 0x00, 0x00, 0x00, 0x00 };//character: 'T'
+
+const tImage OrbitBold_14_0x54 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x54, 10, 20};//character: 'T' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x55[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x30, 0x66, 0x0c, 0xc1, 0x98, 0x33, 0x06, 0x70, 0xce, 0x19, 0xc3, 0x38, 0x67, 0xfc, 0x00, 0x00, 0x00, 0x00 };//character: 'U'
+
+const tImage OrbitBold_14_0x55 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x55, 11, 22};//character: 'U' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x56[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x03, 0x06, 0xe3, 0x98, 0xc6, 0x31, 0xdc, 0x36, 0x0d, 0x83, 0xe0, 0x70, 0x1c, 0x00, 0x00, 0x00, 0x00 };//character: 'V'
+
+const tImage OrbitBold_14_0x56 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x56, 10, 20};//character: 'V' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x57[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0xc6, 0x36, 0x31, 0xb1, 0x8d, 0x8c, 0x6c, 0x63, 0x73, 0x1b, 0x98, 0xdc, 0xc6, 0xe6, 0x37, 0xff, 0x80, 0x00, 0x00, 0x00, 0x00 };//character: 'W'
+
+const tImage OrbitBold_14_0x57 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x57, 13, 26};//character: 'W' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x58[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x03, 0x07, 0xc1, 0xf8, 0xe3, 0x70, 0x78, 0x1e, 0x0f, 0xc6, 0x1f, 0x83, 0xe0, 0xc0, 0x00, 0x00, 0x00 };//character: 'X'
+
+const tImage OrbitBold_14_0x58 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x58, 10, 20};//character: 'X' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x59[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x03, 0x06, 0xc1, 0xb0, 0x6c, 0x1b, 0xfe, 0x1c, 0x07, 0x01, 0xc0, 0x70, 0x1c, 0x00, 0x00, 0x00, 0x00 };//character: 'Y'
+
+const tImage OrbitBold_14_0x59 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x59, 10, 20};//character: 'Y' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x5a[20] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x03, 0xfe, 0xc3, 0xb0, 0xc0, 0x60, 0x70, 0x38, 0x1c, 0x0f, 0x1b, 0x86, 0xff, 0x80, 0x00, 0x00, 0x00 };//character: 'Z'
+
+const tImage OrbitBold_14_0x5a 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x5a, 10, 20};//character: 'Z' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x5b[10] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0xe6, 0x31, 0x8c, 0x63, 0x18, 0xc7, 0x00, 0x00 };//character: '['
+
+const tImage OrbitBold_14_0x5b 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x5b, 5, 10};//character: '[' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x5c[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0xc0, 0xc0, 0x60, 0x60, 0x30, 0x30, 0x18, 0x1c, 0x0e, 0x0e, 0x07, 0x00, 0x00 };//character: '\'
+
+const tImage OrbitBold_14_0x5c 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x5c, 8, 16};//character: '\' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x5d[10] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0xe3, 0x18, 0xc6, 0x31, 0x8c, 0x67, 0x00, 0x00 };//character: ']'
+
+const tImage OrbitBold_14_0x5d 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x5d, 5, 10};//character: ']' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x5e[30] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c, 0x00, 0x7c, 0x01, 0xdc, 0x07, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '^'
+
+const tImage OrbitBold_14_0x5e 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x5e, 15, 30};//character: '^' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x5f[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff };//character: '_'
+
+const tImage OrbitBold_14_0x5f 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x5f, 8, 16};//character: '_' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x60[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x30, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '`'
+
+const tImage OrbitBold_14_0x60 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x60, 8, 16};//character: '`' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x61[18] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xfc, 0x06, 0x7f, 0x39, 0x9c, 0xce, 0x67, 0xf8, 0x00, 0x00, 0x00 };//character: 'a'
+
+const tImage OrbitBold_14_0x61 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x61, 9, 18};//character: 'a' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x62[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x60, 0x60, 0x60, 0x7f, 0x73, 0x73, 0x73, 0x73, 0x73, 0x7f, 0x00, 0x00, 0x00 };//character: 'b'
+
+const tImage OrbitBold_14_0x62 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x62, 8, 16};//character: 'b' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x63[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x67, 0x60, 0x60, 0x60, 0x63, 0x7f, 0x00, 0x00, 0x00 };//character: 'c'
+
+const tImage OrbitBold_14_0x63 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x63, 8, 16};//character: 'c' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x64[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x03, 0x03, 0x03, 0x7f, 0x73, 0x73, 0x73, 0x73, 0x73, 0x7f, 0x00, 0x00, 0x00 };//character: 'd'
+
+const tImage OrbitBold_14_0x64 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x64, 8, 16};//character: 'd' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x65[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x73, 0x73, 0x7f, 0x70, 0x73, 0x7f, 0x00, 0x00, 0x00 };//character: 'e'
+
+const tImage OrbitBold_14_0x65 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x65, 8, 16};//character: 'e' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x66[14] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x03, 0xf7, 0x6e, 0x3e, 0x38, 0x70, 0xe1, 0x83, 0x06, 0x00, 0x00, 0x00 };//character: 'f'
+
+const tImage OrbitBold_14_0x66 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x66, 7, 14};//character: 'f' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x67[18] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xfe, 0xc6, 0x63, 0x31, 0x9f, 0xc6, 0x07, 0xf3, 0x99, 0xcc, 0xfe };//character: 'g'
+
+const tImage OrbitBold_14_0x67 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x67, 9, 18};//character: 'g' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x68[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x60, 0x60, 0x60, 0x7f, 0x73, 0x73, 0x73, 0x73, 0x73, 0x73, 0x00, 0x00, 0x00 };//character: 'h'
+
+const tImage OrbitBold_14_0x68 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x68, 8, 16};//character: 'h' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x69[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x60, 0x66, 0x67, 0x77, 0x70, 0x00 };//character: 'i'
+
+const tImage OrbitBold_14_0x69 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x69, 4, 8};//character: 'i' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x6a[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x30, 0x33, 0x37, 0x77, 0x77, 0x7f };//character: 'j'
+
+const tImage OrbitBold_14_0x6a 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x6a, 4, 8};//character: 'j' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x6b[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x60, 0x60, 0x60, 0x63, 0x73, 0x7f, 0x73, 0x73, 0x73, 0x73, 0x00, 0x00, 0x00 };//character: 'k'
+
+const tImage OrbitBold_14_0x6b 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x6b, 8, 16};//character: 'k' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x6c[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x06, 0x66, 0x66, 0x67, 0x77, 0x70, 0x00 };//character: 'l'
+
+const tImage OrbitBold_14_0x6c 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x6c, 4, 8};//character: 'l' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x6d[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xfb, 0x33, 0x66, 0x6e, 0xcd, 0xd9, 0xbb, 0x37, 0x66, 0x00, 0x00, 0x00, 0x00 };//character: 'm'
+
+const tImage OrbitBold_14_0x6d 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x6d, 11, 22};//character: 'm' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x6e[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x63, 0x63, 0x73, 0x73, 0x73, 0x73, 0x00, 0x00, 0x00 };//character: 'n'
+
+const tImage OrbitBold_14_0x6e 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x6e, 8, 16};//character: 'n' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x6f[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x63, 0x63, 0x67, 0x67, 0x67, 0x7f, 0x00, 0x00, 0x00 };//character: 'o'
+
+const tImage OrbitBold_14_0x6f 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x6f, 8, 16};//character: 'o' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x70[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x63, 0x63, 0x63, 0x63, 0x63, 0x7f, 0x70, 0x70, 0x70 };//character: 'p'
+
+const tImage OrbitBold_14_0x70 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x70, 8, 16};//character: 'p' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x71[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x63, 0x63, 0x63, 0x63, 0x63, 0x7f, 0x07, 0x07, 0x07 };//character: 'q'
+
+const tImage OrbitBold_14_0x71 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x71, 8, 16};//character: 'q' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x72[14] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xb3, 0x60, 0xe1, 0xc3, 0x87, 0x00, 0x00, 0x00 };//character: 'r'
+
+const tImage OrbitBold_14_0x72 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x72, 7, 14};//character: 'r' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x73[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0x63, 0x60, 0x7f, 0x07, 0x67, 0x7f, 0x00, 0x00, 0x00 };//character: 's'
+
+const tImage OrbitBold_14_0x73 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x73, 8, 16};//character: 's' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x74[12] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x61, 0x8f, 0x9e, 0x61, 0x86, 0x18, 0x70, 0x00, 0x00 };//character: 't'
+
+const tImage OrbitBold_14_0x74 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x74, 6, 12};//character: 't' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x75[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x63, 0x63, 0x63, 0x73, 0x73, 0x73, 0x7f, 0x00, 0x00, 0x00 };//character: 'u'
+
+const tImage OrbitBold_14_0x75 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x75, 8, 16};//character: 'u' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x76[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc3, 0x66, 0x66, 0x7e, 0x3c, 0x3c, 0x18, 0x00, 0x00, 0x00 };//character: 'v'
+
+const tImage OrbitBold_14_0x76 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x76, 8, 16};//character: 'v' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x77[22] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0x9b, 0x33, 0x66, 0x6c, 0xcd, 0xd9, 0xbb, 0x37, 0xfe, 0x00, 0x00, 0x00, 0x00 };//character: 'w'
+
+const tImage OrbitBold_14_0x77 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x77, 11, 22};//character: 'w' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x78[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xce, 0xee, 0x7c, 0x38, 0x7c, 0xee, 0xe6, 0x00, 0x00, 0x00 };//character: 'x'
+
+const tImage OrbitBold_14_0x78 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x78, 8, 16};//character: 'x' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x79[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x63, 0x63, 0x63, 0x63, 0x63, 0x63, 0x7f, 0x07, 0x07, 0x07 };//character: 'y'
+
+const tImage OrbitBold_14_0x79 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x79, 8, 16};//character: 'y' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x7a[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfe, 0xce, 0x1c, 0x78, 0x70, 0xe6, 0xfe, 0x00, 0x00, 0x00 };//character: 'z'
+
+const tImage OrbitBold_14_0x7a 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x7a, 8, 16};//character: 'z' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x7b[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x0e, 0x18, 0x18, 0x18, 0x18, 0x18, 0x70, 0x18, 0x18, 0x18, 0x18, 0x18, 0x1e };//character: '{'
+
+const tImage OrbitBold_14_0x7b 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x7b, 8, 16};//character: '{' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x7c[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18 };//character: '|'
+
+const tImage OrbitBold_14_0x7c 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x7c, 8, 16};//character: '|' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x7d[16] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x70, 0x18, 0x18, 0x18, 0x18, 0x18, 0x0e, 0x18, 0x18, 0x18, 0x18, 0x18, 0x78 };//character: '}'
+
+const tImage OrbitBold_14_0x7d 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x7d, 8, 16};//character: '}' (charW,total bytes)
+
+const _smCharType image_data_OrbitBold_14_0x7e[26] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3c, 0xc3, 0x3c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: '~'
+
+const tImage OrbitBold_14_0x7e 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_OrbitBold_14_0x7e, 13, 26};//character: '~' (charW,total bytes)
+
+
+const tChar OrbitBold_14_array[] = {
+
+  // character: ' '
+  {0x20, &OrbitBold_14_0x20},
+  // character: '!'
+  {0x21, &OrbitBold_14_0x21},
+  // character: '"'
+  {0x22, &OrbitBold_14_0x22},
+  // character: '#'
+  {0x23, &OrbitBold_14_0x23},
+  // character: '$'
+  {0x24, &OrbitBold_14_0x24},
+  // character: '%'
+  {0x25, &OrbitBold_14_0x25},
+  // character: '&'
+  {0x26, &OrbitBold_14_0x26},
+  // character: '''
+  {0x27, &OrbitBold_14_0x27},
+  // character: '('
+  {0x28, &OrbitBold_14_0x28},
+  // character: ')'
+  {0x29, &OrbitBold_14_0x29},
+  // character: '*'
+  {0x2a, &OrbitBold_14_0x2a},
+  // character: '+'
+  {0x2b, &OrbitBold_14_0x2b},
+  // character: ','
+  {0x2c, &OrbitBold_14_0x2c},
+  // character: '-'
+  {0x2d, &OrbitBold_14_0x2d},
+  // character: '.'
+  {0x2e, &OrbitBold_14_0x2e},
+  // character: '/'
+  {0x2f, &OrbitBold_14_0x2f},
+  // character: '0'
+  {0x30, &OrbitBold_14_0x30},
+  // character: '1'
+  {0x31, &OrbitBold_14_0x31},
+  // character: '2'
+  {0x32, &OrbitBold_14_0x32},
+  // character: '3'
+  {0x33, &OrbitBold_14_0x33},
+  // character: '4'
+  {0x34, &OrbitBold_14_0x34},
+  // character: '5'
+  {0x35, &OrbitBold_14_0x35},
+  // character: '6'
+  {0x36, &OrbitBold_14_0x36},
+  // character: '7'
+  {0x37, &OrbitBold_14_0x37},
+  // character: '8'
+  {0x38, &OrbitBold_14_0x38},
+  // character: '9'
+  {0x39, &OrbitBold_14_0x39},
+  // character: ':'
+  {0x3a, &OrbitBold_14_0x3a},
+  // character: ';'
+  {0x3b, &OrbitBold_14_0x3b},
+  // character: '<'
+  {0x3c, &OrbitBold_14_0x3c},
+  // character: '='
+  {0x3d, &OrbitBold_14_0x3d},
+  // character: '>'
+  {0x3e, &OrbitBold_14_0x3e},
+  // character: '?'
+  {0x3f, &OrbitBold_14_0x3f},
+  // character: '\x0040'
+  {0x40, &OrbitBold_14_0x40},
+  // character: 'A'
+  {0x41, &OrbitBold_14_0x41},
+  // character: 'B'
+  {0x42, &OrbitBold_14_0x42},
+  // character: 'C'
+  {0x43, &OrbitBold_14_0x43},
+  // character: 'D'
+  {0x44, &OrbitBold_14_0x44},
+  // character: 'E'
+  {0x45, &OrbitBold_14_0x45},
+  // character: 'F'
+  {0x46, &OrbitBold_14_0x46},
+  // character: 'G'
+  {0x47, &OrbitBold_14_0x47},
+  // character: 'H'
+  {0x48, &OrbitBold_14_0x48},
+  // character: 'I'
+  {0x49, &OrbitBold_14_0x49},
+  // character: 'J'
+  {0x4a, &OrbitBold_14_0x4a},
+  // character: 'K'
+  {0x4b, &OrbitBold_14_0x4b},
+  // character: 'L'
+  {0x4c, &OrbitBold_14_0x4c},
+  // character: 'M'
+  {0x4d, &OrbitBold_14_0x4d},
+  // character: 'N'
+  {0x4e, &OrbitBold_14_0x4e},
+  // character: 'O'
+  {0x4f, &OrbitBold_14_0x4f},
+  // character: 'P'
+  {0x50, &OrbitBold_14_0x50},
+  // character: 'Q'
+  {0x51, &OrbitBold_14_0x51},
+  // character: 'R'
+  {0x52, &OrbitBold_14_0x52},
+  // character: 'S'
+  {0x53, &OrbitBold_14_0x53},
+  // character: 'T'
+  {0x54, &OrbitBold_14_0x54},
+  // character: 'U'
+  {0x55, &OrbitBold_14_0x55},
+  // character: 'V'
+  {0x56, &OrbitBold_14_0x56},
+  // character: 'W'
+  {0x57, &OrbitBold_14_0x57},
+  // character: 'X'
+  {0x58, &OrbitBold_14_0x58},
+  // character: 'Y'
+  {0x59, &OrbitBold_14_0x59},
+  // character: 'Z'
+  {0x5a, &OrbitBold_14_0x5a},
+  // character: '['
+  {0x5b, &OrbitBold_14_0x5b},
+  // character: '\'
+  {0x5c, &OrbitBold_14_0x5c},
+  // character: ']'
+  {0x5d, &OrbitBold_14_0x5d},
+  // character: '^'
+  {0x5e, &OrbitBold_14_0x5e},
+  // character: '_'
+  {0x5f, &OrbitBold_14_0x5f},
+  // character: '`'
+  {0x60, &OrbitBold_14_0x60},
+  // character: 'a'
+  {0x61, &OrbitBold_14_0x61},
+  // character: 'b'
+  {0x62, &OrbitBold_14_0x62},
+  // character: 'c'
+  {0x63, &OrbitBold_14_0x63},
+  // character: 'd'
+  {0x64, &OrbitBold_14_0x64},
+  // character: 'e'
+  {0x65, &OrbitBold_14_0x65},
+  // character: 'f'
+  {0x66, &OrbitBold_14_0x66},
+  // character: 'g'
+  {0x67, &OrbitBold_14_0x67},
+  // character: 'h'
+  {0x68, &OrbitBold_14_0x68},
+  // character: 'i'
+  {0x69, &OrbitBold_14_0x69},
+  // character: 'j'
+  {0x6a, &OrbitBold_14_0x6a},
+  // character: 'k'
+  {0x6b, &OrbitBold_14_0x6b},
+  // character: 'l'
+  {0x6c, &OrbitBold_14_0x6c},
+  // character: 'm'
+  {0x6d, &OrbitBold_14_0x6d},
+  // character: 'n'
+  {0x6e, &OrbitBold_14_0x6e},
+  // character: 'o'
+  {0x6f, &OrbitBold_14_0x6f},
+  // character: 'p'
+  {0x70, &OrbitBold_14_0x70},
+  // character: 'q'
+  {0x71, &OrbitBold_14_0x71},
+  // character: 'r'
+  {0x72, &OrbitBold_14_0x72},
+  // character: 's'
+  {0x73, &OrbitBold_14_0x73},
+  // character: 't'
+  {0x74, &OrbitBold_14_0x74},
+  // character: 'u'
+  {0x75, &OrbitBold_14_0x75},
+  // character: 'v'
+  {0x76, &OrbitBold_14_0x76},
+  // character: 'w'
+  {0x77, &OrbitBold_14_0x77},
+  // character: 'x'
+  {0x78, &OrbitBold_14_0x78},
+  // character: 'y'
+  {0x79, &OrbitBold_14_0x79},
+  // character: 'z'
+  {0x7a, &OrbitBold_14_0x7a},
+  // character: '{'
+  {0x7b, &OrbitBold_14_0x7b},
+  // character: '|'
+  {0x7c, &OrbitBold_14_0x7c},
+  // character: '}'
+  {0x7d, &OrbitBold_14_0x7d},
+  // character: '~'
+  {0x7e, &OrbitBold_14_0x7e}
+};
+
+//num chars, array, width, height, descent, compression, char remap code
+/*
+	char remap code:
+	0:no remap
+	1:remap minus to CAPITAL
+	2:remap CAPITAL to minus
+*/
+
+const tFont OrbitBold_14 = { 95, OrbitBold_14_array, RLE_proportional, 16, 0, RLE_no, 0 };
+
+
+#endif

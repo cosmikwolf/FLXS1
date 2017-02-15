@@ -38,59 +38,60 @@
 #define GLOBAL_FILE         	 94
 #define TEMPO_MENU          	 95
 #define PATTERN_SELECT      	 96
-#define	CHANNEL_PITCH_MODE     97
-#define	CHANNEL_VELOCITY_MODE		   98
+
+
 #define	CHANNEL_ENVELOPE_MODE	 99
 #define	CHANNEL_STEP_MODE		   100
-#define	CHANNEL_TUNER_MODE		 102
 #define	CHANNEL_INPUT_MODE		 103
 #define	DELETE_MENU			    	 101
 #define	DEBUG_SCREEN		       127
 #define	CALIBRATION_MENU		   126
 #define	INPUT_DEBUG_MENU		     125
 
+// MENUS
+#define	PITCH_GATE_MENU        97
+#define	ARPEGGIO_MENU          98
+#define	SEQUENCE_MENU_1        99
+#define	SEQUENCE_MENU_2        100
+#define	TUNER_MENU	         	 101
+#define	VELOCITY_MENU          102
+
 
 //PITCH PAGE STEPMODES
-#define STEPMODE_PITCH0       0
-#define STEPMODE_GATELENGTH   1
-#define STEPMODE_GATETYPE     2
-#define STEPMODE_GLIDE        3
-#define STEPMODE_ARPTYPE      4
-#define STEPMODE_ARPSPEEDNUM  5
-#define STEPMODE_ARPSPEEDDEN  6
-#define STEPMODE_ARPOCTAVE    7
-#define STEPMODE_CHORD        8
-#define STEPMODE_STEPCOUNT    9
-#define STEPMODE_BEATCOUNT    10
-#define STEPMODE_PITCH1       11
-#define STEPMODE_PITCH2       12
-#define STEPMODE_PITCH3       13
+#define STATE_PITCH0       0
+#define STATE_GATELENGTH   1
+#define STATE_GATETYPE     2
+#define STATE_GLIDE        3
+#define STATE_ARPTYPE      4
+#define STATE_ARPSPEEDNUM  5
+#define STATE_ARPSPEEDDEN  6
+#define STATE_ARPOCTAVE    7
+#define STATE_CHORD        8
+#define STATE_STEPCOUNT    9
+#define STATE_BEATCOUNT    10
+#define STATE_PITCH1       11
+#define STATE_PITCH2       12
+#define STATE_PITCH3       13
 
-//ARP PAGE STEP MODES
-//#define STEPMODE_GATELENGTH   10
-//#define STEPMODE_GATETYPE     11
-//#define STEPMODE_ARPTYPE      12
-//#define STEPMODE_ARPSPEED     13
-//#define STEPMODE_ARPOCTAVE    14
-
+#define STATE_TUNER         14
 //VELOCITY PAGE STEP MODES
-#define STEPMODE_VELOCITY       0
-#define STEPMODE_VELOCITYTYPE   1
-#define STEPMODE_LFOSPEED       2
+#define STATE_VELOCITY       15
+#define STATE_VELOCITYTYPE   16
+#define STATE_LFOSPEED       17
 
 //STEP PAGE STEP MODES:
-#define STEPMODE_QUANTIZEKEY     17
-#define STEPMODE_QUANTIZESCALE   18
+#define STATE_QUANTIZEKEY     18
+#define STATE_QUANTIZESCALE   19
 
-#define STEPMODE_TEMPO          14
-#define STEPMODE_EXTCLOCK       15
+#define STATE_TEMPO          20
+#define STATE_EXTCLOCK       21
 
-// for stepmode order
-#define MAX_STEPMODE_COUNT 10
-#define CHANNEL_PITCH_MODE_ORDER  0
-#define CHANNEL_VELOCITY_MODE_ORDER   1
-#define CHANNEL_TUNER_MODE_ORDER  2
+#define STATE_PATTERNSELECT   22
 
+
+
+#define MAX_STATE_COUNT 10
+#define PITCH_GATE_MENU_ORDER  0
 
 #define DEBUG_PIN				    	 31
 #define PIN_EXT_AD_1   27
@@ -139,10 +140,45 @@
 #define EXTERNAL_CLOCK_GATE_3 5
 #define GATE_CLOCK_TIMEOUT 5000000
 
+//INPUT MAPPINGS
+#define SW_00    0
+#define SW_01    1
+#define SW_02    2
+#define SW_03    3
+#define SW_04    4
+#define SW_05    5
+#define SW_06    6
+#define SW_07    7
+#define SW_08    8
+#define SW_09    9
+#define SW_10    10
+#define SW_11    11
+#define SW_12    12
+#define SW_13    13
+#define SW_14    14
+#define SW_15    15
+#define SW_PLAY  16
+#define SW_REC   17
+#define SW_STOP  18
+#define SW_M0    19
+#define SW_M1    20
+#define SW_M2    21
+#define SW_M3    22
+#define SW_PGDN  23
+#define SW_PGUP  24
+#define SW_PATTERN  25
+#define SW_MENU   26
+#define SW_SHIFT   27
+#define ENCODER1LEFTPIN 16
+//#define ENCODER1LEFTPIN 32
+#define ENCODER1RIGHTPIN 25
+#define MAX7301PIN  5
+
+
 extern uint32_t tempoX100;
 extern uint8_t stepMode;
 extern uint8_t notePage;
-extern uint8_t currentState;       // Display module + LED module
+extern uint8_t currentMenu;       // Display module + LED module
 extern uint8_t previousState;      // Display module + LED moduleextern
 
 extern float   probability;
@@ -161,7 +197,7 @@ extern uint8_t queuePattern;
 extern boolean playing;
 extern uint8_t chordArray[27][3];
 
-extern uint8_t stepModeOrder[1][MAX_STEPMODE_COUNT];
+extern uint8_t stepModeOrder[1][MAX_STATE_COUNT];
 
 // MasterClock
 extern uint8_t masterPulseCount;

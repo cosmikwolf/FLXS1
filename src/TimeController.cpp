@@ -25,7 +25,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   sequencerArray[3].initialize(3, 16, 4, (tempoX100/100), &outputControl);
 
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
-	buttonIo.changeState(CHANNEL_PITCH_MODE);
+	buttonIo.changeState(STATE_PITCH0);
 
 	display.initialize(sequencerArray, &clockMaster);
 
@@ -67,7 +67,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
     delay(100);
 //    saveFile.loadPattern(0, 0b1111);
     saveFile.listFiles();
-  //  changeState(CHANNEL_PITCH_MODE);
+  //  changeState(STATE_PITCH0);
 
   }
 
@@ -129,11 +129,11 @@ void TimeController::runLoopHandler() {
 	display.displayLoop(DISPLAY_FREQUENCY);
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
-	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* DISPLAY LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+	//if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* DISPLAY LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
 	//Serial.println("Display Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
-	if(currentState == CALIBRATION_MENU){
+	if(currentMenu == CALIBRATION_MENU){
 		playing = 0;
 		outputControl.dacTestLoop();
 		return;
