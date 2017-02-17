@@ -34,36 +34,40 @@ void MasterClock::clockRunCheck(){
 void MasterClock::masterClockFunc(){
 	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
-//	Serial.println(String((int)masterLoopTimer));
-//  masterLooptimeMin
-//  masterLooptimeMax
-if (clockMode == INTERNAL_CLOCK){
+	//	Serial.println(String((int)masterLoopTimer));
+	//  masterLooptimeMin
+	//  masterLooptimeMax
+	if (clockMode == INTERNAL_CLOCK){
 
-	if ((int)masterLoopTimer > kMasterClockInterval + 100){
-		uint8_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
-		clockCounter = clockCounter + countToAdd;
-		//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
-		for(int i=0;  i< countToAdd; i++){
-			digitalWriteFast(PIN_EXT_AD_2, LOW);delayMicroseconds(10);
-			digitalWriteFast(PIN_EXT_AD_2, HIGH);delayMicroseconds(10);
+		if ((int)masterLoopTimer > kMasterClockInterval + 100){
+			uint8_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
+			clockCounter = clockCounter + countToAdd;
+			//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
+			for(int i=0;  i< countToAdd; i++){
+		//		digitalWriteFast(PIN_EXT_AD_2, LOW);delayMicroseconds(10);
+		//		digitalWriteFast(PIN_EXT_AD_2, HIGH);delayMicroseconds(10);
+			}
+		} else {
+			clockCounter++;
 		}
-	} else {
-		clockCounter++;
+
+		if (clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT)){
+			extClockCounter++;
+			if( extClockCounter > EXTCLOCKDIV ){
+				outputControl->setClockOutput(HIGH);
+				extClockCounter = 0;
+			}
+
+			clockCounter = 0;
+			pulseTrigger = 1;
+		}
 	}
+	masterLoopTimer = 0;
 
-	if (clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT)){
-		outputControl->setClockOutput(HIGH);
-
-		clockCounter = 0;
-		pulseTrigger = 1;
+	if (clockCounter > INTERNAL_PPQ_COUNT/2 && outputControl->clockValue) {
+		outputControl->setClockOutput(LOW);
+		ledRunSwitch = true;
 	}
-}
-masterLoopTimer = 0;
-
-if (clockCounter > INTERNAL_PPQ_COUNT/2 && outputControl->clockValue) {
-	outputControl->setClockOutput(LOW);
-	ledRunSwitch = true;
-}
 
 	digitalWriteFast(PIN_EXT_AD_2, LOW);
 
@@ -152,10 +156,11 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 		if (gateTrig[gateNum]){
 			//Serial.print("PPQPULSE: ");
 			for (int i=0; i< SEQUENCECOUNT; i++){
-				sequenceArray[i].ppqPulse(24);
+				sequenceArray[i].ppqPulse(4);
 			}
 		}
 	}
+	ledRunSwitch = true;
 
 	for (int i=0; i< SEQUENCECOUNT; i++){
 		sequenceArray[i].runSequence();

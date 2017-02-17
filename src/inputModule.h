@@ -10,6 +10,8 @@
 #include "MasterClock.h"
 #include "global.h"
 
+#define DOUBLECLICKMS  250
+
 #ifndef _InputModule_h_
 #define _InputModule_h_
 //button stuff
@@ -53,6 +55,8 @@ public:
   void changeState(uint8_t state);
 
 
+  uint8_t lastSelectedStep;
+  elapsedMillis selectedStepTimer;
   // Encoder vars
   int8_t knobRead;
   int8_t knobBuffer;

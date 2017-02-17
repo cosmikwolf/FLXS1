@@ -5,7 +5,7 @@
 
 #include "global.h"
 #define INTERNAL_PPQ_COUNT 32
-
+#define EXTCLOCKDIV  8
 // DAC Mapping for each channel:
 #ifndef _MasterClock_h_
 #define _MasterClock_h_
@@ -34,6 +34,7 @@ public:
   bool gatePrevState[4];
   elapsedMicros pulseTimer;
   uint32_t clockCounter;
+  uint32_t extClockCounter;
 
   uint32_t masterLooptimeMin;
   uint32_t masterLooptimeMax;

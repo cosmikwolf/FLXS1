@@ -14,8 +14,7 @@
 #include "_fonts/OrbitBold_14.c"
 #include "_fonts/PixelSquare_10.c"
 #include "_fonts/PixelSquareBold_10.c"
-#include "_fonts/PixelTech_14.c"
-//#include "_fonts/mono_mid.c"
+#include "_fonts/a04b03.c"
 
 #ifndef _display_h_
 #define _display_h_
@@ -25,6 +24,7 @@
   more colors available at: http://www.rinkydinkelectronics.com/calc_rgb565.php
   */
 #define NAVY            0x000F      /*   0,   0, 128 */
+#define LIGHTBLUE       0x421F    
 #define DARKGREEN       0x03E0      /*   0, 128,   0 */
 #define DARKCYAN        0x03EF      /*   0, 128, 128 */
 #define MAROON          0x7800      /* 128,   0,   0 */
@@ -35,7 +35,7 @@
 #define ORANGE          0xFD20      /* 255, 165,   0 */
 #define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
 #define PINK            0xF81F
-#define DARKPURPLE 0x48B3
+#define DARKPURPLE      0x48B3
 
 #define MAX_DISPLAY_ELEMENTS 30
 
@@ -86,6 +86,7 @@ class DisplayModule
     void channelSequenceDisplay(char *buf);
     void stateDisplay_pitch(char*buf);
     void stateDisplay_arp(char *buf);
+    void stateDisplay_velocity(char *buf);
 
     void stepMode_gateLength(char *buf);
     void stepMode_chord(char *buf);
@@ -99,7 +100,6 @@ class DisplayModule
 
     void channelPitchMenuDisplay(char *buf);
     void channelPitchMenuDisplay2(char *buf);
-    void channelVelocityMenuDisplay(char *buf);
     void channelEnvelopeMenuDisplay(char *buf);
     void channelStepMenuDisplay(char *buf);
 

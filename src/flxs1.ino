@@ -14,7 +14,6 @@
 #include "midiModule.h"
 #include "global.h"
 #include "DisplayModule.h"
-#include <OctoSK6812.h>
 
 //#define NUMLEDS  23
 

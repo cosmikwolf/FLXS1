@@ -70,21 +70,23 @@
 #define STATE_ARPOCTAVE    7
 #define STATE_CHORD        8
 
-//SEQUENCE MENU
-#define STATE_STEPCOUNT    9
-#define STATE_BEATCOUNT    10
-#define STATE_QUANTIZEKEY     11
-#define STATE_QUANTIZESCALE   12
-
-#define STATE_PITCH1       13
-#define STATE_PITCH2       14
-#define STATE_PITCH3       15
-
-#define STATE_TUNER         16
 //VELOCITY PAGE STEP MODES
-#define STATE_VELOCITY       17
-#define STATE_VELOCITYTYPE   18
-#define STATE_LFOSPEED       19
+#define STATE_VELOCITY       9
+#define STATE_VELOCITYTYPE   10
+#define STATE_LFOSPEED       11
+
+
+//SEQUENCE MENU
+#define STATE_STEPCOUNT    12
+#define STATE_BEATCOUNT    13
+#define STATE_QUANTIZEKEY     14
+#define STATE_QUANTIZESCALE   15
+
+#define STATE_PITCH1       16
+#define STATE_PITCH2       17
+#define STATE_PITCH3       18
+#define STATE_TUNER         19
+
 
 
 #define STATE_TEMPO          20
