@@ -32,44 +32,56 @@ void MasterClock::clockRunCheck(){
 }
 
 void MasterClock::masterClockFunc(){
-	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
 	//	Serial.println(String((int)masterLoopTimer));
 	//  masterLooptimeMin
 	//  masterLooptimeMax
+
+	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	if (clockMode == INTERNAL_CLOCK){
 
 		if ((int)masterLoopTimer > kMasterClockInterval + 100){
 			uint8_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
 			clockCounter = clockCounter + countToAdd;
 			//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
-			for(int i=0;  i< countToAdd; i++){
+		//	for(int i=0;  i< countToAdd; i++){
 		//		digitalWriteFast(PIN_EXT_AD_2, LOW);delayMicroseconds(10);
 		//		digitalWriteFast(PIN_EXT_AD_2, HIGH);delayMicroseconds(10);
-			}
+		//	}
 		} else {
 			clockCounter++;
 		}
 
-		if (clockCounter * kMasterClockInterval > (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT)){
+
+		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
+		if (extClockCounter > EXTCLOCKDIV - 1  && clockCounter * kMasterClockInterval>  clockPeriod - 3000){
+			digitalWriteFast(PIN_EXT_AD_2, LOW);
+			ledRunSwitch = false;
+		}
+
+
+		if (clockCounter * kMasterClockInterval >  clockPeriod){
 			extClockCounter++;
 			if( extClockCounter > EXTCLOCKDIV ){
 				outputControl->setClockOutput(HIGH);
 				extClockCounter = 0;
 			}
-
 			clockCounter = 0;
 			pulseTrigger = 1;
 		}
+
+
+
 	}
 	masterLoopTimer = 0;
 
 	if (clockCounter > INTERNAL_PPQ_COUNT/2 && outputControl->clockValue) {
 		outputControl->setClockOutput(LOW);
 		ledRunSwitch = true;
+		digitalWriteFast(PIN_EXT_AD_2, HIGH);
 	}
 
-	digitalWriteFast(PIN_EXT_AD_2, LOW);
+	//digitalWriteFast(PIN_EXT_AD_2, LOW);
 
 //  masterLooptimeAvg
 
@@ -160,11 +172,12 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 			}
 		}
 	}
-	ledRunSwitch = true;
 
 	for (int i=0; i< SEQUENCECOUNT; i++){
 		sequenceArray[i].runSequence();
 	}
+	ledRunSwitch = true;
+
 }
 
 void MasterClock::internalClockTick(){
@@ -182,7 +195,12 @@ void MasterClock::internalClockTick(){
 			outputControl->allNotesOff(i);
     	sequenceArray[i].clockStart(startTime);
     }
-  } else if (	pulseTrigger ){
+  }
+
+	if ( pulseTrigger ){
+
+		Serial.println("Pulsetrigger " + String(pulseTimer));
+		pulseTimer = 0;
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
 		}

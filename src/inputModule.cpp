@@ -83,7 +83,7 @@ void InputModule::loop(uint16_t frequency){
     }
 
     if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_REC) ){
-      currentMenu = INPUT_DEBUG_MENU;
+      changeState(STATE_INPUTDEBUG);
     }
     //we always want the alt (non matrix) buttons to behave the same way
     altButtonHandler();
@@ -174,6 +174,8 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_TEMPO:
       currentMenu = TEMPO_MENU;
       break;
+    case STATE_INPUTDEBUG:
+      currentMenu = INPUT_DEBUG_MENU;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;

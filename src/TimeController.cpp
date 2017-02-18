@@ -2,10 +2,6 @@
 #include "TimeController.h"
 #include "midiModule.h"
 
-#define DISPLAY_FREQUENCY 10000
-#define INPUT_FREQUENCY 20000
-#define LED_FREQUENCY 10000
-
 
 TimeController::TimeController(){ };
 
@@ -104,15 +100,14 @@ void TimeController::runLoopHandler() {
 
 	elapsedMicros timeControlTimer = 0;
 	if (clockMaster.ledRunSwitch){
-		ledArray.loop(LED_FREQUENCY);
-		clockMaster.ledRunSwitch = false;
-
+		ledArray.loop(LED_INTERVAL);
+		//clockMaster.ledRunSwitch = false;
 	}
 	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 //	Serial.println("LED Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
-	buttonIo.loop(INPUT_FREQUENCY);
+	buttonIo.loop(INPUT_INTERVAL);
 	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
 
 	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
@@ -128,7 +123,7 @@ void TimeController::runLoopHandler() {
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 	//Serial.println("Cache Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
-	display.displayLoop(DISPLAY_FREQUENCY);
+	display.displayLoop(DISPLAY_INTERVAL);
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	//if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* DISPLAY LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;

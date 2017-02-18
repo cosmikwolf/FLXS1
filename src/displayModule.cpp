@@ -134,6 +134,9 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         patternSelectDisplay();
       break;
 
+      case INPUT_DEBUG_MENU:
+        inputDebugMenuDisplay();
+        break;
 
       case TUNER_MENU:
         channelTunerDisplay(buf);
@@ -196,19 +199,19 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
     switch(textSize){
       case REGULAR1X:
-        oled.setFont(&PixelSquare_10);
+        oled.setFont(&a04b03);
         oled.setTextScale(1);
         break;
       case REGULAR2X:
-        oled.setFont(&PixelSquare_10);
+        oled.setFont(&a04b03);
         oled.setTextScale(2);
         break;
       case BOLD1X:
-        oled.setFont(&PixelSquareBold_10);
+        oled.setFont(&a04b03);
         oled.setTextScale(1);
         break;
       case BOLD2X:
-        oled.setFont(&PixelSquareBold_10);
+        oled.setFont(&a04b03);
         oled.setTextScale(2);
         break;
       case BOLD4X:
@@ -555,19 +558,19 @@ void DisplayModule::stateDisplay_arp(char *buf){
    sprintf(buf, "D8H: %d", dacCalibration[17]);
    displayElement[18] = strdup(buf);
 
-   renderStringBox(0, DISPLAY_LABEL,  0, 0, 32 , 20, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 20, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(1, DISPLAY_LABEL,  0, 8, 32 , 20, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(2, DISPLAY_LABEL,  0, 16, 32 , 20, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(1, DISPLAY_LABEL,  0, 8,  128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(3, DISPLAY_LABEL,  0, 24, 32 , 20, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(4, DISPLAY_LABEL,  0, 32, 32 , 20, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(3, DISPLAY_LABEL,  0, 24, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(4, DISPLAY_LABEL,  0, 32, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(5, DISPLAY_LABEL,  0, 40, 32 , 20, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(7, DISPLAY_LABEL,  0, 48, 32 , 20, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(5, DISPLAY_LABEL,  0, 40, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(7, DISPLAY_LABEL,  0, 48, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(8, DISPLAY_LABEL,  0, 56, 32 , 20, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(9, DISPLAY_LABEL,  0, 62, 32 , 20, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(8, DISPLAY_LABEL,  0, 56, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(9, DISPLAY_LABEL,  0, 62, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
  }
 
@@ -578,13 +581,13 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[0] = strdup("Calibration Menu");
 
-   sprintf(buf, "CV IN 1: %d", cvInputRaw[0] );
+   sprintf(buf, "CV IN 1: %d  %d", cvInputRaw[0]/512,  cvInputRaw[0]  );
    displayElement[1] = strdup(buf);
-   sprintf(buf, "CV IN 2: %d", cvInputRaw[1] );
+   sprintf(buf, "CV IN 2: %d  %d", cvInputRaw[1]/512,  cvInputRaw[1]  );
    displayElement[2] = strdup(buf);
-   sprintf(buf, "CV IN 3: %d", cvInputRaw[2] );
+   sprintf(buf, "CV IN 3: %d  %d", cvInputRaw[2]/512,  cvInputRaw[2]  );
    displayElement[3] = strdup(buf);
-   sprintf(buf, "CV IN 4: %d", cvInputRaw[3] );
+   sprintf(buf, "CV IN 4: %d  %d", cvInputRaw[3]/512,  cvInputRaw[3] );
    displayElement[4] = strdup(buf);
 
    sprintf(buf, "GT IN 1: %d", gateInputRaw[0]);
@@ -596,19 +599,19 @@ void DisplayModule::stateDisplay_arp(char *buf){
    sprintf(buf, "GT IN 4: %d", gateInputRaw[3]);
    displayElement[8] = strdup(buf);
 
-   renderStringBox(0, DISPLAY_LABEL,  0, 0, 96 , 8, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(0, DISPLAY_LABEL,  0, 0, 96 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(1, DISPLAY_LABEL,  0, 8, 96 , 8, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(2, DISPLAY_LABEL,  0, 16, 96 , 8, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(1, DISPLAY_LABEL,  0, 10, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(2, DISPLAY_LABEL,  0, 20, 96 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(3, DISPLAY_LABEL,  0, 24, 96 , 8, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(4, DISPLAY_LABEL,  0, 32, 96 , 8, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(3, DISPLAY_LABEL,  0, 30, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(4, DISPLAY_LABEL,  0, 40, 96 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(5, DISPLAY_LABEL,  0, 40, 96 , 8, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(6, DISPLAY_LABEL,  0, 48, 96 , 8, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(5, DISPLAY_LABEL,  0, 50, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(6, DISPLAY_LABEL,  0, 60, 96 , 8, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(7, DISPLAY_LABEL,  0, 56, 96 , 8, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(8, DISPLAY_LABEL,  0, 64, 96 , 8, false, STYLE1X, WHITE, BLACK);
+   renderStringBox(7, DISPLAY_LABEL,  0, 70, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(8, DISPLAY_LABEL,  0, 80, 96 , 8, false, REGULAR1X, WHITE, BLACK);
 
  }
 

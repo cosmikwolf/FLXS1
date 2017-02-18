@@ -207,6 +207,9 @@ void Sequencer::incrementActiveStep(){
 
 	if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
 		activeStep++;
+    if(channel == 0){
+      Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) );
+    }
 	}
 }
 

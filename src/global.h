@@ -14,6 +14,12 @@
 #define kMosiPin 11
 #define kSpiClockPin 13
 
+
+#define DISPLAY_INTERVAL 10000
+#define INPUT_INTERVAL 20000
+#define LED_INTERVAL 7000
+
+
 #define PIMILLION             3141593
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		     	 7
@@ -94,6 +100,7 @@
 
 #define STATE_PATTERNSELECT   22
 #define STATE_CALIBRATION    23
+#define STATE_INPUTDEBUG    24
 
 
 
