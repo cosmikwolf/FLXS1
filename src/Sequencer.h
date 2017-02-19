@@ -41,6 +41,9 @@ class Sequencer
 		void 		setBeatCount(uint16_t beatCountNew);
 
 		void 		ppqPulse(uint8_t maxPulseCount);
+
+		void 		gateInputTrigger(uint8_t inputNum);
+
 		uint32_t   	getCurrentFrame();
 
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
@@ -72,9 +75,10 @@ class Sequencer
 		uint32_t	zeroBeatOffset;
 		uint8_t	  zeroSequenceCount;
 
-		uint8_t	tempVar8_1;
-		uint8_t	tempVar8_2;
-		uint8_t	tempVar8_3;
+		uint8_t	  gpio_reset;
+		uint8_t		gpio_yaxis;
+
+		uint8_t		tempVar8_3;
 		uint32_t	clockSinceLastPulse;
 
 		uint16_t  beatCount;

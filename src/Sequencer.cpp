@@ -19,8 +19,8 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->pattern = 0;
 	this->stepCount = stepCount;
 	this->beatCount = beatCount;
+  this->gpio_yaxis = 2;
 	this->tempoX100 = tempoX100;
-	this->sequenceTimer = 0;
 	//this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
 	this->monophonic = true;
@@ -105,6 +105,7 @@ void Sequencer::clockReset(){
 	beatsSinceZero = 0;
 	ppqPulseIndex = 0;
 	zeroSequenceCount = 0;
+  clockSinceLastPulse = 0;
 	firstPulse = 1;
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 		stepData[stepNum].noteStatus = AWAITING_TRIGGER;
@@ -122,6 +123,17 @@ void Sequencer::runSequence(){
 	incrementActiveStep();
 	sequenceModeStandardStep();
 }
+
+void Sequencer::gateInputTrigger(uint8_t inputNum){
+  if (gpio_reset == inputNum){
+    this->clockReset();
+  }
+
+  if(gpio_yaxis == inputNum){
+    activeStep = positive_modulo(activeStep+4, stepCount);
+
+  }
+};
 
 void Sequencer::ppqPulse(uint8_t maxPulseCount){
 	if (firstPulse){
@@ -170,15 +182,27 @@ uint32_t Sequencer::getCurrentFrame(){
 		zeroSequenceCount++;
 		activeStep = 0;
 		for (int stepNum = 0; stepNum < stepCount; stepNum++){
-//			if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
 				stepData[stepNum].noteStatus = AWAITING_TRIGGER;
 				stepData[stepNum].arpStatus = 0;
-	//		}
 		}
 	}
 	currentFrame = currentFrame % sequenceLength;
 	return currentFrame;
 }
+
+void Sequencer::incrementActiveStep(){
+//	getStepLength();
+//uint32_t currentFrame = getCurrentFrame();
+if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
+//if( currentFrame > lastStepOffset + getStepLength(activeStep)){
+  //lastStepOffset = currentFrame;
+		activeStep++;
+    if(channel == 0){
+      Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) );
+    }
+	}
+}
+
 
 uint32_t Sequencer::getStepLength(uint8_t stepNum){
 		if (stepData[stepNum].beatDiv > 0){
@@ -200,17 +224,6 @@ uint32_t Sequencer::calculateStepTimers(){
 		accumulatedOffset += getStepLength(stepNum);
 	}
 	return accumulatedOffset;
-}
-
-void Sequencer::incrementActiveStep(){
-//	getStepLength();
-
-	if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
-		activeStep++;
-    if(channel == 0){
-      Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) );
-    }
-	}
 }
 
 

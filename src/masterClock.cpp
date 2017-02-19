@@ -52,7 +52,6 @@ void MasterClock::masterClockFunc(){
 			clockCounter++;
 		}
 
-
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
 		if (extClockCounter > EXTCLOCKDIV - 1  && clockCounter * kMasterClockInterval>  clockPeriod - 3000){
 			digitalWriteFast(PIN_EXT_AD_2, LOW);
@@ -91,6 +90,14 @@ void MasterClock::sequencerFunc(void){
 //	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
 	outputControl->inputRead();
+
+	for(int i=0; i < 4; i++){
+		for(int n=0; n<4; n++){
+			if (gateInputRose[i] == true){
+				sequenceArray[n].gateInputTrigger(i);
+			}
+		}
+	}
 	//	outputControl->setClockOutput(gateInputRaw[0]);
 	//  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 	//  timerAvg = (lastTimer + 9*timerAvg) /10;
@@ -103,6 +110,9 @@ void MasterClock::sequencerFunc(void){
 	//	midiControl->midiClockSyncFunc(serialMidi);
 
   if(playing){
+
+
+
 		switch(clockMode){
 	    case INTERNAL_CLOCK:
 				internalClockTick();

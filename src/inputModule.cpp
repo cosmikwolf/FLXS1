@@ -96,7 +96,7 @@ void InputModule::loop(uint16_t frequency){
 
         channelPitchModeInputHandler();
       break;
-      case SEQUENCE_MENU_1:
+      case SEQUENCE_MENU:
         sequenceMenuHandler();
       break;
 
@@ -162,7 +162,7 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_BEATCOUNT:
     case STATE_QUANTIZEKEY:
     case STATE_QUANTIZESCALE:
-      currentMenu = SEQUENCE_MENU_1;
+      currentMenu = SEQUENCE_MENU;
       break;
     case STATE_PATTERNSELECT:
       currentMenu = PATTERN_SELECT;
@@ -172,10 +172,16 @@ void InputModule::changeState(uint8_t targetState){
       break;
     case STATE_EXTCLOCK:
     case STATE_TEMPO:
+    case STATE_RESETINPUT:
+    case STATE_YAXISINPUT:
       currentMenu = TEMPO_MENU;
       break;
     case STATE_INPUTDEBUG:
       currentMenu = INPUT_DEBUG_MENU;
+      break;
+    case STATE_GLOBAL:
+      currentMenu = GLOBAL_MENU;
+      break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;
@@ -203,22 +209,36 @@ void InputModule::patternSelectHandler(){
 void InputModule::tempoMenuHandler(){
 
   if(knobChange){
-    switch (stepMode){
-      case STATE_TEMPO:
-        if (tempoX100 > 100100) {
-          tempoX100 = 100100;
-        }
-        tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
-        if(tempoX100 == 0){
-          tempoX100 = 100;
-        }
-        clockMaster->changeTempo(tempoX100);
-      break;
+    if(backplaneGPIO->pressed(22)){
+      changeState(min_max_cycle(stepMode+knobChange, STATE_TEMPO , STATE_YAXISINPUT));
+    } else {
+      switch (stepMode){
+        case STATE_TEMPO:
+          if (tempoX100 > 100100) {
+            tempoX100 = 100100;
+          }
+          tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
+          if(tempoX100 == 0){
+            tempoX100 = 100;
+          }
+          clockMaster->changeTempo(tempoX100);
+        break;
 
-      case STATE_EXTCLOCK:
-        clockMode = positive_modulo(clockMode + knobChange, 6);
-      break;
+        case STATE_EXTCLOCK:
+          clockMode = positive_modulo(clockMode + knobChange, 6);
+        break;
+
+        case STATE_RESETINPUT:
+          sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
+        break;
+
+        case STATE_YAXISINPUT:
+          sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
+        break;
+
+      }
     }
+
   }
 
 }
@@ -250,15 +270,15 @@ void InputModule::sequenceMenuHandler(){
           break;
 
         case STATE_QUANTIZEKEY:
-          for (int i=0; i<4; i++){
-            sequenceArray[i].quantizeKey = positive_modulo(sequenceArray[selectedChannel].quantizeKey + knobChange, 12);
-          }
+          sequenceArray[selectedChannel].quantizeKey = positive_modulo(sequenceArray[selectedChannel].quantizeKey + knobChange, 12);
           break;
         case STATE_QUANTIZESCALE:
-        for (int i=0; i<4; i++){
-          sequenceArray[i].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 15);
-        }
-      break;
+          sequenceArray[selectedChannel].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 15);
+          break;
+        case STATE_RESETINPUT:
+          sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
+          break;
+
 
       }
     }
@@ -403,9 +423,9 @@ void InputModule::altButtonHandler(){
 
         case SW_MENU: //switch M3 toggles the sequence menu
          if (midplaneGPIO->pressed(SW_SHIFT)){
-           changeState(GLOBAL_MENU);
+           changeState(STATE_GLOBAL);
          } else {
-           if (currentMenu == SEQUENCE_MENU_1){
+           if (currentMenu == SEQUENCE_MENU){
             changeState(STATE_PITCH0);
            } else {
              changeState(STATE_STEPCOUNT);
@@ -418,16 +438,13 @@ void InputModule::altButtonHandler(){
         break;
 
         case SW_PGDN:
-          if (stepMode == STATE_TEMPO){
-            changeState(STATE_EXTCLOCK);
-            break;
-          } else if (stepMode == STATE_EXTCLOCK){
-            changeState(STATE_TEMPO);
-            break;
+
+          if (currentMenu == TEMPO_MENU){
+            changeState(min_max_cycle(stepMode+1, STATE_TEMPO , STATE_RESETINPUT));
           }
+
           if (midplaneGPIO->pressed(SW_SHIFT)){
             changeState(STATE_TEMPO);
-            knobBuffer = tempoX100 - knobRead;
           } else {
             notePage = positive_modulo(notePage - 1, 4);
           }

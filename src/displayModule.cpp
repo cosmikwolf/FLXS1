@@ -14,8 +14,6 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   delay(100);
   oled.setBrightness(16);
   //oled.setFont(&Font);//this will load the font
-  oled.setFont(&F_Zero_18);//this will load the font
-  oled.setTextScale(1);
   oled.fillScreen(BLACK);     delay(10);
   oled.fillScreen(RED);     delay(10);
   oled.fillScreen(ORANGE);      delay(10);
@@ -25,30 +23,26 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.fillScreen(NAVY);      delay(10);
   oled.fillScreen(PURPLE);      delay(10);
   oled.fillScreen(RED);        delay(10);
-  oled.fillScreen(ORANGE);      delay(10);
-  oled.fillScreen(YELLOW);      delay(10);
-  oled.fillScreen(GREEN);     delay(10);
-  oled.fillScreen(BLUE);      delay(10);
-  oled.fillScreen(NAVY);      delay(10);
-  oled.fillScreen(PURPLE);       delay(100);
-  oled.fillScreen(BLACK);
-  oled.setCursor(CENTER,CENTER);
-  oled.setTextColor(RED);
-  oled.setFont(&LadyRadical_12);//this will load the font
+  oled.fillScreen(ORANGE, YELLOW);
+  oled.setFont(&NeueHaasXBlack_28);//this will load the font
+  oled.println("RESIST");               delay(50);
+  oled.fillScreen(GREEN, ORANGE);
+  oled.println("FASISM");      delay(50);
+  oled.fillScreen(BLUE, GREEN);      delay(100);
+  oled.fillScreen(PURPLE, NAVY);       delay(100);
+  oled.fillScreen(NAVY,RED);
+  oled.setCursor(CENTER,8);
+  oled.setTextColor(ORANGE);
+  oled.setFont(&LadyRadical_16);//this will load the font
   oled.setTextScale(2);
   oled.println("Zetaohm");
-  delay(1000);
-  oled.setCursor(CENTER,CENTER);
-  oled.setTextColor(BLACK);
-  oled.fillScreen(YELLOW);      delay(10);
+  delay(100);
   oled.setTextScale(1);
-
-  oled.fillScreen(GREEN);
-  oled.setCursor(CENTER,CENTER);
-  oled.setTextColor(PINK);
-  oled.setTextScale(2);
-  oled.setTextColor(BLUE);
-  oled.println("FLXS1");    delay(500);
+  oled.setCursor(CENTER,48);
+  oled.setTextColor(ORANGE);
+  oled.setFont(&NeueHaasXBlack_28);//this will load the font
+  oled.println("FLXS1");
+    delay(1000);
   Serial.println("Display Initialization Complete");
 }
 
@@ -126,8 +120,12 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         stateDisplay_velocity(buf);
       break;
 
-      case SEQUENCE_MENU_1:
+      case SEQUENCE_MENU:
         sequenceMenuDisplay();
+      break;
+
+      case INPUT_MENU:
+        inputMenuDisplay();
       break;
 
       case PATTERN_SELECT:
@@ -299,8 +297,6 @@ void DisplayModule::stateDisplay_arp(char *buf){
   displayElement[8] = strdup("OCTVE");
   sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
   displayElement[9] = strdup(buf);
-
-
   displayElement[10] = strdup("INTVL");
 
     const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
@@ -321,7 +317,6 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
-
  };
 
 
@@ -345,7 +340,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
    renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_VELOCITYTYPE, 60, 37,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
 
    renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
    renderStringBox(6,  STATE_LFOSPEED, 60, 54,68,17, false, STYLE1X, background , foreground);
@@ -357,9 +352,10 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
 
  void DisplayModule::sequenceMenuDisplay(){
-   uint8_t previousHighlight = highlight;
 
-   displayElement[0] = strdup("SEQUENCE");
+   sprintf(buf, "CH%d SETTINGS", selectedChannel+1);
+
+   displayElement[0] = strdup(buf);
 
    displayElement[1] = strdup("LAST:");
 
@@ -386,9 +382,6 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[8] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
 
-
-
-
    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
 
    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
@@ -400,9 +393,13 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(6,  STATE_QUANTIZEKEY,     68, 54,60,17, false, STYLE1X, background , foreground);
 
    renderStringBox(7,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_QUANTIZESCALE,    68, 71,60,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_YAXISINPUT,    68, 71,60,17, false, STYLE1X, background , foreground);
 
  }
+
+void DisplayModule::inputMenuDisplay(){
+
+}
 
 
 
@@ -420,7 +417,22 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[0] = strdup("TEMPO");
    displayElement[2] = strdup("SYNC");
-   displayElement[4] = strdup("RESET");
+   displayElement[4] = strdup("RESET:");
+   displayElement[6] = strdup("Y-AXIS:");
+
+   if (sequenceArray[selectedChannel].gpio_reset < 4){
+    sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_reset +1 );
+    displayElement[5] = strdup(buf);
+  } else {
+    displayElement[5] = strdup("NONE");
+  }
+
+  if (sequenceArray[selectedChannel].gpio_yaxis < 4){
+   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+   displayElement[7] = strdup(buf);
+ } else {
+   displayElement[7] = strdup("NONE");
+ }
 
    switch(clockMode){
      case INTERNAL_CLOCK:
@@ -433,19 +445,19 @@ void DisplayModule::stateDisplay_arp(char *buf){
        displayElement[3] = strdup("MIDI SYNC");
      break;
      case EXTERNAL_CLOCK_GATE_0:
-       displayElement[1] = strdup("EXT GT1");
+       displayElement[1] = strdup("EXT CLK");
        displayElement[3] = strdup("GATE INPUT 1");
      break;
      case EXTERNAL_CLOCK_GATE_1:
-       displayElement[1] = strdup("EXT GT2");
+       displayElement[1] = strdup("EXT CLK");
        displayElement[3] = strdup("GATE INPUT 2");
      break;
      case EXTERNAL_CLOCK_GATE_2:
-       displayElement[1] = strdup("EXT GT3");
+       displayElement[1] = strdup("EXT CLK");
        displayElement[3] = strdup("GATE INPUT 3");
      break;
      case EXTERNAL_CLOCK_GATE_3:
-       displayElement[1] = strdup("EXT GT4");
+       displayElement[1] = strdup("EXT CLK");
        displayElement[3] = strdup("GATE INPUT 4");
      break;
 
@@ -457,12 +469,12 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(3,  STATE_EXTCLOCK, 0,  45,128,17, false, STYLE1X, background , foreground);
    ///renderStringBox(3,  STATE_EXTCLOCK,60, 45,68,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(4,  DISPLAY_LABEL, 0,  62,64,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  DISPLAY_LABEL, 0,  62,74,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(7,  STATE_GATETYPE,  60, 62,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(5,  STATE_RESETINPUT,  74, 62,54,17, false, STYLE1X, background , foreground);
 
    renderStringBox(6,  DISPLAY_LABEL,    0,  79,64,16, false, STYLE1X, background , foreground);
-   renderStringBox(9,  STATE_GLIDE,     60,  79,68,16, false, STYLE1X, background , foreground);
+   renderStringBox(7,  STATE_YAXISINPUT,     74,  79,54,16, false, STYLE1X, background , foreground);
 
  }
 

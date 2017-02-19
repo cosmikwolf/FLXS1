@@ -72,7 +72,7 @@ void LEDArray::loop(uint16_t interval){
     switch (currentMenu ){
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
-      case SEQUENCE_MENU_1:
+      case SEQUENCE_MENU:
         channelPitchModeLEDHandler();
       break;
       case VELOCITY_MENU:

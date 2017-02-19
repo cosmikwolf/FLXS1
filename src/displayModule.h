@@ -9,12 +9,13 @@
 //#include "_fonts/msShell14.c"
 #include "_fonts/Visitor_18.c"
 #include "_fonts/F_Zero_18.c"
-#include "_fonts/LadyRadical_12.c"
+#include "_fonts/LadyRadical_16.c"
 #include "_fonts/OrbitB_12.c"
 #include "_fonts/OrbitBold_14.c"
 #include "_fonts/PixelSquare_10.c"
 #include "_fonts/PixelSquareBold_10.c"
 #include "_fonts/a04b03.c"
+#include "_fonts/NeueHaasXBlack_28.c"
 
 #ifndef _display_h_
 #define _display_h_
@@ -24,7 +25,7 @@
   more colors available at: http://www.rinkydinkelectronics.com/calc_rgb565.php
   */
 #define NAVY            0x000F      /*   0,   0, 128 */
-#define LIGHTBLUE       0x421F    
+#define LIGHTBLUE       0x421F
 #define DARKGREEN       0x03E0      /*   0, 128,   0 */
 #define DARKCYAN        0x03EF      /*   0, 128, 128 */
 #define MAROON          0x7800      /* 128,   0,   0 */
@@ -107,6 +108,7 @@ class DisplayModule
     void channelInputDisplay(char *buf);
 
     void sequenceMenuDisplay();
+    void inputMenuDisplay();
     void globalMenuDisplay();
     void tempoMenuDisplay();
 

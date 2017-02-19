@@ -200,6 +200,11 @@ void OutputController::inputRead(){
   gateInputRaw[1]  = backplaneGPIO->pressed(5);
   gateInputRaw[2]  = backplaneGPIO->pressed(6);
   gateInputRaw[3]  = backplaneGPIO->pressed(7);
+
+  gateInputRose[0]  = backplaneGPIO->rose(4);
+  gateInputRose[1]  = backplaneGPIO->rose(5);
+  gateInputRose[2]  = backplaneGPIO->rose(6);
+  gateInputRose[3]  = backplaneGPIO->rose(7);
   //reset SR Latch
   backplaneGPIO->digitalWrite(8, 1);
   backplaneGPIO->digitalWrite(8, 0);

@@ -56,8 +56,8 @@
 // MENUS
 #define	PITCH_GATE_MENU        97
 #define	ARPEGGIO_MENU          98
-#define	SEQUENCE_MENU_1        99
-#define	SEQUENCE_MENU_2        100
+#define	SEQUENCE_MENU        99
+#define	INPUT_MENU        100
 #define	TUNER_MENU	         	 101
 #define	VELOCITY_MENU          102
 #define	CALIBRATION_MENU       103
@@ -97,10 +97,14 @@
 
 #define STATE_TEMPO          20
 #define STATE_EXTCLOCK       21
+#define STATE_RESETINPUT   22
+#define STATE_YAXISINPUT      23
 
-#define STATE_PATTERNSELECT   22
-#define STATE_CALIBRATION    23
-#define STATE_INPUTDEBUG    24
+#define STATE_PATTERNSELECT     25
+#define STATE_CALIBRATION       26
+#define STATE_INPUTDEBUG        27
+#define STATE_GLOBAL            28
+
 
 
 
@@ -231,6 +235,7 @@ extern boolean eraseAllFlag;
 extern uint16_t calibrationBuffer;
 extern uint16_t dacCalibration[16];
 extern uint16_t cvInputRaw[4];
+extern uint8_t	gateInputRose[4];
 extern uint8_t	gateInputRaw[4];
 
 
