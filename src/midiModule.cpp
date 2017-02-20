@@ -22,7 +22,7 @@ void MidiModule::midiStopHandler(){
     Serial.println("Midi Stop");
     if (playing == 0){
       for (int i=0; i< SEQUENCECOUNT; i++){
-        sequenceArray[i].clockReset();
+        sequenceArray[i].clockReset(true);
       }
     }
     playing = 0;

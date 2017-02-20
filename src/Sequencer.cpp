@@ -100,43 +100,61 @@ void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 	stepData[step].glide = glideTime;
 }
 
-void Sequencer::clockReset(){
+void Sequencer::clockReset(bool activeStepReset){
+
   if (activeStep > stepCount){
     activeStep = activeStep%stepCount;
   } else {
-    activeStep = 0;
+    if (activeStepReset){
+      activeStep = 0;
+    }
   }
+  for (int stepNum = 0; stepNum < stepCount; stepNum++){
+    stepData[stepNum].offset = stepData[stepNum].offset - getCurrentFrame();
+    stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+    stepData[stepNum].arpStatus = 0;
+  }
+
 	beatsSinceZero = 0;
 	ppqPulseIndex = 0;
 	zeroSequenceCount = 0;
   clockSinceLastPulse = 0;
 	firstPulse = 1;
-  lastStep = 0;
-	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-		stepData[stepNum].noteStatus = AWAITING_TRIGGER;
-		stepData[stepNum].arpStatus = 0;
-	}
+  lastStepOffset = 0;
 }
 
 void Sequencer::clockStart(elapsedMicros startTime){
 	pulseTimer = 0;
-	Serial.println("starttime: " + String(startTime));
+	//Serial.println("starttime: " + String(startTime));
 };
 
 void Sequencer::runSequence(){
 	clockSinceLastPulse++;
-	incrementActiveStep();
+  if(playing){
+    incrementActiveStep();
+  }
 	sequenceModeStandardStep();
 }
 
 void Sequencer::gateInputTrigger(uint8_t inputNum){
   if (gpio_reset == inputNum){
-    this->clockReset();
+    this->clockReset(true);
   }
 
   if(gpio_yaxis == inputNum){
-    activeStep = positive_modulo(activeStep+4, stepCount);
+    activeStep = activeStep+4;
+    if (activeStep >= stepCount){
+      activeStep = activeStep % stepCount;
+      this->clockReset(false);
+    }
+  }
 
+  if(gpio_xaxis == inputNum){
+    activeStep++;
+    if (activeStep >= stepCount){
+      activeStep = activeStep % stepCount;
+      this->clockReset(false);
+    }
   }
 };
 
@@ -191,7 +209,7 @@ uint32_t Sequencer::getCurrentFrame(){
 				stepData[stepNum].arpStatus = 0;
 		}
 	}*/
-	currentFrame = currentFrame;
+	//currentFrame = currentFrame;
 	return currentFrame;
 }
 
@@ -202,12 +220,12 @@ uint32_t currentFrame = getCurrentFrame();
     activeStep++;
     if (activeStep >= stepCount){
     //  Serial.println(:)
-      this->clockReset();
+      this->clockReset(true);
     } else {
       lastStepOffset = currentFrame;
     }
    if(channel == 0){
-      Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) );
+      Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) + "\tcurrentFrame: " + String(currentFrame) + "\tBSZ: " + String(beatsSinceZero));
     }
 	}
 
@@ -231,7 +249,6 @@ uint32_t Sequencer::calculateStepTimers(){
 	//beatOffset
 	//stepLength = beatLength/stepDivider*stepCount;
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
-		stepData[stepNum].offset = accumulatedOffset;
 		accumulatedOffset += getStepLength(stepNum);
 	}
 	return accumulatedOffset;
@@ -239,11 +256,19 @@ uint32_t Sequencer::calculateStepTimers(){
 
 
 void Sequencer::sequenceModeStandardStep(){
-	// sequenceModeStandardStep determines if any notes should be triggered this loop.
-	// This means that this loop is responsible for all timing calculations and triggering notes
+  uint32_t currentFrameVar = getCurrentFrame();
+
+  if (stepData[activeStep].noteStatus == AWAITING_TRIGGER){
+    if (stepData[activeStep].gateType != GATETYPE_REST){
+      noteTrigger(activeStep, stepData[activeStep].gateTrig());
+      stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
+      stepData[activeStep].offset = currentFrameVar;
+    }
+  }
+
 	for (int stepNum = 0; stepNum < activeStep + 1; stepNum++){
 	// iterate through all steps to determine if they need to have action taken.
-		if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
+		if (stepData[stepNum].noteStatus ==                       NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
 			continue;
 		}
 
@@ -260,56 +285,16 @@ void Sequencer::sequenceModeStandardStep(){
 			trigLength = stepOffTime;
 		};
 
-		bool gateTrig;
-		bool gateOff;
-
-		if (stepData[stepNum].gateType == GATETYPE_REST) {
-			//no gate
-			gateTrig = false;
-			gateOff = true;
-		} else if (stepData[stepNum].gateType == GATETYPE_STEP){
-			//gate is on / retrigger
-			gateTrig = true;
-			gateOff = true;
-		} else if (stepData[stepNum].gateType == GATETYPE_ARP){
-			if (stepData[stepNum].arpStatus == 0){
-				gateTrig = true;
-				gateOff = true;
-			} else {
-				gateTrig = true;
-			}
-		} else {
-			gateTrig = true; // for hold. logic needs to be in note Off section
-	//		if (  getCurrentFrame()   < stepOffTime - trigLength){
-	//			gateOff = false;
-	//		} else {
-	//			gateOff = true;
-	//		}
-		}
-
-		uint32_t currentFrameVar = getCurrentFrame();
-		switch (stepData[stepNum].noteStatus){
-			case CURRENTLY_PLAYING:
+		if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
 	    	if ( currentFrameVar > (stepData[stepNum].offset + stepData[stepNum].arpStatus * trigLength  - trigLength/2 ) ) {
-					noteShutOff(stepNum, gateOff);
+					noteShutOff(stepNum, stepData[stepNum].gateOff());
 					if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
 						stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
 					} else {
 						stepData[stepNum].noteStatus = AWAITING_TRIGGER;
 					}
-				}
-			break;
-			case AWAITING_TRIGGER:
-				if ( currentFrameVar > (stepData[stepNum].offset + stepData[stepNum].arpStatus*trigLength) ) {
-						noteTrigger(stepNum, gateTrig);
-						stepData[stepNum].noteStatus = CURRENTLY_PLAYING;
-				}
-			break;
+			}
 		}
-
-
-
-
 	}
 }
 

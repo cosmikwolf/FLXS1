@@ -99,7 +99,9 @@ void InputModule::loop(uint16_t frequency){
       case SEQUENCE_MENU:
         sequenceMenuHandler();
       break;
-
+      case INPUT_MENU:
+        inputMenuHandler();
+      break;
       case GLOBAL_MENU:
         globalMenuHandler();
       break;
@@ -113,7 +115,7 @@ void InputModule::loop(uint16_t frequency){
       break;
 
       case PATTERN_SELECT:
-      patternSelectHandler();
+        patternSelectHandler();
       break;
 
       case TEMPO_MENU:
@@ -121,11 +123,11 @@ void InputModule::loop(uint16_t frequency){
       break;
 
       case TIMING_MENU:
-      timingMenuInputHandler();
+        timingMenuInputHandler();
       break;
 
       case DEBUG_SCREEN:
-      debugScreenInputHandler();
+        debugScreenInputHandler();
       break;
 
       case CALIBRATION_MENU:
@@ -173,8 +175,11 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_EXTCLOCK:
     case STATE_TEMPO:
     case STATE_RESETINPUT:
-    case STATE_YAXISINPUT:
       currentMenu = TEMPO_MENU;
+      break;
+    case STATE_XAXISINPUT:
+    case STATE_YAXISINPUT:
+      currentMenu = INPUT_MENU;
       break;
     case STATE_INPUTDEBUG:
       currentMenu = INPUT_DEBUG_MENU;
@@ -225,22 +230,17 @@ void InputModule::tempoMenuHandler(){
         break;
 
         case STATE_EXTCLOCK:
-          clockMode = positive_modulo(clockMode + knobChange, 6);
+          clockMode = positive_modulo(clockMode + knobChange, 7);
         break;
 
         case STATE_RESETINPUT:
           sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
         break;
 
-        case STATE_YAXISINPUT:
-          sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
-        break;
 
       }
     }
-
   }
-
 }
 
 void InputModule::sequenceMenuHandler(){
@@ -278,6 +278,29 @@ void InputModule::sequenceMenuHandler(){
         case STATE_RESETINPUT:
           sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
           break;
+
+
+      }
+    }
+
+  }
+
+}
+
+void InputModule::inputMenuHandler(){
+
+  if(knobChange){
+    if ( backplaneGPIO->pressed(22) ) {// Encoder Switch
+      changeState(min_max_cycle(stepMode+knobChange, STATE_STEPCOUNT , STATE_YAXISINPUT));
+    } else {
+
+      switch(stepMode){
+        case STATE_YAXISINPUT:
+          sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
+        break;
+        case STATE_XAXISINPUT:
+          sequenceArray[selectedChannel].gpio_xaxis = positive_modulo(sequenceArray[selectedChannel].gpio_xaxis + knobChange, 5);
+        break;
 
 
       }
@@ -425,8 +448,8 @@ void InputModule::altButtonHandler(){
          if (midplaneGPIO->pressed(SW_SHIFT)){
            changeState(STATE_GLOBAL);
          } else {
-           if (currentMenu == SEQUENCE_MENU){
-            changeState(STATE_PITCH0);
+           if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU){
+             changeState(min_max_cycle(stepMode+1, STATE_STEPCOUNT , STATE_YAXISINPUT));
            } else {
              changeState(STATE_STEPCOUNT);
            }
@@ -469,7 +492,7 @@ void InputModule::altButtonHandler(){
           playing = false;
 
           for(int s = 0; s < SEQUENCECOUNT; s++){
-            sequenceArray[s].clockReset();
+            sequenceArray[s].clockReset(true);
           }
           break;
 

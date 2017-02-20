@@ -393,32 +393,46 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(6,  STATE_QUANTIZEKEY,     68, 54,60,17, false, STYLE1X, background , foreground);
 
    renderStringBox(7,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_YAXISINPUT,    68, 71,60,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_QUANTIZESCALE,    68, 71,60,17, false, STYLE1X, background , foreground);
 
  }
 
 void DisplayModule::inputMenuDisplay(){
+  sprintf(buf, "CH%d INPUT MAP", selectedChannel+1);
+
+  displayElement[0] = strdup(buf);
+
+  displayElement[1] = strdup("X-AXIS:");
+  if (sequenceArray[selectedChannel].gpio_xaxis < 4){
+   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_xaxis +1 );
+   displayElement[2] = strdup(buf);
+ } else {
+   displayElement[2] = strdup("NONE");
+ }
+ displayElement[3] = strdup("Y-AXIS:");
+ if (sequenceArray[selectedChannel].gpio_yaxis < 4){
+  sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+  displayElement[4] = strdup(buf);
+} else {
+  displayElement[4] = strdup("NONE");
+}
+
+
+ renderStringBox(0,  DISPLAY_LABEL,     0,    0, 128, 15, false, STYLE1X, background , foreground);
+ renderStringBox(1,  DISPLAY_LABEL,     0,   16,  64,16, false, STYLE1X, background , foreground);
+ renderStringBox(2,  STATE_XAXISINPUT,  74,  16,  54,16, false, STYLE1X, background , foreground);
+ renderStringBox(3,  DISPLAY_LABEL,     0,   32,  64,16, false, STYLE1X, background , foreground);
+ renderStringBox(4,  STATE_YAXISINPUT,  74,  32,  54,16, false, STYLE1X, background , foreground);
 
 }
 
 
 
  void DisplayModule::tempoMenuDisplay(){
-   uint8_t previousHighlight = highlight;
-
-   switch (stepMode){
-     case STATE_TEMPO:
-       highlight = 1;
-       break;
-     case STATE_EXTCLOCK:
-       highlight = 2;
-       break;
-   }
 
    displayElement[0] = strdup("TEMPO");
    displayElement[2] = strdup("SYNC");
    displayElement[4] = strdup("RESET:");
-   displayElement[6] = strdup("Y-AXIS:");
 
    if (sequenceArray[selectedChannel].gpio_reset < 4){
     sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_reset +1 );
@@ -427,12 +441,6 @@ void DisplayModule::inputMenuDisplay(){
     displayElement[5] = strdup("NONE");
   }
 
-  if (sequenceArray[selectedChannel].gpio_yaxis < 4){
-   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
-   displayElement[7] = strdup(buf);
- } else {
-   displayElement[7] = strdup("NONE");
- }
 
    switch(clockMode){
      case INTERNAL_CLOCK:
@@ -460,6 +468,11 @@ void DisplayModule::inputMenuDisplay(){
        displayElement[1] = strdup("EXT CLK");
        displayElement[3] = strdup("GATE INPUT 4");
      break;
+     case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
+       displayElement[1] = strdup("EXT CLK");
+       displayElement[3] = strdup("CLOCK INPUT");
+     break;
+
 
    }
 

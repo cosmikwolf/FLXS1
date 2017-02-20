@@ -44,6 +44,7 @@ public:
   void channelInputInputHandler();
 
   void sequenceMenuHandler();
+  void inputMenuHandler();
   void globalMenuHandler();
   void tempoMenuHandler();
 

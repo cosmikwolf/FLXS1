@@ -87,23 +87,25 @@
 #define STATE_BEATCOUNT    13
 #define STATE_QUANTIZEKEY     14
 #define STATE_QUANTIZESCALE   15
+#define STATE_XAXISINPUT       16
+#define STATE_YAXISINPUT       17
 
-#define STATE_PITCH1       16
-#define STATE_PITCH2       17
-#define STATE_PITCH3       18
-#define STATE_TUNER         19
+#define STATE_TEMPO            20
+#define STATE_EXTCLOCK         21
+#define STATE_RESETINPUT       22
 
-
-
-#define STATE_TEMPO          20
-#define STATE_EXTCLOCK       21
-#define STATE_RESETINPUT   22
-#define STATE_YAXISINPUT      23
 
 #define STATE_PATTERNSELECT     25
 #define STATE_CALIBRATION       26
 #define STATE_INPUTDEBUG        27
 #define STATE_GLOBAL            28
+
+
+#define STATE_PITCH1       161
+#define STATE_PITCH2       172
+#define STATE_PITCH3       182
+#define STATE_TUNER         192
+
 
 
 
@@ -156,6 +158,7 @@
 #define EXTERNAL_CLOCK_GATE_1 3
 #define EXTERNAL_CLOCK_GATE_2 4
 #define EXTERNAL_CLOCK_GATE_3 5
+#define EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT 6
 #define GATE_CLOCK_TIMEOUT 5000000
 
 //INPUT MAPPINGS

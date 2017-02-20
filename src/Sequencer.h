@@ -26,7 +26,7 @@ class Sequencer
 
 		uint32_t 		calculateStepTimers();
 		void 		clockStart(elapsedMicros startTime);
-		void 		clockReset();
+		void 		clockReset(bool activeStepReset);
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
 
@@ -62,6 +62,7 @@ class Sequencer
 		uint16_t  beatCount;
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
+		uint8_t		gpio_xaxis;
 
 	private:
 
@@ -83,7 +84,6 @@ class Sequencer
 		uint32_t	zeroBeatOffset;
 		uint8_t	  zeroSequenceCount;
 
-		uint8_t		tempVar8_3;
 		uint32_t	clockSinceLastPulse;
 
 		uint32_t 	avgClocksPerPulse;

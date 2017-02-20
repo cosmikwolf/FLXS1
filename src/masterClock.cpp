@@ -109,9 +109,6 @@ void MasterClock::sequencerFunc(void){
 
 	//	midiControl->midiClockSyncFunc(serialMidi);
 
-  if(playing){
-
-
 
 		switch(clockMode){
 	    case INTERNAL_CLOCK:
@@ -132,6 +129,9 @@ void MasterClock::sequencerFunc(void){
 	    case EXTERNAL_CLOCK_GATE_3:
 				externalClockTick(3);
 			  break;
+			case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
+				externalClockTick(4);
+				break;
 	  }
 
 		if(lfoTimer > 10){
@@ -141,7 +141,7 @@ void MasterClock::sequencerFunc(void){
 			lfoTimer = 0;
 		}
 
-  }
+
 
   wasPlaying = playing;
 
