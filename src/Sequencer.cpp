@@ -10,7 +10,7 @@
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
-			#define FRAMES_PER_BEAT  16777216
+#define FRAMES_PER_BEAT  16777216
 
 void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl){
 	// initialization routine that runs during setup
@@ -101,12 +101,17 @@ void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 }
 
 void Sequencer::clockReset(){
-	activeStep = 0;
+  if (activeStep > stepCount){
+    activeStep = activeStep%stepCount;
+  } else {
+    activeStep = 0;
+  }
 	beatsSinceZero = 0;
 	ppqPulseIndex = 0;
 	zeroSequenceCount = 0;
   clockSinceLastPulse = 0;
 	firstPulse = 1;
+  lastStep = 0;
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 		stepData[stepNum].noteStatus = AWAITING_TRIGGER;
 		stepData[stepNum].arpStatus = 0;
@@ -175,7 +180,7 @@ uint32_t Sequencer::getCurrentFrame(){
 	uint32_t sequenceLength = calculateStepTimers();
 
 //	Serial.println("1: " + String(framesFromBeats) + "\t2: " + String(framesFromPulses)+ "\t3: "+ String(framesSincePulse));
-	if (currentFrame > sequenceLength * zeroSequenceCount){
+/*	if (currentFrame > sequenceLength * zeroSequenceCount){
 		if(channel == 0){
 		//	Serial.println("RESETTING ACTIVESTEP CF: " + String(currentFrame % sequenceLength)  + "\tSL:" + String(sequenceLength));
 		}
@@ -185,22 +190,28 @@ uint32_t Sequencer::getCurrentFrame(){
 				stepData[stepNum].noteStatus = AWAITING_TRIGGER;
 				stepData[stepNum].arpStatus = 0;
 		}
-	}
-	currentFrame = currentFrame % sequenceLength;
+	}*/
+	currentFrame = currentFrame;
 	return currentFrame;
 }
 
 void Sequencer::incrementActiveStep(){
-//	getStepLength();
-//uint32_t currentFrame = getCurrentFrame();
-if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
-//if( currentFrame > lastStepOffset + getStepLength(activeStep)){
-  //lastStepOffset = currentFrame;
-		activeStep++;
-    if(channel == 0){
+uint32_t currentFrame = getCurrentFrame();
+//if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
+  if( currentFrame > lastStepOffset + getStepLength(activeStep)){
+    activeStep++;
+    if (activeStep >= stepCount){
+    //  Serial.println(:)
+      this->clockReset();
+    } else {
+      lastStepOffset = currentFrame;
+    }
+   if(channel == 0){
       Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) );
     }
 	}
+
+
 }
 
 

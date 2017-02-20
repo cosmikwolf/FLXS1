@@ -52,20 +52,28 @@ class Sequencer
 		uint32_t  getStepLength(uint8_t stepNum);
 		uint32_t  ppqSequenceTime();
 
-		boolean  	monophonic;
-		boolean  	beatPulseResyncFlag;
-		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
-
+		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 		uint8_t	 	activeStep;
-		uint8_t	 	zeroBeat;
-		uint8_t		zeroBeatIndex;
-		uint8_t		ppqPulseIndex;
 		uint8_t 	stepCount;
 		uint8_t		quantizeKey;
 		uint8_t		quantizeScale;
 		uint8_t 	pattern;
 		uint8_t		channel;
+		uint16_t  beatCount;
+		uint8_t	  gpio_reset;
+		uint8_t		gpio_yaxis;
+
+	private:
+
+		boolean  	monophonic;
+		boolean  	beatPulseResyncFlag;
+		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
+
+		uint8_t	 	zeroBeat;
+		uint8_t		zeroBeatIndex;
+		uint8_t		ppqPulseIndex;
 		uint8_t 	maxPulseCount;
+		uint32_t  lastStepOffset;
 
 		uint8_t 	lowEndStep;
 		uint8_t 	beatsSinceZero;  //temp vars that i have to keep around because data corruption
@@ -75,25 +83,14 @@ class Sequencer
 		uint32_t	zeroBeatOffset;
 		uint8_t	  zeroSequenceCount;
 
-		uint8_t	  gpio_reset;
-		uint8_t		gpio_yaxis;
-
 		uint8_t		tempVar8_3;
 		uint32_t	clockSinceLastPulse;
 
-		uint16_t  beatCount;
-
 		uint32_t 	avgClocksPerPulse;
-//		uint32_t 	stepLength;
 		uint32_t 	tempoX100;
-		elapsedMicros sequenceTimer; // timer for sequence interval to sequence interval
+
 		elapsedMicros pulseTimer;
-		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
-
 		OutputController* outputControl;
-
-	private:
-
 };
 
 

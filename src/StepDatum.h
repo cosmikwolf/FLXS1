@@ -3,32 +3,6 @@
 #ifndef StepDatum_h
 #define StepDatum_h
 
-// noteStatus indicates the status of the next note
-// stepData[activeStep].noteStatus = stepData[activeStep].pitch;
-#define AWAITING_TRIGGER 								0   // 0 indicates not playing, not queued
-#define CURRENTLY_PLAYING 									1		// 1 indicates the note is currently playing
-#define CURRENTLY_QUEUED 										2   // 2 indicates the note is currently queued.
-#define CURRENTLY_PLAYING_AND_QUEUED				3   // 3 indicates that the note is currently playing and currently queued
-#define NOTE_HAS_BEEN_PLAYED_THIS_ITERATION	4   // 4 indicates that the note has been played this iteration
-#define CURRENTLY_ARPEGGIATING							5   // 4 indicates that the note has been played this iteration
-#define BETWEEN_APEGGIATIONS								6
-#define CURRENT_ARP_OFFSET									63	// difference between notestatus value and the current Arpeggiation note
-
-#define MAX_STEPS_PER_SEQUENCE							64
-
-#define GATETYPE_REST				0
-#define GATETYPE_STEP				1
-#define GATETYPE_ARP				2   // gate types that are greater than 1 are arpeggios.
-// the amount greater than 1 - 1 is the number of arpeggios per step. a gateType value of 2 means that the note retriggers every step.
-// a gateType of 5 means that the note will retrigger 4 times per step
-
-#define ARPTYPE_OFF   0
-#define ARPTYPE_UP		1
-#define ARPTYPE_DN		2
-#define ARPTYPE_UPDN1 3
-#define ARPTYPE_UPDN2 4
-#define ARPTYPE_RNDM	5
-
 typedef	struct StepDatum {
 	// data that needs to be stored
 	uint8_t			pitch[4];		    // note pitch

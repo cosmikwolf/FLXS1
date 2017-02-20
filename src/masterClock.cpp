@@ -209,7 +209,7 @@ void MasterClock::internalClockTick(){
 
 	if ( pulseTrigger ){
 
-		Serial.println("Pulsetrigger " + String(pulseTimer));
+		//Serial.println("Pulsetrigger " + String(pulseTimer));
 		pulseTimer = 0;
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);

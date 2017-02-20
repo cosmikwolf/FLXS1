@@ -470,7 +470,6 @@ void InputModule::altButtonHandler(){
 
           for(int s = 0; s < SEQUENCECOUNT; s++){
             sequenceArray[s].clockReset();
-           // sam2695.allNotesOff(s);
           }
           break;
 
