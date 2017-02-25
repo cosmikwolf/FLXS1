@@ -595,7 +595,7 @@ void DisplayModule::inputMenuDisplay(){
    renderStringBox(7, DISPLAY_LABEL,  0, 48, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
    renderStringBox(8, DISPLAY_LABEL,  0, 56, 128 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(9, DISPLAY_LABEL,  0, 62, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(9, DISPLAY_LABEL,   0, 62, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
  }
 
