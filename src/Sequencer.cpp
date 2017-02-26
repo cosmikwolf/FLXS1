@@ -10,7 +10,8 @@
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
-#define FRAMES_PER_BEAT  16777216
+//#define FRAMES_PER_BEAT  16777216
+#define FRAMES_PER_BEAT  4194304
 
 void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl){
 	// initialization routine that runs during setup
@@ -19,7 +20,9 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->pattern = 0;
 	this->stepCount = stepCount;
 	this->beatCount = beatCount;
-  this->gpio_yaxis = 2;
+  this->gpio_yaxis = 5;
+  this->gpio_xaxis = 5;
+  this->gpio_reset = 5;
 	this->tempoX100 = tempoX100;
 	//this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
@@ -107,17 +110,18 @@ void Sequencer::clockReset(bool activeStepReset){
   } else {
     if (activeStepReset){
       activeStep = 0;
+      Serial.println("Ch " + String(channel) + "reset ");
     }
   }
   for (int stepNum = 0; stepNum < stepCount; stepNum++){
-    stepData[stepNum].offset = stepData[stepNum].offset - getCurrentFrame();
+//    stepData[stepNum].offset = stepData[stepNum].offset - getCurrentFrame();
     stepData[stepNum].noteStatus = AWAITING_TRIGGER;
     stepData[stepNum].arpStatus = 0;
   }
 
 	beatsSinceZero = 0;
 	ppqPulseIndex = 0;
-	zeroSequenceCount = 0;
+//	zeroSequenceCount = 0;
   clockSinceLastPulse = 0;
 	firstPulse = 1;
   lastStepOffset = 0;
@@ -175,6 +179,8 @@ void Sequencer::ppqPulse(uint8_t maxPulseCount){
 		beatsSinceZero = beatsSinceZero % stepCount; //resync at the zero point, which is stepCounts beats from the start.
 		if (beatsSinceZero == 0){
 			zeroSequenceCount = 0;
+      this->clockReset(false);
+
 		}
 	}
 //if(channel == 0){
@@ -214,22 +220,18 @@ uint32_t Sequencer::getCurrentFrame(){
 }
 
 void Sequencer::incrementActiveStep(){
-uint32_t currentFrame = getCurrentFrame();
-//if( getCurrentFrame() > stepData[activeStep].offset + getStepLength(activeStep)){
+  uint32_t currentFrame = getCurrentFrame();
+//  if( currentFrame > stepData[activeStep].offset + getStepLength(activeStep)){
   if( currentFrame > lastStepOffset + getStepLength(activeStep)){
     activeStep++;
+    lastStepOffset = currentFrame;
     if (activeStep >= stepCount){
-    //  Serial.println(:)
       this->clockReset(true);
-    } else {
-      lastStepOffset = currentFrame;
     }
-   if(channel == 0){
-      Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) + "\tcurrentFrame: " + String(currentFrame) + "\tBSZ: " + String(beatsSinceZero));
+    if(channel == 0 || channel == 3){
+    //  Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) + "\tcurrentFrame: " + String(currentFrame) + "\tBSZ: " + String(beatsSinceZero));
     }
 	}
-
-
 }
 
 
@@ -249,6 +251,7 @@ uint32_t Sequencer::calculateStepTimers(){
 	//beatOffset
 	//stepLength = beatLength/stepDivider*stepCount;
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
+    stepData[stepNum].offset = accumulatedOffset;
 		accumulatedOffset += getStepLength(stepNum);
 	}
 	return accumulatedOffset;
@@ -286,13 +289,13 @@ void Sequencer::sequenceModeStandardStep(){
 		};
 
 		if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-	    	if ( currentFrameVar > (stepData[stepNum].offset + stepData[stepNum].arpStatus * trigLength  - trigLength/2 ) ) {
-					noteShutOff(stepNum, stepData[stepNum].gateOff());
-					if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
-						stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
-					} else {
-						stepData[stepNum].noteStatus = AWAITING_TRIGGER;
-					}
+    	if ( currentFrameVar > (stepData[stepNum].offset + stepData[stepNum].arpStatus * trigLength  - trigLength/2 ) ) {
+				noteShutOff(stepNum, stepData[stepNum].gateOff());
+				if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
+					stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
+				} else {
+					stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+				}
 			}
 		}
 	}

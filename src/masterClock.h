@@ -40,6 +40,7 @@ public:
   uint32_t masterLooptimeMax;
   uint32_t masterLooptimeAvg;
   elapsedMicros masterLoopTimer;
+  elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
   boolean ledRunSwitch;
   uint8_t beatPulseIndex;

@@ -6,8 +6,8 @@
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 300
-#define kSequenceTimerInterval 500
+#define kMasterClockInterval 125
+#define kSequenceTimerInterval 650
 #define kPeripheralLoopTimer 15000
 #define kMidiClockInterval  600
 #define kCacheClockInterval 10000

@@ -39,9 +39,8 @@ void MasterClock::masterClockFunc(){
 
 	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	if (clockMode == INTERNAL_CLOCK){
-
 		if ((int)masterLoopTimer > kMasterClockInterval + 100){
-			uint8_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
+			uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
 			clockCounter = clockCounter + countToAdd;
 			//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
 		//	for(int i=0;  i< countToAdd; i++){
@@ -58,15 +57,21 @@ void MasterClock::masterClockFunc(){
 			ledRunSwitch = false;
 		}
 
-
 		if (clockCounter * kMasterClockInterval >  clockPeriod){
 			extClockCounter++;
-			if( extClockCounter > EXTCLOCKDIV ){
+	//		outputControl->setClockOutput(HIGH);
+//			outputControl->setClockOutput(LOW);
+
+			if( extClockCounter >= EXTCLOCKDIV ){
 				outputControl->setClockOutput(HIGH);
 				extClockCounter = 0;
+				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval));
+				masterDebugTimer = 0;
 			}
 			clockCounter = 0;
 			pulseTrigger = 1;
+
+
 		}
 
 
@@ -74,7 +79,7 @@ void MasterClock::masterClockFunc(){
 	}
 	masterLoopTimer = 0;
 
-	if (clockCounter > INTERNAL_PPQ_COUNT/2 && outputControl->clockValue) {
+	if ((clockCounter * kMasterClockInterval >  clockPeriod/2) && outputControl->clockValue) {
 		outputControl->setClockOutput(LOW);
 		ledRunSwitch = true;
 		digitalWriteFast(PIN_EXT_AD_2, HIGH);
@@ -110,38 +115,36 @@ void MasterClock::sequencerFunc(void){
 	//	midiControl->midiClockSyncFunc(serialMidi);
 
 
-		switch(clockMode){
-	    case INTERNAL_CLOCK:
-				internalClockTick();
-	    	break;
-	    case EXTERNAL_MIDI_CLOCK:
-				midiClockTick();
-		    break;
-			case EXTERNAL_CLOCK_GATE_0:
-				externalClockTick(0);
-				break;
-	    case EXTERNAL_CLOCK_GATE_1:
-				externalClockTick(1);
-			  break;
-	    case EXTERNAL_CLOCK_GATE_2:
-				externalClockTick(2);
-		    break;
-	    case EXTERNAL_CLOCK_GATE_3:
-				externalClockTick(3);
-			  break;
-			case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
-				externalClockTick(4);
-				break;
-	  }
+	switch(clockMode){
+    case INTERNAL_CLOCK:
+			internalClockTick();
+    	break;
+    case EXTERNAL_MIDI_CLOCK:
+			midiClockTick();
+	    break;
+		case EXTERNAL_CLOCK_GATE_0:
+			externalClockTick(0);
+			break;
+    case EXTERNAL_CLOCK_GATE_1:
+			externalClockTick(1);
+		  break;
+    case EXTERNAL_CLOCK_GATE_2:
+			externalClockTick(2);
+	    break;
+    case EXTERNAL_CLOCK_GATE_3:
+			externalClockTick(3);
+		  break;
+		case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
+			externalClockTick(4);
+			break;
+  }
 
-		if(lfoTimer > 10){
-			for (int i=0; i< SEQUENCECOUNT; i++){
-				outputControl->lfoUpdate(i);
-			}
-			lfoTimer = 0;
+	if(lfoTimer > 10){
+		for (int i=0; i< SEQUENCECOUNT; i++){
+			outputControl->lfoUpdate(i);
 		}
-
-
+		lfoTimer = 0;
+	}
 
   wasPlaying = playing;
 
