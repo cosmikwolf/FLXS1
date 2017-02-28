@@ -24,13 +24,12 @@ class Sequencer
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
 		uint32_t 		calculateStepTimers();
-		void 		incrementActiveStep();						// Increments the active step, self explanitory.
 		void 		clockStart(elapsedMicros startTime);
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
 		void    masterClockPulse();
 
-		uint8_t activeStep(uint32_t frame);
+		void    getActiveStep(uint32_t frame);
 
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
@@ -63,7 +62,7 @@ class Sequencer
 		uint8_t		quantizeScale;
 		uint8_t 	pattern;
 		uint8_t		channel;
-		uint16_t  beatCount;
+		uint8_t   beatCount;
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
 		uint8_t		gpio_xaxis;

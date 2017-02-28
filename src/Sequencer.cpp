@@ -11,13 +11,10 @@
 
 
 void Sequencer::clockReset(bool activeStepReset){
-  if (activeStep > stepCount){
-    activeStep = (activeStep)%stepCount;
-  } else {
-    if (activeStepReset){
-      activeStep = 0;
-    }
+  if (activeStepReset){
+    beatCount = 0;
   }
+
   for (int stepNum = 0; stepNum < stepCount; stepNum++){
     if(stepNum == activeStep){
       break;
@@ -45,30 +42,28 @@ void Sequencer::masterClockPulse(){
   clockSinceLastPulse++;
   for (int stepNum=0; stepNum<stepCount; stepNum++){
     if (stepData[stepNum].framesRemaining > 0){
-      stepData[stepNum].framesRemaining -= framesPerPulse / avgClocksPerPulse;
+      stepData[stepNum].framesRemaining -= (framesPerPulse / avgClocksPerPulse);
     }
   }
 }
 
 void Sequencer::runSequence(){
 	if(playing){
-    incrementActiveStep();
     sequenceModeStandardStep();
   }
 }
 
 void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
-//  if (channel ==0) Serial.print(String(pulsesSinceResync) + " ");
-  clockSinceLastPulse = 0;
   this->pulsesPerBeat = pulsesPerBeat;
   ppqPulseIndex++;
   pulsesSinceResync++;
 	avgClocksPerPulse = ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
+  clockSinceLastPulse = 0;
   framesPerPulse = FRAMES_PER_BEAT / pulsesPerBeat;
 
   for (int stepNum=0; stepNum<stepCount; stepNum++){
     if (stepData[stepNum].framesRemaining > 0){
-      stepData[stepNum].framesRemaining -= framesPerPulse;
+    //  stepData[stepNum].framesRemaining -= framesPerPulse;
     }
   }
 
@@ -85,9 +80,11 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   if (pulsesSinceResync >= syncStep * pulsesPerBeat){
     pulsesSinceResync = 0;
     stepsSinceResync = 0;
+    beatCount++;
+    beatCount = beatCount % ((stepCount)/clockDivision);
     this->clockReset(false);
     if(channel==0){
-      Serial.println("resync: syncStep: " + String(syncStep) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\tClockdivision: " + String(clockDivision) );
+      Serial.println("resync: syncStep: " + String(syncStep) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\tClockdivision: " + String(clockDivision) + "\tbeatcount: " + String(beatCount) + "\ttotalBeats: " + String( ((stepCount-1)/clockDivision))  + "\tavgClkPP: " + String(avgClocksPerPulse));
     }
   }
 
@@ -95,37 +92,11 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
 
 uint32_t Sequencer::getCurrentFrame(){
   uint32_t currentFrame = pulsesSinceResync * framesPerPulse + framesPerPulse * clockSinceLastPulse / avgClocksPerPulse;
-
 	return currentFrame;
 }
 
-
-uint8_t Sequencer::activeStep(uint32_t frame){
-  uint8_t step = getCurrentFrame() / getStepLength();
-}
-
-void Sequencer::incrementActiveStep(){
-  uint32_t currentFrame = getCurrentFrame();
-
-  if( currentFrame >= stepData[activeStep].offset){
-  //if( currentFrame > lastStepOffset + getStepLength() ){
-    if (stepsSinceResync > syncStep){
-      //don't want the sequence to get ahead of itself. at this point, it should wait for the next ppq pulse to advance
-//      if(channel==0) Serial.println("not incrementing ");
-  //    return;
-    }
-    activeStep = (activeStep + 1) % stepCount;
-    stepsSinceResync++;
-    lastStepOffset = currentFrame;
-
-    if(channel == 0){
-//     Serial.println("Activestep increment " + String(activeStep) + "\tch:" + String(channel) + "\tcurrentFrame: " + String(currentFrame) + "\toffset: " + String(stepData[activeStep].offset) + "\tstepsSynceResync: " + String(stepsSinceResync)  + "\tpulseSinceSync: " + String(pulsesSinceResync) + "\tsyncStep: " + String(syncStep) + "\tclockSinceLastPulse: " + String(clockSinceLastPulse) + "\tstepLength: " + String(getStepLength()));
-    }
-	} else {
-    if(channel == 0){
-    //  Serial.println("NOT increment " + String(activeStep) + "\tch:" + String(channel) + "\tcurrentFrame: " + String(currentFrame) + "\tstepsSynceResync: " + String(stepsSinceResync)  + "\tppqPulseIndex: " + String(ppqPulseIndex) + "\tsyncStep: " + String(syncStep) + "\tclockSinceLastPulse: " + String(clockSinceLastPulse) + "\tstepLength: " + String(getStepLength())+ "\tlastStepOffset: " + String(lastStepOffset) );
-    }
-  }
+void Sequencer::getActiveStep(uint32_t frame){
+  activeStep = getCurrentFrame() / getStepLength() + beatCount * clockDivision ;
 }
 
 uint32_t Sequencer::getStepLength(){
@@ -153,6 +124,7 @@ uint32_t Sequencer::calculateStepTimers(){
 
 void Sequencer::sequenceModeStandardStep(){
   uint32_t currentFrameVar = getCurrentFrame();
+  getActiveStep(currentFrameVar);
 
   if (stepData[activeStep].noteStatus == AWAITING_TRIGGER){
     if (stepData[activeStep].gateType != GATETYPE_REST){
