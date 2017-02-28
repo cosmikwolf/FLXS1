@@ -4,8 +4,8 @@
 #include "midiModule.h"
 
 #include "global.h"
-#define INTERNAL_PPQ_COUNT 32
-#define EXTCLOCKDIV  8
+#define INTERNAL_PPQ_COUNT 12
+#define EXTCLOCKDIV  3  
 // DAC Mapping for each channel:
 #ifndef _MasterClock_h_
 #define _MasterClock_h_

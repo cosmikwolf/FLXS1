@@ -262,10 +262,10 @@ void InputModule::sequenceMenuHandler(){
           }
           break;
         case STATE_BEATCOUNT:
-           newBeatDiv = min_max(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv + knobChange,-16, 16);
+           newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange,-16, 16);
 
           for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
-              sequenceArray[selectedChannel].stepData[i].beatDiv = newBeatDiv;
+              sequenceArray[selectedChannel].clockDivision = newBeatDiv;
           }
           break;
 
@@ -598,6 +598,7 @@ void InputModule::altButtonHandler(){
               }
               if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
                 sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 0, 255);
+                Serial.println("Setting Gatelength: " + String(sequenceArray[selectedChannel].stepData[selectedStep].gateLength));
               }
 
           break;

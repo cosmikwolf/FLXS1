@@ -364,12 +364,12 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[3] = strdup("LENGTH:");
 
-   if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv == 1){
-     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
-   } else if (sequenceArray[selectedChannel].stepData[selectedStep].beatDiv > 0){
-     sprintf(buf, "1/%d", sequenceArray[selectedChannel].stepData[selectedStep].beatDiv);
+   if (sequenceArray[selectedChannel].clockDivision == 1){
+     sprintf(buf, "%d", sequenceArray[selectedChannel].clockDivision);
+   } else if (sequenceArray[selectedChannel].clockDivision > 0){
+     sprintf(buf, "1/%d", sequenceArray[selectedChannel].clockDivision);
    } else {
-     sprintf(buf, "%d", abs(sequenceArray[selectedChannel].stepData[selectedStep].beatDiv)+2 );
+     sprintf(buf, "%d", abs(sequenceArray[selectedChannel].clockDivision)+2 );
    }
    displayElement[4] = strdup(buf);
 

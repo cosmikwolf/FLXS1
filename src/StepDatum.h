@@ -23,7 +23,7 @@ typedef	struct StepDatum {
 	uint8_t				arpStatus;		// if note is playing or not. Value indicates arp number.
 	uint8_t				notePlaying;	// stores the note that is played so it can be turned off.
 	int32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
-	elapsedMicros	stepTimer;		// timer to compare to the noteOffTimer for noteOff signal
+	int32_t 	framesRemaining;  // number of frames to continue playing.
 
 	bool gateTrig(){ //should the gate be turned on this step?
 		switch(gateType){

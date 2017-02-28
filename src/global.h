@@ -7,12 +7,16 @@
 
 #define kSerialSpeed 115200
 #define kMasterClockInterval 125
-#define kSequenceTimerInterval 650
+#define kSequenceTimerInterval 350
 #define kPeripheralLoopTimer 15000
 #define kMidiClockInterval  600
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
+
+#define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
+//#define FRAMES_PER_BEAT  16777216
+#define FRAMES_PER_BEAT  4194304
 
 
 #define DISPLAY_INTERVAL 10000

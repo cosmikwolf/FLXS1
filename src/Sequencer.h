@@ -20,16 +20,20 @@ class Sequencer
 		void 		sequenceModeStandardStep();
 		// Note Trigger Utilities
 	//	void  	clearNoteData(NoteDatum *noteData);
-		void 		incrementActiveStep();
 		void    noteTrigger(uint8_t stepNum, bool gateTrig);
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
 		uint32_t 		calculateStepTimers();
+		void 		incrementActiveStep();						// Increments the active step, self explanitory.
 		void 		clockStart(elapsedMicros startTime);
 		void 		clockReset(bool activeStepReset);
+		void 		ppqPulse(uint8_t pulsesPerBeat);
+		void    masterClockPulse();
+
+		uint8_t activeStep(uint32_t frame);
+
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
-
 		void 		setTempo(uint32_t tempoX100);
 		void 		setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
 		void 		setGateLength(uint8_t step, uint8_t length);
@@ -40,7 +44,6 @@ class Sequencer
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
 
-		void 		ppqPulse(uint8_t maxPulseCount);
 
 		void 		gateInputTrigger(uint8_t inputNum);
 
@@ -49,11 +52,12 @@ class Sequencer
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint8_t   getArpCount(uint8_t stepNum);
-		uint32_t  getStepLength(uint8_t stepNum);
-		uint32_t  ppqSequenceTime();
+		uint32_t  getStepLength();
+		//uint32_t  ppqSequenceTime();
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 		uint8_t	 	activeStep;
+		uint8_t 	syncStep;
 		uint8_t 	stepCount;
 		uint8_t		quantizeKey;
 		uint8_t		quantizeScale;
@@ -63,6 +67,7 @@ class Sequencer
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
 		uint8_t		gpio_xaxis;
+		uint8_t 	clockDivision;
 
 	private:
 
@@ -70,18 +75,19 @@ class Sequencer
 		boolean  	beatPulseResyncFlag;
 		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
 
+
 		uint8_t	 	zeroBeat;
 		uint8_t		zeroBeatIndex;
 		uint8_t		ppqPulseIndex;
-		uint8_t 	maxPulseCount;
+		uint8_t 	pulsesPerBeat;
 		uint32_t  lastStepOffset;
 
 		uint8_t 	lowEndStep;
-		uint8_t 	beatsSinceZero;  //temp vars that i have to keep around because data corruption
+		uint8_t 	stepsSinceResync;  //temp vars that i have to keep around because data corruption
+		uint32_t	pulsesSinceResync;
 
 		uint32_t	avgPulseLength;
 		uint32_t	framesPerPulse;
-		uint32_t	zeroBeatOffset;
 		uint8_t	  zeroSequenceCount;
 
 		uint32_t	clockSinceLastPulse;

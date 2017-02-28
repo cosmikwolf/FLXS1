@@ -37,6 +37,10 @@ void MasterClock::masterClockFunc(){
 	//  masterLooptimeMin
 	//  masterLooptimeMax
 
+	for (int i = 0; i < SEQUENCECOUNT; i++ ){
+    sequenceArray[i].masterClockPulse();
+  }
+
 	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	if (clockMode == INTERNAL_CLOCK){
 		if ((int)masterLoopTimer > kMasterClockInterval + 100){
@@ -59,8 +63,6 @@ void MasterClock::masterClockFunc(){
 
 		if (clockCounter * kMasterClockInterval >  clockPeriod){
 			extClockCounter++;
-	//		outputControl->setClockOutput(HIGH);
-//			outputControl->setClockOutput(LOW);
 
 			if( extClockCounter >= EXTCLOCKDIV ){
 				outputControl->setClockOutput(HIGH);
@@ -70,12 +72,7 @@ void MasterClock::masterClockFunc(){
 			}
 			clockCounter = 0;
 			pulseTrigger = 1;
-
-
 		}
-
-
-
 	}
 	masterLoopTimer = 0;
 
@@ -171,11 +168,11 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 
 	if (playing){
 		if (wasPlaying == false){
-				for (int i=0; i< SEQUENCECOUNT; i++){
-					outputControl->allNotesOff(i);
-					sequenceArray[i].clockStart(startTime);
-					Serial.println("Starting sequence: " + String(i));
-				}
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				outputControl->allNotesOff(i);
+				sequenceArray[i].clockStart(startTime);
+				Serial.println("Starting sequence: " + String(i));
+			}
 		}
 
 		if (gateTrig[gateNum]){
