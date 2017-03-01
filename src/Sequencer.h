@@ -24,6 +24,9 @@ class Sequencer
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
 		uint32_t 		calculateStepTimers();
+		uint32_t    framesPerSequence();
+		uint32_t   	getCurrentFrame();
+
 		void 		clockStart(elapsedMicros startTime);
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
@@ -46,7 +49,6 @@ class Sequencer
 
 		void 		gateInputTrigger(uint8_t inputNum);
 
-		uint32_t   	getCurrentFrame();
 
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
@@ -58,6 +60,7 @@ class Sequencer
 		uint8_t	 	activeStep;
 		uint8_t 	syncStep;
 		uint8_t 	stepCount;
+		uint8_t 	stepsPlayed;
 		uint8_t		quantizeKey;
 		uint8_t		quantizeScale;
 		uint8_t 	pattern;
@@ -75,15 +78,13 @@ class Sequencer
 		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
 
 
-		uint8_t	 	zeroBeat;
-		uint8_t		zeroBeatIndex;
+		uint8_t	 	lastActiveStep;
 		uint8_t		ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
-		uint32_t  lastStepOffset;
 
 		uint8_t 	lowEndStep;
 		uint8_t 	stepsSinceResync;  //temp vars that i have to keep around because data corruption
-		uint32_t	pulsesSinceResync;
+		uint8_t	resyncSinceReset;
 
 		uint32_t	avgPulseLength;
 		uint32_t	framesPerPulse;

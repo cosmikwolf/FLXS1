@@ -72,7 +72,7 @@ void Sequencer::setGateLength(uint8_t step, uint8_t length){
 };
 
 void Sequencer::setStepCount(uint8_t stepCountNew){
-	stepCount = stepCountNew;
+	//stepCount = stepCountNew;
 	calculateStepTimers();
 };
 
@@ -263,9 +263,9 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
 	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gateTrig );
 	stepData[stepNum].arpStatus++;
   stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
-  //stepData[stepNum].framesRemaining = 4096;
+  stepData[stepNum].framesRemaining = 4096;
   stepData[stepNum].framesRemaining = (stepData[stepNum].gateLength+1) * FRAMES_PER_BEAT / (4*clockDivision);
-  Serial.println("Triggering step " + String(stepNum) + " frames remaining: " + String(stepData[stepNum].framesRemaining) +"\tgateLength: " + String(stepData[stepNum].gateLength) + "\tframesperbeat:" + String(FRAMES_PER_BEAT) + "\tclockdiv:" + String(clockDivision));
+  //Serial.println("Triggering step " + String(stepNum) + " frames remaining: " + String(stepData[stepNum].framesRemaining) +"\tgateLength: " + String(stepData[stepNum].gateLength) + "\tframesperbeat:" + String(FRAMES_PER_BEAT) + "\tclockdiv:" + String(clockDivision));
 }
 
 uint8_t Sequencer::getArpCount(uint8_t stepNum){
