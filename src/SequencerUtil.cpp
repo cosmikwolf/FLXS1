@@ -154,21 +154,17 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
   }
 
   if(gpio_yaxis == inputNum){
-    activeStep = activeStep+4;
-    if (activeStep >= stepCount){
-      activeStep = activeStep % stepCount;
-      this->clockReset(false);
-      sequenceModeStandardStep();
-    }
+    this->skipStep(4);
+		if(!playing){
+			sequenceModeStandardStep();
+		}
   }
 
   if(gpio_xaxis == inputNum){
-    activeStep++;
-    if (activeStep >= stepCount){
-      activeStep = activeStep % stepCount;
-      this->clockReset(false);
-      sequenceModeStandardStep();
-    }
+		this->skipStep(1);
+		if(!playing){
+			sequenceModeStandardStep();
+		}
   }
 };
 
@@ -263,9 +259,13 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
 	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gateTrig );
 	stepData[stepNum].arpStatus++;
   stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
-  stepData[stepNum].framesRemaining = 4096;
-  stepData[stepNum].framesRemaining = (stepData[stepNum].gateLength+1) * FRAMES_PER_BEAT / (4*clockDivision);
-  //Serial.println("Triggering step " + String(stepNum) + " frames remaining: " + String(stepData[stepNum].framesRemaining) +"\tgateLength: " + String(stepData[stepNum].gateLength) + "\tframesperbeat:" + String(FRAMES_PER_BEAT) + "\tclockdiv:" + String(clockDivision));
+
+	if(stepData[stepNum].arpType == ARPTYPE_OFF){
+		stepData[stepNum].framesRemaining = (stepData[stepNum].gateLength+1) * FRAMES_PER_BEAT / (4*clockDivision);
+	} else {
+		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT * stepData[stepNum].arpSpdNum / (clockDivision*stepData[stepNum].arpSpdDen);
+	}
+
 }
 
 uint8_t Sequencer::getArpCount(uint8_t stepNum){

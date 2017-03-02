@@ -76,7 +76,7 @@ void MasterClock::masterClockFunc(){
 	}
 	masterLoopTimer = 0;
 
-	if ((clockCounter * kMasterClockInterval >  clockPeriod/2) && outputControl->clockValue) {
+	if ((clockCounter * kMasterClockInterval >  clockPeriod/2 ) && outputControl->clockValue) {
 		outputControl->setClockOutput(LOW);
 		ledRunSwitch = true;
 		digitalWriteFast(PIN_EXT_AD_2, HIGH);

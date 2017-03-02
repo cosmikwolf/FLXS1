@@ -196,6 +196,9 @@ void OutputController::inputRead(){
   cvInputRaw[1] = adc->analogRead(A12, ADC_1);
   cvInputRaw[2] = adc->analogRead(A13, ADC_1);
   cvInputRaw[3] = adc->analogRead(A10, ADC_1);
+  for(int ch=0; ch < SEQUENCECOUNT; ch++){
+    cvInputMapped[ch] = map(cvInputRaw[ch], adcCalibrationHigh[ch], adcCalibrationLow[ch], -60, 60) +1;
+  }
   gateInputRaw[0]  = backplaneGPIO->pressed(4);
   gateInputRaw[1]  = backplaneGPIO->pressed(5);
   gateInputRaw[2]  = backplaneGPIO->pressed(6);
@@ -260,19 +263,8 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
   }
   int offset = 0;
-  switch (channel){
-    case 1:
-    offset = map(adc->analogRead(A12, ADC_1), 0, 1023, 60, -60) ;
-    //Serial.println("ch1 offset: "+ String(offset));
-    break;
-    case 2:
-    offset = map(adc->analogRead(A13, ADC_1), 0, 1023, 60, -60) ;
+    offset = cvInputMapped[channel];
 
-    break;
-    case 3:
-    offset = map(adc->analogRead(A10, ADC_1), 0, 1023, 60, -60) ;
-    break;
-  }
 
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   delayMicroseconds(5);
@@ -280,7 +272,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
   delayMicroseconds(5);
-
+  //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
     backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
   }

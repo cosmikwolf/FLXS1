@@ -30,8 +30,10 @@ class Sequencer
 		void 		clockStart(elapsedMicros startTime);
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
-		void    masterClockPulse();
+		void 		skipStep(uint8_t count);
 
+		void    masterClockPulse();
+		
 		void    getActiveStep(uint32_t frame);
 
 		int  		positive_modulo(int i, int n);
@@ -79,7 +81,7 @@ class Sequencer
 
 
 		uint8_t	 	lastActiveStep;
-		uint8_t		ppqPulseIndex;
+		uint16_t		ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
 
 		uint8_t 	lowEndStep;

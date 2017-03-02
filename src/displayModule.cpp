@@ -604,15 +604,15 @@ void DisplayModule::inputMenuDisplay(){
 
  void DisplayModule::inputDebugMenuDisplay(){
 
-   displayElement[0] = strdup("Calibration Menu");
+   displayElement[0] = strdup("Input Calibration Menu");
 
-   sprintf(buf, "CV IN 1: %d  %d", cvInputRaw[0]/512,  cvInputRaw[0]  );
+   sprintf(buf, "CV IN 1: %d  %d", cvInputMapped[0],  cvInputRaw[0]  );
    displayElement[1] = strdup(buf);
-   sprintf(buf, "CV IN 2: %d  %d", cvInputRaw[1]/512,  cvInputRaw[1]  );
+   sprintf(buf, "CV IN 2: %d  %d", cvInputMapped[1],  cvInputRaw[1]  );
    displayElement[2] = strdup(buf);
-   sprintf(buf, "CV IN 3: %d  %d", cvInputRaw[2]/512,  cvInputRaw[2]  );
+   sprintf(buf, "CV IN 3: %d  %d", cvInputMapped[2],  cvInputRaw[2]  );
    displayElement[3] = strdup(buf);
-   sprintf(buf, "CV IN 4: %d  %d", cvInputRaw[3]/512,  cvInputRaw[3] );
+   sprintf(buf, "CV IN 4: %d  %d", cvInputMapped[3],  cvInputRaw[3] );
    displayElement[4] = strdup(buf);
 
    sprintf(buf, "GT IN 1: %d", gateInputRaw[0]);

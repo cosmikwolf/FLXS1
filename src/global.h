@@ -269,6 +269,7 @@ extern boolean eraseAllFlag;
 extern uint16_t calibrationBuffer;
 extern uint16_t dacCalibration[16];
 extern uint16_t cvInputRaw[4];
+extern int8_t cvInputMapped[4];
 extern uint8_t	gateInputRose[4];
 extern uint8_t	gateInputRaw[4];
 

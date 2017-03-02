@@ -39,6 +39,7 @@ elapsedMicros debugTimer2;
 uint16_t calibrationBuffer = 0;
 uint16_t  dacCalibration[16];
 uint16_t  cvInputRaw[4];
+int8_t cvInputMapped[4];
 uint8_t			gateInputRaw[4];
 uint8_t gateInputRose[4];
 //midi
