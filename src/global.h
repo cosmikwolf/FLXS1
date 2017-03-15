@@ -6,8 +6,8 @@
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 125
-#define kSequenceTimerInterval 350
+#define kMasterClockInterval 100
+#define kSequenceTimerInterval 500
 #define kPeripheralLoopTimer 15000
 #define kMidiClockInterval  600
 #define kCacheClockInterval 10000
@@ -19,7 +19,7 @@
 #define FRAMES_PER_BEAT  4194304
 
 
-#define DISPLAY_INTERVAL 10000
+#define DISPLAY_INTERVAL 20000
 #define INPUT_INTERVAL 20000
 #define LED_INTERVAL 7000
 
@@ -27,10 +27,8 @@
 #define PIMILLION             3141593
 //STATE DEFINITIONS:
 #define STEP_DISPLAY		     	 7
-#define	SEQUENCE_MENU		     	  2
 #define TIMING_MENU 	      	 66
 #define GENERATIVE_MENU     	 71
-#define GLOBAL_MENU            68
 #define SEQUENCE_TRAN       	 67
 #define SEQUENCE_NAME       	 65
 #define SEQUENCE_QUAN       	 69
@@ -46,10 +44,6 @@
 #define GLOBAL_SAVE         	 92
 #define GLOBAL_LOAD         	 93
 #define GLOBAL_FILE         	 94
-#define TEMPO_MENU          	 95
-#define PATTERN_SELECT      	 96
-
-
 #define	CHANNEL_ENVELOPE_MODE	 99
 #define	CHANNEL_STEP_MODE		   241
 #define	CHANNEL_INPUT_MODE		 243
@@ -58,58 +52,68 @@
 #define	INPUT_DEBUG_MENU		     125
 
 // MENUS
-#define	PITCH_GATE_MENU        97
-#define	ARPEGGIO_MENU          98
-#define	SEQUENCE_MENU        99
-#define	INPUT_MENU        100
-#define	TUNER_MENU	         	 101
-#define	VELOCITY_MENU          102
-#define	CALIBRATION_MENU       103
-
+#define	PITCH_GATE_MENU   0
+#define	ARPEGGIO_MENU     PITCH_GATE_MENU + 1
+#define	SEQUENCE_MENU     ARPEGGIO_MENU + 1
+#define	INPUT_MENU        SEQUENCE_MENU + 1
+#define	TUNER_MENU        INPUT_MENU + 1
+#define	VELOCITY_MENU     TUNER_MENU + 1
+#define	CALIBRATION_MENU  VELOCITY_MENU + 1
+#define TEMPO_MENU        CALIBRATION_MENU + 1
+#define PATTERN_SELECT    TEMPO_MENU + 1
+#define GLOBAL_MENU       PATTERN_SELECT + 1
+#define MOD_MENU_1        GLOBAL_MENU + 1
+#define MOD_MENU_2        MOD_MENU_1 + 1
 
 //PITCH PAGE STEPMODES
 #define STATE_PITCH0       0
-#define STATE_GATELENGTH   1
-#define STATE_GATETYPE     2
-#define STATE_GLIDE        3
+#define STATE_GATELENGTH   STATE_PITCH0 +1
+#define STATE_GATETYPE     STATE_GATELENGTH +1
+#define STATE_GLIDE        STATE_GATETYPE +1
 
 //ARPEGGIO MENU
-#define STATE_ARPTYPE      4
-#define STATE_ARPSPEEDNUM  5
-#define STATE_ARPSPEEDDEN  6
-#define STATE_ARPOCTAVE    7
-#define STATE_CHORD        8
+#define STATE_ARPTYPE      STATE_GLIDE + 1
+#define STATE_ARPSPEEDNUM  STATE_ARPTYPE + 1
+#define STATE_ARPSPEEDDEN  STATE_ARPSPEEDNUM + 1
+#define STATE_ARPOCTAVE    STATE_ARPSPEEDDEN + 1
+#define STATE_CHORD        STATE_ARPOCTAVE + 1
 
 //VELOCITY PAGE STEP MODES
-#define STATE_VELOCITY       9
-#define STATE_VELOCITYTYPE   10
-#define STATE_LFOSPEED       11
+#define STATE_VELOCITY      STATE_CHORD +1
+#define STATE_VELOCITYTYPE  STATE_VELOCITY +1
+#define STATE_LFOSPEED      STATE_VELOCITYTYPE +1
 
 
 //SEQUENCE MENU
-#define STATE_STEPCOUNT    12
-#define STATE_BEATCOUNT    13
-#define STATE_QUANTIZEKEY     14
-#define STATE_QUANTIZESCALE   15
-#define STATE_XAXISINPUT       16
-#define STATE_YAXISINPUT       17
+#define STATE_STEPCOUNT       STATE_LFOSPEED +1
+#define STATE_BEATCOUNT       STATE_STEPCOUNT +1
+#define STATE_QUANTIZEKEY      STATE_BEATCOUNT+1
+#define STATE_QUANTIZESCALE    STATE_QUANTIZEKEY+1
+//TEMPO MENU
+#define STATE_TEMPO            STATE_QUANTIZESCALE +1
+#define STATE_EXTCLOCK         STATE_TEMPO +1
+#define STATE_RESETINPUT       STATE_EXTCLOCK +1
+#define STATE_YAXISINPUT       STATE_RESETINPUT +1
+// MOD MENU 1
+#define STATE_ARPON            STATE_YAXISINPUT +1
+#define STATE_GATEINVERT       STATE_ARPON +1
+#define STATE_RANDOMPITCH      STATE_GATEINVERT +1
+#define STATE_PITCHMOD         STATE_RANDOMPITCH +1
+// MOD MENU 2
+#define STATE_GLIDEMOD         STATE_PITCHMOD +1
+#define STATE_GATEMOD          STATE_GLIDEMOD +1
+#define STATE_ARPSPDMOD        STATE_GATEMOD +1
+#define STATE_ARPOCTMOD        STATE_ARPSPDMOD +1
+#define STATE_ARPINTMOD        STATE_ARPOCTMOD +1
 
-#define STATE_TEMPO            20
-#define STATE_EXTCLOCK         21
-#define STATE_RESETINPUT       22
-
-
-#define STATE_PATTERNSELECT     25
-#define STATE_CALIBRATION       26
-#define STATE_INPUTDEBUG        27
-#define STATE_GLOBAL            28
-
-
-#define STATE_PITCH1       161
-#define STATE_PITCH2       172
-#define STATE_PITCH3       182
-#define STATE_TUNER         192
-
+#define STATE_PATTERNSELECT    STATE_ARPINTMOD  +1
+#define STATE_CALIBRATION       STATE_PATTERNSELECT +1
+#define STATE_INPUTDEBUG        STATE_CALIBRATION +1
+#define STATE_GLOBAL            STATE_INPUTDEBUG +1
+#define STATE_PITCH1            STATE_GLOBAL +1
+#define STATE_PITCH2            STATE_PITCH1 +1
+#define STATE_PITCH3            STATE_PITCH2 +1
+#define STATE_TUNER             STATE_PITCH3  +1
 
 
 
@@ -281,7 +285,6 @@ int min_max(int value, int min, int max);
 int min_max_cycle(int value, int min, int max);
 uint8_t getNote(uint8_t index);
 uint32_t FreeRam2();
-
 
 
 extern elapsedMicros debugTimer2;

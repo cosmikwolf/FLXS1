@@ -8,9 +8,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->pattern = 0;
 	this->stepCount = stepCount;
 	this->beatCount = beatCount;
-  this->gpio_yaxis = 5;
-  this->gpio_xaxis = 5;
-  this->gpio_reset = 5;
   this->clockDivision = 4;
 
 	this->tempoX100 = tempoX100;
@@ -23,14 +20,26 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 
 void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	Serial.println("*&*&*&*& Initializing pattern: " + String(pattern) + " channel: " + String(ch));
-	this->stepCount = 16;
-	this->beatCount = 4;
-	this->quantizeKey = 0;
-	this->quantizeScale = 0;
-	this->pattern = pattern;
-	this->channel = ch;
-	this->avgPulseLength = 20000;
-  this->clockDivision = 4;
+	this->stepCount 				= 16;
+	this->beatCount 				= 4;
+	this->quantizeKey 			= 0;
+	this->quantizeScale 		= 0;
+	this->pattern 					= pattern;
+	this->channel 					= ch;
+	this->avgPulseLength 		= 20000;
+  this->clockDivision 		= 4;
+	this->gpio_reset 				= 5;
+	this->gpio_yaxis 				= 5;
+	this->gpio_arpon 			  = 5;
+	this->gpio_gateinvert 	= 5;
+	this->gpio_randompitch 	= 5;
+	this->cv_arpspdmod 			= 5;
+	this->cv_arpoctmod 			= 5;
+	this->cv_arpintmod 			= 5;
+	this->cv_pitchmod 			= 5;
+	this->cv_gatemod 				= 5;
+	this->cv_glidemod 			= 5;
+
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
 		this->stepData[n].pitch[0]   = 24;
 		for (int i=1; i<4; i++){
@@ -50,7 +59,9 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 		this->stepData[n].lfoSpeed		 =  16;
 		this->stepData[n].offset       =   0;
 		this->stepData[n].noteStatus   =  AWAITING_TRIGGER;
+		this->stepData[n].arpStatus   =   0;
 		this->stepData[n].notePlaying  =   0;
+		this->stepData[n].framesRemaining = 0;
 	}
 };
 
@@ -154,19 +165,23 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
   }
 
   if(gpio_yaxis == inputNum){
-    this->skipStep(4);
-		if(!playing){
-			sequenceModeStandardStep();
+		if(playing){
+			this->skipStep(4);
 		}
   }
 
-  if(gpio_xaxis == inputNum){
-		this->skipStep(1);
-		if(!playing){
-			sequenceModeStandardStep();
-		}
-  }
+
 };
+
+void Sequencer::skipStep(uint8_t count){
+  Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
+
+  uint16_t oldPpqPulseIndex = ppqPulseIndex;
+  ppqPulseIndex = (ppqPulseIndex + count*pulsesPerBeat/clockDivision) % (pulsesPerBeat*stepCount/clockDivision );
+  for(int stepNum = 0; stepNum < stepCount; stepNum++){
+    stepData[stepNum].framesRemaining += oldPpqPulseIndex-ppqPulseIndex;
+  }
+}
 
 
 void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
@@ -260,11 +275,22 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
 	stepData[stepNum].arpStatus++;
   stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
 
+	//ensuring that gate is turned off before next step:
+	uint8_t nextStep = stepCount;
+	for(int nxtStp = stepNum + 1; nxtStp < stepCount; nxtStp++){
+		if (stepData[nxtStp].gateType != GATETYPE_REST){
+			nextStep = nxtStp;
+			break;
+		}
+	}
+
 	if(stepData[stepNum].arpType == ARPTYPE_OFF){
 		stepData[stepNum].framesRemaining = (stepData[stepNum].gateLength+1) * FRAMES_PER_BEAT / (4*clockDivision);
 	} else {
 		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT * stepData[stepNum].arpSpdNum / (clockDivision*stepData[stepNum].arpSpdDen);
 	}
+
+	//stepData[stepNum].framesRemaining = std::min( (int)stepData[stepNum].framesRemaining ,(int) (nextStep*FRAMES_PER_BEAT/clockDivision - getCurrentFrame() - FRAMES_PER_BEAT/16) );
 
 }
 

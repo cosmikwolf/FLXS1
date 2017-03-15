@@ -19,7 +19,7 @@ class Sequencer
 		// Sequencing Modes
 		void 		sequenceModeStandardStep();
 		// Note Trigger Utilities
-	//	void  	clearNoteData(NoteDatum *noteData);
+		//void  	clearNoteData(NoteDatum *noteData);
 		void    noteTrigger(uint8_t stepNum, bool gateTrig);
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
@@ -33,7 +33,7 @@ class Sequencer
 		void 		skipStep(uint8_t count);
 
 		void    masterClockPulse();
-		
+
 		void    getActiveStep(uint32_t frame);
 
 		int  		positive_modulo(int i, int n);
@@ -70,8 +70,18 @@ class Sequencer
 		uint8_t   beatCount;
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
-		uint8_t		gpio_xaxis;
-		uint8_t 	clockDivision;
+		uint8_t		gpio_arpon;
+		uint8_t		gpio_gateinvert;
+		uint8_t		gpio_randompitch;
+		uint8_t		cv_arpspdmod;
+		uint8_t		cv_arpoctmod;
+		uint8_t		cv_arpintmod;
+		uint8_t		cv_pitchmod;
+		uint8_t		cv_gatemod;
+		uint8_t		cv_glidemod;
+
+
+		int8_t 	  clockDivision;
 
 	private:
 

@@ -27,10 +27,13 @@ public:
 	bool			fell(uint8_t index);					// was the button pressed since the last check?
 	bool			rose(uint8_t index);					// was the button pressed since the last check?
 	bool			pressed(uint8_t index);
+	bool 			cacheCheck(uint8_t index);
+
 	uint32_t		inputBuffer;
 	uint32_t		fellBuffer;
 	uint32_t		roseBuffer;
 	uint8_t			indexMap[32];
+	bool				indexCache[32];
 	uint8_t			portConfig[7];
 
 	elapsedMicros 	debounceTimer;

@@ -329,7 +329,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
    displayElement[3] = strdup("TYPE:");
    char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "RoundSq" };
    displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
-   displayElement[5] = strdup("LFO speed:");
+   displayElement[5] = strdup("LFO SPD:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
    displayElement[6] = strdup(buf);
@@ -343,7 +343,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
 
    renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_LFOSPEED, 60, 54,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
 
    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
@@ -401,7 +401,7 @@ void DisplayModule::inputMenuDisplay(){
   sprintf(buf, "CH%d INPUT MAP", selectedChannel+1);
 
   displayElement[0] = strdup(buf);
-
+/*
   displayElement[1] = strdup("X-AXIS:");
   if (sequenceArray[selectedChannel].gpio_xaxis < 4){
    sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_xaxis +1 );
@@ -409,20 +409,13 @@ void DisplayModule::inputMenuDisplay(){
  } else {
    displayElement[2] = strdup("NONE");
  }
- displayElement[3] = strdup("Y-AXIS:");
- if (sequenceArray[selectedChannel].gpio_yaxis < 4){
-  sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
-  displayElement[4] = strdup(buf);
-} else {
-  displayElement[4] = strdup("NONE");
-}
-
+*/
 
  renderStringBox(0,  DISPLAY_LABEL,     0,    0, 128, 15, false, STYLE1X, background , foreground);
  renderStringBox(1,  DISPLAY_LABEL,     0,   16,  64,16, false, STYLE1X, background , foreground);
- renderStringBox(2,  STATE_XAXISINPUT,  74,  16,  54,16, false, STYLE1X, background , foreground);
+ //renderStringBox(2,  STATE_XAXISINPUT,  74,  16,  54,16, false, STYLE1X, background , foreground);
  renderStringBox(3,  DISPLAY_LABEL,     0,   32,  64,16, false, STYLE1X, background , foreground);
- renderStringBox(4,  STATE_YAXISINPUT,  74,  32,  54,16, false, STYLE1X, background , foreground);
+ //renderStringBox(4,  STATE_YAXISINPUT,  74,  32,  54,16, false, STYLE1X, background , foreground);
 
 }
 
@@ -441,6 +434,13 @@ void DisplayModule::inputMenuDisplay(){
     displayElement[5] = strdup("NONE");
   }
 
+  displayElement[6] = strdup("Y-AXIS:");
+  if (sequenceArray[selectedChannel].gpio_yaxis < 4){
+   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+   displayElement[7] = strdup(buf);
+ } else {
+   displayElement[7] = strdup("NONE");
+ }
 
    switch(clockMode){
      case INTERNAL_CLOCK:

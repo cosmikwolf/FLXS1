@@ -133,6 +133,14 @@ void InputModule::loop(uint16_t frequency){
       case CALIBRATION_MENU:
         calibrationMenuHandler();
       break;
+
+      case MOD_MENU_1:
+        modMenu1_InputHandler();
+        break;
+      case MOD_MENU_2:
+        modMenu2_InputHandler();
+        break;
+
     }
   }
 
@@ -175,11 +183,21 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_EXTCLOCK:
     case STATE_TEMPO:
     case STATE_RESETINPUT:
+    case STATE_YAXISINPUT:
       currentMenu = TEMPO_MENU;
       break;
-    case STATE_XAXISINPUT:
-    case STATE_YAXISINPUT:
-      currentMenu = INPUT_MENU;
+    case STATE_ARPON:
+    case STATE_GATEINVERT:
+    case STATE_RANDOMPITCH:
+    case STATE_PITCHMOD:
+      currentMenu = MOD_MENU_1;
+      break;
+    case STATE_GLIDEMOD:
+    case STATE_GATEMOD:
+    case STATE_ARPSPDMOD:
+    case STATE_ARPOCTMOD:
+    case STATE_ARPINTMOD:
+      currentMenu = MOD_MENU_2;
       break;
     case STATE_INPUTDEBUG:
       currentMenu = INPUT_DEBUG_MENU;
@@ -215,7 +233,7 @@ void InputModule::tempoMenuHandler(){
 
   if(knobChange){
     if(backplaneGPIO->pressed(22)){
-      changeState(min_max_cycle(stepMode+knobChange, STATE_TEMPO , STATE_YAXISINPUT));
+      changeState(min_max_cycle(stepMode+knobChange, STATE_TEMPO , STATE_YAXISINPUT ));
     } else {
       switch (stepMode){
         case STATE_TEMPO:
@@ -237,14 +255,79 @@ void InputModule::tempoMenuHandler(){
           sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
         break;
 
+        case STATE_YAXISINPUT:
+          sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
+        break;
+
 
       }
     }
   }
 }
 
+void InputModule::modMenu1_InputHandler(){
+
+  if(knobChange){
+    if(backplaneGPIO->pressed(22)){
+      changeState(min_max_cycle(stepMode+knobChange, STATE_ARPON , STATE_PITCHMOD ));
+    } else {
+      switch (stepMode){
+
+        case STATE_ARPON:
+          sequenceArray[selectedChannel].gpio_arpon = positive_modulo(sequenceArray[selectedChannel].gpio_arpon + knobChange, 5);
+        break;
+
+        case STATE_GATEINVERT:
+          sequenceArray[selectedChannel].gpio_gateinvert = positive_modulo(sequenceArray[selectedChannel].gpio_gateinvert + knobChange, 5);
+        break;
+
+        case STATE_RANDOMPITCH:
+          sequenceArray[selectedChannel].gpio_randompitch = positive_modulo(sequenceArray[selectedChannel].gpio_randompitch + knobChange, 5);
+        break;
+
+        case STATE_PITCHMOD:
+          sequenceArray[selectedChannel].cv_pitchmod = positive_modulo(sequenceArray[selectedChannel].cv_pitchmod + knobChange, 5);
+        break;
+
+      }
+    }
+  }
+}
+
+void InputModule::modMenu1_InputHandler(){
+
+  if(knobChange){
+    if(backplaneGPIO->pressed(22)){
+      changeState(min_max_cycle(stepMode+knobChange, STATE_ARPON , STATE_PITCHMOD ));
+    } else {
+      switch (stepMode){
+
+        case STATE_ARPON:
+          sequenceArray[selectedChannel].gpio_arpon = positive_modulo(sequenceArray[selectedChannel].gpio_arpon + knobChange, 5);
+        break;
+
+        case STATE_GATEINVERT:
+          sequenceArray[selectedChannel].gpio_gateinvert = positive_modulo(sequenceArray[selectedChannel].gpio_gateinvert + knobChange, 5);
+        break;
+
+        case STATE_RANDOMPITCH:
+          sequenceArray[selectedChannel].gpio_randompitch = positive_modulo(sequenceArray[selectedChannel].gpio_randompitch + knobChange, 5);
+        break;
+
+        case STATE_PITCHMOD:
+          sequenceArray[selectedChannel].cv_pitchmod = positive_modulo(sequenceArray[selectedChannel].cv_pitchmod + knobChange, 5);
+        break;
+
+
+
+      }
+    }
+  }
+}
+
+
 void InputModule::sequenceMenuHandler(){
-  uint8_t newBeatDiv;
+  int8_t newBeatDiv;
   if (midplaneGPIO->fell(SW_MENU)){
     changeState(STATE_PITCH0);
   }
@@ -262,11 +345,11 @@ void InputModule::sequenceMenuHandler(){
           }
           break;
         case STATE_BEATCOUNT:
-           newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange,-16, 16);
+           newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange, -16, 16);
+           sequenceArray[selectedChannel].clockDivision = newBeatDiv;
+           Serial.println("newBeatDiv: " + String(newBeatDiv));
+           Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
 
-          for (int i =0; i<MAX_STEPS_PER_SEQUENCE; i++ ){
-              sequenceArray[selectedChannel].clockDivision = newBeatDiv;
-          }
           break;
 
         case STATE_QUANTIZEKEY:
@@ -295,12 +378,7 @@ void InputModule::inputMenuHandler(){
     } else {
 
       switch(stepMode){
-        case STATE_YAXISINPUT:
-          sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
-        break;
-        case STATE_XAXISINPUT:
-          sequenceArray[selectedChannel].gpio_xaxis = positive_modulo(sequenceArray[selectedChannel].gpio_xaxis + knobChange, 5);
-        break;
+
 
 
       }
@@ -543,7 +621,7 @@ void InputModule::altButtonHandler(){
 //      if (midplaneGPIO->pressed(selectedStep%16) ){
       backplaneGPIO->update();
       if ( midplaneGPIO->pressed(SW_M0) || midplaneGPIO->pressed(SW_M1) || midplaneGPIO->pressed(SW_M2) || midplaneGPIO->pressed(SW_M3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
-        changeState(positive_modulo(stepMode + knobChange, STATE_LFOSPEED));
+        changeState(positive_modulo(stepMode + knobChange, STATE_LFOSPEED+1));
       } else {
 
         switch (stepMode) {

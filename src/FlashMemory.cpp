@@ -99,6 +99,19 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
   seqSettingsArray.add(sequenceArray[channel].quantizeScale);
   seqSettingsArray.add(sequenceArray[channel].channel);
   seqSettingsArray.add(sequenceArray[channel].pattern);
+  seqSettingsArray.add(sequenceArray[channel].clockDivision);
+  seqSettingsArray.add(sequenceArray[channel].gpio_reset);
+  seqSettingsArray.add(sequenceArray[channel].gpio_yaxis);
+  seqSettingsArray.add(sequenceArray[channel].gpio_arpon);
+  seqSettingsArray.add(sequenceArray[channel].gpio_gateinvert);
+  seqSettingsArray.add(sequenceArray[channel].gpio_randompitch);
+  seqSettingsArray.add(sequenceArray[channel].cv_arpspdmod);
+  seqSettingsArray.add(sequenceArray[channel].cv_arpoctmod);
+  seqSettingsArray.add(sequenceArray[channel].cv_arpintmod);
+  seqSettingsArray.add(sequenceArray[channel].cv_pitchmod);
+  seqSettingsArray.add(sequenceArray[channel].cv_gatemod);
+  seqSettingsArray.add(sequenceArray[channel].cv_glidemod);
+
   JsonArray& stepDataArray = root.createNestedArray("data");
 
   //for (int i=0; i< root["stepCount"]; i++){
@@ -136,9 +149,22 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
    sequenceArray[channel].stepCount    = jsonReader["settings"][0];
    sequenceArray[channel].beatCount    = jsonReader["settings"][1];
    sequenceArray[channel].quantizeKey  = jsonReader["settings"][2];
-   sequenceArray[channel].quantizeScale = jsonReader["settings"][3];
+   sequenceArray[channel].quantizeScale= jsonReader["settings"][3];
    sequenceArray[channel].channel      = jsonReader["settings"][4];
-   sequenceArray[channel].pattern = jsonReader["settings"][5]; //.as<uint8_t>();
+   sequenceArray[channel].pattern      = jsonReader["settings"][5];
+   sequenceArray[channel].clockDivision= jsonReader["settings"][6];
+   sequenceArray[channel].gpio_reset   = jsonReader["settings"][7];
+   sequenceArray[channel].gpio_yaxis   = jsonReader["settings"][8];
+   sequenceArray[channel].gpio_arpon   = jsonReader["settings"][9];
+   sequenceArray[channel].gpio_gateinvert= jsonReader["settings"][10];
+   sequenceArray[channel].gpio_randompitch = jsonReader["settings"][11];
+   sequenceArray[channel].cv_arpspdmod = jsonReader["settings"][12];
+   sequenceArray[channel].cv_arpoctmod = jsonReader["settings"][13];
+   sequenceArray[channel].cv_arpintmod = jsonReader["settings"][14];
+   sequenceArray[channel].cv_pitchmod  = jsonReader["settings"][15];
+   sequenceArray[channel].cv_gatemod   = jsonReader["settings"][16];
+   sequenceArray[channel].cv_glidemod  = jsonReader["settings"][17];
+    //.as<uint8_t>();
    Serial.print("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
    JsonArray& stepDataArray = jsonReader["data"];
    Serial.println("Step Data Array Success: " + String(stepDataArray.success())) ;
@@ -169,6 +195,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
   }
 
   for(int n = sequenceArray[channel].stepCount; n< MAX_STEPS_PER_SEQUENCE; n++){
+    // fill up the remaining steps with zeroed data so if stepCount is increased, it will work
     StepDatum stepDataBuf;
 
     stepDataBuf.pitch[0]   = 24;

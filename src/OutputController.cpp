@@ -223,7 +223,14 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 -5v - 17210
 -10v  1540
 */
-  //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide));
+  //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide) + "\tgate: " + String(gate));
+  if (gate){
+    if(backplaneGPIO->cacheCheck(channel) == 1){
+      backplaneGPIO->digitalWrite(channel, LOW);                                 // close gate before re opening
+    //  delay(1);
+      Serial.println("setting gate low because it was still on.");
+    }
+  }
 
   if (glide > 0) {
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), LOW);           // turn on switch with cap to ground, enable slew
@@ -267,11 +274,11 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
 
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
-  delayMicroseconds(5);
+//  delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
-  delayMicroseconds(5);
+//  delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
-  delayMicroseconds(5);
+//  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
     backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage

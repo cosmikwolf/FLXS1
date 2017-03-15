@@ -48,6 +48,9 @@ public:
   void globalMenuHandler();
   void tempoMenuHandler();
 
+  void modMenu1_InputHandler();
+  void modMenu2_InputHandler();
+
   void timingMenuInputHandler();
   void debugScreenInputHandler();
   void calibrationMenuHandler();

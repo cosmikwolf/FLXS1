@@ -45,6 +45,7 @@ void Zetaohm_MAX7301::initPort(uint8_t index, uint8_t port, uint16_t mode) {
   }
 
   indexMap[index] = port;
+  indexCache[index] = 0;
 
   portConfig[portConfigIndex] &= uint8_t(~(0x3 << offset*2) ) ;   // clear existing setting
   portConfig[portConfigIndex] |= setting << offset*2;        // set mode at correct offset
@@ -161,6 +162,8 @@ void Zetaohm_MAX7301::update(){
 void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
   //  noInterrupts();
     writeByte(0x24 + indexMap[index], value);
+    indexCache[index] = value;
+
   //  interrupts();
 }
 
@@ -203,3 +206,7 @@ bool Zetaohm_MAX7301::pressed(uint8_t index){
 		return false;
 	}
 };
+
+bool Zetaohm_MAX7301::cacheCheck(uint8_t index){
+  return indexCache[index];
+}
