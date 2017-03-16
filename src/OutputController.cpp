@@ -199,10 +199,10 @@ void OutputController::inputRead(){
   for(int ch=0; ch < SEQUENCECOUNT; ch++){
     cvInputMapped[ch] = map(cvInputRaw[ch], adcCalibrationHigh[ch], adcCalibrationLow[ch], -60, 60) +1;
   }
-  gateInputRaw[0]  = backplaneGPIO->pressed(4);
-  gateInputRaw[1]  = backplaneGPIO->pressed(5);
-  gateInputRaw[2]  = backplaneGPIO->pressed(6);
-  gateInputRaw[3]  = backplaneGPIO->pressed(7);
+  gateInputRaw[0]  = !backplaneGPIO->pressed(4);
+  gateInputRaw[1]  = !backplaneGPIO->pressed(5);
+  gateInputRaw[2]  = !backplaneGPIO->pressed(6);
+  gateInputRaw[3]  = !backplaneGPIO->pressed(7);
 
   gateInputRose[0]  = backplaneGPIO->rose(4);
   gateInputRose[1]  = backplaneGPIO->rose(5);
@@ -228,7 +228,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
     if(backplaneGPIO->cacheCheck(channel) == 1){
       backplaneGPIO->digitalWrite(channel, LOW);                                 // close gate before re opening
     //  delay(1);
-      Serial.println("setting gate low because it was still on.");
+      //Serial.println("setting gate low because it was still on.");
     }
   }
 
@@ -270,13 +270,13 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
   }
   int offset = 0;
-    offset = cvInputMapped[channel];
+//  offset = cvInputMapped[channel];
 
 
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
-//  delayMicroseconds(5);
+  //delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
-//  delayMicroseconds(5);
+//delayMicroseconds(5);
   ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));

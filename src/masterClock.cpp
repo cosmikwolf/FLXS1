@@ -154,7 +154,7 @@ bool MasterClock::gateTrigger(uint8_t gateNum){
 
 void MasterClock::checkGateClock(){
 	for (int i =0; i <4; i++){
-		if (gateInputRaw[i] == 0 && gatePrevState[i] == 1 ){
+		if (gateInputRaw[i] == 1 && gatePrevState[i] == 0 ){
 			gateTrig[i] = true;
 		} else {
 			gateTrig[i] = false;

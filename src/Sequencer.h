@@ -20,7 +20,7 @@ class Sequencer
 		void 		sequenceModeStandardStep();
 		// Note Trigger Utilities
 		//void  	clearNoteData(NoteDatum *noteData);
-		void    noteTrigger(uint8_t stepNum, bool gateTrig);
+		void    noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
 		uint32_t 		calculateStepTimers();
@@ -55,6 +55,10 @@ class Sequencer
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint8_t   getArpCount(uint8_t stepNum);
+
+		uint8_t  getArpSpeedNumerator(uint8_t stepNum);
+		uint8_t  getArpSpeedDenominator(uint8_t stepNum);
+
 		uint32_t  getStepLength();
 		//uint32_t  ppqSequenceTime();
 
@@ -70,9 +74,9 @@ class Sequencer
 		uint8_t   beatCount;
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
-		uint8_t		gpio_arpon;
 		uint8_t		gpio_gateinvert;
 		uint8_t		gpio_randompitch;
+		uint8_t		cv_arptypemod;
 		uint8_t		cv_arpspdmod;
 		uint8_t		cv_arpoctmod;
 		uint8_t		cv_arpintmod;
@@ -80,6 +84,9 @@ class Sequencer
 		uint8_t		cv_gatemod;
 		uint8_t		cv_glidemod;
 
+		uint8_t arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
+		uint8_t arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
+		int8_t arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];
 
 		int8_t 	  clockDivision;
 

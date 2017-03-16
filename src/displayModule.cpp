@@ -13,6 +13,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.begin();
   delay(100);
   oled.setBrightness(16);
+  oled.setTextWrap(false);
   //oled.setFont(&Font);//this will load the font
   oled.fillScreen(BLACK);     delay(10);
   oled.fillScreen(RED);     delay(10);
@@ -87,7 +88,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         background = BLACK;
         break;
       case 1:
-        foreground = BLUE;
+        foreground = GREENYELLOW;
         background = BLACK;
         break;
       case 2:
@@ -154,6 +155,14 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
       case CALIBRATION_MENU:
         calibrationMenuDisplay();
+      break;
+
+      case MOD_MENU_1:
+        modMenu1_DisplayHandler();
+      break;
+
+      case MOD_MENU_2:
+        modMenu2_DisplayHandler();
       break;
 
     }
@@ -476,7 +485,6 @@ void DisplayModule::inputMenuDisplay(){
 
    }
 
-   renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , foreground);
    renderStringBox(1,  STATE_TEMPO, 0, 15 , 128, 29, false, BOLD4X, background , foreground);
 
    renderStringBox(3,  STATE_EXTCLOCK, 0,  45,128,17, false, STYLE1X, background , foreground);
@@ -490,6 +498,128 @@ void DisplayModule::inputMenuDisplay(){
    renderStringBox(7,  STATE_YAXISINPUT,     74,  79,54,16, false, STYLE1X, background , foreground);
 
  }
+
+ void DisplayModule::modMenu1_DisplayHandler(){
+   sprintf(buf, "CH%d MOD CONFG", selectedChannel+1);
+   displayElement[0] = strdup(buf);
+
+   displayElement[1] = strdup("GATELNGTH:");
+
+   if (sequenceArray[selectedChannel].cv_gatemod < 4){
+    sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_gatemod +1 );
+    displayElement[2] = strdup(buf);
+  } else {
+    displayElement[2] = strdup("OFF");
+  }
+  displayElement[3] = strdup("GATEINVRT:");
+
+  if (sequenceArray[selectedChannel].gpio_gateinvert < 4){
+   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_gateinvert +1 );
+   displayElement[4] = strdup(buf);
+ } else {
+   displayElement[4] = strdup("OFF");
+ }
+ displayElement[5] = strdup("RNDMPTCH:");
+
+ if (sequenceArray[selectedChannel].gpio_randompitch < 4){
+  sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_randompitch +1 );
+  displayElement[6] = strdup(buf);
+} else {
+  displayElement[6] = strdup("OFF");
+}
+displayElement[7] = strdup("TRNSPOSE:");
+
+if (sequenceArray[selectedChannel].cv_pitchmod < 4){
+ sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_pitchmod +1 );
+ displayElement[8] = strdup(buf);
+} else {
+ displayElement[8] = strdup("OFF");
+}
+
+displayElement[9] = strdup("GLIDETIME:");
+
+if (sequenceArray[selectedChannel].cv_glidemod < 4){
+ sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_glidemod +1 );
+ displayElement[10] = strdup(buf);
+} else {
+ displayElement[10] = strdup("OFF");
+}
+
+   renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(1,  DISPLAY_LABEL,      0,   15,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_GATEMOD,     96,   15,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,      0,   31,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_GATEINVERT,  96,   31,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(5,  DISPLAY_LABEL,      0,   47,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_RANDOMPITCH, 96,   47,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(7,  DISPLAY_LABEL,      0,   63,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_PITCHMOD,    96,   63,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(9,  DISPLAY_LABEL,      0,   79,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(10,  STATE_GLIDEMOD,   96,   79,  32,16, false, STYLE1X, background , foreground);
+
+ };
+
+ void DisplayModule::modMenu2_DisplayHandler(){
+   sprintf(buf, "CH%d MOD CONFG", selectedChannel+1);
+   displayElement[0] = strdup(buf);
+
+   displayElement[1] = strdup("ARP TYPE:");
+
+   if (sequenceArray[selectedChannel].cv_arptypemod < 4){
+    sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arptypemod +1 );
+    displayElement[2] = strdup(buf);
+  } else {
+    displayElement[2] = strdup("OFF");
+  }
+  displayElement[3] = strdup("ARP SPEED:");
+
+  if (sequenceArray[selectedChannel].cv_arpspdmod < 4){
+   sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arpspdmod +1 );
+   displayElement[4] = strdup(buf);
+ } else {
+   displayElement[4] = strdup("OFF");
+ }
+ displayElement[5] = strdup("ARP OCTVE:");
+
+ if (sequenceArray[selectedChannel].cv_arpoctmod < 4){
+  sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arpoctmod +1 );
+  displayElement[6] = strdup(buf);
+} else {
+  displayElement[6] = strdup("OFF");
+}
+displayElement[7] = strdup("ARP INTVL:");
+
+if (sequenceArray[selectedChannel].cv_arpintmod < 4){
+ sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arpintmod +1 );
+ displayElement[8] = strdup(buf);
+} else {
+ displayElement[8] = strdup("OFF");
+}
+/*
+displayElement[9] = strdup("GLIDETIME:");
+
+if (sequenceArray[selectedChannel].cv_glidemod < 4){
+ sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_glidemod +1 );
+ displayElement[10] = strdup(buf);
+} else {
+ displayElement[10] = strdup("OFF");
+}
+*/
+   renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(1,  DISPLAY_LABEL,      0,   15,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_ARPTYPEMOD,     96,   15,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,      0,   31,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_ARPSPDMOD,  96,   31,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(5,  DISPLAY_LABEL,      0,   47,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_ARPOCTMOD, 96,   47,  32,16, false, STYLE1X, background , foreground);
+   renderStringBox(7,  DISPLAY_LABEL,      0,   63,  64,16, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_ARPINTMOD,    96,   63,  32,16, false, STYLE1X, background , foreground);
+   //renderStringBox(9,  DISPLAY_LABEL,      0,   79,  64,16, false, STYLE1X, background , foreground);
+   //renderStringBox(10,  STATE_GLIDEMOD,   96,   79,  32,16, false, STYLE1X, background , foreground);
+
+
+ };
+
 
 
  void DisplayModule::patternSelectDisplay(){

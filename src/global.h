@@ -83,30 +83,29 @@
 #define STATE_VELOCITYTYPE  STATE_VELOCITY +1
 #define STATE_LFOSPEED      STATE_VELOCITYTYPE +1
 
-
 //SEQUENCE MENU
 #define STATE_STEPCOUNT       STATE_LFOSPEED +1
 #define STATE_BEATCOUNT       STATE_STEPCOUNT +1
 #define STATE_QUANTIZEKEY      STATE_BEATCOUNT+1
 #define STATE_QUANTIZESCALE    STATE_QUANTIZEKEY+1
+// MOD MENU 1
+#define STATE_GATEMOD          STATE_QUANTIZESCALE +1
+#define STATE_GATEINVERT       STATE_GATEMOD +1
+#define STATE_RANDOMPITCH      STATE_GATEINVERT +1
+#define STATE_PITCHMOD         STATE_RANDOMPITCH +1
+#define STATE_GLIDEMOD         STATE_PITCHMOD +1
+// MOD MENU 2
+#define STATE_ARPSPDMOD        STATE_GLIDEMOD +1
+#define STATE_ARPTYPEMOD       STATE_ARPSPDMOD +1
+#define STATE_ARPOCTMOD        STATE_ARPTYPEMOD +1
+#define STATE_ARPINTMOD        STATE_ARPOCTMOD +1
 //TEMPO MENU
-#define STATE_TEMPO            STATE_QUANTIZESCALE +1
+#define STATE_TEMPO            STATE_ARPINTMOD +1
 #define STATE_EXTCLOCK         STATE_TEMPO +1
 #define STATE_RESETINPUT       STATE_EXTCLOCK +1
 #define STATE_YAXISINPUT       STATE_RESETINPUT +1
-// MOD MENU 1
-#define STATE_ARPON            STATE_YAXISINPUT +1
-#define STATE_GATEINVERT       STATE_ARPON +1
-#define STATE_RANDOMPITCH      STATE_GATEINVERT +1
-#define STATE_PITCHMOD         STATE_RANDOMPITCH +1
-// MOD MENU 2
-#define STATE_GLIDEMOD         STATE_PITCHMOD +1
-#define STATE_GATEMOD          STATE_GLIDEMOD +1
-#define STATE_ARPSPDMOD        STATE_GATEMOD +1
-#define STATE_ARPOCTMOD        STATE_ARPSPDMOD +1
-#define STATE_ARPINTMOD        STATE_ARPOCTMOD +1
 
-#define STATE_PATTERNSELECT    STATE_ARPINTMOD  +1
+#define STATE_PATTERNSELECT     STATE_YAXISINPUT  +1
 #define STATE_CALIBRATION       STATE_PATTERNSELECT +1
 #define STATE_INPUTDEBUG        STATE_CALIBRATION +1
 #define STATE_GLOBAL            STATE_INPUTDEBUG +1
@@ -273,9 +272,9 @@ extern boolean eraseAllFlag;
 extern uint16_t calibrationBuffer;
 extern uint16_t dacCalibration[16];
 extern uint16_t cvInputRaw[4];
-extern int8_t cvInputMapped[4];
-extern uint8_t	gateInputRose[4];
-extern uint8_t	gateInputRaw[4];
+extern int8_t cvInputMapped[5];
+extern uint8_t	gateInputRose[5];
+extern uint8_t	gateInputRaw[5];
 
 
 void debug(const char* text);

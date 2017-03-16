@@ -30,7 +30,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->clockDivision 		= 4;
 	this->gpio_reset 				= 5;
 	this->gpio_yaxis 				= 5;
-	this->gpio_arpon 			  = 5;
+	this->cv_arptypemod 			  = 5;
 	this->gpio_gateinvert 	= 5;
 	this->gpio_randompitch 	= 5;
 	this->cv_arpspdmod 			= 5;
@@ -47,7 +47,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 		}
 		this->stepData[n].chord	   		 =	 0;
 		this->stepData[n].gateType		 =	 0;
-		this->stepData[n].gateLength	 =	 1;
+		this->stepData[n].gateLength	 =	 3;
 		this->stepData[n].arpType			 =	 0;
 		this->stepData[n].arpOctave		 =   1;
 		this->stepData[n].arpSpdNum		 =   1;
@@ -184,7 +184,7 @@ void Sequencer::skipStep(uint8_t count){
 }
 
 
-void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
+void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig){
 	uint8_t pitchArray[22];
 	pitchArray[0] = stepData[stepNum].pitch[0];
 	pitchArray[1] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[1];
@@ -204,15 +204,15 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
 		pitchArray[i] = pitchArray[i-arpSteps]+12;
 	}
 
-	if (stepData[stepNum].arpOctave > 0){
-		arpSteps = stepData[stepNum].arpOctave * arpSteps;
+	if (arpOctaveTrig > 0){
+		arpSteps = arpOctaveTrig * arpSteps;
 	}
 
 	uint8_t index;
 
 	int8_t playPitch; 	//pitch that will be triggered in this loop
 
-	switch (stepData[stepNum].arpType){
+	switch (arpTypeTrig){
 		case ARPTYPE_UP:
 			index = stepData[stepNum].arpStatus % arpSteps;
 			playPitch = pitchArray[index];
@@ -271,36 +271,75 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig){
 		stepData[stepNum].notePlaying = playPitch;
 	}
 	//Serial.println("noteOn"); delay(10);
-	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gateTrig );
-	stepData[stepNum].arpStatus++;
-  stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
 
-	//ensuring that gate is turned off before next step:
-	uint8_t nextStep = stepCount;
-	for(int nxtStp = stepNum + 1; nxtStp < stepCount; nxtStp++){
-		if (stepData[nxtStp].gateType != GATETYPE_REST){
-			nextStep = nxtStp;
-			break;
-		}
+	//BEGIN INPUT MAPPING SECTION
+	if (gateInputRaw[gpio_randompitch]){
+		stepData[stepNum].notePlaying = random(0, 127);
+	}
+
+	stepData[stepNum].notePlaying += cvInputMapped[cv_pitchmod]/4;
+	uint8_t glideVal = min_max(stepData[stepNum].glide + cvInputMapped[cv_glidemod], 0, 255);
+
+	if(gateInputRaw[gpio_gateinvert]){
+		gateTrig = !gateTrig;
 	}
 
 	if(stepData[stepNum].arpType == ARPTYPE_OFF){
-		stepData[stepNum].framesRemaining = (stepData[stepNum].gateLength+1) * FRAMES_PER_BEAT / (4*clockDivision);
+		// THIS INPUT MAPPING STILL NEEDS WORK.
+		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
+		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
+		stepData[stepNum].framesRemaining = min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 64 ) * FRAMES_PER_BEAT / (8*clockDivision);
+		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT / (8 * clockDivision) ;
+		Serial.println("Setting note with gate length: " + String(min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 256 ))  + "\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
+
 	} else {
-		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT * stepData[stepNum].arpSpdNum / (clockDivision*stepData[stepNum].arpSpdDen);
+		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT *  getArpSpeedNumerator(stepNum) / (clockDivision * getArpSpeedDenominator(stepNum)) ;
+		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/2;
+
+		Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
+
 	}
+
+	//END INPUT MAPPING SECTION
+	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig );
+	stepData[stepNum].arpStatus++;
+
+	//ensuring that gate is turned off before next step:
+	// uint8_t nextStep = stepCount;
+	// for(int nxtStp = stepNum + 1; nxtStp < stepCount; nxtStp++){
+	// 	if (stepData[nxtStp].gateType != GATETYPE_REST){
+	// 		nextStep = nxtStp;
+	// 		break;
+	// 	}
+	// }
+
 
 	//stepData[stepNum].framesRemaining = std::min( (int)stepData[stepNum].framesRemaining ,(int) (nextStep*FRAMES_PER_BEAT/clockDivision - getCurrentFrame() - FRAMES_PER_BEAT/16) );
 
 }
 
+uint8_t  Sequencer::getArpSpeedNumerator(uint8_t stepNum){
+	if (arpSpeedModulation[stepNum] < 0){
+		return min_max(stepData[stepNum].arpSpdNum - abs(arpSpeedModulation[stepNum]), 1, 64) ;
+	} else {
+		return stepData[stepNum].arpSpdNum;
+	}
+};
+uint8_t  Sequencer::getArpSpeedDenominator(uint8_t stepNum){
+	if (arpSpeedModulation[stepNum] > 0){
+		return stepData[stepNum].arpSpdDen * arpSpeedModulation[stepNum];
+	} else {
+		return stepData[stepNum].arpSpdDen;
+	}
+};
+
 uint8_t Sequencer::getArpCount(uint8_t stepNum){
 	uint8_t arpCount;
 
-	if (stepData[stepNum].arpType == ARPTYPE_OFF) {
+	if (arpTypeModulated[stepNum] == ARPTYPE_OFF) {
 		arpCount = 0;
 	} else {
-		arpCount = (stepData[stepNum].gateLength *  stepData[stepNum].arpSpdDen / stepData[stepNum].arpSpdNum )/4 ;
+		arpCount = (stepData[stepNum].gateLength *  getArpSpeedDenominator( stepNum) / getArpSpeedNumerator(stepNum))/4 ;
 	}
 
 	return arpCount;
@@ -326,7 +365,7 @@ uint8_t Sequencer::getArpCount(uint8_t stepNum){
 
 void Sequencer::noteShutOff(uint8_t stepNum, bool gateOff){
 	//shut off any other notes that might still be playing.
-
+//	Serial.println("shutting step " + String(stepNum) + " off");
 		if( stepData[stepNum].noteStatus == CURRENTLY_PLAYING ){
 	//		noteData->noteOff = true;
 	//		noteData->channel = channel;

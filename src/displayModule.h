@@ -111,6 +111,8 @@ class DisplayModule
     void inputMenuDisplay();
     void globalMenuDisplay();
     void tempoMenuDisplay();
+    void modMenu1_DisplayHandler();
+    void modMenu2_DisplayHandler();
 
     void gameOfLifeDisplay();
     void deleteMenuDisplay();

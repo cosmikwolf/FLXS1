@@ -72,7 +72,6 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   clockSinceLastPulse = 0;
   framesPerPulse = FRAMES_PER_BEAT / pulsesPerBeat;
 
-
   for (int stepNum = 1; stepNum < pulsesPerBeat; stepNum++){
     if ( ((stepNum*pulsesPerBeat) % clockDivision) == 0 ){
       syncStep = stepNum;
@@ -155,49 +154,56 @@ void Sequencer::sequenceModeStandardStep(){
 
   if (stepData[activeStep].noteStatus == AWAITING_TRIGGER){
     if (stepData[activeStep].gateType != GATETYPE_REST){
+
       stepData[activeStep].arpStatus = 0;
 
-      noteTrigger(activeStep, stepData[activeStep].gateTrig());
-      //Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision));
+      arpTypeModulated[activeStep] = min_max(stepData[activeStep].arpType + cvInputMapped[cv_arptypemod]/20, 0, 5);
+
+      arpOctaveModulated[activeStep] = min_max(stepData[activeStep].arpOctave + cvInputMapped[cv_arpoctmod]/20, 1, 5);
+      arpSpeedModulation[activeStep] = cvInputMapped[cv_arpspdmod]/15;
+
+      noteTrigger(activeStep, stepData[activeStep].gateTrig(), arpTypeModulated[activeStep], arpOctaveModulated[activeStep] );
       stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
+      //Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision));
       //stepData[activeStep].offset = currentFrameVar;
     }
   }
 
 	for (int stepNum = 0; stepNum < stepCount; stepNum++){
 	// iterate through all steps to determine if they need to have action taken.
-		if (stepData[stepNum].noteStatus == NOTE_HAS_BEEN_PLAYED_THIS_ITERATION){
-      if(stepNum != activeStep){
-        //Serial.println("Resetting step: " + String(stepNum) + "\tactiveStep: " + String(activeStep)) ;
-        stepData[stepNum].noteStatus = AWAITING_TRIGGER;
-        stepData[stepNum].arpStatus = 0;
-      }
-			continue;
-		}
 
 		if (stepData[stepNum].gateType == GATETYPE_REST){
 			continue;
 		}
-/*
-		uint32_t stepOffTime = (stepData[stepNum].gateLength+1)*getStepLength()/4;
-		uint32_t trigLength;
 
-		if (stepData[stepNum].arpType != ARPTYPE_OFF ){
-  		trigLength = stepData[stepNum].arpSpdNum*getStepLength()/stepData[stepNum].arpSpdDen;
-		} else {
-			trigLength = stepOffTime;
-		};
-*/
-		if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-    //  if ( currentFrameVar > (stepData[stepNum].offset + stepData[stepNum].arpStatus * trigLength  - trigLength/2 ) ) {
-      if ( stepData[stepNum].framesRemaining <= 0 ) {
-				noteShutOff(stepNum, stepData[stepNum].gateOff());
-				if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
-					stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
-				} else {
-          noteTrigger(stepNum, stepData[stepNum].gateTrig());
-				}
-			}
-		}
+    switch (stepData[stepNum].noteStatus){
+      case NOTE_HAS_BEEN_PLAYED_THIS_ITERATION:
+        if(stepNum != activeStep){
+          //Serial.println("Resetting step: " + String(stepNum) + "\tactiveStep: " + String(activeStep)) ;
+          stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+          stepData[stepNum].arpStatus = 0;
+        }
+  			continue;
+      break;
+      case CURRENTLY_PLAYING:
+        if(stepData[stepNum].framesRemaining < stepData[stepNum].arpLastFrame){
+          noteShutOff(stepNum, stepData[stepNum].gateOff());
+          Serial.println("note shut off");
+          stepData[stepNum].noteStatus = BETWEEN_APEGGIATIONS;
+          if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
+            stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
+          }
+        }
+
+      break;
+
+      case BETWEEN_APEGGIATIONS:
+        // Arpeggio retrigger
+        if ( stepData[stepNum].framesRemaining <= 0 ) {
+            noteTrigger(stepNum, stepData[stepNum].gateTrig(), arpTypeModulated[stepNum], arpOctaveModulated[stepNum] );
+            stepData[stepNum].noteStatus = CURRENTLY_PLAYING;
+        }
+      break;
+    }
 	}
 }

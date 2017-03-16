@@ -4,6 +4,7 @@
 //Zetaohm_SAM2695 sam2695;
 
 uint32_t tempoX100 = 12000;
+//uint32_t tempoX100 = 99900;
 uint8_t stepMode = 0;
 uint8_t notePage;
 uint8_t	currentMenu = STEP_DISPLAY;       // Display module + LED module
@@ -39,9 +40,9 @@ elapsedMicros debugTimer2;
 uint16_t calibrationBuffer = 0;
 uint16_t  dacCalibration[16];
 uint16_t  cvInputRaw[4];
-int8_t cvInputMapped[4];
-uint8_t			gateInputRaw[4];
-uint8_t gateInputRose[4];
+int8_t cvInputMapped[5];
+uint8_t			gateInputRaw[5];
+uint8_t gateInputRose[5];
 //midi
 elapsedMicros blipTimer;
 elapsedMicros testTimer;

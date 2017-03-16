@@ -19,11 +19,12 @@ typedef	struct StepDatum {
 	uint8_t			velocityType;
 	uint8_t			lfoSpeed;
 	// utility variables - dont need to be saved.
-	uint8_t				noteStatus;		// if note is playing or not
-	uint8_t				arpStatus;		// if note is playing or not. Value indicates arp number.
-	uint8_t				notePlaying;	// stores the note that is played so it can be turned off.
+	uint8_t			noteStatus;		// if note is playing or not
+	uint8_t			arpStatus;		// if note is playing or not. Value indicates arp number.
+	uint8_t			notePlaying;	// stores the note that is played so it can be turned off.
 	int32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
 	int32_t 	framesRemaining;  // number of frames to continue playing.
+	int32_t 	arpLastFrame;  // When to end current arp.
 
 	bool gateTrig(){ //should the gate be turned on this step?
 		switch(gateType){

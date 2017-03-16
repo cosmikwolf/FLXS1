@@ -21,16 +21,16 @@ void LEDArray::initialize(Sequencer *sequenceArray){
       leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
     }
     leds.show();
-    delay(1);
+    delayMicroseconds(100);
   }
   for (int j=255; j > 0 ; j--){
     for (int i=0; i < 16; i++){
       leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
     }
     leds.show();
-    delay(1);
+    delayMicroseconds(100);
   }
-  rainbowCycle(1);
+  rainbowCycle(100);
 /*
 
   for(int m=0; m<10; m++ ) {
@@ -221,7 +221,7 @@ void LEDArray::rainbowCycle(uint8_t wait) {
       leds.setPixelColor(ledChannelButtons[i%4], wheel(((i * 256 / 16) + j) & 255));
     }
     leds.show();
-    delay(wait);
+    delayMicroseconds(wait);
   }
 }
 
