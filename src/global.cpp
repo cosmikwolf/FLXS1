@@ -37,10 +37,18 @@ elapsedMicros internalClockTimer;
 elapsedMicros startTime;
 elapsedMicros debugTimer2;
 
+elapsedMillis modalTimer;
+uint8_t selectedCalibrationChannel = 0;
 uint16_t calibrationBuffer = 0;
-uint16_t  dacCalibration[16];
+uint16_t  dacCalibrationNeg[8] = {65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535};
+uint16_t  dacCalibrationPos[8] = {65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535};
+uint16_t  adcCalibrationPos[4] = {850,850,850,850};
+uint16_t  adcCalibrationNeg[4] = {65300, 65300, 65300, 65300};
+uint16_t  adcCalibrationOffset[4] = {33237,33237,33237,33237};
+
 uint16_t  cvInputRaw[4];
 int8_t cvInputMapped[5];
+int16_t cvInputMapped1024[4];
 uint8_t			gateInputRaw[5];
 uint8_t gateInputRose[5];
 //midi
@@ -123,6 +131,12 @@ uint8_t getNote(uint8_t index){
 	return index + notePage * 16;
 }
 
+int intFloatHundreds(int value){
+	return value/100;
+};
+int intFloatTensOnes(int value){
+	return abs(value - (value/100*100));
+};
 
 
 uint32_t FreeRam2(){ // for Teensy 3.0

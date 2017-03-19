@@ -219,7 +219,7 @@ void FlashMemory::EEPROMWrite16(int address, uint16_t value) {
   EEPROM.update(address + 1, one);
 }
 
-uint16_t FlashMemory::EEPROMReadlong(int address)  {
+uint16_t FlashMemory::EEPROMRead16(int address)  {
   //Read the 2 bytes from the eeprom memory.
   long two = EEPROM.read(address);
   long one = EEPROM.read(address + 1);

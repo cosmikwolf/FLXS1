@@ -64,6 +64,7 @@
 #define GLOBAL_MENU       PATTERN_SELECT + 1
 #define MOD_MENU_1        GLOBAL_MENU + 1
 #define MOD_MENU_2        MOD_MENU_1 + 1
+#define MENU_MODAL        MOD_MENU_2 +1
 
 //PITCH PAGE STEPMODES
 #define STATE_PITCH0       0
@@ -112,10 +113,46 @@
 #define STATE_PITCH1            STATE_GLOBAL +1
 #define STATE_PITCH2            STATE_PITCH1 +1
 #define STATE_PITCH3            STATE_PITCH2 +1
-#define STATE_TUNER             STATE_PITCH3  +1
+#define STATE_TUNER             STATE_PITCH3 +1
 
-
-
+// Calibration Menu
+#define STATE_CALIB_INPUT0_OFFSET      STATE_TUNER  + 1
+#define STATE_CALIB_INPUT0_LOW      STATE_CALIB_INPUT0_OFFSET  + 1
+#define STATE_CALIB_INPUT0_HIGH     STATE_CALIB_INPUT0_LOW  + 1
+#define STATE_CALIB_INPUT1_OFFSET    STATE_CALIB_INPUT0_HIGH  + 1
+#define STATE_CALIB_INPUT1_LOW      STATE_CALIB_INPUT1_OFFSET  + 1
+#define STATE_CALIB_INPUT1_HIGH     STATE_CALIB_INPUT1_LOW  + 1
+#define STATE_CALIB_INPUT2_OFFSET    STATE_CALIB_INPUT1_HIGH  + 1
+#define STATE_CALIB_INPUT2_LOW      STATE_CALIB_INPUT2_OFFSET  + 1
+#define STATE_CALIB_INPUT2_HIGH     STATE_CALIB_INPUT2_LOW  + 1
+#define STATE_CALIB_INPUT3_OFFSET    STATE_CALIB_INPUT2_HIGH  + 1
+#define STATE_CALIB_INPUT3_LOW      STATE_CALIB_INPUT3_OFFSET  + 1
+#define STATE_CALIB_INPUT3_HIGH     STATE_CALIB_INPUT3_LOW  + 1
+#define STATE_CALIB_OUTPUT0_LOW      STATE_CALIB_INPUT3_HIGH  + 1
+#define STATE_CALIB_OUTPUT0_HIGH     STATE_CALIB_OUTPUT0_LOW  + 1
+#define STATE_CALIB_OUTPUT0_TEST      STATE_CALIB_OUTPUT0_HIGH  + 1
+#define STATE_CALIB_OUTPUT1_LOW      STATE_CALIB_OUTPUT0_TEST  + 1
+#define STATE_CALIB_OUTPUT1_HIGH     STATE_CALIB_OUTPUT1_LOW  + 1
+#define STATE_CALIB_OUTPUT1_TEST      STATE_CALIB_OUTPUT1_HIGH  + 1
+#define STATE_CALIB_OUTPUT2_LOW      STATE_CALIB_OUTPUT1_TEST  + 1
+#define STATE_CALIB_OUTPUT2_HIGH     STATE_CALIB_OUTPUT2_LOW  + 1
+#define STATE_CALIB_OUTPUT2_TEST      STATE_CALIB_OUTPUT2_HIGH  + 1
+#define STATE_CALIB_OUTPUT3_LOW      STATE_CALIB_OUTPUT2_TEST  + 1
+#define STATE_CALIB_OUTPUT3_HIGH     STATE_CALIB_OUTPUT3_LOW  + 1
+#define STATE_CALIB_OUTPUT3_TEST      STATE_CALIB_OUTPUT3_HIGH  + 1
+#define STATE_CALIB_OUTPUT4_LOW      STATE_CALIB_OUTPUT3_TEST  + 1
+#define STATE_CALIB_OUTPUT4_HIGH     STATE_CALIB_OUTPUT4_LOW  + 1
+#define STATE_CALIB_OUTPUT4_TEST      STATE_CALIB_OUTPUT4_HIGH  + 1
+#define STATE_CALIB_OUTPUT5_LOW      STATE_CALIB_OUTPUT4_TEST  + 5
+#define STATE_CALIB_OUTPUT5_HIGH     STATE_CALIB_OUTPUT5_LOW  + 5
+#define STATE_CALIB_OUTPUT5_TEST      STATE_CALIB_OUTPUT5_HIGH  + 1
+#define STATE_CALIB_OUTPUT6_LOW      STATE_CALIB_OUTPUT5_TEST  + 1
+#define STATE_CALIB_OUTPUT6_HIGH     STATE_CALIB_OUTPUT6_LOW  + 1
+#define STATE_CALIB_OUTPUT6_TEST      STATE_CALIB_OUTPUT6_HIGH  + 1
+#define STATE_CALIB_OUTPUT7_LOW      STATE_CALIB_OUTPUT6_TEST  + 1
+#define STATE_CALIB_OUTPUT7_HIGH     STATE_CALIB_OUTPUT7_LOW  + 1
+#define STATE_CALIB_OUTPUT7_TEST      STATE_CALIB_OUTPUT7_HIGH  + 1
+#define STATE_CALIBRATION_SAVE_MODAL  STATE_CALIB_OUTPUT7_TEST  + 1
 
 #define MAX_STATE_COUNT 10
 #define PITCH_GATE_MENU_ORDER  0
@@ -197,6 +234,8 @@
 #define SW_PATTERN  25
 #define SW_MENU   26
 #define SW_SHIFT   27
+#define SW_ENCODER_BACKPLANE    22
+
 #define ENCODER1LEFTPIN 16
 //#define ENCODER1LEFTPIN 32
 #define ENCODER1RIGHTPIN 25
@@ -242,7 +281,7 @@ extern float   frequency;
 extern uint8_t selectedChannel;
 extern uint8_t selectedStep;
 extern uint8_t patternChannelSelector;
-
+extern uint8_t selectedCalibrationChannel;
 extern boolean extClock;
 extern uint8_t clockMode;
 extern boolean debugBoolean;
@@ -269,10 +308,17 @@ extern elapsedMicros testTimer;
 extern boolean firstRun;
 extern boolean eraseAllFlag;
 
+extern elapsedMillis modalTimer;
+
 extern uint16_t calibrationBuffer;
-extern uint16_t dacCalibration[16];
+extern uint16_t  dacCalibrationNeg[8];
+extern uint16_t  dacCalibrationPos[8];
+extern uint16_t  adcCalibrationPos[4];
+extern uint16_t  adcCalibrationNeg[4];
+extern uint16_t  adcCalibrationOffset[4];
 extern uint16_t cvInputRaw[4];
 extern int8_t cvInputMapped[5];
+extern int16_t cvInputMapped1024[4];
 extern uint8_t	gateInputRose[5];
 extern uint8_t	gateInputRaw[5];
 
@@ -282,6 +328,10 @@ int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);
 int min_max_cycle(int value, int min, int max);
+
+int intFloatHundreds(int value);
+int intFloatTensOnes(int value);
+
 uint8_t getNote(uint8_t index);
 uint32_t FreeRam2();
 

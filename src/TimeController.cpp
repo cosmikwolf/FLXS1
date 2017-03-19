@@ -74,6 +74,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	saveFile.initializeCache();
 	saveFile.loadPattern(0, 0b1111);
 
+	saveFile.readCalibrationEEPROM();
+
 	buttonIo.changeState(STATE_PITCH0);
 
 
@@ -130,11 +132,7 @@ void TimeController::runLoopHandler() {
 
 	//Serial.println("Display Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 
-	if(currentMenu == CALIBRATION_MENU){
-		playing = 0;
-		outputControl.dacTestLoop();
-		return;
-	}
+
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 }

@@ -8,6 +8,7 @@
 #include "DisplayModule.h"
 #include "Sequencer.h"
 #include "MasterClock.h"
+#include "FlashMemory.h"
 #include "global.h"
 
 #define DOUBLECLICKMS  250
@@ -34,6 +35,8 @@ public:
   //void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
   void channelButtonShiftHandler(uint8_t channel);
+  void channelButtonShiftMenuHandler(uint8_t channel);
+
   void altButtonHandler();
   void stepModeMatrixHandler();
 
@@ -54,6 +57,7 @@ public:
   void timingMenuInputHandler();
   void debugScreenInputHandler();
   void calibrationMenuHandler();
+  void calibrationSaveHandler();
 
   void resetKnobValues();
   void changeState(uint8_t state);

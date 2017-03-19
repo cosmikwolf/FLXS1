@@ -154,7 +154,11 @@ void DisplayModule::displayLoop(uint16_t frequency) {
       break;
 
       case CALIBRATION_MENU:
-        calibrationMenuDisplay();
+        if (stepMode < STATE_CALIB_OUTPUT0_LOW) {
+          inputCalibrationMenuDisplay();
+        } else {
+          outputCalibrationMenuDisplay();
+        }
       break;
 
       case MOD_MENU_1:
@@ -163,6 +167,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
       case MOD_MENU_2:
         modMenu2_DisplayHandler();
+      break;
+
+      case MENU_MODAL:
+        modalPopup();
       break;
 
     }
@@ -669,67 +677,197 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
  }
 
 
+void DisplayModule::modalPopup(){
+  uint8_t previousHighlight = highlight;
+  highlight = currentPattern;
 
-   void DisplayModule::calibrationMenuDisplay(){
+  sprintf(buf, "Calibration Saved!");
+  displayElement[0] = strdup(buf);
+
+  renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR3X, BLACK, WHITE);
+}
+
+ void DisplayModule::inputCalibrationMenuDisplay(){
    uint8_t previousHighlight = highlight;
    highlight = currentPattern;
+   oled.setTextWrap(true);
 
-   displayElement[0] = strdup("Calibration Menu");
+   sprintf(buf, "Input Calibration: SHIFT-CH1 to save");
+   displayElement[0] = strdup(buf);
 
-   sprintf(buf, "D0L: %d", dacCalibration[0]);
+
+   sprintf(buf, "CV IN 1: %d %d.%02dv %d", cvInputMapped[0],    intFloatHundreds(cvInputMapped1024[0]*500/1024),    intFloatTensOnes(cvInputMapped1024[0]*500/1024), cvInputMapped1024[0] );
    displayElement[1] = strdup(buf);
-   sprintf(buf, "D0H: %d", dacCalibration[1]);
+   sprintf(buf, "O:%d", adcCalibrationOffset[0]);
    displayElement[2] = strdup(buf);
-   sprintf(buf, "D1L: %d", dacCalibration[2]);
+   sprintf(buf, "L:%d", adcCalibrationPos[0]);
    displayElement[3] = strdup(buf);
-   sprintf(buf, "D1H: %d", dacCalibration[3]);
+   sprintf(buf, "H:%d", adcCalibrationNeg[0]);
    displayElement[4] = strdup(buf);
-   sprintf(buf, "D2L: %d", dacCalibration[4]);
+
+   sprintf(buf, "CV IN 2: %d %d.%02dv %d", cvInputMapped[1],    intFloatHundreds(cvInputMapped1024[1]*500/1024),    intFloatTensOnes(cvInputMapped1024[1]*500/1024), cvInputMapped1024[1] );
    displayElement[5] = strdup(buf);
-   sprintf(buf, "D2H: %d", dacCalibration[5]);
+   sprintf(buf, "O:%d", adcCalibrationOffset[1]);
    displayElement[6] = strdup(buf);
-   sprintf(buf, "D3L: %d", dacCalibration[6]);
+   sprintf(buf, "L: %d", adcCalibrationPos[1]);
    displayElement[7] = strdup(buf);
-   sprintf(buf, "D3H: %d", dacCalibration[7]);
+   sprintf(buf, "H: %d", adcCalibrationNeg[1]);
    displayElement[8] = strdup(buf);
-   sprintf(buf, "D4L: %d", dacCalibration[8]);
+
+   sprintf(buf, "CV IN 3: %d %d.%02dv %d", cvInputMapped[2],    intFloatHundreds(cvInputMapped1024[2]*500/1024),    intFloatTensOnes(cvInputMapped1024[2]*500/1024), cvInputMapped1024[2] );
    displayElement[9] = strdup(buf);
-   sprintf(buf, "D4H: %d", dacCalibration[9]);
+   sprintf(buf, "O:%d", adcCalibrationOffset[2]);
    displayElement[10] = strdup(buf);
-   sprintf(buf, "D5L: %d", dacCalibration[10]);
+   sprintf(buf, "L: %d", adcCalibrationPos[2]);
    displayElement[11] = strdup(buf);
-   sprintf(buf, "D5H: %d", dacCalibration[11]);
+   sprintf(buf, "H: %d", adcCalibrationNeg[2]);
    displayElement[12] = strdup(buf);
-   sprintf(buf, "D6L: %d", dacCalibration[12]);
+
+   sprintf(buf, "CV IN 4: %d %d.%02dv %d", cvInputMapped[3],    intFloatHundreds(cvInputMapped1024[3]*500/1024),    intFloatTensOnes(cvInputMapped1024[3]*500/1024), cvInputMapped1024[3] );
    displayElement[13] = strdup(buf);
-   sprintf(buf, "D6H: %d", dacCalibration[13]);
+   sprintf(buf, "O:%d", adcCalibrationOffset[3]);
    displayElement[14] = strdup(buf);
-   sprintf(buf, "D7L: %d", dacCalibration[14]);
+   sprintf(buf, "L: %d", adcCalibrationPos[3]);
    displayElement[15] = strdup(buf);
-   sprintf(buf, "D7H: %d", dacCalibration[15]);
+   sprintf(buf, "H: %d", adcCalibrationNeg[3]);
    displayElement[16] = strdup(buf);
-   sprintf(buf, "D8L: %d", dacCalibration[16]);
-   displayElement[17] = strdup(buf);
-   sprintf(buf, "D8H: %d", dacCalibration[17]);
-   displayElement[18] = strdup(buf);
 
-   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 20, false, REGULAR1X, WHITE, BLACK);
 
-   renderStringBox(1, DISPLAY_LABEL,  0, 8,  128 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
 
-   renderStringBox(3, DISPLAY_LABEL,  0, 24, 128 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(4, DISPLAY_LABEL,  0, 32, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(1, DISPLAY_LABEL,              0,  16,128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(2, STATE_CALIB_INPUT0_OFFSET,  0, 24, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(3, STATE_CALIB_INPUT0_LOW,    42, 24, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(4, STATE_CALIB_INPUT0_HIGH,   84, 24, 42 , 8, false, REGULAR1X, BLACK, WHITE);
 
-   renderStringBox(5, DISPLAY_LABEL,  0, 40, 128 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(7, DISPLAY_LABEL,  0, 48, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(5, DISPLAY_LABEL,               0, 32, 128, 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(6, STATE_CALIB_INPUT1_OFFSET,   0, 40, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(7, STATE_CALIB_INPUT1_LOW,     42, 40, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(8, STATE_CALIB_INPUT1_HIGH,    84, 40, 42 , 8, false, REGULAR1X, BLACK, WHITE);
 
-   renderStringBox(8, DISPLAY_LABEL,  0, 56, 128 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(9, DISPLAY_LABEL,   0, 62, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(9, DISPLAY_LABEL,               0, 48, 128, 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(10, STATE_CALIB_INPUT2_OFFSET,  0, 56, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(11, STATE_CALIB_INPUT2_LOW,    42, 56, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(12, STATE_CALIB_INPUT2_HIGH,   84, 56, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(13, DISPLAY_LABEL,              0, 64,  128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(14, STATE_CALIB_INPUT3_OFFSET,  0, 72, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(15, STATE_CALIB_INPUT3_LOW,    42, 72, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(16, STATE_CALIB_INPUT3_HIGH,   84, 72, 42 , 8, false, REGULAR1X, BLACK, WHITE);
+
+  //  renderStringBox(5, DISPLAY_LABEL,  0, 40, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+  //  renderStringBox(7, DISPLAY_LABEL,  0, 48, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+   //
+  //  renderStringBox(8, DISPLAY_LABEL,  0, 56, 128 , 8, false, REGULAR1X, WHITE, BLACK);
+  //  renderStringBox(9, DISPLAY_LABEL,   0, 62, 128 , 8, false, REGULAR1X, WHITE, BLACK);
 
  }
 
+ void DisplayModule::outputCalibrationMenuDisplay(){
+   oled.setTextWrap(true);
+   sprintf(buf, "Ouput Calibration:\rSHIFT-CH1 to save");
+   displayElement[0] = strdup(buf);
 
+
+   sprintf(buf, "CH1 -10v:%d", dacCalibrationNeg[0]);
+   displayElement[1] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[0]);
+   displayElement[2] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[3] = strdup(buf);
+
+   sprintf(buf, "CH2 -10v:%d", dacCalibrationNeg[1]);
+   displayElement[4] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[1]);
+   displayElement[5] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[6] = strdup(buf);
+
+   sprintf(buf, "CH3 -10v:%d", dacCalibrationNeg[2]);
+   displayElement[7] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[2]);
+   displayElement[8] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[9] = strdup(buf);
+
+   sprintf(buf, "CH4 -10v:%d", dacCalibrationNeg[3]);
+   displayElement[10] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[3]);
+   displayElement[11] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[12] = strdup(buf);
+
+   sprintf(buf, "CH5 -10v:%d", dacCalibrationNeg[4]);
+   displayElement[13] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[4]);
+   displayElement[14] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[15] = strdup(buf);
+
+   sprintf(buf, "CH6 -10v:%d", dacCalibrationNeg[5]);
+   displayElement[16] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[5]);
+   displayElement[17] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[18] = strdup(buf);
+
+   sprintf(buf, "CH7 -10v:%d", dacCalibrationNeg[6]);
+   displayElement[19] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[6]);
+   displayElement[20] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[21] = strdup(buf);
+
+   sprintf(buf, "CH8 -10v:%d", dacCalibrationNeg[7]);
+   displayElement[22] = strdup(buf);
+   sprintf(buf, "+10v:%d", dacCalibrationPos[7]);
+   displayElement[23] = strdup(buf);
+   sprintf(buf, "test");
+   displayElement[24] = strdup(buf);
+
+   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(1, STATE_CALIB_OUTPUT0_LOW,      0, 16, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(2, STATE_CALIB_OUTPUT0_HIGH,    63, 16, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(3, STATE_CALIB_OUTPUT0_TEST,    108, 16, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(4, STATE_CALIB_OUTPUT1_LOW,      0, 24, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(5, STATE_CALIB_OUTPUT1_HIGH,    63, 24, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(6, STATE_CALIB_OUTPUT1_TEST,    108, 24, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(7, STATE_CALIB_OUTPUT2_LOW,      0, 32, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(8, STATE_CALIB_OUTPUT2_HIGH,    63, 32, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(9, STATE_CALIB_OUTPUT2_TEST,    108, 32, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(10, STATE_CALIB_OUTPUT3_LOW,      0, 40, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(11, STATE_CALIB_OUTPUT3_HIGH,    63, 40, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(12, STATE_CALIB_OUTPUT3_TEST,    108, 40, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(13, STATE_CALIB_OUTPUT4_LOW,      0, 48, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(14, STATE_CALIB_OUTPUT4_HIGH,    63, 48, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(15, STATE_CALIB_OUTPUT4_TEST,    108, 48, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(16, STATE_CALIB_OUTPUT5_LOW,      0, 56, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(17, STATE_CALIB_OUTPUT5_HIGH,    63, 56, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(18, STATE_CALIB_OUTPUT5_TEST,    108, 56, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(19, STATE_CALIB_OUTPUT6_LOW,      0, 64, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(20, STATE_CALIB_OUTPUT6_HIGH,    63, 64, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(21, STATE_CALIB_OUTPUT6_TEST,    108, 64, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+   renderStringBox(22, STATE_CALIB_OUTPUT7_LOW,      0, 72, 64 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(23, STATE_CALIB_OUTPUT7_HIGH,    63, 72, 45 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(24, STATE_CALIB_OUTPUT7_TEST,    108, 72, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+
+  //  STATE_CALIB_OUTPUT0_LOW
+  //  STATE_CALIB_OUTPUT0_HIGH
+  //  STATE_CALIB_OUTPUT1_LOW
+  //  STATE_CALIB_OUTPUT1_HIGH
+  //  STATE_CALIB_OUTPUT2_LOW
+  //  STATE_CALIB_OUTPUT2_HIGH
+  //  STATE_CALIB_OUTPUT3_LOW
+  //  STATE_CALIB_OUTPUT3_HIGH
+ }
 
 
  void DisplayModule::inputDebugMenuDisplay(){

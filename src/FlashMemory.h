@@ -50,12 +50,15 @@ public:
   void fileSizeTest();
   void deleteTest();
 
+  void saveCalibrationEEPROM();
+  void readCalibrationEEPROM();
+
   void setCacheStatus(uint8_t index, uint8_t status);
   int  getCacheStatus(uint8_t index);
   int  getCacheIndex(uint8_t channel,uint8_t pattern);
 
   int  checkCacheStatus(uint8_t address);
-  uint16_t EEPROMReadlong(int address);
+  uint16_t EEPROMRead16(int address);
   void EEPROMWrite16(int address, uint16_t value);
   void wipeEEPROM();
 

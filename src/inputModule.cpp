@@ -153,6 +153,12 @@ void InputModule::loop(uint16_t frequency){
         modMenu2_InputHandler();
       break;
 
+      case MENU_MODAL:
+        if (modalTimer > 1000){
+          changeState(STATE_PITCH0);
+        }
+      break;
+
     }
   }
 
@@ -217,6 +223,31 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_GLOBAL:
       currentMenu = GLOBAL_MENU;
       break;
+    case STATE_CALIB_INPUT0_OFFSET:
+    case STATE_CALIB_INPUT0_LOW:
+    case STATE_CALIB_INPUT0_HIGH:
+    case STATE_CALIB_INPUT1_OFFSET:
+    case STATE_CALIB_INPUT1_LOW:
+    case STATE_CALIB_INPUT1_HIGH:
+    case STATE_CALIB_INPUT2_OFFSET:
+    case STATE_CALIB_INPUT2_LOW:
+    case STATE_CALIB_INPUT2_HIGH:
+    case STATE_CALIB_INPUT3_OFFSET:
+    case STATE_CALIB_INPUT3_LOW:
+    case STATE_CALIB_INPUT3_HIGH:
+    case STATE_CALIB_OUTPUT0_LOW:
+    case STATE_CALIB_OUTPUT0_HIGH:
+    case STATE_CALIB_OUTPUT1_LOW:
+    case STATE_CALIB_OUTPUT1_HIGH:
+    case STATE_CALIB_OUTPUT2_LOW:
+    case STATE_CALIB_OUTPUT2_HIGH:
+    case STATE_CALIB_OUTPUT3_LOW:
+    case STATE_CALIB_OUTPUT3_HIGH:
+      currentMenu = CALIBRATION_MENU;
+      break;
+    case STATE_CALIBRATION_SAVE_MODAL:
+      currentMenu = MENU_MODAL;
+      break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;
@@ -244,7 +275,7 @@ void InputModule::patternSelectHandler(){
 void InputModule::tempoMenuHandler(){
 
   if(knobChange){
-    if(backplaneGPIO->pressed(22)){
+    if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
       changeState(min_max_cycle(stepMode+knobChange, STATE_TEMPO , STATE_YAXISINPUT ));
     } else {
       switch (stepMode){
@@ -404,10 +435,12 @@ void InputModule::inputMenuHandler(){
 
 void InputModule::globalMenuHandler(){
   if (midplaneGPIO->fell(0)){
+    Serial.println("Initializing sequence");
     sequenceArray[selectedChannel].initNewSequence(currentPattern, selectedChannel);
       changeState(STATE_PITCH0);
 
   } else if (midplaneGPIO->fell(4)){
+    Serial.println("Initializing pattern");
     for (int i=0; i < SEQUENCECOUNT; i++){
       sequenceArray[i].initNewSequence(currentPattern, i);
     }
@@ -448,17 +481,6 @@ void InputModule::globalMenuHandler(){
     saveFile->listFiles();
     changeState(STATE_PITCH0);
 
-  } else if (midplaneGPIO->fell(12)){
-  /*  if (sequenceArray[selectedChannel].instType == 0){
-      sequenceArray[selectedChannel].setInstType(1);
-      //sequenceArray[selectedChannel].stepCount = 16;
-      //sequenceArray[selectedChannel].beatCount = 16;
-      life.genGrid(micros());
-    } else {
-      sequenceArray[selectedChannel].setInstType(0);
-    }
-    */
-    changeState(STATE_PITCH0);
   }
 }
 
@@ -476,6 +498,12 @@ void InputModule::channelButtonShiftHandler(uint8_t channel){
   changeState(STATE_TUNER);
 };
 
+void InputModule::channelButtonShiftMenuHandler(uint8_t channel){
+  selectedCalibrationChannel = channel;
+  changeState(STATE_CALIB_INPUT0_OFFSET);
+  Serial.println("CALIB MENU " + String(channel) + "\t" + String(CALIBRATION_MENU));
+}
+
 void InputModule::channelButtonHandler(uint8_t channel){
   uint8_t previous = patternChannelSelector;
 
@@ -486,7 +514,7 @@ void InputModule::channelButtonHandler(uint8_t channel){
       return;
     }
   }
-  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));    
+  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));
 
 }
 
@@ -499,7 +527,14 @@ void InputModule::altButtonHandler(){
         // left row bottom up
         case SW_M0:
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(0);
+            if(currentMenu == CALIBRATION_MENU){
+              calibrationSaveHandler();
+            }
+            if(midplaneGPIO->pressed(SW_MENU)){
+              channelButtonShiftMenuHandler(0);
+            } else {
+              channelButtonShiftHandler(0);
+            }
           } else {
             channelButtonHandler(0);
           }
@@ -507,26 +542,37 @@ void InputModule::altButtonHandler(){
 
         case SW_M1:
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(1);
+            if(midplaneGPIO->pressed(SW_MENU)){
+              channelButtonShiftMenuHandler(1);
+            } else {
+              channelButtonShiftHandler(1);
+            }
           } else {
             channelButtonHandler(1);
           }
         break;
 
         case SW_M2:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(2);
+        if (midplaneGPIO->pressed(SW_SHIFT)){
+          if(midplaneGPIO->pressed(SW_MENU)){
+            channelButtonShiftMenuHandler(2);
           } else {
-            channelButtonHandler(2);
+            channelButtonShiftHandler(2);
           }
-        break;
+        } else {
+          channelButtonHandler(2);
+        }        break;
 
         case SW_M3:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            channelButtonShiftHandler(3);
+        if (midplaneGPIO->pressed(SW_SHIFT)){
+          if(midplaneGPIO->pressed(SW_MENU)){
+            channelButtonShiftMenuHandler(3);
           } else {
-            channelButtonHandler(3);
+            channelButtonShiftHandler(3);
           }
+        } else {
+          channelButtonHandler(3);
+        }
         break;
 
         case SW_PATTERN:
@@ -779,7 +825,11 @@ void InputModule::resetKnobValues(){
 	//Serial.println("resetting knob: " + String(knob.read()));
 };
 
-
+void InputModule::calibrationSaveHandler(){
+  modalTimer = 0;
+  saveFile->saveCalibrationEEPROM();
+  changeState(STATE_CALIBRATION_SAVE_MODAL);
+}
 
 void InputModule::calibrationMenuHandler(){
   uint8_t multiplier = 100;
@@ -787,9 +837,98 @@ void InputModule::calibrationMenuHandler(){
   if (midplaneGPIO->pressed(SW_REC)){
     multiplier = 10;
   }
-  if (knobChange){
-    calibrationBuffer += knobChange * multiplier;
-    outputControl->calibrationRoutine();
+  if(knobChange){
+    if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
+      changeState(min_max_cycle(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_CALIB_OUTPUT7_TEST ));
+    } else {
+      switch (stepMode){
+        case STATE_CALIB_INPUT0_LOW:
+          adcCalibrationPos[0] += knobChange;
+        break;
+        case STATE_CALIB_INPUT0_HIGH:
+          adcCalibrationNeg[0] += knobChange;
+        break;
+
+        case STATE_CALIB_INPUT0_OFFSET:
+          adcCalibrationOffset[0] += knobChange;
+        break;
+        case STATE_CALIB_INPUT1_OFFSET:
+          adcCalibrationOffset[1] += knobChange;
+        break;
+        case STATE_CALIB_INPUT2_OFFSET:
+          adcCalibrationOffset[2] += knobChange;
+        break;
+        case STATE_CALIB_INPUT3_OFFSET:
+          adcCalibrationOffset[3] += knobChange;
+        break;
+        case STATE_CALIB_INPUT1_LOW:
+          adcCalibrationPos[1] += knobChange;
+        break;
+        case STATE_CALIB_INPUT1_HIGH:
+          adcCalibrationNeg[1] += knobChange;
+        break;
+        case STATE_CALIB_INPUT2_LOW:
+          adcCalibrationPos[2] += knobChange;
+        break;
+        case STATE_CALIB_INPUT2_HIGH:
+          adcCalibrationNeg[2] += knobChange;
+        break;
+        case STATE_CALIB_INPUT3_LOW:
+          adcCalibrationPos[3] += knobChange;
+        break;
+        case STATE_CALIB_INPUT3_HIGH:
+          adcCalibrationNeg[3] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT0_LOW:
+          dacCalibrationNeg[0] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT0_HIGH:
+          dacCalibrationPos[0] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT1_LOW:
+          dacCalibrationNeg[1] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT1_HIGH:
+          dacCalibrationPos[1] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT2_LOW:
+          dacCalibrationNeg[2] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT2_HIGH:
+          dacCalibrationPos[2] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT3_LOW:
+          dacCalibrationNeg[3] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT3_HIGH:
+          dacCalibrationPos[3] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT4_LOW:
+          dacCalibrationNeg[4] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT4_HIGH:
+          dacCalibrationPos[4] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT5_LOW:
+          dacCalibrationNeg[5] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT5_HIGH:
+          dacCalibrationPos[5] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT6_LOW:
+          dacCalibrationNeg[6] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT6_HIGH:
+          dacCalibrationPos[6] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT7_LOW:
+          dacCalibrationNeg[7] += knobChange;
+        break;
+        case STATE_CALIB_OUTPUT7_HIGH:
+          dacCalibrationPos[7] += knobChange;
+        break;
+      }
+    }
   }
 
 }

@@ -93,6 +93,12 @@ void MasterClock::sequencerFunc(void){
 
 	outputControl->inputRead();
 
+	if(currentMenu == CALIBRATION_MENU){
+		playing = 0;
+		outputControl->dacTestLoop();
+		return;
+	}
+	
 	for(int i=0; i < 4; i++){
 		for(int n=0; n<4; n++){
 			if (gateInputRose[i] == true){

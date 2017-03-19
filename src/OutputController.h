@@ -64,8 +64,8 @@ private:
   uint8_t gateMap[4]  = {0,1,2,3};
   uint8_t dacCvMap[4] = {7,0,5,3};
   uint8_t dacCcMap[4] = {1,6,2,4};
-  uint16_t adcCalibrationHigh[4] = {65300,65350,65350, 65380 };
-  uint16_t adcCalibrationLow[4] = {530,750, 750, 560};
+  //uint16_t adcCalibrationNeg[4] = {65300,65350,65350, 65380 };
+  //uint16_t adcCalibrationPos[4] = {530,750, 750, 560};
   //uint8_t gateMap[4]  = {4,6,5,7};
   //uint8_t dacCvMap[4] = {2,3,4,5};
   //uint8_t dacCcMap[4] = {1,0,7,6};

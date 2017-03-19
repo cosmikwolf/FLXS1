@@ -20,7 +20,6 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   this->spiFlash = spiFlash;
   this->adc = adc;
 
-//  wipeEEPROM();
   if(!spiFlash->begin(WINBOND_CS_PIN)){
     Serial.println("SPI FLASH CHIP INITIALIZATION FAILED!");
   }
@@ -41,6 +40,76 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
 // COPYING CACHESECTOR TO SAVESECTOR
 // ERASING CACHESECTOR
 //
+void FlashMemory::saveCalibrationEEPROM(){
+  uint16_t address = 0;
+  //setting calibration written flag.
+  EEPROMWrite16(address, 0x0000);
+  address += 2;
+
+  for (int i = 0; i<4; i++){
+    EEPROMWrite16(address, adcCalibrationPos[i]);
+    address += 2;
+  }
+  for (int i = 0; i<4; i++){
+    EEPROMWrite16(address, adcCalibrationNeg[i]);
+    address += 2;
+  }
+  for (int i = 0; i<4; i++){
+    EEPROMWrite16(address, adcCalibrationOffset[i]);
+    address += 2;
+  }
+  for (int i = 0; i<8; i++){
+    EEPROMWrite16(address, dacCalibrationNeg[i]);
+    address += 2;
+  }
+  for (int i = 0; i<8; i++){
+    EEPROMWrite16(address, dacCalibrationPos[i]);
+    address += 2;
+  }
+  Serial.println(" -- CALIBRATION EEPROM WRITE COMPLETE -- ");
+
+};
+
+void FlashMemory::readCalibrationEEPROM(){
+  uint16_t address = 0;
+  uint16_t checkVal;
+
+  if(EEPROMRead16(address) == 0xFFFF){
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    return;
+  }
+  address += 2;
+
+
+  for (int i = 0; i<4; i++){
+    adcCalibrationPos[i] = EEPROMRead16(address);
+    address += 2;
+  }
+  for (int i = 0; i<4; i++){
+    adcCalibrationNeg[i] = EEPROMRead16(address);
+    address += 2;
+  }
+  for (int i = 0; i<4; i++){
+    adcCalibrationOffset[i] = EEPROMRead16(address);
+    address += 2;
+  }
+  for (int i = 0; i<8; i++){
+    dacCalibrationNeg[i] = EEPROMRead16(address);
+    address += 2;
+  }
+  for (int i = 0; i<8; i++){
+    dacCalibrationPos[i] = EEPROMRead16(address);
+    address += 2;
+  }
+
+
+
+};
 
 uint8_t FlashMemory::getSaveSector(uint8_t channel, uint8_t pattern){
   return (pattern * 4 + channel) * SECTORSIZE;

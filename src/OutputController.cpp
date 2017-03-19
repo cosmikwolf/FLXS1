@@ -151,6 +151,7 @@ for (int i=0; i<4; i++){
 
 void OutputController::dacTestLoop(){
   int voltage; // = 65535*(sin(millis()/10.0)+1)/2;
+  int32_t sinVal = sin(millis()/10)*16384;
 
   if (sin(millis()) > 0 ){
     voltage = 65535;
@@ -158,15 +159,114 @@ void OutputController::dacTestLoop(){
     voltage = 0;
   }
 
-  Serial.println("setting voltage all dacs to: " + String(voltage) + " -- starttime:" + String(startTime));
+  switch (stepMode){
+
+    case STATE_CALIB_OUTPUT0_LOW:
+      ad5676.setVoltage(0, dacCalibrationNeg[0] );
+      ad5676.setVoltage(0, dacCalibrationNeg[0] );
+    break;
+    case STATE_CALIB_OUTPUT0_HIGH:
+      ad5676.setVoltage(0, dacCalibrationPos[0] );
+      ad5676.setVoltage(0, dacCalibrationPos[0] );
+    break;
+    case STATE_CALIB_OUTPUT0_TEST:
+      ad5676.setVoltage(0, map(sinVal, -16384, 16384, dacCalibrationNeg[0], dacCalibrationPos[0] ) );
+      ad5676.setVoltage(0, map(sinVal, -16384, 16384, dacCalibrationNeg[0], dacCalibrationPos[0] ) );
+    break;
+    case STATE_CALIB_OUTPUT1_LOW:
+      ad5676.setVoltage(1, dacCalibrationNeg[1] );
+      ad5676.setVoltage(1, dacCalibrationNeg[1] );
+    break;
+    case STATE_CALIB_OUTPUT1_HIGH:
+      ad5676.setVoltage(1, dacCalibrationPos[1] );
+      ad5676.setVoltage(1, dacCalibrationPos[1] );
+    break;
+    case STATE_CALIB_OUTPUT1_TEST:
+      ad5676.setVoltage(1, map(sinVal, -16384, 16384, dacCalibrationNeg[1], dacCalibrationPos[1] ) );
+      ad5676.setVoltage(1, map(sinVal, -16384, 16384, dacCalibrationNeg[1], dacCalibrationPos[1] ) );
+    break;
+    case STATE_CALIB_OUTPUT2_LOW:
+      ad5676.setVoltage(2, dacCalibrationNeg[2] );
+      ad5676.setVoltage(2, dacCalibrationNeg[2] );
+    break;
+    case STATE_CALIB_OUTPUT2_HIGH:
+      ad5676.setVoltage(2, dacCalibrationPos[2] );
+      ad5676.setVoltage(2, dacCalibrationPos[2] );
+    break;
+    case STATE_CALIB_OUTPUT2_TEST:
+      ad5676.setVoltage(2, map(sinVal, -16384, 16384, dacCalibrationNeg[2], dacCalibrationPos[2] ) );
+      ad5676.setVoltage(2, map(sinVal, -16384, 16384, dacCalibrationNeg[2], dacCalibrationPos[2] ) );
+    break;
+    case STATE_CALIB_OUTPUT3_LOW:
+      ad5676.setVoltage(3, dacCalibrationNeg[3] );
+      ad5676.setVoltage(3, dacCalibrationNeg[3] );
+    break;
+    case STATE_CALIB_OUTPUT3_HIGH:
+      ad5676.setVoltage(3, dacCalibrationPos[3] );
+      ad5676.setVoltage(3, dacCalibrationPos[3] );
+    break;
+    case STATE_CALIB_OUTPUT3_TEST:
+      ad5676.setVoltage(3, map(sinVal, -16384, 16384, dacCalibrationNeg[3], dacCalibrationPos[3] ) );
+      ad5676.setVoltage(3, map(sinVal, -16384, 16384, dacCalibrationNeg[3], dacCalibrationPos[3] ) );
+    break;
+    case STATE_CALIB_OUTPUT4_LOW:
+      ad5676.setVoltage(4, dacCalibrationNeg[4] );
+      ad5676.setVoltage(4, dacCalibrationNeg[4] );
+    break;
+    case STATE_CALIB_OUTPUT4_HIGH:
+      ad5676.setVoltage(4, dacCalibrationPos[4] );
+      ad5676.setVoltage(4, dacCalibrationPos[4] );
+    break;
+    case STATE_CALIB_OUTPUT4_TEST:
+      ad5676.setVoltage(4, map(sinVal, -16384, 16384, dacCalibrationNeg[4], dacCalibrationPos[4] ) );
+      ad5676.setVoltage(4, map(sinVal, -16384, 16384, dacCalibrationNeg[4], dacCalibrationPos[4] ) );
+    break;
+    case STATE_CALIB_OUTPUT5_LOW:
+      ad5676.setVoltage(5, dacCalibrationNeg[5] );
+      ad5676.setVoltage(5, dacCalibrationNeg[5] );
+    break;
+    case STATE_CALIB_OUTPUT5_HIGH:
+      ad5676.setVoltage(5, dacCalibrationPos[5] );
+      ad5676.setVoltage(5, dacCalibrationPos[5] );
+    break;
+    case STATE_CALIB_OUTPUT5_TEST:
+      ad5676.setVoltage(5, map(sinVal, -16384, 16384, dacCalibrationNeg[5], dacCalibrationPos[5] ) );
+      ad5676.setVoltage(5, map(sinVal, -16384, 16384, dacCalibrationNeg[5], dacCalibrationPos[5] ) );
+    break;
+    case STATE_CALIB_OUTPUT6_LOW:
+      ad5676.setVoltage(6, dacCalibrationNeg[6] );
+      ad5676.setVoltage(6, dacCalibrationNeg[6] );
+    break;
+    case STATE_CALIB_OUTPUT6_HIGH:
+      ad5676.setVoltage(6, dacCalibrationPos[6] );
+      ad5676.setVoltage(6, dacCalibrationPos[6] );
+    break;
+    case STATE_CALIB_OUTPUT6_TEST:
+      ad5676.setVoltage(6, map(sinVal, -16384, 16384, dacCalibrationNeg[6], dacCalibrationPos[6] ) );
+      ad5676.setVoltage(6, map(sinVal, -16384, 16384, dacCalibrationNeg[6], dacCalibrationPos[6] ) );
+    break;
+    case STATE_CALIB_OUTPUT7_LOW:
+      ad5676.setVoltage(7, dacCalibrationNeg[7] );
+      ad5676.setVoltage(7, dacCalibrationNeg[7] );
+    break;
+    case STATE_CALIB_OUTPUT7_HIGH:
+      ad5676.setVoltage(7, dacCalibrationPos[7] );
+      ad5676.setVoltage(7, dacCalibrationPos[7] );
+    break;
+    case STATE_CALIB_OUTPUT7_TEST:
+      ad5676.setVoltage(7, map(sinVal, -16384, 16384, dacCalibrationNeg[7], dacCalibrationPos[7] ) );
+      ad5676.setVoltage(7, map(sinVal, -16384, 16384, dacCalibrationNeg[7], dacCalibrationPos[7] ) );
+    break;
+  }
+  //Serial.println("setting voltage all dacs to: " + String(voltage) + " -- starttime:" + String(startTime));
 
   for (int i=0; i<8; i++){
 
-    ad5676.setVoltage(i, voltage );
-    delayMicroseconds(1);
+//    ad5676.setVoltage(i, voltage );
+//    delayMicroseconds(1);
 
-    ad5676.setVoltage(i, voltage );
-    delayMicroseconds(1);
+//    ad5676.setVoltage(i, voltage );
+//    delayMicroseconds(1);
     //ad5676.setVoltage(i, 65535sin(millis()/2) );
   }
 }
@@ -197,7 +297,15 @@ void OutputController::inputRead(){
   cvInputRaw[2] = adc->analogRead(A13, ADC_1);
   cvInputRaw[3] = adc->analogRead(A10, ADC_1);
   for(int ch=0; ch < SEQUENCECOUNT; ch++){
-    cvInputMapped[ch] = map(cvInputRaw[ch], adcCalibrationHigh[ch], adcCalibrationLow[ch], -60, 60) +1;
+    //cvInputMapped[ch] = map(cvInputRaw[ch], adcCalibrationNeg[ch], adcCalibrationPos[ch], -60, 60) +1;
+
+    if (cvInputRaw[ch] < adcCalibrationOffset[ch] ){
+      cvInputMapped1024[ch] = map( cvInputRaw[ch], adcCalibrationPos[ch], adcCalibrationOffset[ch], 1024, 0);
+    }else {
+      cvInputMapped1024[ch] = map( cvInputRaw[ch], adcCalibrationOffset[ch], adcCalibrationNeg[ch] , 0, -1024);
+    }
+    cvInputMapped[ch] = map( cvInputMapped1024[ch], -1024, 1024, -64, 64) ;
+
   }
   gateInputRaw[0]  = !backplaneGPIO->pressed(4);
   gateInputRaw[1]  = !backplaneGPIO->pressed(5);

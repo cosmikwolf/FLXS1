@@ -107,6 +107,8 @@ class DisplayModule
     void channelTunerDisplay(char *buf);
     void channelInputDisplay(char *buf);
 
+    void modalPopup();
+
     void sequenceMenuDisplay();
     void inputMenuDisplay();
     void globalMenuDisplay();
@@ -118,7 +120,8 @@ class DisplayModule
     void deleteMenuDisplay();
     void cleanupTextBuffers();
     void timingMenuDisplay();
-    void calibrationMenuDisplay();
+    void inputCalibrationMenuDisplay();
+    void outputCalibrationMenuDisplay();
     void inputDebugMenuDisplay();
     uint16_t foreground, background;
 
