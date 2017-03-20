@@ -273,7 +273,12 @@ void InputModule::patternSelectHandler(){
 }
 
 void InputModule::tempoMenuHandler(){
-
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+      changeState(STATE_PITCH0);
+      selectedStep = getNote(i);
+    }
+  }
   if(knobChange){
     if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
       changeState(min_max_cycle(stepMode+knobChange, STATE_TEMPO , STATE_YAXISINPUT ));
@@ -309,7 +314,12 @@ void InputModule::tempoMenuHandler(){
 }
 
 void InputModule::modMenu1_InputHandler(){
-
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+      changeState(STATE_PITCH0);
+      selectedStep = getNote(i);
+    }
+  }
   if(knobChange){
     if(backplaneGPIO->pressed(22)){
   //    changeState(min_max_cycle(stepMode+knobChange, STATE_GATEMOD , STATE_GLIDEMOD ));
@@ -342,7 +352,12 @@ void InputModule::modMenu1_InputHandler(){
 }
 
 void InputModule::modMenu2_InputHandler(){
-
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+      changeState(STATE_PITCH0);
+      selectedStep = getNote(i);
+    }
+  }
   if(knobChange){
     if(backplaneGPIO->pressed(22)){
     //  changeState(min_max_cycle(stepMode+knobChange, STATE_ARPTYPE , STATE_ARPINTMOD ));
@@ -375,6 +390,12 @@ void InputModule::sequenceMenuHandler(){
   int8_t newBeatDiv;
   if (midplaneGPIO->fell(SW_MENU)){
     changeState(STATE_PITCH0);
+  }
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+      changeState(STATE_PITCH0);
+      selectedStep = getNote(i);
+    }
   }
   if(knobChange){
     if ( backplaneGPIO->pressed(22) ) {// Encoder Switch
@@ -697,7 +718,7 @@ void InputModule::altButtonHandler(){
             // and finally set the new step value!
             // monophonic so pitch[0] only
             sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max_cycle(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,120), 0);
-        
+
           break;
 
           case STATE_PITCH1:

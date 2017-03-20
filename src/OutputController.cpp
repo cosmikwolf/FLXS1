@@ -382,6 +382,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
     //  Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
   } else {
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
+
     if(velocityType == 1){
         Serial.println("velocitytype == 1 on channel " + String(channel));
       if (outputMap(channel, RHEOCHANNELCC) == 0){
@@ -390,15 +391,19 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
         mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
       }
 
-      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
-      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+    //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+    //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
       lfoRheoSet[channel] = 1;
+      lfoType[channel] = velocityType;
+      lfoAmplitude[channel] = velocity;
+
     } else if (velocityType > 1){
       Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
       lfoAmplitude[channel] = velocity;
       lfoSpeed[channel] = lfoSpeedSetting;
-      lfoType[channel] = velocityType;
       lfoRheoSet[channel] = 1;
+      lfoType[channel] = velocityType;
+
     }
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
@@ -431,7 +436,7 @@ uint16_t OutputController::calibMidscale(uint8_t mapAddress){
 };
 
 uint16_t OutputController::calibLow(uint8_t mapAddress, uint8_t range){
-
+//  dacCalibrationNeg[mapAddress]+dacCalibrationPos[mapAddress]
 }
 
 uint16_t OutputController::calibHigh(uint8_t mapAddress, uint8_t range){
@@ -449,6 +454,7 @@ void OutputController::lfoUpdate(uint8_t channel){
 
   switch(lfoType[channel]){
     case 1:
+      rheoStatLevel = 0;
       voltageLevel = lfoAmplitude[channel]*128;
     break;
 
