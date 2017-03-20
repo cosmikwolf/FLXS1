@@ -102,7 +102,6 @@ void setup() {
   //CacheTimer.begin(cacheLoop,kCacheClockInterval);
   //CacheTimer.priority(2);
 
-  Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
   pinMode(31, OUTPUT); // debug pin - EXT_TX - exp pin 5
   pinMode(3, OUTPUT);
@@ -153,13 +152,13 @@ void setup() {
 //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
-  delay(100);
+  Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
-  Serial.println("TEST EQUATIONS");
+//  Serial.println("TEST EQUATIONS");
 
-  for (int x=0; x < 16; x++){
-    Serial.println("X: " + String(x) + "\t x * 24 mod 5: " + String((x*24)%(5)));
-  }
+//  for (int x=0; x < 16; x++){
+//    Serial.println("X: " + String(x) + "\t x * 24 mod 5: " + String((x*24)%(5)));
+//  }
 
 }
 

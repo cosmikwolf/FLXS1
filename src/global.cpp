@@ -37,14 +37,16 @@ elapsedMicros internalClockTimer;
 elapsedMicros startTime;
 elapsedMicros debugTimer2;
 
+uint32_t lfoClockCounter;
 elapsedMillis modalTimer;
 uint8_t selectedCalibrationChannel = 0;
 uint16_t calibrationBuffer = 0;
-uint16_t  dacCalibrationNeg[8] = {65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535};
-uint16_t  dacCalibrationPos[8] = {65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535};
+uint16_t  dacCalibrationNeg[8] = {1650, 1650, 1650, 1650, 1650, 1650, 1650, 1650};
+uint16_t  dacCalibrationPos[8] = {64350, 64350, 64350, 64350, 64350, 64350, 64350, 64350};
 uint16_t  adcCalibrationPos[4] = {850,850,850,850};
 uint16_t  adcCalibrationNeg[4] = {65300, 65300, 65300, 65300};
 uint16_t  adcCalibrationOffset[4] = {33237,33237,33237,33237};
+uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
 uint16_t  cvInputRaw[4];
 int8_t cvInputMapped[5];

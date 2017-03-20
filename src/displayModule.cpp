@@ -254,7 +254,7 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
 void DisplayModule::stateDisplay_pitch(char*buf){
 
-  sprintf(buf, "CV%d PITCH", selectedChannel+1);
+  sprintf(buf, "CV%d PITCH PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1);
 
   displayElement[0] = strdup(buf);
 
@@ -492,8 +492,9 @@ void DisplayModule::inputMenuDisplay(){
 
 
    }
+   renderStringBox(0,  DISPLAY_LABEL, 0, 0 , 128, 15, false, STYLE1X, background , foreground);
 
-   renderStringBox(1,  STATE_TEMPO, 0, 15 , 128, 29, false, BOLD4X, background , foreground);
+   renderStringBox(1,  STATE_TEMPO, 0, 16 , 128, 29, false, BOLD4X, background , foreground);
 
    renderStringBox(3,  STATE_EXTCLOCK, 0,  45,128,17, false, STYLE1X, background , foreground);
    ///renderStringBox(3,  STATE_EXTCLOCK,60, 45,68,17, false, STYLE1X, background , foreground);
@@ -635,24 +636,27 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
    uint8_t previousHighlight = highlight;
    highlight = currentPattern;
 
-   displayElement[0] = strdup("0");
-   displayElement[1] = strdup("1");
-   displayElement[2] = strdup("2");
-   displayElement[3] = strdup("3");
-   displayElement[4] = strdup("4");
-   displayElement[5] = strdup("5");
-   displayElement[6] = strdup("6");
-   displayElement[7] = strdup("7");
-   displayElement[8] = strdup("8");
-   displayElement[9] = strdup("9");
-   displayElement[10] = strdup("10");
-   displayElement[11] = strdup("11");
-   displayElement[12] = strdup("12");
-   displayElement[13] = strdup("13");
-   displayElement[14] = strdup("14");
-   displayElement[15] = strdup("15");
+   displayElement[0] = strdup("01");
+   displayElement[1] = strdup("02");
+   displayElement[2] = strdup("03");
+   displayElement[3] = strdup("04");
+   displayElement[4] = strdup("05");
+   displayElement[5] = strdup("06");
+   displayElement[6] = strdup("07");
+   displayElement[7] = strdup("08");
+   displayElement[8] = strdup("09");
+   displayElement[9] = strdup("10");
+   displayElement[10] = strdup("11");
+   displayElement[11] = strdup("12");
+   displayElement[12] = strdup("13");
+   displayElement[13] = strdup("14");
+   displayElement[14] = strdup("15");
+   displayElement[15] = strdup("16");
 
    displayElement[16] = strdup("PATTERN SELECT");
+   sprintf(buf, "Current: %02d", currentPattern );
+   sprintf(buf, "CH1:%02d CH2:%02d CH3:%02d CH4:%02d ", sequenceArray[0].pattern+1,sequenceArray[1].pattern+1, sequenceArray[2].pattern+1, sequenceArray[3].pattern+1 );
+   displayElement[17] = strdup(buf);
 
    renderStringBox( 0, DISPLAY_LABEL,  0, 30, 32 , 16, false, STYLE1X, BLACK, RED);
    renderStringBox( 1, DISPLAY_LABEL, 32, 30, 32 , 16, false, STYLE1X, BLACK, GREEN);
@@ -673,6 +677,7 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
 
 
    renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 8, false, STYLE1X, BLACK, PINK);
+   renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, BLACK, PINK);
 
  }
 
@@ -769,60 +774,60 @@ void DisplayModule::modalPopup(){
    displayElement[0] = strdup(buf);
 
 
-   sprintf(buf, "CH1 -10v:%d", dacCalibrationNeg[0]);
+   sprintf(buf, "CV1A -5v:%d", dacCalibrationNeg[dacMap[0]]);
    displayElement[1] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[0]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[0]]);
    displayElement[2] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[3] = strdup(buf);
 
-   sprintf(buf, "CH2 -10v:%d", dacCalibrationNeg[1]);
+   sprintf(buf, "CV1B -5v:%d", dacCalibrationNeg[dacMap[1]]);
    displayElement[4] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[1]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[1]]);
    displayElement[5] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[6] = strdup(buf);
 
-   sprintf(buf, "CH3 -10v:%d", dacCalibrationNeg[2]);
+   sprintf(buf, "CV2A -5v:%d", dacCalibrationNeg[dacMap[2]]);
    displayElement[7] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[2]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[2]]);
    displayElement[8] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[9] = strdup(buf);
 
-   sprintf(buf, "CH4 -10v:%d", dacCalibrationNeg[3]);
+   sprintf(buf, "CV2B -5v:%d", dacCalibrationNeg[dacMap[3]]);
    displayElement[10] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[3]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[3]]);
    displayElement[11] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[12] = strdup(buf);
 
-   sprintf(buf, "CH5 -10v:%d", dacCalibrationNeg[4]);
+   sprintf(buf, "CV3A -5v:%d", dacCalibrationNeg[dacMap[4]]);
    displayElement[13] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[4]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[4]]);
    displayElement[14] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[15] = strdup(buf);
 
-   sprintf(buf, "CH6 -10v:%d", dacCalibrationNeg[5]);
+   sprintf(buf, "CV3B -5v:%d", dacCalibrationNeg[dacMap[5]]);
    displayElement[16] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[5]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[5]]);
    displayElement[17] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[18] = strdup(buf);
 
-   sprintf(buf, "CH7 -10v:%d", dacCalibrationNeg[6]);
+   sprintf(buf, "CV4A -5v:%d", dacCalibrationNeg[dacMap[6]]);
    displayElement[19] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[6]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[6]]);
    displayElement[20] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[21] = strdup(buf);
 
-   sprintf(buf, "CH8 -10v:%d", dacCalibrationNeg[7]);
+   sprintf(buf, "CV4B -5v:%d", dacCalibrationNeg[dacMap[7]]);
    displayElement[22] = strdup(buf);
-   sprintf(buf, "+10v:%d", dacCalibrationPos[7]);
+   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[7]]);
    displayElement[23] = strdup(buf);
-   sprintf(buf, "test");
+   sprintf(buf, "0v");
    displayElement[24] = strdup(buf);
 
    renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
@@ -858,6 +863,16 @@ void DisplayModule::modalPopup(){
    renderStringBox(22, STATE_CALIB_OUTPUT7_LOW,      0, 72, 64 , 8, false, REGULAR1X, BLACK, WHITE);
    renderStringBox(23, STATE_CALIB_OUTPUT7_HIGH,    63, 72, 45 , 8, false, REGULAR1X, BLACK, WHITE);
    renderStringBox(24, STATE_CALIB_OUTPUT7_TEST,    108, 72, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+/*
+CV1A   - OUT7
+CV1B   - OUT1
+CV2A   - OUT0
+CV2B   - OUT6
+CV3A   - OUT5
+CV3B   - OUT2
+CV4A  - OUT3
+CV4B   - OUT4
+*/
 
   //  STATE_CALIB_OUTPUT0_LOW
   //  STATE_CALIB_OUTPUT0_HIGH

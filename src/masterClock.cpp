@@ -46,6 +46,7 @@ void MasterClock::masterClockFunc(){
 		if ((int)masterLoopTimer > kMasterClockInterval + 100){
 			uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
 			clockCounter = clockCounter + countToAdd;
+			lfoClockCounter += countToAdd;
 			//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
 		//	for(int i=0;  i< countToAdd; i++){
 		//		digitalWriteFast(PIN_EXT_AD_2, LOW);delayMicroseconds(10);
@@ -53,6 +54,7 @@ void MasterClock::masterClockFunc(){
 		//	}
 		} else {
 			clockCounter++;
+			lfoClockCounter++;
 		}
 
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
@@ -98,7 +100,7 @@ void MasterClock::sequencerFunc(void){
 		outputControl->dacTestLoop();
 		return;
 	}
-	
+
 	for(int i=0; i < 4; i++){
 		for(int n=0; n<4; n++){
 			if (gateInputRose[i] == true){
@@ -142,7 +144,7 @@ void MasterClock::sequencerFunc(void){
 			break;
   }
 
-	if(lfoTimer > 10){
+	if(lfoTimer > 2){
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->lfoUpdate(i);
 		}

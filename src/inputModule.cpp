@@ -880,52 +880,52 @@ void InputModule::calibrationMenuHandler(){
           adcCalibrationNeg[3] += knobChange;
         break;
         case STATE_CALIB_OUTPUT0_LOW:
-          dacCalibrationNeg[0] += knobChange;
+          dacCalibrationNeg[dacMap[0]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT0_HIGH:
-          dacCalibrationPos[0] += knobChange;
+          dacCalibrationPos[dacMap[0]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT1_LOW:
-          dacCalibrationNeg[1] += knobChange;
+          dacCalibrationNeg[dacMap[1]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT1_HIGH:
-          dacCalibrationPos[1] += knobChange;
+          dacCalibrationPos[dacMap[1]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT2_LOW:
-          dacCalibrationNeg[2] += knobChange;
+          dacCalibrationNeg[dacMap[2]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT2_HIGH:
-          dacCalibrationPos[2] += knobChange;
+          dacCalibrationPos[dacMap[2]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT3_LOW:
-          dacCalibrationNeg[3] += knobChange;
+          dacCalibrationNeg[dacMap[3]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT3_HIGH:
-          dacCalibrationPos[3] += knobChange;
+          dacCalibrationPos[dacMap[3]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT4_LOW:
-          dacCalibrationNeg[4] += knobChange;
+          dacCalibrationNeg[dacMap[4]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT4_HIGH:
-          dacCalibrationPos[4] += knobChange;
+          dacCalibrationPos[dacMap[4]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT5_LOW:
-          dacCalibrationNeg[5] += knobChange;
+          dacCalibrationNeg[dacMap[5]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT5_HIGH:
-          dacCalibrationPos[5] += knobChange;
+          dacCalibrationPos[dacMap[5]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT6_LOW:
-          dacCalibrationNeg[6] += knobChange;
+          dacCalibrationNeg[dacMap[6]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT6_HIGH:
-          dacCalibrationPos[6] += knobChange;
+          dacCalibrationPos[dacMap[6]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT7_LOW:
-          dacCalibrationNeg[7] += knobChange;
+          dacCalibrationNeg[dacMap[7]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT7_HIGH:
-          dacCalibrationPos[7] += knobChange;
+          dacCalibrationPos[dacMap[7]] += knobChange;
         break;
       }
     }

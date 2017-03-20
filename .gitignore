@@ -2,3 +2,4 @@
 .clang_complete
 .gcc-flags.json
 .piolibdeps
+/src/flxs1.ino.cpp

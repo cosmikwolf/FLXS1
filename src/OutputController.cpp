@@ -151,7 +151,7 @@ for (int i=0; i<4; i++){
 
 void OutputController::dacTestLoop(){
   int voltage; // = 65535*(sin(millis()/10.0)+1)/2;
-  int32_t sinVal = sin(millis()/10)*16384;
+  int32_t sinVal = sin(millis()/10.0)*16384.0;
 
   if (sin(millis()) > 0 ){
     voltage = 65535;
@@ -161,101 +161,133 @@ void OutputController::dacTestLoop(){
 
   switch (stepMode){
 
+    case STATE_CALIB_INPUT0_OFFSET:
+    case STATE_CALIB_INPUT1_OFFSET:
+    case STATE_CALIB_INPUT2_OFFSET:
+    case STATE_CALIB_INPUT3_OFFSET:
+      for (int i=0; i<8; i++){
+        ad5676.setVoltage(dacMap[i], map(0, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+        ad5676.setVoltage(dacMap[i], map(0, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+      }
+    break;
+    case STATE_CALIB_INPUT0_LOW:
+    case STATE_CALIB_INPUT1_LOW:
+    case STATE_CALIB_INPUT2_LOW:
+    case STATE_CALIB_INPUT3_LOW:
+      for (int i=0; i<8; i++){
+        ad5676.setVoltage(dacMap[i], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+        ad5676.setVoltage(dacMap[i], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+      }
+    break;
+    case STATE_CALIB_INPUT1_HIGH:
+    case STATE_CALIB_INPUT0_HIGH:
+    case STATE_CALIB_INPUT2_HIGH:
+    case STATE_CALIB_INPUT3_HIGH:
+      for (int i=0; i<8; i++){
+        ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+        ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+      }
+    break;
+
+
     case STATE_CALIB_OUTPUT0_LOW:
-      ad5676.setVoltage(0, dacCalibrationNeg[0] );
-      ad5676.setVoltage(0, dacCalibrationNeg[0] );
+      ad5676.setVoltage(dacMap[0], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
+      ad5676.setVoltage(dacMap[0], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
     break;
     case STATE_CALIB_OUTPUT0_HIGH:
-      ad5676.setVoltage(0, dacCalibrationPos[0] );
-      ad5676.setVoltage(0, dacCalibrationPos[0] );
+      ad5676.setVoltage(dacMap[0], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
+      ad5676.setVoltage(dacMap[0], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
     break;
     case STATE_CALIB_OUTPUT0_TEST:
-      ad5676.setVoltage(0, map(sinVal, -16384, 16384, dacCalibrationNeg[0], dacCalibrationPos[0] ) );
-      ad5676.setVoltage(0, map(sinVal, -16384, 16384, dacCalibrationNeg[0], dacCalibrationPos[0] ) );
+  //    ad5676.setVoltage(dacMap[0], map(sinVal, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
+  //    ad5676.setVoltage(dacMap[0], map(sinVal, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
+      ad5676.setVoltage(dacMap[0], map(0, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
+      ad5676.setVoltage(dacMap[0], map(0, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
+
     break;
     case STATE_CALIB_OUTPUT1_LOW:
-      ad5676.setVoltage(1, dacCalibrationNeg[1] );
-      ad5676.setVoltage(1, dacCalibrationNeg[1] );
+      ad5676.setVoltage(dacMap[1], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[1]], dacCalibrationPos[dacMap[1]] ) );
+      ad5676.setVoltage(dacMap[1], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[1]], dacCalibrationPos[dacMap[1]] ) );
     break;
     case STATE_CALIB_OUTPUT1_HIGH:
-      ad5676.setVoltage(1, dacCalibrationPos[1] );
-      ad5676.setVoltage(1, dacCalibrationPos[1] );
+      ad5676.setVoltage(dacMap[1], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[1]], dacCalibrationPos[dacMap[1]] ) );
+      ad5676.setVoltage(dacMap[1], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[1]], dacCalibrationPos[dacMap[1]] ) );
     break;
     case STATE_CALIB_OUTPUT1_TEST:
-      ad5676.setVoltage(1, map(sinVal, -16384, 16384, dacCalibrationNeg[1], dacCalibrationPos[1] ) );
-      ad5676.setVoltage(1, map(sinVal, -16384, 16384, dacCalibrationNeg[1], dacCalibrationPos[1] ) );
+      ad5676.setVoltage(dacMap[1], map(0, -16384, 16384, dacCalibrationNeg[dacMap[1]], dacCalibrationPos[dacMap[1]] ) );
+      ad5676.setVoltage(dacMap[1], map(0, -16384, 16384, dacCalibrationNeg[dacMap[1]], dacCalibrationPos[dacMap[1]] ) );
     break;
     case STATE_CALIB_OUTPUT2_LOW:
-      ad5676.setVoltage(2, dacCalibrationNeg[2] );
-      ad5676.setVoltage(2, dacCalibrationNeg[2] );
+      ad5676.setVoltage(dacMap[2], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[2]], dacCalibrationPos[dacMap[2]] ) );
+      ad5676.setVoltage(dacMap[2], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[2]], dacCalibrationPos[dacMap[2]] ) );
     break;
     case STATE_CALIB_OUTPUT2_HIGH:
-      ad5676.setVoltage(2, dacCalibrationPos[2] );
-      ad5676.setVoltage(2, dacCalibrationPos[2] );
+      ad5676.setVoltage(dacMap[2], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[2]], dacCalibrationPos[dacMap[2]] ) );
+      ad5676.setVoltage(dacMap[2], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[2]], dacCalibrationPos[dacMap[2]] ) );
     break;
     case STATE_CALIB_OUTPUT2_TEST:
-      ad5676.setVoltage(2, map(sinVal, -16384, 16384, dacCalibrationNeg[2], dacCalibrationPos[2] ) );
-      ad5676.setVoltage(2, map(sinVal, -16384, 16384, dacCalibrationNeg[2], dacCalibrationPos[2] ) );
+      ad5676.setVoltage(dacMap[2], map(0, -16384, 16384, dacCalibrationNeg[dacMap[2]], dacCalibrationPos[dacMap[2]] ) );
+      ad5676.setVoltage(dacMap[2], map(0, -16384, 16384, dacCalibrationNeg[dacMap[2]], dacCalibrationPos[dacMap[2]] ) );
     break;
     case STATE_CALIB_OUTPUT3_LOW:
-      ad5676.setVoltage(3, dacCalibrationNeg[3] );
-      ad5676.setVoltage(3, dacCalibrationNeg[3] );
+      ad5676.setVoltage(dacMap[3], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[3]], dacCalibrationPos[dacMap[3]] ) );
+      ad5676.setVoltage(dacMap[3], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[3]], dacCalibrationPos[dacMap[3]] ) );
     break;
     case STATE_CALIB_OUTPUT3_HIGH:
-      ad5676.setVoltage(3, dacCalibrationPos[3] );
-      ad5676.setVoltage(3, dacCalibrationPos[3] );
+      ad5676.setVoltage(dacMap[3], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[3]], dacCalibrationPos[dacMap[3]] ) );
+      ad5676.setVoltage(dacMap[3], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[3]], dacCalibrationPos[dacMap[3]] ) );
     break;
     case STATE_CALIB_OUTPUT3_TEST:
-      ad5676.setVoltage(3, map(sinVal, -16384, 16384, dacCalibrationNeg[3], dacCalibrationPos[3] ) );
-      ad5676.setVoltage(3, map(sinVal, -16384, 16384, dacCalibrationNeg[3], dacCalibrationPos[3] ) );
+      ad5676.setVoltage(dacMap[3], map(0, -16384, 16384, dacCalibrationNeg[dacMap[3]], dacCalibrationPos[dacMap[3]] ) );
+      ad5676.setVoltage(dacMap[3], map(0, -16384, 16384, dacCalibrationNeg[dacMap[3]], dacCalibrationPos[dacMap[3]] ) );
     break;
     case STATE_CALIB_OUTPUT4_LOW:
-      ad5676.setVoltage(4, dacCalibrationNeg[4] );
-      ad5676.setVoltage(4, dacCalibrationNeg[4] );
+      ad5676.setVoltage(dacMap[4], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[4]], dacCalibrationPos[dacMap[4]] ) );
+      ad5676.setVoltage(dacMap[4], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[4]], dacCalibrationPos[dacMap[4]] ) );
     break;
     case STATE_CALIB_OUTPUT4_HIGH:
-      ad5676.setVoltage(4, dacCalibrationPos[4] );
-      ad5676.setVoltage(4, dacCalibrationPos[4] );
+      ad5676.setVoltage(dacMap[4], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[4]], dacCalibrationPos[dacMap[4]] ) );
+      ad5676.setVoltage(dacMap[4], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[4]], dacCalibrationPos[dacMap[4]] ) );
     break;
     case STATE_CALIB_OUTPUT4_TEST:
-      ad5676.setVoltage(4, map(sinVal, -16384, 16384, dacCalibrationNeg[4], dacCalibrationPos[4] ) );
-      ad5676.setVoltage(4, map(sinVal, -16384, 16384, dacCalibrationNeg[4], dacCalibrationPos[4] ) );
+      ad5676.setVoltage(dacMap[4], map(0, -16384, 16384, dacCalibrationNeg[dacMap[4]], dacCalibrationPos[dacMap[4]] ) );
+      ad5676.setVoltage(dacMap[4], map(0, -16384, 16384, dacCalibrationNeg[dacMap[4]], dacCalibrationPos[dacMap[4]] ) );
     break;
     case STATE_CALIB_OUTPUT5_LOW:
-      ad5676.setVoltage(5, dacCalibrationNeg[5] );
-      ad5676.setVoltage(5, dacCalibrationNeg[5] );
+      ad5676.setVoltage(dacMap[5], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[5]], dacCalibrationPos[dacMap[5]] ) );
+      ad5676.setVoltage(dacMap[5], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[5]], dacCalibrationPos[dacMap[5]] ) );
     break;
     case STATE_CALIB_OUTPUT5_HIGH:
-      ad5676.setVoltage(5, dacCalibrationPos[5] );
-      ad5676.setVoltage(5, dacCalibrationPos[5] );
+      ad5676.setVoltage(dacMap[5], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[5]], dacCalibrationPos[dacMap[5]] ) );
+      ad5676.setVoltage(dacMap[5], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[5]], dacCalibrationPos[dacMap[5]] ) );
     break;
     case STATE_CALIB_OUTPUT5_TEST:
-      ad5676.setVoltage(5, map(sinVal, -16384, 16384, dacCalibrationNeg[5], dacCalibrationPos[5] ) );
-      ad5676.setVoltage(5, map(sinVal, -16384, 16384, dacCalibrationNeg[5], dacCalibrationPos[5] ) );
+      ad5676.setVoltage(dacMap[5], map(0, -16384, 16384, dacCalibrationNeg[dacMap[5]], dacCalibrationPos[dacMap[5]] ) );
+      ad5676.setVoltage(dacMap[5], map(0, -16384, 16384, dacCalibrationNeg[dacMap[5]], dacCalibrationPos[dacMap[5]] ) );
     break;
     case STATE_CALIB_OUTPUT6_LOW:
-      ad5676.setVoltage(6, dacCalibrationNeg[6] );
-      ad5676.setVoltage(6, dacCalibrationNeg[6] );
+      ad5676.setVoltage(dacMap[6], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[6]], dacCalibrationPos[dacMap[6]] ) );
+      ad5676.setVoltage(dacMap[6], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[6]], dacCalibrationPos[dacMap[6]] ) );
     break;
     case STATE_CALIB_OUTPUT6_HIGH:
-      ad5676.setVoltage(6, dacCalibrationPos[6] );
-      ad5676.setVoltage(6, dacCalibrationPos[6] );
+      ad5676.setVoltage(dacMap[6], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[6]], dacCalibrationPos[dacMap[6]] ) );
+      ad5676.setVoltage(dacMap[6], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[6]], dacCalibrationPos[dacMap[6]] ) );
     break;
     case STATE_CALIB_OUTPUT6_TEST:
-      ad5676.setVoltage(6, map(sinVal, -16384, 16384, dacCalibrationNeg[6], dacCalibrationPos[6] ) );
-      ad5676.setVoltage(6, map(sinVal, -16384, 16384, dacCalibrationNeg[6], dacCalibrationPos[6] ) );
+      ad5676.setVoltage(dacMap[6], map(0, -16384, 16384, dacCalibrationNeg[dacMap[6]], dacCalibrationPos[dacMap[6]] ) );
+      ad5676.setVoltage(dacMap[6], map(0, -16384, 16384, dacCalibrationNeg[dacMap[6]], dacCalibrationPos[dacMap[6]] ) );
     break;
     case STATE_CALIB_OUTPUT7_LOW:
-      ad5676.setVoltage(7, dacCalibrationNeg[7] );
-      ad5676.setVoltage(7, dacCalibrationNeg[7] );
+      ad5676.setVoltage(dacMap[7], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[7]], dacCalibrationPos[dacMap[7]] ) );
+      ad5676.setVoltage(dacMap[7], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[7]], dacCalibrationPos[dacMap[7]] ) );
     break;
     case STATE_CALIB_OUTPUT7_HIGH:
-      ad5676.setVoltage(7, dacCalibrationPos[7] );
-      ad5676.setVoltage(7, dacCalibrationPos[7] );
+      ad5676.setVoltage(dacMap[7], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[7]], dacCalibrationPos[dacMap[7]] ) );
+      ad5676.setVoltage(dacMap[7], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[7]], dacCalibrationPos[dacMap[7]] ) );
     break;
     case STATE_CALIB_OUTPUT7_TEST:
-      ad5676.setVoltage(7, map(sinVal, -16384, 16384, dacCalibrationNeg[7], dacCalibrationPos[7] ) );
-      ad5676.setVoltage(7, map(sinVal, -16384, 16384, dacCalibrationNeg[7], dacCalibrationPos[7] ) );
+      ad5676.setVoltage(dacMap[7], map(0, -16384, 16384, dacCalibrationNeg[dacMap[7]], dacCalibrationPos[dacMap[7]] ) );
+      ad5676.setVoltage(dacMap[7], map(0, -16384, 16384, dacCalibrationNeg[dacMap[7]], dacCalibrationPos[dacMap[7]] ) );
     break;
   }
   //Serial.println("setting voltage all dacs to: " + String(voltage) + " -- starttime:" + String(startTime));
@@ -398,36 +430,40 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
 void OutputController::lfoUpdate(uint8_t channel){
   uint8_t rheoStatLevel;
-  int8_t voltageLevel;
+  int16_t voltageLevel;
 
   //Serial.println("beginning lfoUpdate for channel " + String(channel));
-  if (lfoType[channel] < 2){
+  if (lfoType[channel] < 1){
     return;
   }
 
   switch(lfoType[channel]){
+    case 1:
+      voltageLevel = lfoAmplitude[channel]*128;
+    break;
+
     case 2:
-      rheoStatLevel = 0;
-      voltageLevel = (sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)))*lfoAmplitude[channel];
+      rheoStatLevel = 2;
+      voltageLevel = (sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)))*lfoAmplitude[channel]*128;
+      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW);
     break;
 
     case 3: // SQUARE WAVE
       rheoStatLevel = 0;
-      if ( sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)) > 0){
-        voltageLevel = lfoAmplitude[channel];
+      if ( sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)) > 0){
+        voltageLevel = lfoAmplitude[channel]*128;
       } else {
-        voltageLevel = -lfoAmplitude[channel];
+        voltageLevel = -lfoAmplitude[channel]*128;
       }
       backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), HIGH);        // shut off swich with cap to ground, disable slew
-
     break;
 
     case 4: //rounded square wave
       rheoStatLevel = 40;
-      if ( sin((lfoSpeed[channel]*startTime*3.14159)/(beatLength*16)) > 0){
-        voltageLevel = lfoAmplitude[channel];
+      if ( sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)) > 0){
+        voltageLevel = lfoAmplitude[channel]*128;
       } else {
-        voltageLevel = -lfoAmplitude[channel];
+        voltageLevel = -lfoAmplitude[channel]*128;
       }
       backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW);        // shut off swich with cap to ground, disable slew
 
@@ -450,8 +486,8 @@ void OutputController::lfoUpdate(uint8_t channel){
     //Serial.println("setting rheo");
     lfoRheoSet[channel] = 0;
   //}
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,1, 65535 ) );  // set CC voltage
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -127,127,1, 65535 ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384,1, 65535 ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384,1, 65535 ) );  // set CC voltage
 
 //  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(rheoStatLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
 

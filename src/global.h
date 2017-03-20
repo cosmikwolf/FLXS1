@@ -52,7 +52,7 @@
 #define	INPUT_DEBUG_MENU		     125
 
 // MENUS
-#define	PITCH_GATE_MENU   0
+#define	PITCH_GATE_MENU   1
 #define	ARPEGGIO_MENU     PITCH_GATE_MENU + 1
 #define	SEQUENCE_MENU     ARPEGGIO_MENU + 1
 #define	INPUT_MENU        SEQUENCE_MENU + 1
@@ -67,7 +67,7 @@
 #define MENU_MODAL        MOD_MENU_2 +1
 
 //PITCH PAGE STEPMODES
-#define STATE_PITCH0       0
+#define STATE_PITCH0       1
 #define STATE_GATELENGTH   STATE_PITCH0 +1
 #define STATE_GATETYPE     STATE_GATELENGTH +1
 #define STATE_GLIDE        STATE_GATETYPE +1
@@ -96,9 +96,9 @@
 #define STATE_PITCHMOD         STATE_RANDOMPITCH +1
 #define STATE_GLIDEMOD         STATE_PITCHMOD +1
 // MOD MENU 2
-#define STATE_ARPSPDMOD        STATE_GLIDEMOD +1
-#define STATE_ARPTYPEMOD       STATE_ARPSPDMOD +1
-#define STATE_ARPOCTMOD        STATE_ARPTYPEMOD +1
+#define STATE_ARPTYPEMOD       STATE_GLIDEMOD +1
+#define STATE_ARPSPDMOD        STATE_ARPTYPEMOD +1
+#define STATE_ARPOCTMOD        STATE_ARPSPDMOD +1
 #define STATE_ARPINTMOD        STATE_ARPOCTMOD +1
 //TEMPO MENU
 #define STATE_TEMPO            STATE_ARPINTMOD +1
@@ -143,8 +143,8 @@
 #define STATE_CALIB_OUTPUT4_LOW      STATE_CALIB_OUTPUT3_TEST  + 1
 #define STATE_CALIB_OUTPUT4_HIGH     STATE_CALIB_OUTPUT4_LOW  + 1
 #define STATE_CALIB_OUTPUT4_TEST      STATE_CALIB_OUTPUT4_HIGH  + 1
-#define STATE_CALIB_OUTPUT5_LOW      STATE_CALIB_OUTPUT4_TEST  + 5
-#define STATE_CALIB_OUTPUT5_HIGH     STATE_CALIB_OUTPUT5_LOW  + 5
+#define STATE_CALIB_OUTPUT5_LOW      STATE_CALIB_OUTPUT4_TEST  + 1
+#define STATE_CALIB_OUTPUT5_HIGH     STATE_CALIB_OUTPUT5_LOW  + 1
 #define STATE_CALIB_OUTPUT5_TEST      STATE_CALIB_OUTPUT5_HIGH  + 1
 #define STATE_CALIB_OUTPUT6_LOW      STATE_CALIB_OUTPUT5_TEST  + 1
 #define STATE_CALIB_OUTPUT6_HIGH     STATE_CALIB_OUTPUT6_LOW  + 1
@@ -303,6 +303,8 @@ extern elapsedMicros internalClockTimer;
 extern elapsedMicros startTime;
 extern uint16_t masterDebugCounter;
 
+extern uint32_t lfoClockCounter;
+
 //midi
 extern elapsedMicros testTimer;
 extern boolean firstRun;
@@ -322,6 +324,7 @@ extern int16_t cvInputMapped1024[4];
 extern uint8_t	gateInputRose[5];
 extern uint8_t	gateInputRaw[5];
 
+extern uint8_t dacMap[8];
 
 void debug(const char* text);
 int positive_modulo(int i, int n);
