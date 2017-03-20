@@ -389,8 +389,9 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
       } else {
         mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
       }
-      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
-      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,1540, 64240 ) );  // set CC voltage
+
+      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+      ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
       lfoRheoSet[channel] = 1;
     } else if (velocityType > 1){
       Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
@@ -410,14 +411,12 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
   }
   int offset = 0;
-//  offset = cvInputMapped[channel];
-
-
+  //offset = cvInputMapped[channel];
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   //delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,120,calibMidscale(dacCvMap[channel]), dacCalibrationPos[dacCvMap[channel]] ) );    // set CV voltage
 //delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,127,32896, 64240 ) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,120,calibMidscale(dacCvMap[channel]), dacCalibrationPos[dacCvMap[channel]]) );    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
@@ -427,6 +426,17 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
 };
 
+uint16_t OutputController::calibMidscale(uint8_t mapAddress){
+  return (dacCalibrationNeg[mapAddress]+dacCalibrationPos[mapAddress])/2;
+};
+
+uint16_t OutputController::calibLow(uint8_t mapAddress, uint8_t range){
+
+}
+
+uint16_t OutputController::calibHigh(uint8_t mapAddress, uint8_t range){
+
+}
 
 void OutputController::lfoUpdate(uint8_t channel){
   uint8_t rheoStatLevel;
@@ -486,8 +496,8 @@ void OutputController::lfoUpdate(uint8_t channel){
     //Serial.println("setting rheo");
     lfoRheoSet[channel] = 0;
   //}
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384,1, 65535 ) );  // set CC voltage
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384,1, 65535 ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, dacCalibrationNeg[dacCcMap[channel]], dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
 
 //  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(rheoStatLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
 

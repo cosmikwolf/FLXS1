@@ -688,13 +688,7 @@ void InputModule::altButtonHandler(){
         switch (stepMode) {
           case STATE_PITCH0:
         // just change the note
-          if (knobRead + sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) < 0){
-            // you can turn off a note by turning the value to 0
-            // turn off a note by setting gate type and pitch to 0
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, 0, 0);
-            knob.write(4);
-          } else {
+
             if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
               // if a note is not active, turn it on and give it a length.
               sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
@@ -702,8 +696,8 @@ void InputModule::altButtonHandler(){
             }
             // and finally set the new step value!
             // monophonic so pitch[0] only
-            sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,127), 0);
-          }
+            sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max_cycle(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,120), 0);
+        
           break;
 
           case STATE_PITCH1:

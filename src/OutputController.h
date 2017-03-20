@@ -42,6 +42,12 @@ public:
   void calibrationRoutine();
   void inputLoopTest();
   void inputRead();
+
+  uint16_t calibMidscale(uint8_t mapAddress);
+  uint16_t calibLow(uint8_t mapAddress, uint8_t range);
+  uint16_t calibHigh(uint8_t mapAddress, uint8_t range);
+
+
   elapsedMillis clockOutputTimer;
   elapsedMillis lfoTimer;
 
