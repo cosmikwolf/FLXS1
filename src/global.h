@@ -6,8 +6,8 @@
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 100
-#define kSequenceTimerInterval 500
+#define kMasterClockInterval 150
+#define kSequenceTimerInterval 600
 #define kPeripheralLoopTimer 15000
 #define kMidiClockInterval  600
 #define kCacheClockInterval 10000
@@ -21,7 +21,7 @@
 
 #define DISPLAY_INTERVAL 20000
 #define INPUT_INTERVAL 20000
-#define LED_INTERVAL 7000
+#define LED_INTERVAL 10000
 
 
 #define PIMILLION             3141593
@@ -222,9 +222,9 @@
 #define SW_13    13
 #define SW_14    14
 #define SW_15    15
-#define SW_PLAY  16
-#define SW_REC   17
-#define SW_STOP  18
+#define SW_PLAY  17
+#define SW_REC   18
+#define SW_STOP  16
 #define SW_M0    19
 #define SW_M1    20
 #define SW_M2    21

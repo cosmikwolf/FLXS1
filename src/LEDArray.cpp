@@ -129,6 +129,29 @@ void LEDArray::channelPitchModeLEDHandler(){
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
     }
   }
+  if(playing){
+    leds.setPixelColor(0, wheel(64));
+  } else {
+    leds.setPixelColor(0, wheel(255));
+  }
+  switch(notePage){
+    case 0:
+      leds.setPixelColor(21, wheel(255));
+      leds.setPixelColor(22, wheel(127));
+    break;
+    case 1:
+      leds.setPixelColor(21, wheel(191));
+      leds.setPixelColor(22, wheel(127));
+    break;
+    case 2:
+      leds.setPixelColor(21, wheel(127));
+      leds.setPixelColor(22, wheel(191));
+    break;
+    case 3:
+      leds.setPixelColor(21, wheel(127));
+      leds.setPixelColor(22, wheel(255));
+    break;
+  }
   for (int i=0; i < 4; i++){
     if (selectedChannel == i) {
     //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
