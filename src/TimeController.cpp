@@ -32,7 +32,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	if(eraseAllFlag){
     Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
-    saveFile.formatChip();
+		saveFile.wipeEEPROM();
+		saveFile.formatChip();
     saveFile.initializeCache();
 
     for(int pattern=0; pattern < 16; pattern++){

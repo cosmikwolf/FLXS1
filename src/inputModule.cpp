@@ -74,7 +74,7 @@ void InputModule::loop(uint16_t frequency){
   if (inputTimer > frequency){
     inputTimer = 0;
     knobPrevious = knobRead;
-    knobRead = knob.read()/-2  ;
+    knobRead = -1 * knob.read()/2  ;
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 

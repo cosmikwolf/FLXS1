@@ -232,9 +232,9 @@ uint16_t FlashMemory::EEPROMRead16(int address)  {
 
 void FlashMemory::wipeEEPROM(){
   for (int i=0; i<2048; i++){
-    Serial.print("writing EEProm: " + String(i));
-    EEPROM.update(i, 0);
-    Serial.println("\t" + String(EEPROM.read(i) ));
+  //  Serial.print("writing EEProm: " + String(i));
+    EEPROM.update(i, 0xFF);
+    //Serial.println("\t" + String(EEPROM.read(i) ));
   }
   delay(500);
 }

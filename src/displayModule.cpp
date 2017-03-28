@@ -300,7 +300,9 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
 
 void DisplayModule::stateDisplay_arp(char *buf){
-  displayElement[0] = strdup("ARPEGGIO");
+
+  sprintf(buf, "CV%dA Arp PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  displayElement[0] = strdup(buf);
   displayElement[1]  = strdup("TYPE");
   const char*  arpTypeArray[] = { "OFF","UP","DOWN","UP DN 1","UP DN 2","RANDOM" };
   displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
@@ -338,7 +340,8 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
-   displayElement[0] = strdup("CV2");
+   sprintf(buf, "CV%dB Out  PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+   displayElement[0] = strdup(buf);
    displayElement[1] = strdup("LEVEL:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);

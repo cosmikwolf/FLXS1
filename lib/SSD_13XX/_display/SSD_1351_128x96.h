@@ -38,7 +38,7 @@
 	static const uint8_t	SSD_COMMANDLOCK2		=	0xB1;
 	static const uint8_t	SSD_MUXRATIO			=	0x7F;
 	static const uint8_t	SSD_SETGPIO				=	0x00;
-	static const uint8_t	SSD_PRECHARGE2			=	0xB1;
+	static const uint8_t	SSD_PRECHARGE2			=	0xB3;
 	static const uint8_t	SSD_CONTRASTMASTER		=	0x0F;
 	static const uint8_t	SSD_FUNCTIONSELECT		=	0x01;
 	static const uint8_t	SSD_DISPLAYOFFSET		=	0x00;
@@ -48,8 +48,8 @@
 	static const uint8_t	SSD_FILL				=	0x01;
 	static const uint8_t	SSD_SETMASTER			=	0x8E;
 	static const uint8_t	SSD_POWERMODE			=	0x0B;
-	static const uint8_t	SSD_PRECHARGE			=	0xB1;
-	static const uint8_t	SSD_CLOCKDIV			=	0xF1;
+	static const uint8_t	SSD_PRECHARGE			=	0xB3;
+	static const uint8_t	SSD_CLOCKDIV			=	0xF0;
 	static const uint8_t	SSD_SETVSL_A			=	0xA0;
 	static const uint8_t	SSD_SETVSL_B			=	0xB5;
 	static const uint8_t	SSD_SETVSL_C			=	0x55;
