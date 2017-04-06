@@ -890,39 +890,21 @@ CV4B   - OUT4
 
  void DisplayModule::inputDebugMenuDisplay(){
 
-   displayElement[0] = strdup("Input Calibration Menu");
+   displayElement[0] = strdup("HELLO");
+   displayElement[1] = strdup("WORLD");
 
-   sprintf(buf, "CV IN 1: %d  %d", cvInputMapped[0],  cvInputRaw[0]  );
-   displayElement[1] = strdup(buf);
-   sprintf(buf, "CV IN 2: %d  %d", cvInputMapped[1],  cvInputRaw[1]  );
-   displayElement[2] = strdup(buf);
-   sprintf(buf, "CV IN 3: %d  %d", cvInputMapped[2],  cvInputRaw[2]  );
-   displayElement[3] = strdup(buf);
-   sprintf(buf, "CV IN 4: %d  %d", cvInputMapped[3],  cvInputRaw[3] );
-   displayElement[4] = strdup(buf);
-
-   sprintf(buf, "GT IN 1: %d", gateInputRaw[0]);
-   displayElement[5] = strdup(buf);
-   sprintf(buf, "GT IN 2: %d", gateInputRaw[1]);
-   displayElement[6] = strdup(buf);
-   sprintf(buf, "GT IN 3: %d", gateInputRaw[2]);
-   displayElement[7] = strdup(buf);
-   sprintf(buf, "GT IN 4: %d", gateInputRaw[3]);
-   displayElement[8] = strdup(buf);
-
-   renderStringBox(0, DISPLAY_LABEL,  0, 0, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-
-   renderStringBox(1, DISPLAY_LABEL,  0, 10, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(2, DISPLAY_LABEL,  0, 20, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-
-   renderStringBox(3, DISPLAY_LABEL,  0, 30, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(4, DISPLAY_LABEL,  0, 40, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-
-   renderStringBox(5, DISPLAY_LABEL,  0, 50, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(6, DISPLAY_LABEL,  0, 60, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-
-   renderStringBox(7, DISPLAY_LABEL,  0, 70, 96 , 8, false, REGULAR1X, WHITE, BLACK);
-   renderStringBox(8, DISPLAY_LABEL,  0, 80, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   renderStringBox(0, DISPLAY_LABEL,  0, 20, 128 , 28, false, BOLD4X, BLACK, CYAN);
+   renderStringBox(1, DISPLAY_LABEL,  0, 48, 128 , 48, false, BOLD4X, BLACK, PINK);
+  //  renderStringBox(2, DISPLAY_LABEL,  0, 20, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   //
+  //  renderStringBox(3, DISPLAY_LABEL,  0, 30, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+  //  renderStringBox(4, DISPLAY_LABEL,  0, 40, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   //
+  //  renderStringBox(5, DISPLAY_LABEL,  0, 50, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+  //  renderStringBox(6, DISPLAY_LABEL,  0, 60, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+   //
+  //  renderStringBox(7, DISPLAY_LABEL,  0, 70, 96 , 8, false, REGULAR1X, WHITE, BLACK);
+  //  renderStringBox(8, DISPLAY_LABEL,  0, 80, 96 , 8, false, REGULAR1X, WHITE, BLACK);
 
  }
 

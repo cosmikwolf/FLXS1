@@ -11,7 +11,7 @@ void LEDArray::initialize(Sequencer *sequenceArray){
 
   //LEDS.addLeds<WS2812Controller800Khz,DATA_PIN,GRB>(leds,NUM_LEDS);
   //LEDS.addLeds<NEOPIXEL,DATA_PIN>(leds,NUM_LEDS);
-  leds.setBrightness(64);
+  leds.setBrightness(255);
   leds.begin();
   leds.show(); // Initialize all pixels to 'off'
 
@@ -82,6 +82,7 @@ void LEDArray::loop(uint16_t interval){
         channelStepModeLEDHandler();
       break;
 
+      case INPUT_DEBUG_MENU:
       case PATTERN_SELECT:
         for (int i=0; i < 16; i++){
           //leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
