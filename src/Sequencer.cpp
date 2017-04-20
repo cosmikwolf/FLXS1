@@ -188,7 +188,7 @@ void Sequencer::sequenceModeStandardStep(){
       case CURRENTLY_PLAYING:
         if(stepData[stepNum].framesRemaining < stepData[stepNum].arpLastFrame){
           noteShutOff(stepNum, stepData[stepNum].gateOff());
-          Serial.println("note shut off");
+          //Serial.println("note shut off");
           stepData[stepNum].noteStatus = BETWEEN_APEGGIATIONS;
           if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
             stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;

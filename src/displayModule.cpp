@@ -226,6 +226,68 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
         oled.setTextScale(1);
         break;
       case BOLD2X:
+        oled.setCursor(CENTER,y+1);
+        oled.setFont(&a04b03);
+        oled.setTextScale(2);
+        break;
+      case BOLD4X:
+        oled.setCursor(CENTER,y+1);
+        oled.setFont(&a04b03);
+        oled.setTextScale(4);
+        break;
+      case STYLE1X:
+        oled.setCursor(x+1,y+1);
+        oled.setFont(&a04b03);
+
+        oled.setTextScale(2);
+        break;
+    }
+
+    oled.setTextColor(color1);
+    oled.print(displayElement[index]);
+    if (border){
+      oled.drawRect(x,y,w,h, color1);
+    }
+  }
+}
+
+
+void DisplayModule::renderString(uint8_t index, uint8_t highlight, int16_t x, int16_t y, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
+  // renders a string box only once.
+  uint16_t color1;
+  uint16_t color2;
+
+  bool refresh = 0;
+  if (strcmp(displayElement[index], displayCache[index]) != 0 ){ refresh = 1; };
+  if( previousStepMode != highlight && highlight == stepMode){ refresh = 1;};
+  if (previousStepMode == highlight && highlight != stepMode) {refresh = 1 ;};
+
+  if ( refresh ) {
+    if (highlight == stepMode){
+      color1 = color;
+      color2 = bgColor;
+    } else {
+      color1 = bgColor;
+      color2 = color;
+    }
+
+    oled.setCursor(x, y);
+
+    switch(textSize){
+      case REGULAR1X:
+        oled.setFont(&a04b03);
+        oled.setTextScale(1);
+        break;
+      case REGULAR2X:
+        oled.setFont(&a04b03);
+        oled.setTextScale(2);
+        break;
+      case BOLD1X:
+        oled.setFont(&a04b03);
+        oled.setTextScale(1);
+        break;
+      case BOLD2X:
+      oled.setCursor(CENTER,y+1);
         oled.setFont(&a04b03);
         oled.setTextScale(2);
         break;
@@ -245,11 +307,9 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
     oled.setTextColor(color1);
     oled.print(displayElement[index]);
-    if (border){
-      oled.drawRect(x,y,w,h, color1);
-    }
   }
 }
+
 
 
 void DisplayModule::stateDisplay_pitch(char*buf){
@@ -340,7 +400,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
-   sprintf(buf, "CV%dB Out  PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+   sprintf(buf, "CV%dB LFO  PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
    displayElement[0] = strdup(buf);
    displayElement[1] = strdup("LEVEL:");
 
@@ -890,11 +950,53 @@ CV4B   - OUT4
 
  void DisplayModule::inputDebugMenuDisplay(){
 
-   displayElement[0] = strdup("HELLO");
-   displayElement[1] = strdup("WORLD");
+   switch (selectedText){
+     case 0:
+        if (prevSelectedText != selectedText){
+          oled.fillScreen(NAVY,RED);
+        }
+       displayElement[0] = strdup("HELLO");
+       displayElement[1] = strdup("WORLD");
 
-   renderStringBox(0, DISPLAY_LABEL,  0, 20, 128 , 28, false, BOLD4X, BLACK, CYAN);
-   renderStringBox(1, DISPLAY_LABEL,  0, 48, 128 , 48, false, BOLD4X, BLACK, PINK);
+       renderString(0, DISPLAY_LABEL,  0, 20,  false, BOLD4X, BLACK, CYAN);
+       renderString(1, DISPLAY_LABEL,  0, 48,  false, BOLD4X, BLACK, PINK);
+      break;
+      case 1:
+         if (prevSelectedText != selectedText){
+           oled.fillScreen(ORANGE,PINK);
+         }
+        displayElement[0] = strdup("TENKAI");
+        displayElement[1] = strdup("KARIYA");
+
+        renderString(0, DISPLAY_LABEL,  0, 20,  false, BOLD4X, BLACK, NAVY);
+        renderString(1, DISPLAY_LABEL,  0, 48,  false, BOLD4X, BLACK, RED);
+       break;
+       case 2:
+          if (prevSelectedText != selectedText){
+            oled.fillScreen(NAVY,DARK_GREY);
+          }
+          displayElement[0] = strdup("modulation");
+          displayElement[3] = strdup("input");
+          displayElement[1] = strdup("4x GATE");
+         displayElement[2] = strdup("4x CV");
+
+         renderString(3, DISPLAY_LABEL,  0, 3,  false, BOLD2X, BLACK, YELLOW);
+         renderString(0, DISPLAY_LABEL,  0, 18,  false, BOLD2X, BLACK, YELLOW);
+         renderString(1, DISPLAY_LABEL,  0, 30,  false, BOLD4X, BLACK, YELLOW);
+         renderString(2, DISPLAY_LABEL,  0, 55,  false, BOLD4X, BLACK, YELLOW);
+        break;
+        case 3:
+           if (prevSelectedText != selectedText){
+             oled.fillScreen(BLACK);
+           }
+          displayElement[0] = strdup("4 CHANNELS");
+          displayElement[1] = strdup("64 STEPS");
+
+          renderString(0, DISPLAY_LABEL,  0, 20,  false, BOLD2X, BLACK, YELLOW);
+          renderString(1, DISPLAY_LABEL,  0, 48,  false, BOLD2X, BLACK, YELLOW);
+         break;
+   }
+prevSelectedText = selectedText;
   //  renderStringBox(2, DISPLAY_LABEL,  0, 20, 96 , 8, false, REGULAR1X, WHITE, BLACK);
    //
   //  renderStringBox(3, DISPLAY_LABEL,  0, 30, 96 , 8, false, REGULAR1X, WHITE, BLACK);

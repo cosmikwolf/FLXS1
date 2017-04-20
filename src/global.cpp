@@ -59,6 +59,9 @@ elapsedMicros testTimer;
 
 uint16_t masterDebugCounter = 0;
 
+uint8_t selectedText = 0;
+uint8_t prevSelectedText = 255 ;
+
 uint8_t chordArray[27][3] = {
 {255,255,255},
 {4,7,255},

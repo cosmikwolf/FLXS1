@@ -326,6 +326,9 @@ extern uint8_t	gateInputRaw[5];
 
 extern uint8_t dacMap[8];
 
+extern uint8_t selectedText;
+extern uint8_t prevSelectedText;
+
 void debug(const char* text);
 int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);

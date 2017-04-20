@@ -290,13 +290,13 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
 		stepData[stepNum].framesRemaining = min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 64 ) * FRAMES_PER_BEAT / (8*clockDivision);
 		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT / (8 * clockDivision) ;
-		Serial.println("Setting note with gate length: " + String(min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 256 ))  + "\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
+		//Serial.println("Setting note with gate length: " + String(min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 256 ))  + "\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
 
 	} else {
 		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT *  getArpSpeedNumerator(stepNum) / (clockDivision * getArpSpeedDenominator(stepNum)) ;
 		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/2;
 
-		Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
+		//Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
 
 	}
 

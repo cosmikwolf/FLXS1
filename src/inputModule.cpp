@@ -125,6 +125,12 @@ void InputModule::loop(uint16_t frequency){
         channelStepModeInputHandler();
       break;
 
+      case INPUT_DEBUG_MENU:
+        if (knobChange){
+          selectedText = positive_modulo(selectedText+knobChange, 5);
+        }
+      break;
+
       case PATTERN_SELECT:
         patternSelectHandler();
       break;
@@ -534,8 +540,9 @@ void InputModule::channelButtonHandler(uint8_t channel){
       selectedChannel = channel;
       return;
     }
+    changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));
+
   }
-  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));
 
 }
 

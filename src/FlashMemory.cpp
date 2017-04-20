@@ -524,7 +524,8 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 	if(saveFirst){
     for(int i=0; i < SEQUENCECOUNT; i++){
   		//saveChannelPattern(i);
-      saveSequenceJSON(i, currentPattern);
+      //saveSequenceJSON(i, currentPattern);
+      saveSequenceJSON(i, sequenceArray[i].pattern);
     }
     Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	}
