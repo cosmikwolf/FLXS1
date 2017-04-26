@@ -75,7 +75,15 @@ void MasterClock::masterClockFunc(){
 			clockCounter = 0;
 			pulseTrigger = 1;
 		}
-	}
+	} else if(clockMode == EXTERNAL_MIDI_CLOCK){
+    if ((int)masterLoopTimer > kMasterClockInterval + 100){
+      uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
+      lfoClockCounter += countToAdd;
+    } else {
+      lfoClockCounter++;
+    }
+
+  }
 	masterLoopTimer = 0;
 
 	if ((clockCounter * kMasterClockInterval >  clockPeriod/2 ) && outputControl->clockValue) {

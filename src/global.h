@@ -14,6 +14,16 @@
 #define kMosiPin 11
 #define kSpiClockPin 13
 
+
+//#define DEBUG
+
+#ifdef DEBUG
+ #define DEBUG_PRINT(x)  Serial.println(x)
+#else
+ #define DEBUG_PRINT(x)
+#endif
+
+
 #define NOTE_LENGTH_BUFFER 5000  // number of microseconds to end each gate early
 //#define FRAMES_PER_BEAT  16777216
 #define FRAMES_PER_BEAT  4194304

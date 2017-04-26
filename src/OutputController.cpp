@@ -384,7 +384,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
 
     if(velocityType == 1){
-        Serial.println("velocitytype == 1 on channel " + String(channel));
+      //  Serial.println("velocitytype == 1 on channel " + String(channel));
       if (outputMap(channel, RHEOCHANNELCC) == 0){
         mcp4352_1.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
       } else {
@@ -398,7 +398,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
       lfoAmplitude[channel] = velocity;
 
     } else if (velocityType > 1){
-      Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
+    //  Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
       lfoAmplitude[channel] = velocity;
       lfoSpeed[channel] = lfoSpeedSetting;
       lfoRheoSet[channel] = 1;
