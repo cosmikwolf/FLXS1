@@ -288,20 +288,20 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-		stepData[stepNum].framesRemaining = min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 64 ) * FRAMES_PER_BEAT / (8*clockDivision);
-		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT / (8 * clockDivision);
+		stepData[stepNum].framesRemaining = min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 64 ) * FRAMES_PER_BEAT * clockDivisionNum() / (8*clockDivisionDen());
+		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen());
 		//Serial.println("Setting note with gate length: " + String(min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 256 ))  + "\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
 
 
 	} else {
-		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT *  getArpSpeedNumerator(stepNum) / (clockDivision * getArpSpeedDenominator(stepNum));
+		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT * clockDivisionNum() * getArpSpeedNumerator(stepNum) / (clockDivisionDen() * getArpSpeedDenominator(stepNum));
 		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/2;
 
 		//Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
 
 	}
 
-  DEBUG_PRINT("clockDiv:" + String(clockDiv) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
+  DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION
 	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig );

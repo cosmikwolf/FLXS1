@@ -15,7 +15,7 @@
 #define kSpiClockPin 13
 
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
  #define DEBUG_PRINT(x)  Serial.println(x)

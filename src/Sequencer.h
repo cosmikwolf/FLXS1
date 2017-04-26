@@ -51,6 +51,22 @@ class Sequencer
 
 		void 		gateInputTrigger(uint8_t inputNum);
 
+    uint8_t clockDivisionNum(){
+      if (clockDivision > 0){
+        return 1;
+      } else {
+        return -1 * clockDivision + 2;
+      }
+    }
+
+    uint8_t clockDivisionDen(){
+      if (clockDivision < 1){
+        return 1;
+      } else {
+        return clockDivision;
+      }
+
+    }
 
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);

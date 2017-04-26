@@ -66,14 +66,14 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   }
 
   ppqPulseIndex++;
-  ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount/clockDivision );
+  ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() );
 
 	avgClocksPerPulse = clockSinceLastPulse ;// ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
   clockSinceLastPulse = 0;
   framesPerPulse = FRAMES_PER_BEAT / pulsesPerBeat;
 
   for (int stepNum = 1; stepNum < pulsesPerBeat; stepNum++){
-    if ( ((stepNum*pulsesPerBeat) % clockDivision) == 0 ){
+    if ( ((stepNum*pulsesPerBeat) % ( clockDivisionNum() / clockDivisionDen())) == 0 ){
       syncStep = stepNum;
       break;
     }
@@ -125,13 +125,15 @@ uint32_t Sequencer::framesPerSequence(){
 }
 
 uint32_t Sequencer::getStepLength(){
-		if (clockDivision > 0){
-			//return beatLength/stepData[stepNum].beatDiv;
-			return FRAMES_PER_BEAT / clockDivision;
-		} else { // negative values of beatDiv allow for whole multiples of beatLength
-			return FRAMES_PER_BEAT*(abs(clockDivision)+2);
-		//	return beatLength*(abs(stepData[stepNum].beatDiv)+2);
-		}
+  return FRAMES_PER_BEAT * clockDivisionNum() / clockDivisionDen();
+
+		// if (clockDivision > 0){
+		// 	//return beatLength/stepData[stepNum].beatDiv;
+		// 	return FRAMES_PER_BEAT / clockDivision;
+		// } else { // negative values of beatDiv allow for whole multiples of beatLength
+		// 	return FRAMES_PER_BEAT*(abs(clockDivision)+2);
+		// //	return beatLength*(abs(stepData[stepNum].beatDiv)+2);
+		// }
 }
 
 uint32_t Sequencer::calculateStepTimers(){
