@@ -80,8 +80,10 @@ class Sequencer
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 		uint8_t	 	activeStep;
-		uint8_t 	syncStep;
+    uint8_t   firstStep; //first step to be played
 		uint8_t 	stepCount;
+    uint8_t   playDirection; //forward, backward, pendulum
+		uint8_t 	syncStep;
 		uint8_t 	stepsPlayed;
 		uint8_t		quantizeKey;
 		uint8_t		quantizeScale;

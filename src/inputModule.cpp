@@ -91,7 +91,7 @@ void InputModule::loop(uint16_t frequency){
         case MOD_MENU_1:
         case MOD_MENU_2:
           if(backplaneGPIO->pressed(22)){
-            changeState(min_max_cycle(stepMode+knobChange, STATE_STEPCOUNT , STATE_ARPINTMOD ));
+            changeState(min_max_cycle(stepMode+knobChange, STATE_FIRSTSTEP , STATE_ARPINTMOD ));
           }
           break;
       }
@@ -192,6 +192,7 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_LFOSPEED:
       currentMenu = VELOCITY_MENU;
       break;
+    case STATE_FIRSTSTEP:
     case STATE_STEPCOUNT:
     case STATE_BEATCOUNT:
     case STATE_QUANTIZEKEY:
@@ -409,6 +410,10 @@ void InputModule::sequenceMenuHandler(){
     } else {
 
       switch(stepMode){
+
+        case STATE_FIRSTSTEP:
+          sequenceArray[selectedChannel].firstStep = positive_modulo(sequenceArray[selectedChannel].firstStep + knobChange, 63);
+          break;
         case STATE_STEPCOUNT:
           sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
 
@@ -548,60 +553,46 @@ void InputModule::channelButtonHandler(uint8_t channel){
 
 void InputModule::altButtonHandler(){
 
+  uint8_t channelButton;
 
   for (int i=16; i <28; i++){
     if (midplaneGPIO->fell(i) ){
       switch (i){
         // left row bottom up
         case SW_M0:
+          channelButton = 0;
+          goto  SW_DEFAULT;
+        case SW_M1:
+          channelButton = 1;
+          goto  SW_DEFAULT;
+        case SW_M2:
+          channelButton = 2;
+          goto  SW_DEFAULT;
+        case SW_M3:
+         channelButton = 3;
+
+         SW_DEFAULT:
+
           if (midplaneGPIO->pressed(SW_SHIFT)){
             if(currentMenu == CALIBRATION_MENU){
               calibrationSaveHandler();
             }
             if(midplaneGPIO->pressed(SW_MENU)){
-              channelButtonShiftMenuHandler(0);
+              channelButtonShiftMenuHandler(channelButton);
             } else {
-              channelButtonShiftHandler(0);
+              channelButtonShiftHandler(channelButton);
+            }
+          } else if (selectedChannel == channelButton ) {
+            if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
+              changeState(min_max_cycle(stepMode+1, STATE_STEPCOUNT , STATE_YAXISINPUT));
+            } else {
+              changeState(STATE_STEPCOUNT);
             }
           } else {
-            channelButtonHandler(0);
+            channelButtonHandler(channelButton);
           }
         break;
 
-        case SW_M1:
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            if(midplaneGPIO->pressed(SW_MENU)){
-              channelButtonShiftMenuHandler(1);
-            } else {
-              channelButtonShiftHandler(1);
-            }
-          } else {
-            channelButtonHandler(1);
-          }
-        break;
-
-        case SW_M2:
-        if (midplaneGPIO->pressed(SW_SHIFT)){
-          if(midplaneGPIO->pressed(SW_MENU)){
-            channelButtonShiftMenuHandler(2);
-          } else {
-            channelButtonShiftHandler(2);
-          }
-        } else {
-          channelButtonHandler(2);
-        }        break;
-
-        case SW_M3:
-        if (midplaneGPIO->pressed(SW_SHIFT)){
-          if(midplaneGPIO->pressed(SW_MENU)){
-            channelButtonShiftMenuHandler(3);
-          } else {
-            channelButtonShiftHandler(3);
-          }
-        } else {
-          channelButtonHandler(3);
-        }
-        break;
 
         case SW_PATTERN:
           if(currentMenu == PATTERN_SELECT){
@@ -615,11 +606,11 @@ void InputModule::altButtonHandler(){
          if (midplaneGPIO->pressed(SW_SHIFT)){
            changeState(STATE_GLOBAL);
          } else {
-           if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
-             changeState(min_max_cycle(stepMode+1, STATE_STEPCOUNT , STATE_YAXISINPUT));
-           } else {
-             changeState(STATE_STEPCOUNT);
-           }
+          //  if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
+          //    changeState(min_max_cycle(stepMode+1, STATE_STEPCOUNT , STATE_YAXISINPUT));
+          //  } else {
+          //    changeState(STATE_STEPCOUNT);
+          //  }
          }
         break;
 
@@ -698,9 +689,6 @@ void InputModule::altButtonHandler(){
 
         lastSelectedStep = selectedStep;
         selectedStepTimer = 0;
-
-
-
       }
     }
 

@@ -17,7 +17,7 @@ void Sequencer::clockReset(bool activeStepReset){
     getActiveStep(getCurrentFrame());
   }
 
-  for (int stepNum = 0; stepNum < stepCount; stepNum++){
+  for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
     if(stepNum == activeStep){
       break;
     }
@@ -45,7 +45,7 @@ void Sequencer::masterClockPulse(){
   }
 
   clockSinceLastPulse++;
-  for (int stepNum=0; stepNum<stepCount; stepNum++){
+  for (int stepNum=0; stepNum< firstStep + stepCount; stepNum++){
     if (stepData[stepNum].framesRemaining > 0){
       stepData[stepNum].framesRemaining -= (framesPerPulse / avgClocksPerPulse);
     }
@@ -105,13 +105,13 @@ uint32_t Sequencer::getCurrentFrame(){
   } else {
     workingCpp = clockSinceLastPulse;
   }
-  return (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse);
+  return (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse) + (firstStep * getStepLength());
 }
 
 void Sequencer::getActiveStep(uint32_t frame){
   // getCurrentFrame() / getStepLength()  <-- steps since last beat
 
-  activeStep = getCurrentFrame() / getStepLength();
+  activeStep = getCurrentFrame() / getStepLength() ;
 
   if( lastActiveStep > activeStep ){
   //  if (channel ==0)Serial.println("activestep changed  old: " + String(lastActiveStep) + "\tnew: " + String(activeStep) + "\tppqIndex: " + String(ppqPulseIndex) + "\tpulseFrames: " + String(ppqPulseIndex * framesPerPulse) + "\tFPP: " + String(framesPerPulse) + "\tframesfromclocks: " + String(framesPerPulse * clockSinceLastPulse / avgClocksPerPulse) + "\tcurrentFrame: " + String(getCurrentFrame()) + "\tclocksSincePulse: " + String(clockSinceLastPulse) + "\tavgCpp:" + String(avgClocksPerPulse));
@@ -141,8 +141,8 @@ uint32_t Sequencer::calculateStepTimers(){
 	uint32_t accumulatedOffset = 0;
 	//beatOffset
 	//stepLength = beatLength/stepDivider*stepCount;
-	for (int stepNum = activeStep; stepNum < stepCount + activeStep-1; stepNum++){
-    stepData[stepNum % stepCount].offset = accumulatedOffset;
+	for (int stepNum = activeStep; stepNum < firstStep + stepCount + activeStep-1; stepNum++){
+    stepData[stepNum % (firstStep + stepCount)].offset = accumulatedOffset;
     accumulatedOffset += getStepLength();
 	}
 	return accumulatedOffset;
@@ -171,7 +171,7 @@ void Sequencer::sequenceModeStandardStep(){
     }
   }
 
-	for (int stepNum = 0; stepNum < stepCount; stepNum++){
+	for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
 	// iterate through all steps to determine if they need to have action taken.
 
 		if (stepData[stepNum].gateType == GATETYPE_REST){

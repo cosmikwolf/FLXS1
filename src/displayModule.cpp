@@ -437,12 +437,17 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[0] = strdup(buf);
 
-   displayElement[1] = strdup("LAST:");
+   displayElement[9] = strdup("FIRST STEP:");
+   sprintf(buf, "%d", sequenceArray[selectedChannel].firstStep+1);
+   displayElement[10] = strdup(buf);
+
+
+   displayElement[1] = strdup("STEP COUNT:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepCount);
    displayElement[2] = strdup(buf);
 
-   displayElement[3] = strdup("LENGTH:");
+   displayElement[3] = strdup("CLOCK DIV:");
 
    if (sequenceArray[selectedChannel].clockDivision == 1){
      sprintf(buf, "%d", sequenceArray[selectedChannel].clockDivision);
@@ -453,9 +458,9 @@ void DisplayModule::stateDisplay_arp(char *buf){
    }
    displayElement[4] = strdup(buf);
 
-   displayElement[5] = strdup("KEY:");
+   displayElement[5] = strdup("QUANT KEY:");
    char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
-   char *scaleArray[] = { "OFF", "CHROMATIC", "MAJOR", "MINOR", "MAJORMINOR", "PENTATONIC_MAJOR", "PENTATONIC_MINOR", "PENTATONIC_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDIAN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
+   char *scaleArray[] = { "     OFF", "CHROMATK", "MAJOR", "MINOR", "MAJMINOR", "PENT_MAJOR", "PENT_MINOR", "PENT_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
 
    displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
    displayElement[7] = strdup("SCALE:");
@@ -464,16 +469,20 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
 
-   renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_STEPCOUNT,     68, 20,60,17, false, STYLE1X, background , foreground);
-   renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_BEATCOUNT,     68, 37,60,17, false, STYLE1X, background , foreground);
+   renderStringBox(9,  DISPLAY_LABEL,       0, 15,95,17, false, STYLE1X, background , foreground);
+   renderStringBox(10,  STATE_FIRSTSTEP,    96, 15,32,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_QUANTIZEKEY,     68, 54,60,17, false, STYLE1X, background , foreground);
+   renderStringBox(1,  DISPLAY_LABEL,        0, 31,95,17, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_STEPCOUNT,     96, 31,32,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(7,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_QUANTIZESCALE,    68, 71,60,17, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,        0, 47,90,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_BEATCOUNT,     90, 47, 37,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(5,  DISPLAY_LABEL,        0,  63,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_QUANTIZEKEY,     96, 63,32,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(7,  DISPLAY_LABEL,        0, 79,50,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_QUANTIZESCALE,    50, 79,78,17, false, STYLE1X, background , foreground);
 
  }
 

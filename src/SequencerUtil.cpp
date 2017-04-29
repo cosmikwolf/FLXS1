@@ -20,7 +20,8 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 
 void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	Serial.println("*&*&*&*& Initializing pattern: " + String(pattern) + " channel: " + String(ch));
-	this->stepCount 				= 16;
+  this->stepCount 				= 16;
+  this->firstStep 				= 0;
 	this->beatCount 				= 4;
 	this->quantizeKey 			= 0;
 	this->quantizeScale 		= 0;
@@ -301,7 +302,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	}
 
-  DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
+  //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION
 	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig );
