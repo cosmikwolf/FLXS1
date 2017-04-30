@@ -115,7 +115,7 @@ class DisplayModule
     void tempoMenuDisplay();
     void modMenu1_DisplayHandler();
     void modMenu2_DisplayHandler();
-
+    void noteDisplayHandler();
     void gameOfLifeDisplay();
     void deleteMenuDisplay();
     void cleanupTextBuffers();

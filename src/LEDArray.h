@@ -22,6 +22,7 @@ class LEDArray
     void rainbowCycle(uint8_t wait);
     uint32_t wheel(byte WheelPos);
     void channelPitchModeLEDHandler();
+    void channelSequenceModeLEDHandler();
     void channelGateModeLEDHandler();
     void channelEnvelopeModeLEDHandler();
     void channelStepModeLEDHandler();

@@ -169,6 +169,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         modMenu2_DisplayHandler();
       break;
 
+      case NOTE_DISPLAY:
+        noteDisplayHandler();
+      break;
+
       case MENU_MODAL:
         modalPopup();
       break;
@@ -458,12 +462,12 @@ void DisplayModule::stateDisplay_arp(char *buf){
    }
    displayElement[4] = strdup(buf);
 
-   displayElement[5] = strdup("QUANT KEY:");
+   displayElement[5] = strdup("KEY:");
    char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
    char *scaleArray[] = { "     OFF", "CHROMATK", "MAJOR", "MINOR", "MAJMINOR", "PENT_MAJOR", "PENT_MINOR", "PENT_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
 
    displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
-   displayElement[7] = strdup("SCALE:");
+   displayElement[7] = strdup("MODE:");
 
    displayElement[8] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
 
@@ -753,6 +757,20 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
 
  }
 
+ void DisplayModule::noteDisplayHandler(){
+
+
+   uint8_t currentStep = sequenceArray[selectedChannel].getActivePage()*16;
+   for(int i = 0; i<16; i++){
+     displayElement[i] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[currentStep+i].pitch[0]]);
+     renderStringBox( i, DISPLAY_LABEL, 32*(i%4), 16*(i/4+1), 32 , 16, false, STYLE1X, BLACK, GREEN);
+   }
+
+   displayElement[16] = strdup("NOTES:");
+   renderStringBox( 16, DISPLAY_LABEL, 0, 0, 128 , 16, false, STYLE1X, BLACK, GREEN);
+
+
+ }
 
 void DisplayModule::modalPopup(){
   uint8_t previousHighlight = highlight;
@@ -763,6 +781,7 @@ void DisplayModule::modalPopup(){
 
   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR3X, BLACK, WHITE);
 }
+
 
  void DisplayModule::inputCalibrationMenuDisplay(){
    uint8_t previousHighlight = highlight;

@@ -105,17 +105,42 @@ uint32_t Sequencer::getCurrentFrame(){
   } else {
     workingCpp = clockSinceLastPulse;
   }
-  return (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse) + (firstStep * getStepLength());
+  //return ((ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse) + (firstStep * getStepLength()))% (MAX_STEPS_PER_SEQUENCE * getStepLength());
+  return (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse);
 }
 
 void Sequencer::getActiveStep(uint32_t frame){
   // getCurrentFrame() / getStepLength()  <-- steps since last beat
 
-  activeStep = getCurrentFrame() / getStepLength() ;
+  if (playDirection == PLAY_REVERSE) {
+    activeStep = firstStep + stepCount - getCurrentFrame() / getStepLength() - 1;
+  } else if (playDirection == PLAY_FORWARD) {
+    activeStep = firstStep + getCurrentFrame() / getStepLength();
+  };
+//
+// NUM  activeStep       REVERSED
+// 0    12                 14
+// 1    13                 13
+// 2    14                 12
+// NUM = ACTIVESTEP-FIRSTSTEP
+//
+// FIRSTSTEP + STEPCOUNT - (ACTIVESTEP - FIRSTSTEP) - 1
+// 2 * FIRSTSTEP + STEPCOUNT - ACTIVESTEP - 1
+// 12 + 3 - (12 - 12) - 1 = 14
+//
+// 12 + 3 - 0 - 1  = 14
+// 12 + 3 - 1 - 1  = 13
+//
+//
+// firstStep
+// 12            13
+//
+// stepCount
+// 3
 
-  if( lastActiveStep > activeStep ){
+  //if( lastActiveStep > activeStep ){
   //  if (channel ==0)Serial.println("activestep changed  old: " + String(lastActiveStep) + "\tnew: " + String(activeStep) + "\tppqIndex: " + String(ppqPulseIndex) + "\tpulseFrames: " + String(ppqPulseIndex * framesPerPulse) + "\tFPP: " + String(framesPerPulse) + "\tframesfromclocks: " + String(framesPerPulse * clockSinceLastPulse / avgClocksPerPulse) + "\tcurrentFrame: " + String(getCurrentFrame()) + "\tclocksSincePulse: " + String(clockSinceLastPulse) + "\tavgCpp:" + String(avgClocksPerPulse));
-  }
+  //}
 
   lastActiveStep = activeStep;
 }
@@ -134,6 +159,10 @@ uint32_t Sequencer::getStepLength(){
 		// 	return FRAMES_PER_BEAT*(abs(clockDivision)+2);
 		// //	return beatLength*(abs(stepData[stepNum].beatDiv)+2);
 		// }
+}
+
+int Sequencer::getActivePage(){
+  return activeStep/16;
 }
 
 uint32_t Sequencer::calculateStepTimers(){

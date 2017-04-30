@@ -70,9 +70,13 @@ void LEDArray::loop(uint16_t interval){
     pixelTimer = 0;
 
     switch (currentMenu ){
+      case SEQUENCE_MENU:
+      case MOD_MENU_1:
+      case MOD_MENU_2:
+        channelSequenceModeLEDHandler();
+      break;
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
-      case SEQUENCE_MENU:
         channelPitchModeLEDHandler();
       break;
       case VELOCITY_MENU:
@@ -112,6 +116,40 @@ void LEDArray::loop(uint16_t interval){
   }
 }
 
+void LEDArray::channelSequenceModeLEDHandler(){
+  uint8_t iStep;
+  for (int i=0; i < 16; i++){
+    iStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
+    if (iStep == sequenceArray[selectedChannel].activeStep ){
+    //  leds[ledMapping[i]] = CRGB(255, 255, 255);
+      leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
+
+    } else if(sequenceArray[selectedChannel].stepData[iStep].gateType == 0){
+        //    leds[ledMapping[i]] = CHSV(0,0,0);
+        leds.setPixelColor(ledMainMatrix[i], 1,1,1,1);
+    } else {
+        //  leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0),255,255);
+        leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(iStep, 0)));
+    }
+  }
+  if(playing){
+    leds.setPixelColor(0, wheel(64));
+  } else {
+    leds.setPixelColor(0, wheel(255));
+  }
+
+  for (int i=0; i < 4; i++){
+    if (selectedChannel == i) {
+    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
+    leds.setPixelColor(ledChannelButtons[i], wheel(millis()/100));
+
+    } else {
+      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
+    }
+  }
+
+}
+
 void LEDArray::channelPitchModeLEDHandler(){
   for (int i=0; i < 16; i++){
     if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
@@ -135,6 +173,9 @@ void LEDArray::channelPitchModeLEDHandler(){
   } else {
     leds.setPixelColor(0, wheel(255));
   }
+
+
+
   switch(notePage){
     case 0:
       leds.setPixelColor(21, wheel(255));

@@ -318,7 +318,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	// }
 
 
-	//stepData[stepNum].framesRemaining = std::min( (int)stepData[stepNum].framesRemaining ,(int) (nextStep*FRAMES_PER_BEAT/clockDivision - getCurrentFrame() - FRAMES_PER_BEAT/16) );
 
 }
 

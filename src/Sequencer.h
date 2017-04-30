@@ -34,7 +34,8 @@ class Sequencer
 
 		void    masterClockPulse();
 
-		void    getActiveStep(uint32_t frame);
+    void    getActiveStep(uint32_t frame);
+    int     getActivePage();
 
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
