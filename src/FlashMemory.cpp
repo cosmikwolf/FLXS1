@@ -240,7 +240,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
 
     Serial.println("jsonArray declared");
 
-    for (int i=0; i< sequenceArray[channel].stepCount; i++){
+    for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
      StepDatum stepDataBuf;
 
      stepDataBuf.pitch[0]    = stepDataArray[i][1];
@@ -263,7 +263,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
      sequenceArray[channel].stepData[index] = stepDataBuf;
   }
 
-  for(int n = sequenceArray[channel].stepCount; n< MAX_STEPS_PER_SEQUENCE; n++){
+/*  for(int n = sequenceArray[channel].stepCount; n< MAX_STEPS_PER_SEQUENCE; n++){
     // fill up the remaining steps with zeroed data so if stepCount is increased, it will work
     StepDatum stepDataBuf;
 
@@ -288,7 +288,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
     stepDataBuf.notePlaying  =   0;
     sequenceArray[channel].stepData[n] = stepDataBuf;
 
-  }
+  }*/
 
   return jsonReader.success();
 }

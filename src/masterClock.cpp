@@ -92,9 +92,8 @@ void MasterClock::masterClockFunc(){
 		digitalWriteFast(PIN_EXT_AD_2, HIGH);
 	}
 
-	//digitalWriteFast(PIN_EXT_AD_2, LOW);
-
-//  masterLooptimeAvg
+	// digitalWriteFast(PIN_EXT_AD_2, LOW);
+  // masterLooptimeAvg
 
 };
 

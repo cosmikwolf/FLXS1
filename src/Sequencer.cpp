@@ -41,7 +41,7 @@ void Sequencer::clockStart(elapsedMicros startTime){
 
 void Sequencer::masterClockPulse(){
   if (!playing){
-    return;
+    //return;
   }
 
   clockSinceLastPulse++;

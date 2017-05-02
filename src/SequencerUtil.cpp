@@ -184,6 +184,17 @@ void Sequencer::skipStep(uint8_t count){
   }
 }
 
+void Sequencer::jumpToStep(uint8_t stepNum){
+//  Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
+
+  uint16_t oldPpqPulseIndex = ppqPulseIndex;
+  ppqPulseIndex = (stepNum*pulsesPerBeat/clockDivision);
+  for(int stepNum = 0; stepNum < stepCount; stepNum++){
+    stepData[stepNum].framesRemaining += ppqPulseIndex;
+  }
+}
+
+
 
 void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig){
 	uint8_t pitchArray[22];

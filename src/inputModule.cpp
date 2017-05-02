@@ -331,9 +331,7 @@ void InputModule::sequenceMenuHandler(){
     if ( backplaneGPIO->pressed(22) ) {// Encoder Switch
     //  changeState(min_max_cycle(stepMode + knobChange,  STATE_STEPCOUNT,  STATE_QUANTIZESCALE));
     } else {
-
       switch(stepMode){
-
         case STATE_FIRSTSTEP:
           sequenceArray[selectedChannel].firstStep = positive_modulo(sequenceArray[selectedChannel].firstStep + knobChange, 63);
           //sequenceArray[selectedChannel].firstStepChanged == TRUE;
@@ -631,32 +629,53 @@ void InputModule::altButtonHandler(){
     uint8_t chrd;
     for (int i=0; i < 16; i++){
       if (midplaneGPIO->fell(i)){
+        // select the step
+        selectedStep = getNote(i);
+
         //  changeState(STATE_PITCH0);
         // i is the first step pressed
         // n is the second step pressed
-        // if n is double tapped, then first and last
-        for (int n=0; n < 16; n++){
-          if (i == n) continue;
-          if (midplaneGPIO->pressed(n)){
+        if (playing){
+          //two butons are pressed simultaneously, loop between the buttons
+          //play direction is dependent upon the order in which buttons are pressed.
+          for (int n=0; n < 16; n++){
+            if (i == n) continue;
+            if (midplaneGPIO->pressed(n)){
 
-            sequenceArray[selectedChannel].stepCount = abs(i-n)+1;
+              sequenceArray[selectedChannel].stepCount = abs(i-n)+1;
+              if (n<i){
+                sequenceArray[selectedChannel].firstStep = n + notePage*16;
+                sequenceArray[selectedChannel].playDirection = PLAY_FORWARD;
+              } else {
+                sequenceArray[selectedChannel].firstStep = i + notePage*16;
+                sequenceArray[selectedChannel].playDirection = PLAY_REVERSE;
+              }
 
-            if (n<i){
-              sequenceArray[selectedChannel].firstStep = n;
-              sequenceArray[selectedChannel].playDirection = PLAY_FORWARD;
-            } else {
-              sequenceArray[selectedChannel].firstStep = i;
-              sequenceArray[selectedChannel].playDirection = PLAY_REVERSE;
+              break;
             }
-
-
-            break;
           }
+        } else {
+          sequenceArray[selectedChannel].jumpToStep(i);
         }
+      //  knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
 
+        //multi select logic - double tap and hold
+        if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
+          //enable multi select mode -
+          multiSelectStep = selectedStep;
+          debug("enable mutli select");
+        }
+        // record which was the last step, and time, for double press purposes
+        lastSelectedStep = selectedStep;
+        selectedStepTimer = 0;
 
-        selectedStep = getNote(i);
-        knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
+      } else if (midplaneGPIO->rose(i)){
+
+        if (multiSelectStep == selectedStep){
+          //disable multi select mode
+          debug("disable mutli select");
+          multiSelectStep = 255;
+        }
 
         if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
           sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
@@ -669,8 +688,6 @@ void InputModule::altButtonHandler(){
 
 
 
-        lastSelectedStep = selectedStep;
-        selectedStepTimer = 0;
       }
     }
 
