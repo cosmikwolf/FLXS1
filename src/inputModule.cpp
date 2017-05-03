@@ -640,6 +640,7 @@ void InputModule::altButtonHandler(){
         // select the step
         selectedStep = getNote(i);
 
+        buttonMode = BUTTON_MODE_XOX;
         //  changeState(STATE_PITCH0);
         // i is the first step pressed
         // n is the second step pressed
@@ -649,18 +650,15 @@ void InputModule::altButtonHandler(){
           for (int n=0; n < 16; n++){
             if (i == n) continue;
             if (midplaneGPIO->pressed(n)){
-              sequenceArray[selectedChannel].stepCount = abs(i-n)+1;
-              if (n<i){
-                sequenceArray[selectedChannel].firstStep = n + notePage*16;
-                sequenceArray[selectedChannel].playDirection = PLAY_FORWARD;
-              } else {
-                sequenceArray[selectedChannel].firstStep = i + notePage*16;
-                sequenceArray[selectedChannel].playDirection = PLAY_REVERSE;
-              }
-              midplaneGPIO->clearBuffers();
+              buttonMode = BUTTON_MODE_PLAYRANGE;
+              sequenceArray[selectedChannel].setPlayRange(n,i);
               break;
             }
           }
+
+          lastSelectedStep = selectedStep;
+          selectedStepTimer = 0;
+
         }
         //multi select logic - double tap and hold
         if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
@@ -673,18 +671,21 @@ void InputModule::altButtonHandler(){
 
       } else if (midplaneGPIO->rose(i)){
 
-        selectedStep = getNote(i);
-        if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
-          sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
-        } else {
-          if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP ;
+        if(buttonMode == BUTTON_MODE_XOX){
+          selectedStep = getNote(i);
+          if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
+            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
+          } else {
+            if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+              sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP ;
+            }
+  //            sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
           }
-//            sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
-        }
 
-        lastSelectedStep = selectedStep;
-        selectedStepTimer = 0;
+          lastSelectedStep = selectedStep;
+          selectedStepTimer = 0;
+
+        }
 
         if (multiSelectStep == selectedStep){
           //disable multi select mode

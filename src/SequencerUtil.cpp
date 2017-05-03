@@ -41,7 +41,8 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->cv_gatemod 				= 5;
 	this->cv_glidemod 			= 5;
 	this->mute 							= 0;
-
+  this->fill              = 0;
+  this->skipNextNoteTrigger = 0;
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
 		this->stepData[n].pitch[0]   = 24;
 		for (int i=1; i<4; i++){
@@ -219,6 +220,10 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	pitchArray[2] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2];
 	pitchArray[3] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3];
 
+  if(skipNextNoteTrigger){
+    skipNextNoteTrigger = false;
+    return;
+  }
 	//figure out how many steps are nil (255)
 	uint8_t arpSteps = 4;
 	for(int i=1; i<4; i++){
@@ -415,3 +420,15 @@ void Sequencer::noteShutOff(uint8_t stepNum, bool gateOff){
 		}
 
 }
+
+void Sequencer::setPlayRange(uint8_t first, uint8_t last){
+  stepCount = abs(last - first)+1;
+  if (first < last){
+    firstStep = first + notePage*16;
+    playDirection = PLAY_FORWARD;
+  } else {
+    firstStep = last + notePage*16;
+    playDirection = PLAY_REVERSE;
+  }
+  skipNextNoteTrigger = true;
+};

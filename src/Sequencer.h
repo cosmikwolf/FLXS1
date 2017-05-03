@@ -48,7 +48,7 @@ class Sequencer
 		void 		setGateType(uint8_t step, uint8_t gate);
 		void 		setStepVelocity(uint8_t step, uint8_t velocity);
 		void 		setStepGlide(uint8_t step, uint8_t glideTime);
-
+    void    setPlayRange(uint8_t first, uint8_t last);
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
 
@@ -107,7 +107,7 @@ class Sequencer
 		uint8_t		cv_glidemod;
 		bool 			mute;
 		bool			fill;
-
+    bool      skipNextNoteTrigger;
 		uint8_t arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
 		uint8_t arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
 		int8_t arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];

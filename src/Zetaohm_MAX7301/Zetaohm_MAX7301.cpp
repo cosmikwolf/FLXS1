@@ -13,7 +13,7 @@ void Zetaohm_MAX7301::begin(uint8_t csPin) {
   _cs = csPin;
   //	postSetup(csPin);
 	MAX7301_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);//mode3
-
+  skipRiseCount = 0;
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);
@@ -164,6 +164,10 @@ void Zetaohm_MAX7301::clearBuffers(){
   inputBuffer = 0;
 }
 
+void Zetaohm_MAX7301::skipNextRises(uint8_t count){
+  skipRiseCount += count;
+}
+
 void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
   //  noInterrupts();
     writeByte(0x24 + indexMap[index], value);
@@ -196,6 +200,10 @@ bool Zetaohm_MAX7301::fell(uint8_t index){
 };
 
 bool Zetaohm_MAX7301::rose(uint8_t index){
+  if(skipRiseCount){
+    skipRiseCount--;
+    return true;
+  }
 	if ( roseBuffer & (1 << indexMap[index]) ) {
 		roseBuffer = roseBuffer & ~(1 << indexMap[index]) ;
 		return true;

@@ -12,6 +12,10 @@
 #include "global.h"
 
 #define DOUBLECLICKMS  250
+#define BUTTON_MODE_WAIT        0
+#define BUTTON_MODE_XOX         1
+#define BUTTON_MODE_PLAYRANGE  2
+#define BUTTON_MODE_MULTISELECT 3
 
 #ifndef _InputModule_h_
 #define _InputModule_h_
@@ -62,7 +66,7 @@ public:
   void resetKnobValues();
   void changeState(uint8_t state);
 
-
+  uint8_t buttonMode;
   uint8_t lastSelectedStep;
   elapsedMillis selectedStepTimer;
   // Encoder vars
