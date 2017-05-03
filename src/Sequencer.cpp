@@ -182,6 +182,9 @@ void Sequencer::sequenceModeStandardStep(){
   uint32_t currentFrameVar = getCurrentFrame();
   getActiveStep(currentFrameVar);
   //incrementActiveStep(currentFrameVar);
+  if (mute){
+    return;
+  }
 
   if (stepData[activeStep].noteStatus == AWAITING_TRIGGER){
     if (stepData[activeStep].gateType != GATETYPE_REST){

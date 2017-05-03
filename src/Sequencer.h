@@ -30,7 +30,8 @@ class Sequencer
 		void 		clockStart(elapsedMicros startTime);
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
-    
+		void 		toggleMute();
+
 		void 		skipStep(uint8_t count);
     void    jumpToStep(uint8_t stepNum);
 
@@ -104,6 +105,8 @@ class Sequencer
 		uint8_t		cv_pitchmod;
 		uint8_t		cv_gatemod;
 		uint8_t		cv_glidemod;
+		bool 			mute;
+		bool			fill;
 
 		uint8_t arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
 		uint8_t arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];

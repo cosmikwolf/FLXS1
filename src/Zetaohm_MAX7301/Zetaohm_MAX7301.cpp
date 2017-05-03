@@ -158,6 +158,11 @@ void Zetaohm_MAX7301::update(){
 	}
 };
 
+void Zetaohm_MAX7301::clearBuffers(){
+  fellBuffer = 0;
+  roseBuffer = 0;
+  inputBuffer = 0;
+}
 
 void Zetaohm_MAX7301::digitalWrite(uint8_t index, bool value){
   //  noInterrupts();

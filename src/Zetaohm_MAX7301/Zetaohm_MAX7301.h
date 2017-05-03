@@ -28,7 +28,8 @@ public:
 	bool			rose(uint8_t index);					// was the button pressed since the last check?
 	bool			pressed(uint8_t index);
 	bool 			cacheCheck(uint8_t index);
-
+	void 			clearBuffers();
+	
 	uint32_t		inputBuffer;
 	uint32_t		fellBuffer;
 	uint32_t		roseBuffer;

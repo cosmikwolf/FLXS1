@@ -40,6 +40,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->cv_pitchmod 			= 5;
 	this->cv_gatemod 				= 5;
 	this->cv_glidemod 			= 5;
+	this->mute 							= 0;
 
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
 		this->stepData[n].pitch[0]   = 24;
@@ -66,6 +67,21 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	}
 };
 
+void Sequencer::toggleMute(){
+	this->mute = !mute;
+
+	if (mute){
+		for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
+			if(stepNum == activeStep){
+				break;
+			}
+			stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+			stepData[stepNum].arpStatus = 0;
+		}
+		outputControl->allNotesOff(channel);
+	}
+
+};
 
 void Sequencer::setTempo(uint32_t tempoX100){
 	this->tempoX100 = tempoX100;

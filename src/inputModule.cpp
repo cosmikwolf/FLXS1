@@ -507,6 +507,7 @@ void InputModule::channelButtonHandler(uint8_t channel){
   }
 }
 
+
 void InputModule::altButtonHandler(){
 
   uint8_t channelButton;
@@ -551,6 +552,13 @@ void InputModule::altButtonHandler(){
 
 
         case SW_PATTERN:
+          if(midplaneGPIO->pressed(SW_M0)) sequenceArray[0].toggleMute();
+          if(midplaneGPIO->pressed(SW_M1)) sequenceArray[1].toggleMute();
+          if(midplaneGPIO->pressed(SW_M2)) sequenceArray[2].toggleMute();
+          if(midplaneGPIO->pressed(SW_M3)) sequenceArray[3].toggleMute();
+
+          if(midplaneGPIO->pressed(SW_M0) || midplaneGPIO->pressed(SW_M1) || midplaneGPIO->pressed(SW_M2) || midplaneGPIO->pressed(SW_M3)) break;
+
           if(currentMenu == PATTERN_SELECT){
             changeState(STATE_PITCH0);
           } else {
@@ -641,7 +649,6 @@ void InputModule::altButtonHandler(){
           for (int n=0; n < 16; n++){
             if (i == n) continue;
             if (midplaneGPIO->pressed(n)){
-
               sequenceArray[selectedChannel].stepCount = abs(i-n)+1;
               if (n<i){
                 sequenceArray[selectedChannel].firstStep = n + notePage*16;
@@ -650,15 +657,11 @@ void InputModule::altButtonHandler(){
                 sequenceArray[selectedChannel].firstStep = i + notePage*16;
                 sequenceArray[selectedChannel].playDirection = PLAY_REVERSE;
               }
-
+              midplaneGPIO->clearBuffers();
               break;
             }
           }
-        } else {
-          sequenceArray[selectedChannel].jumpToStep(i);
         }
-      //  knobBuffer = sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) - knobRead;
-
         //multi select logic - double tap and hold
         if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
           //enable multi select mode -
@@ -666,17 +669,11 @@ void InputModule::altButtonHandler(){
           debug("enable mutli select");
         }
         // record which was the last step, and time, for double press purposes
-        lastSelectedStep = selectedStep;
-        selectedStepTimer = 0;
+
 
       } else if (midplaneGPIO->rose(i)){
 
-        if (multiSelectStep == selectedStep){
-          //disable multi select mode
-          debug("disable mutli select");
-          multiSelectStep = 255;
-        }
-
+        selectedStep = getNote(i);
         if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
           sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
         } else {
@@ -686,8 +683,14 @@ void InputModule::altButtonHandler(){
 //            sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
         }
 
+        lastSelectedStep = selectedStep;
+        selectedStepTimer = 0;
 
-
+        if (multiSelectStep == selectedStep){
+          //disable multi select mode
+          debug("disable mutli select");
+          multiSelectStep = 255;
+        }
       }
     }
 
