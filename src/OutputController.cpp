@@ -353,7 +353,7 @@ void OutputController::inputRead(){
   backplaneGPIO->digitalWrite(8, 0);
 }
 
-void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate){
+void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -365,15 +365,19 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 */
   //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide) + "\tgate: " + String(gate));
   if (gate){
-    if(backplaneGPIO->cacheCheck(channel) == 1){
+    if(backplaneGPIO->cacheCheck(channel) == 1 && tieFlag == 0){
       backplaneGPIO->digitalWrite(channel, LOW);                                 // close gate before re opening
     //  delay(1);
       //Serial.println("setting gate low because it was still on.");
     }
   }
 
+  if (glide == 0 && tieFlag){
+    glide = 5; // this is where tempo dependent glide needs to be set
+  }
+
   if (glide > 0) {
-    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), LOW);           // turn on switch with cap to ground, enable slew
+    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), LOW);                     // turn on switch with cap to ground, enable slew
     if (outputMap(channel, RHEOCHANNELCV) == 0){
       mcp4352_1.setResistance(outputMap(channel, CVRHEO), map(glide, 0,127,0,255) );        // set digipot to correct resistance, set slew rate
     } else {

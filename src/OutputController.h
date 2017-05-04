@@ -29,7 +29,7 @@
 class OutputController {
 public:
   void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc);
-  void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate);
+  void noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   void lfoUpdate(uint8_t channel);
   void allNotesOff(uint8_t channel);

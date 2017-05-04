@@ -49,10 +49,10 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   midplaneGPIO->initPort(16, 0, INPUT_PULLUP);   // SW_PLAY
   midplaneGPIO->initPort(17, 27, INPUT_PULLUP);   // SW_PAUSE
   midplaneGPIO->initPort(18, 4, INPUT_PULLUP);   // SW_STOP
-  midplaneGPIO->initPort(19, 1, INPUT_PULLUP);  // SW_M0
-  midplaneGPIO->initPort(20, 26, INPUT_PULLUP);  // SW_M1
-  midplaneGPIO->initPort(21, 2, INPUT_PULLUP);  // SW_M2
-  midplaneGPIO->initPort(22, 25, INPUT_PULLUP);  // SW_M3
+  midplaneGPIO->initPort(19, 1, INPUT_PULLUP);  // SW_CH0
+  midplaneGPIO->initPort(20, 26, INPUT_PULLUP);  // SW_CH1
+  midplaneGPIO->initPort(21, 2, INPUT_PULLUP);  // SW_CH2
+  midplaneGPIO->initPort(22, 25, INPUT_PULLUP);  // SW_CH3
   midplaneGPIO->initPort(23, 5, INPUT_PULLUP);   // SW_PGDN
   midplaneGPIO->initPort(24, 8, INPUT_PULLUP);  // SW_PGUP
   midplaneGPIO->initPort(25, 10, INPUT_PULLUP);  // SW_PATTERN
@@ -333,15 +333,15 @@ void InputModule::sequenceMenuHandler(){
     } else {
       switch(stepMode){
         case STATE_FIRSTSTEP:
-          sequenceArray[selectedChannel].firstStep = positive_modulo(sequenceArray[selectedChannel].firstStep + knobChange, 63);
+          sequenceArray[selectedChannel].firstStep = min_max(sequenceArray[selectedChannel].firstStep + knobChange, 0, 63);
           //sequenceArray[selectedChannel].firstStepChanged == TRUE;
           break;
         case STATE_STEPCOUNT:
-          sequenceArray[selectedChannel].stepCount = positive_modulo(sequenceArray[selectedChannel].stepCount + knobChange, 64);
+          sequenceArray[selectedChannel].stepCount = min_max(sequenceArray[selectedChannel].stepCount + knobChange, 1, 64);
 
-          if (sequenceArray[selectedChannel].stepCount == 0) {
-            sequenceArray[selectedChannel].stepCount = 64;
-          }
+          // if (sequenceArray[selectedChannel].stepCount == 0) {
+          //   sequenceArray[selectedChannel].stepCount = 64;
+          // }
           break;
         case STATE_BEATCOUNT:
            newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange, -16, 16);
@@ -494,17 +494,33 @@ void InputModule::channelButtonShiftMenuHandler(uint8_t channel){
   Serial.println("CALIB MENU " + String(channel) + "\t" + String(CALIBRATION_MENU));
 }
 
+void InputModule::channelButtonPatternSelectHandler(uint8_t channel){
+  switch(channel){
+    case 0:
+      patternChannelSelector = patternChannelSelector ^ 0b0001;
+    break;
+    case 1:
+      patternChannelSelector = patternChannelSelector ^ 0b0010;
+    break;
+    case 2:
+      patternChannelSelector = patternChannelSelector ^ 0b0100;
+    break;
+    case 3:
+      patternChannelSelector = patternChannelSelector ^ 0b1000;
+    break;
+  }
+};
+
 void InputModule::channelButtonHandler(uint8_t channel){
-  uint8_t previous = patternChannelSelector;
+  //uint8_t previous = patternChannelSelector;
 
   resetKnobValues();
-  if (currentMenu != PATTERN_SELECT){
-    if (selectedChannel != channel){
-      selectedChannel = channel;
-      return;
-    }
-    changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));
+  if (selectedChannel != channel){
+    selectedChannel = channel;
+    return;
   }
+  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));
+
 }
 
 
@@ -516,48 +532,57 @@ void InputModule::altButtonHandler(){
     if (midplaneGPIO->fell(i) ){
       switch (i){
         // left row bottom up
-        case SW_M0:
+        case SW_CH0:
           channelButton = 0;
           goto  SW_DEFAULT;
-        case SW_M1:
+        case SW_CH1:
           channelButton = 1;
           goto  SW_DEFAULT;
-        case SW_M2:
+        case SW_CH2:
           channelButton = 2;
           goto  SW_DEFAULT;
-        case SW_M3:
+        case SW_CH3:
          channelButton = 3;
 
          SW_DEFAULT:
 
-          if (midplaneGPIO->pressed(SW_SHIFT)){
-            if(currentMenu == CALIBRATION_MENU){
-              calibrationSaveHandler();
-            }
-            if(midplaneGPIO->pressed(SW_MENU)){
-              channelButtonShiftMenuHandler(channelButton);
-            } else {
-              channelButtonShiftHandler(channelButton);
-            }
-          } else if (selectedChannel == channelButton ) {
-            if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
-              changeState(min_max_cycle(stepMode+1, STATE_NOTEDISPLAY , STATE_YAXISINPUT));
-            } else {
-              changeState(STATE_STEPCOUNT);
-            }
-          } else {
-            channelButtonHandler(channelButton);
-          }
+         switch(currentMenu){
+           case PATTERN_SELECT:
+            channelButtonPatternSelectHandler(channelButton);
+           break;
+           default:
+             if (midplaneGPIO->pressed(SW_SHIFT)){
+               if(currentMenu == CALIBRATION_MENU){
+                 calibrationSaveHandler();
+               }
+               if(midplaneGPIO->pressed(SW_MENU)){
+                 channelButtonShiftMenuHandler(channelButton);
+               } else {
+                 channelButtonShiftHandler(channelButton);
+               }
+             } else if (selectedChannel == channelButton ) {
+               if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
+                 changeState(min_max_cycle(stepMode+1, STATE_FIRSTSTEP , STATE_YAXISINPUT));
+               } else {
+                 changeState(STATE_STEPCOUNT);
+               }
+             } else {
+               debug("going to channel button menu");
+               channelButtonHandler(channelButton);
+             }
+         }
+
+
         break;
 
 
         case SW_PATTERN:
-          if(midplaneGPIO->pressed(SW_M0)) sequenceArray[0].toggleMute();
-          if(midplaneGPIO->pressed(SW_M1)) sequenceArray[1].toggleMute();
-          if(midplaneGPIO->pressed(SW_M2)) sequenceArray[2].toggleMute();
-          if(midplaneGPIO->pressed(SW_M3)) sequenceArray[3].toggleMute();
+          if(midplaneGPIO->pressed(SW_CH0)) sequenceArray[0].toggleMute();
+          if(midplaneGPIO->pressed(SW_CH1)) sequenceArray[1].toggleMute();
+          if(midplaneGPIO->pressed(SW_CH2)) sequenceArray[2].toggleMute();
+          if(midplaneGPIO->pressed(SW_CH3)) sequenceArray[3].toggleMute();
 
-          if(midplaneGPIO->pressed(SW_M0) || midplaneGPIO->pressed(SW_M1) || midplaneGPIO->pressed(SW_M2) || midplaneGPIO->pressed(SW_M3)) break;
+          if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
           if(currentMenu == PATTERN_SELECT){
             changeState(STATE_PITCH0);
@@ -700,7 +725,7 @@ void InputModule::altButtonHandler(){
 
 //      if (midplaneGPIO->pressed(selectedStep%16) ){
       backplaneGPIO->update();
-      if ( midplaneGPIO->pressed(SW_M0) || midplaneGPIO->pressed(SW_M1) || midplaneGPIO->pressed(SW_M2) || midplaneGPIO->pressed(SW_M3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
+      if ( midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
         changeState(positive_modulo(stepMode + knobChange, STATE_LFOSPEED+1));
       } else {
 

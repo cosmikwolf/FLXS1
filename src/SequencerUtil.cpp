@@ -43,6 +43,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->mute 							= 0;
   this->fill              = 0;
   this->skipNextNoteTrigger = 0;
+  this->tieFlag           =0;
 	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
 		this->stepData[n].pitch[0]   = 24;
 		for (int i=1; i<4; i++){
@@ -220,10 +221,11 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	pitchArray[2] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2];
 	pitchArray[3] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3];
 
-  if(skipNextNoteTrigger){
+  if(skipNextNoteTrigger){ // so that when first step is changed, it doesn't constantly retrigger
     skipNextNoteTrigger = false;
     return;
   }
+
 	//figure out how many steps are nil (255)
 	uint8_t arpSteps = 4;
 	for(int i=1; i<4; i++){
@@ -337,7 +339,9 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION
-	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig );
+	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig, tieFlag);
+  tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true);
+
 	stepData[stepNum].arpStatus++;
 
 	//ensuring that gate is turned off before next step:

@@ -95,9 +95,9 @@ void LEDArray::loop(uint16_t interval){
 
         for (int i=0; i < 4; i++){
           if( patternChannelSelector & (1<<i) ){
-            leds.setPixelColor(ledChannelButtons[i], 255,255,255, 255);
+            leds.setPixelColor(ledChannelButtons[i], 0,0,0, 255);
           } else {
-            leds.setPixelColor(ledChannelButtons[i], 0,255,127, 0);
+            leds.setPixelColor(ledChannelButtons[i], 64,64,64, 0);
           }
 
 /*          if( patternChannelSelector & (1<<i) ){

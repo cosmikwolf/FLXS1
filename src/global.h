@@ -31,7 +31,7 @@
 
 #define DISPLAY_INTERVAL 20000
 #define INPUT_INTERVAL 20000
-#define LED_INTERVAL 10000
+#define LED_INTERVAL 100000
 
 #define PLAY_FORWARD          0
 #define PLAY_REVERSE          1
@@ -242,10 +242,10 @@
 #define SW_PLAY  17
 #define SW_REC   18
 #define SW_STOP  16
-#define SW_M0    19
-#define SW_M1    20
-#define SW_M2    21
-#define SW_M3    22
+#define SW_CH0    19
+#define SW_CH1    20
+#define SW_CH2    21
+#define SW_CH3    22
 #define SW_PGDN  23
 #define SW_PGUP  24
 #define SW_PATTERN  25
@@ -272,9 +272,8 @@
 
 #define GATETYPE_REST				0
 #define GATETYPE_STEP				1
-#define GATETYPE_ARP				2   // gate types that are greater than 1 are arpeggios.
-// the amount greater than 1 - 1 is the number of arpeggios per step. a gateType value of 2 means that the note retriggers every step.
-// a gateType of 5 means that the note will retrigger 4 times per step
+#define GATETYPE_TIE        2
+#define GATETYPE_1HIT       3
 
 #define ARPTYPE_OFF   0
 #define ARPTYPE_UP		1

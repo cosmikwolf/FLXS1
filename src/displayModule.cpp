@@ -343,7 +343,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   displayElement[9] = strdup(buf);
 
   displayElement[8] = strdup("TYPE:");
-  String gateTypeArray[] = { "OFF", "ON", "1HIT","HOLD" };
+  String gateTypeArray[] = { "OFF", "ON", "TIE","1HIT" };
   displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
 
   //digitalWriteFast(PIN_EXT_RX, HIGH);

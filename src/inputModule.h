@@ -40,6 +40,7 @@ public:
   void patternSelectHandler();
   //void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
+  void channelButtonPatternSelectHandler(uint8_t channel);
   void channelButtonShiftHandler(uint8_t channel);
   void channelButtonShiftMenuHandler(uint8_t channel);
 

@@ -111,7 +111,6 @@ uint32_t Sequencer::getCurrentFrame(){
 
 void Sequencer::getActiveStep(uint32_t frame){
   // getCurrentFrame() / getStepLength()  <-- steps since last beat
-
   if (playDirection == PLAY_REVERSE) {
     activeStep = firstStep + stepCount - getCurrentFrame() / getStepLength() - 1;
   } else if (playDirection == PLAY_FORWARD) {
@@ -203,16 +202,17 @@ void Sequencer::sequenceModeStandardStep(){
     }
   }
 
-	for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
+	for (int stepNum = 0; stepNum <= (firstStep + stepCount); stepNum++){
 	// iterate through all steps to determine if they need to have action taken.
 
 		if (stepData[stepNum].gateType == GATETYPE_REST){
 			continue;
 		}
+    //Serial.println("noteStatus: " + String(stepData[stepNum].noteStatus));
 
     switch (stepData[stepNum].noteStatus){
       case NOTE_HAS_BEEN_PLAYED_THIS_ITERATION:
-        if(stepNum != activeStep){
+        if(stepNum != activeStep || ( stepCount == 1 && currentFrameVar < getStepLength()/4 ) ){
           //Serial.println("Resetting step: " + String(stepNum) + "\tactiveStep: " + String(activeStep)) ;
           stepData[stepNum].noteStatus = AWAITING_TRIGGER;
           stepData[stepNum].arpStatus = 0;
@@ -222,7 +222,7 @@ void Sequencer::sequenceModeStandardStep(){
       case CURRENTLY_PLAYING:
         if(stepData[stepNum].framesRemaining < stepData[stepNum].arpLastFrame){
           noteShutOff(stepNum, stepData[stepNum].gateOff());
-          //Serial.println("note shut off");
+        //  Serial.println("note shut off");
           stepData[stepNum].noteStatus = BETWEEN_APEGGIATIONS;
           if ( stepData[stepNum].arpStatus > getArpCount(stepNum) ){
             stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
@@ -233,6 +233,8 @@ void Sequencer::sequenceModeStandardStep(){
 
       case BETWEEN_APEGGIATIONS:
         // Arpeggio retrigger
+      //  Serial.println("arpRetrigger");
+
         if ( stepData[stepNum].framesRemaining <= 0 ) {
             noteTrigger(stepNum, stepData[stepNum].gateTrig(), arpTypeModulated[stepNum], arpOctaveModulated[stepNum] );
             stepData[stepNum].noteStatus = CURRENTLY_PLAYING;

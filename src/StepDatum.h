@@ -34,9 +34,17 @@ typedef	struct StepDatum {
 			case GATETYPE_STEP:
 				return true;
 			break;
-			case GATETYPE_ARP:
-				return true;
-			break;
+      case GATETYPE_TIE:
+        return true;
+      break;
+      case GATETYPE_1HIT:
+        if (arpStatus > 0){
+          return false;
+        } else {
+          return true;
+        }
+      break;
+
 		}
 	}
 	bool gateOff(){ // should the gate be turned off this step?
@@ -47,12 +55,12 @@ typedef	struct StepDatum {
 			case GATETYPE_STEP:
 				return true;
 			break;
-			case GATETYPE_ARP:
-				return true;
-			break;
-			default:
-				return true;
-				break;
+      case GATETYPE_TIE:
+        return false;
+      break;
+      case GATETYPE_1HIT:
+        return true;
+      break;
 		}
 	}
 } StepDatum;
