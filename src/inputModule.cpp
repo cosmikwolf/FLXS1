@@ -651,15 +651,16 @@ void InputModule::altButtonHandler(){
             if (i == n) continue;
             if (midplaneGPIO->pressed(n)){
               buttonMode = BUTTON_MODE_PLAYRANGE;
-              sequenceArray[selectedChannel].setPlayRange(n,i);
-              break;
+              if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
+                sequenceArray[selectedChannel].setPlayRange(n,i);
+                break;
+              }
             }
           }
 
-          lastSelectedStep = selectedStep;
-          selectedStepTimer = 0;
-
         }
+
+
         //multi select logic - double tap and hold
         if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
           //enable multi select mode -
@@ -681,11 +682,10 @@ void InputModule::altButtonHandler(){
             }
   //            sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
           }
-
-          lastSelectedStep = selectedStep;
-          selectedStepTimer = 0;
-
         }
+
+        lastSelectedStep = selectedStep;
+        selectedStepTimer = 0;
 
         if (multiSelectStep == selectedStep){
           //disable multi select mode

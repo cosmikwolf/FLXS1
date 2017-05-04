@@ -108,6 +108,8 @@ class Sequencer
 		bool 			mute;
 		bool			fill;
     bool      skipNextNoteTrigger;
+    bool      channelPlaying;
+
 		uint8_t arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
 		uint8_t arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
 		int8_t arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];

@@ -12,6 +12,8 @@
 #include "global.h"
 
 #define DOUBLECLICKMS  250
+#define HOLDMS  1000
+
 #define BUTTON_MODE_WAIT        0
 #define BUTTON_MODE_XOX         1
 #define BUTTON_MODE_PLAYRANGE  2
