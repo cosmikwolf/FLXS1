@@ -373,7 +373,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   }
 
   if (glide == 0 && tieFlag){
-    glide = 5; // this is where tempo dependent glide needs to be set
+    glide = 3; // this is where tempo dependent glide needs to be set
   }
 
   if (glide > 0) {
