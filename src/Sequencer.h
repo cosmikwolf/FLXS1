@@ -23,6 +23,8 @@ class Sequencer
 		void    noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
+    void    stoppedTrig(uint8_t stepNum, bool onOff);
+
 		uint32_t 		calculateStepTimers();
 		uint32_t    framesPerSequence();
 		uint32_t   	getCurrentFrame();

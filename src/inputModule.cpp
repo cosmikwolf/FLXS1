@@ -477,7 +477,6 @@ void InputModule::globalMenuHandler(){
 
 void InputModule::channelInputInputHandler(){
 
-
 }
 
 
@@ -550,11 +549,13 @@ void InputModule::altButtonHandler(){
            case PATTERN_SELECT:
             channelButtonPatternSelectHandler(channelButton);
            break;
+           case CALIBRATION_MENU:
+            if (midplaneGPIO->pressed(SW_SHIFT)){
+              calibrationSaveHandler();
+            }
+           break;
            default:
              if (midplaneGPIO->pressed(SW_SHIFT)){
-               if(currentMenu == CALIBRATION_MENU){
-                 calibrationSaveHandler();
-               }
                if(midplaneGPIO->pressed(SW_MENU)){
                  channelButtonShiftMenuHandler(channelButton);
                } else {
@@ -683,6 +684,8 @@ void InputModule::altButtonHandler(){
             }
           }
 
+        } else {
+          sequenceArray[selectedChannel].stoppedTrig(selectedStep, true);
         }
 
 
@@ -696,6 +699,9 @@ void InputModule::altButtonHandler(){
 
 
       } else if (midplaneGPIO->rose(i)){
+        if (!playing){
+          sequenceArray[selectedChannel].stoppedTrig(getNote(i), false);
+        }
 
         if(buttonMode == BUTTON_MODE_XOX){
           selectedStep = getNote(i);
@@ -741,6 +747,7 @@ void InputModule::altButtonHandler(){
             // and finally set the new step value!
             // monophonic so pitch[0] only
             sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max_cycle(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,120), 0);
+            sequenceArray[selectedChannel].stoppedTrig(selectedStep, true);
 
           break;
 

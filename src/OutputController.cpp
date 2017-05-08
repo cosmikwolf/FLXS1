@@ -423,9 +423,9 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   //offset = cvInputMapped[channel];
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   //delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,120,calibMidscale(dacCvMap[channel]), dacCalibrationPos[dacCvMap[channel]] ) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)) );    // set CV voltage
 //delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel],  map( (note+offset), 0,120,calibMidscale(dacCvMap[channel]), dacCalibrationPos[dacCvMap[channel]]) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)));    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
@@ -435,16 +435,21 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
 
 };
 
+uint16_t OutputController::voltageOffset(uint8_t volts, uint8_t mapAddress){
+  uint16_t twentyVolts = dacCalibrationPos[mapAddress]-dacCalibrationNeg[mapAddress];
+  return volts * twentyVolts / 20;
+}
+
 uint16_t OutputController::calibMidscale(uint8_t mapAddress){
   return (dacCalibrationNeg[mapAddress]+dacCalibrationPos[mapAddress])/2;
 };
 
-uint16_t OutputController::calibLow(uint8_t mapAddress, uint8_t range){
-//  dacCalibrationNeg[mapAddress]+dacCalibrationPos[mapAddress]
+uint16_t OutputController::calibLow(uint8_t channel, uint8_t mapAddress, uint8_t negOffset){
+  return calibMidscale(dacCvMap[channel])-voltageOffset(negOffset, dacCvMap[channel]);
 }
 
-uint16_t OutputController::calibHigh(uint8_t mapAddress, uint8_t range){
-
+uint16_t OutputController::calibHigh(uint8_t channel, uint8_t mapAddress, uint8_t negOffset){
+  return dacCalibrationPos[dacCvMap[channel]]-voltageOffset(negOffset, dacCvMap[channel]);
 }
 
 void OutputController::lfoUpdate(uint8_t channel){
@@ -560,7 +565,7 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 
 void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
-  //Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) + "\timer: " + String(debugTimer1) );
+  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) + "\timer: " + String(debugTimer1) );
 
   if (gateOff){
     backplaneGPIO->digitalWrite(channel, LOW);
@@ -570,6 +575,8 @@ void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
 }
 
 void OutputController::allNotesOff(uint8_t channel){
+  Serial.println("    OutputController -- all notes off ch:"  + String(channel) + " nt: "  + "\timer: " + String(debugTimer1) );
+
     backplaneGPIO->digitalWrite(channel, LOW);
     this->lfoType[channel] = 0;
     this->lfoAmplitude[channel] = 0;

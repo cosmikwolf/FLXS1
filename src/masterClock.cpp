@@ -182,7 +182,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 	checkGateClock();
 
 	if (playing){
-		if (wasPlaying == false){
+		if (!wasPlaying){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->allNotesOff(i);
 				sequenceArray[i].clockStart(startTime);
@@ -210,7 +210,7 @@ void MasterClock::internalClockTick(){
   debug("begin internal clock tick");
         // int clock
 
-  if (wasPlaying == false){
+  if (playing && !wasPlaying){
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
     masterPulseCount = 0;
@@ -220,6 +220,9 @@ void MasterClock::internalClockTick(){
 			outputControl->allNotesOff(i);
     	sequenceArray[i].clockStart(startTime);
     }
+
+    Serial.println("Starting sequence - internal clock: ");
+
   }
 
 	if ( pulseTrigger ){
@@ -248,36 +251,3 @@ void MasterClock::midiClockTick(){
 			sequenceArray[i].runSequence();
 	  }
 }
-/*
-void MasterClock::noteOffSwitch(){
-  for (int i=0; i< SEQUENCECOUNT; i++){
-    if (noteData[i].noteOff == true){
-      for (int n=0; n< MAX_STEPS_PER_SEQUENCE; n++){
-        if (!noteData[i].noteOffArray[n]){
-          continue;
-        }
-
-				outputControl->noteOff(noteData[i].channel, noteData[i].noteOffArray[n],noteData[i].noteGateOffArray[n] );
-      }
-    }
-  }
-}
-
-void MasterClock::noteOnSwitch(){
-
-  for (int i=0; i< SEQUENCECOUNT; i++){
-    if (noteData[i].noteOn == true){
-      for (int n=0; n< MAX_STEPS_PER_SEQUENCE; n++){
-        if (!noteData[i].noteOnArray[n]){
-          continue;
-        }
-
-				//Serial.print(String(noteData[i].noteOnStep) + "\t"  + String(noteData[i].noteGlideArray[n]) + "\t") ;
-				outputControl->noteOn(noteData[i].channel,noteData[i].noteOnArray[n],noteData[i].noteVelArray[n],noteData[i].noteVelTypeArray[n], noteData[i].noteLfoSpeed[n], noteData[i].noteGlideArray[n], noteData[i].noteGateArray[n] );
-
-      }
-    }
-  }
-}
-
-*/

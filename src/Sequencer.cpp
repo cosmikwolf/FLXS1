@@ -181,7 +181,7 @@ void Sequencer::sequenceModeStandardStep(){
   uint32_t currentFrameVar = getCurrentFrame();
   getActiveStep(currentFrameVar);
   //incrementActiveStep(currentFrameVar);
-  if (mute){
+  if (mute || !playing){
     return;
   }
 

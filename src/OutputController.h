@@ -44,8 +44,10 @@ public:
   void inputRead();
 
   uint16_t calibMidscale(uint8_t mapAddress);
-  uint16_t calibLow(uint8_t mapAddress, uint8_t range);
-  uint16_t calibHigh(uint8_t mapAddress, uint8_t range);
+  uint16_t voltageOffset(uint8_t volts, uint8_t mapAddress);
+
+  uint16_t calibLow(uint8_t channel, uint8_t mapAddress, uint8_t negOffset);
+  uint16_t calibHigh(uint8_t channel, uint8_t mapAddress, uint8_t negOffset);
 
 
   elapsedMillis clockOutputTimer;
@@ -56,7 +58,7 @@ public:
   uint8_t lfoSpeed[4];
   uint8_t lfoAmplitude[4];
   bool    lfoRheoSet[4];
-  bool  clockValue;
+  bool    clockValue;
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
 private:

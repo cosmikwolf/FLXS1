@@ -212,6 +212,25 @@ void Sequencer::jumpToStep(uint8_t stepNum){
   }
 }
 
+void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff){
+
+  if (onOff){
+    Serial.println("Stopped trig note on");
+    if (quantizeScale > 0){
+  		stepData[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[0], quantizeKey, quantizeScale, 1);
+  	} else {
+  		stepData[stepNum].notePlaying = stepData[stepNum].pitch[0];
+  	}
+
+    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, 1, 0);
+
+    stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
+  } else {
+    Serial.println("Stopped trig note off");
+    outputControl->noteOff(channel, stepData[stepNum].notePlaying, true );
+  }
+
+};
 
 
 void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig){
@@ -384,43 +403,12 @@ uint8_t Sequencer::getArpCount(uint8_t stepNum){
 	return arpCount;
 }
 
-/*void Sequencer::clearNoteData(NoteDatum *noteData){
-	noteData->noteOff = false;
-	noteData->noteOn = false;
-
-	for(int i = 0; i < stepCount; i++){
-		noteData->noteOnArray[i] = NULL;
-		noteData->noteVelArray[i] = NULL;
-		noteData->noteVelTypeArray[i] = NULL;
-		noteData->noteLfoSpeed[i] = NULL;
-		noteData->noteGlideArray[i] = NULL;
-		noteData->noteOffArray[i] = NULL;
-	}
-
-	noteData->channel = 0;
-	noteData->noteOnStep = 0;
-	noteData->noteOffStep = 0;
-}*/
 
 void Sequencer::noteShutOff(uint8_t stepNum, bool gateOff){
 	//shut off any other notes that might still be playing.
-//	Serial.println("shutting step " + String(stepNum) + " off");
+ //Serial.println("shutting step " + String(stepNum) + " off");
 		if( stepData[stepNum].noteStatus == CURRENTLY_PLAYING ){
-	//		noteData->noteOff = true;
-	//		noteData->channel = channel;
-	//		noteData->noteOffStep = stepNum;
-	//		noteData->noteGateOffArray[stepNum] = gateOff;
-
-
 			outputControl->noteOff(channel, stepData[stepNum].notePlaying, gateOff );
-/*
-			for (int f=0; f<stepCount; f++){
-				if (noteData->noteOffArray[f] == NULL){
-					noteData->noteOffArray[f] = stepData[stepNum].notePlaying;
-					break;
-				}
-			}
-*/
 		}
 
 }

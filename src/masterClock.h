@@ -5,7 +5,7 @@
 
 #include "global.h"
 #define INTERNAL_PPQ_COUNT 96
-#define EXTCLOCKDIV  24  
+#define EXTCLOCKDIV  24
 // DAC Mapping for each channel:
 #ifndef _MasterClock_h_
 #define _MasterClock_h_
@@ -22,8 +22,6 @@ public:
   void midiClockTick();
   void clockRunCheck();
   void externalClockTick(uint8_t gateNum);
-//  void noteOffSwitch();
-//  void noteOnSwitch();
 
   bool gateTrigger(uint8_t gateNum);
   void checkGateClock();
