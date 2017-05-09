@@ -93,7 +93,7 @@ void Sequencer::setTempo(uint32_t tempoX100){
 
 void Sequencer::setStepPitch(uint8_t step, uint8_t pitch, uint8_t index){
 	stepData[step].pitch[index] = pitch;
-	Serial.println("step: " + String(step) + " pitch: " + String(pitch) + " index: " + String(index) + " set pitch: " + String(stepData[step].pitch[index]));
+	//Serial.println("step: " + String(step) + " pitch: " + String(pitch) + " index: " + String(index) + " set pitch: " + String(stepData[step].pitch[index]));
 };
 
 void Sequencer::setGateLength(uint8_t step, uint8_t length){
@@ -193,7 +193,7 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
 };
 
 void Sequencer::skipStep(uint8_t count){
-  Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
+//Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
 
   uint16_t oldPpqPulseIndex = ppqPulseIndex;
   ppqPulseIndex = (ppqPulseIndex + count*pulsesPerBeat/clockDivision) % (pulsesPerBeat*stepCount/clockDivision );
@@ -212,21 +212,21 @@ void Sequencer::jumpToStep(uint8_t stepNum){
   }
 }
 
-void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff){
+void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
 
   if (onOff){
-    Serial.println("Stopped trig note on");
+  //  Serial.println("Stopped trig note on");
     if (quantizeScale > 0){
   		stepData[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[0], quantizeKey, quantizeScale, 1);
   	} else {
   		stepData[stepNum].notePlaying = stepData[stepNum].pitch[0];
   	}
 
-    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, 1, 0);
+    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gate, 0);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
   } else {
-    Serial.println("Stopped trig note off");
+    //Serial.println("Stopped trig note off");
     outputControl->noteOff(channel, stepData[stepNum].notePlaying, true );
   }
 

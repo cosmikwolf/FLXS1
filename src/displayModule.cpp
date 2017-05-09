@@ -105,7 +105,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     if (previousMenu != currentMenu || previouslySelectedChannel != selectedChannel){
        freeDisplayCache();
        oled.fillScreen(background);
-       Serial.println("Changing Menu: " + String(currentMenu));
+       //Serial.println("Changing Menu: " + String(currentMenu));
     }
 
     switch(currentMenu) {
@@ -179,14 +179,14 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
     }
 
-    if (previousMenu != currentMenu){
-      Serial.println("finished first loop of displaying new state");
-    }
+    // if (previousMenu != currentMenu){
+    //   Serial.println("finished first loop of displaying new state");
+    // }
     cleanupTextBuffers();
-    if (previousMenu != currentMenu){
-      Serial.println("text buffers cleaned up");
-      Serial.println("Freeram: " + String(FreeRam2()));
-    }
+    // if (previousMenu != currentMenu){
+    //   Serial.println("text buffers cleaned up");
+    //   Serial.println("Freeram: " + String(FreeRam2()));
+    // }
     previouslySelectedChannel = selectedChannel;
     previousStepMode = stepMode;
     previousMenu = currentMenu;

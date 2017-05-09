@@ -93,7 +93,7 @@ uint8_t chordArray[27][3] = {
 {4,10,15}
 };
 
-void debug(const char* text){
+void debug(String text){
 	if (debugBoolean == 1){
 		Serial.println(text);
 	}

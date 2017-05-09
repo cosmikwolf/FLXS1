@@ -345,7 +345,7 @@ extern uint8_t dacMap[8];
 extern uint8_t selectedText;
 extern uint8_t prevSelectedText;
 
-void debug(const char* text);
+void debug(String text);
 int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);

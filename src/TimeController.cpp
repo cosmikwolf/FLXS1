@@ -106,14 +106,20 @@ void TimeController::runLoopHandler() {
 		ledArray.loop(LED_INTERVAL);
 		//clockMaster.ledRunSwitch = false;
 	}
-	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+	if(timeControlTimer > 10000){
+    debug("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
+  };
+  timeControlTimer = 0;
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 //	Serial.println("LED Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	buttonIo.loop(INPUT_INTERVAL);
-	if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+	if(timeControlTimer > 10000){
+    debug("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
+  };
+  timeControlTimer = 0;
 
-	//Serial.println("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
+	//debug("Button Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch){
@@ -121,7 +127,9 @@ void TimeController::runLoopHandler() {
 		saveFile.cacheWriteLoop();
 		// digitalWriteFast(DEBUG_PIN, LOW);
 		cacheWriteTimer=0;
-		if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
+		if(timeControlTimer > 10000){
+      debug("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
+    }; timeControlTimer = 0;
 	}
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 

@@ -165,7 +165,7 @@ void InputModule::loop(uint16_t frequency){
 }
 
 void InputModule::changeState(uint8_t targetState){
-  Serial.println("change state: " + String(targetState));
+//  Serial.println("change state: " + String(targetState));
   stepMode = targetState;
   switch (stepMode) {
     case STATE_PITCH0:
@@ -346,8 +346,8 @@ void InputModule::sequenceMenuHandler(){
         case STATE_BEATCOUNT:
            newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange, -16, 16);
            sequenceArray[selectedChannel].clockDivision = newBeatDiv;
-           Serial.println("newBeatDiv: " + String(newBeatDiv));
-           Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
+        //   Serial.println("newBeatDiv: " + String(newBeatDiv));
+          // Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
 
           break;
 
@@ -578,10 +578,10 @@ void InputModule::altButtonHandler(){
 
 
         case SW_PATTERN:
-          if(midplaneGPIO->pressed(SW_CH0)) sequenceArray[0].toggleMute();
-          if(midplaneGPIO->pressed(SW_CH1)) sequenceArray[1].toggleMute();
-          if(midplaneGPIO->pressed(SW_CH2)) sequenceArray[2].toggleMute();
-          if(midplaneGPIO->pressed(SW_CH3)) sequenceArray[3].toggleMute();
+        //  if(midplaneGPIO->pressed(SW_CH0)) sequenceArray[0].toggleMute();
+        //  if(midplaneGPIO->pressed(SW_CH1)) sequenceArray[1].toggleMute();
+        //  if(midplaneGPIO->pressed(SW_CH2)) sequenceArray[2].toggleMute();
+        //  if(midplaneGPIO->pressed(SW_CH3)) sequenceArray[3].toggleMute();
 
           if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
@@ -684,8 +684,10 @@ void InputModule::altButtonHandler(){
             }
           }
 
-        } else {
-          sequenceArray[selectedChannel].stoppedTrig(selectedStep, true);
+        }
+
+        if(!playing){
+          sequenceArray[selectedChannel].stoppedTrig(selectedStep, true, true);
         }
 
 
@@ -700,7 +702,7 @@ void InputModule::altButtonHandler(){
 
       } else if (midplaneGPIO->rose(i)){
         if (!playing){
-          sequenceArray[selectedChannel].stoppedTrig(getNote(i), false);
+          sequenceArray[selectedChannel].stoppedTrig(getNote(i), false, false);
         }
 
         if(buttonMode == BUTTON_MODE_XOX){
@@ -747,7 +749,9 @@ void InputModule::altButtonHandler(){
             // and finally set the new step value!
             // monophonic so pitch[0] only
             sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max_cycle(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,120), 0);
-            sequenceArray[selectedChannel].stoppedTrig(selectedStep, true);
+            if(!playing){
+              sequenceArray[selectedChannel].stoppedTrig(selectedStep, true, false);
+            }
 
           break;
 

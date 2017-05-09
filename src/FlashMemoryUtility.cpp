@@ -119,21 +119,21 @@ void FlashMemory::listFiles(){
     uint32_t filesize;
 
     if (spiFlash->readdir(filename, sizeof(filename), filesize)) {
-      Serial.print("  ");
-      Serial.print(filename);
+      // Serial.print("  ");
+      // Serial.print(filename);
       for (int i=0; i < (20 - strlen(filename)); i++) {
         Serial.print(" ");
       }
-      Serial.print("  ");
-      Serial.print(filesize);
-      Serial.print(" bytes");
-      Serial.println();
+      // Serial.print("  ");
+      // Serial.print(filesize);
+      // Serial.print(" bytes");
+      // Serial.println();
       for(int i=0; i<64; i++){
         char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
         file.seek(SECTORSIZE*i);
         file.read(fileBuffer, 90);
         fileBuffer[91] = '\0';               // Add the terminating null char.
-        Serial.println(String(i*SECTORSIZE) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
+        // Serial.println(String(i*SECTORSIZE) + ":\t" + String(fileBuffer));                // Print the file to the serial monitor.
         free(fileBuffer);
       }
 

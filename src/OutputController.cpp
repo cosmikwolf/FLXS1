@@ -423,9 +423,11 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   //offset = cvInputMapped[channel];
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   //delayMicroseconds(5);
+//  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel],0)) );    // set CV voltage
   ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)) );    // set CV voltage
 //delayMicroseconds(5);
-  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)));    // set CV voltage
+  //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
+ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)));    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
@@ -565,7 +567,7 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 
 void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
-  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) + "\timer: " + String(debugTimer1) );
+//  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) + "\timer: " + String(debugTimer1) );
 
   if (gateOff){
     backplaneGPIO->digitalWrite(channel, LOW);
@@ -575,7 +577,7 @@ void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
 }
 
 void OutputController::allNotesOff(uint8_t channel){
-  Serial.println("    OutputController -- all notes off ch:"  + String(channel) + " nt: "  + "\timer: " + String(debugTimer1) );
+  //Serial.println("    OutputController -- all notes off ch:"  + String(channel) + " nt: "  + "\timer: " + String(debugTimer1) );
 
     backplaneGPIO->digitalWrite(channel, LOW);
     this->lfoType[channel] = 0;

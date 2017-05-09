@@ -186,7 +186,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->allNotesOff(i);
 				sequenceArray[i].clockStart(startTime);
-				Serial.println("Starting sequence: " + String(i));
+				//Serial.println("Starting sequence: " + String(i));
 			}
 		}
 
@@ -221,7 +221,7 @@ void MasterClock::internalClockTick(){
     	sequenceArray[i].clockStart(startTime);
     }
 
-    Serial.println("Starting sequence - internal clock: ");
+  //  Serial.println("Starting sequence - internal clock: ");
 
   }
 

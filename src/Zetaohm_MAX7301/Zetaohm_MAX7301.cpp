@@ -192,7 +192,7 @@ uint16_t Zetaohm_MAX7301::digitalRead(uint8_t index){
 bool Zetaohm_MAX7301::fell(uint8_t index){
 	if ( fellBuffer & (1 << indexMap[index]) ) {
 		fellBuffer = fellBuffer & ~(1 << indexMap[index]) ;
-    Serial.println("Button Press index: " + String(index) + "\tindexMap: " + String(indexMap[index]));
+  //  Serial.println("Button Press index: " + String(index) + "\tindexMap: " + String(indexMap[index]));
 		return true;
 	} else {
 		return false;
