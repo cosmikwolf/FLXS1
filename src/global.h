@@ -174,6 +174,16 @@
 #define MAX_STATE_COUNT 10
 #define PITCH_GATE_MENU_ORDER  0
 
+#define MODAL_SELECT_CH1       0
+#define MODAL_SELECT_CH2       1
+#define MODAL_SELECT_CH3       2
+#define MODAL_SELECT_CH4       3
+
+#define MODAL_MUTE_CH1       4
+#define MODAL_MUTE_CH2       5
+#define MODAL_MUTE_CH3       6
+#define MODAL_MUTE_CH4       7
+
 #define DEBUG_PIN				    	 31
 #define PIN_EXT_AD_1   27
 #define PIN_EXT_AD_2   30
@@ -345,7 +355,7 @@ extern uint8_t dacMap[8];
 extern uint8_t selectedText;
 extern uint8_t prevSelectedText;
 
-void debug(String text);
+//void//Serial.println(String text);
 int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);

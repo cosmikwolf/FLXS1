@@ -14,14 +14,14 @@ FlashMemory::FlashMemory(){
 };
 
 void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequenceArray, SerialFlashChip *spiFlash, ADC *adc){
-  debug("<</~*^*~\>>Initializing Flash Memory<</~*^*~\>>");
+  Serial.println("<</~*^*~\>>Initializing Flash Memory<</~*^*~\>>");
   this->outputControl = outputControl;
   this->sequenceArray = sequenceArray;
   this->spiFlash = spiFlash;
   this->adc = adc;
 
   if(!spiFlash->begin(WINBOND_CS_PIN)){
-    debug("SPI FLASH CHIP INITIALIZATION FAILED!");
+    Serial.println("SPI FLASH CHIP INITIALIZATION FAILED!");
   }
   spiFlashBusy = 0;
   cacheWriteBusy = 0;
@@ -29,7 +29,7 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   for(int n = 0; n < CACHE_COUNT; n++){
     cacheStatus[n] = 0;
   }
-  debug("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
+  Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
 }
 
 // BRAIN DUMP:
@@ -66,7 +66,7 @@ void FlashMemory::saveCalibrationEEPROM(){
     EEPROMWrite16(address, dacCalibrationPos[i]);
     address += 2;
   }
-  debug(" -- CALIBRATION EEPROM WRITE COMPLETE -- ");
+  Serial.println(" -- CALIBRATION EEPROM WRITE COMPLETE -- ");
 
 };
 
@@ -75,12 +75,12 @@ void FlashMemory::readCalibrationEEPROM(){
   uint16_t checkVal;
 
   if(EEPROMRead16(address) == 0xFFFF){
-    debug(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
-    debug(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
-    debug(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
-    debug(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
-    debug(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
-    debug(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
+    Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
     return;
   }
   address += 2;
@@ -119,10 +119,10 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
 
   uint8_t cacheIndex = getCacheIndex(channel, pattern);
-  debug("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
+  //Serial.println("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
   while (cacheStatus[cacheIndex] != 0){
     int tempint = cacheWriteLoop();
-    debug("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
+    //Serial.println("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
   }
   saveSequenceBusy = 1;
   cacheWriteTotalTimer = 0;
@@ -143,9 +143,9 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
     file.close();
     setCacheStatus(cacheIndex, SAVING_TO_CACHE_SECTOR);
   } else {
-      debug("##############");
-      debug("UNABLE TO OPEN SAVE FILE: "  + String(cacheFileName));
-      debug("##############");
+      Serial.println("##############");
+      Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(cacheFileName));
+      Serial.println("##############");
   }
   free(fileBuffer);
   fileBuffer = NULL;
@@ -210,11 +210,11 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
 bool FlashMemory::deserialize(uint8_t channel, char* json){
   StaticJsonBuffer<16384> jsonBuffer;
 
-  debug("jsonBuffer allocated");
+  //Serial.println("jsonBuffer allocated");
    JsonObject& jsonReader = jsonBuffer.parseObject(json);
-   debug("Json Reader Success: " + String(jsonReader.success())) ;
+   //Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
 
-   debug("JSON object Parsed");
+   //Serial.println("JSON object Parsed");
    sequenceArray[channel].stepCount    = jsonReader["settings"][0];
    sequenceArray[channel].beatCount    = jsonReader["settings"][1];
    sequenceArray[channel].quantizeKey  = jsonReader["settings"][2];
@@ -234,12 +234,17 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
    sequenceArray[channel].cv_gatemod   = jsonReader["settings"][16];
    sequenceArray[channel].cv_glidemod  = jsonReader["settings"][17];
     //.as<uint8_t>();
-   debug("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); debug((const char *)jsonReader["pattern"]);
+   //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
    JsonArray& stepDataArray = jsonReader["data"];
-   debug("Step Data Array Success: " + String(stepDataArray.success())) ;
+   //Serial.println("Step Data Array Success: " + String(stepDataArray.success())) ;
 
-    debug("jsonArray declared");
-
+    //Serial.println("jsonArray declared");
+    if (sequenceArray[channel].stepCount == 0){
+        for (size_t i = 0; i < 3; i++) {
+         Serial.println("Channel " + String(channel) + " -- DATA CORRUPTION ALERT");
+        }
+      sequenceArray[channel].stepCount = 16;
+    }
     for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
      StepDatum stepDataBuf;
 
@@ -348,48 +353,59 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
   //  strcat(fileNameChar, String(channel).c_str());
     strcat(fileNameChar,".TXT");
 */
-      char* fileName = (char *) malloc(sizeof(char) * 12);
-
+    char* fileName = (char *) malloc(sizeof(char) * 12);
       //strcpy(fileName, String("p" + String(pattern) + ".txt").c_str());
       fileName = strdup("seqData");
-      debug("*&*&*&*&*&*&*&*&* SPI FLASH FILE " + String(fileName) + " LOAD START *&*&*&*&*&*&*&*&*&");
+      //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE " + String(fileName) + " LOAD START *&*&*&*&*&*&*&*&*&");
 
+      while (!spiFlash->ready()){
+        Serial.println("SPIFLASH NOT READY");
+      } ; // wait
 
       if (spiFlash->exists(fileName)){
-        debug("Save file exists... attempting load");
+        //Serial.println("Save file exists... attempting load");
         file = spiFlash->open(fileName);
         if (file){
-          debug("File opened...");
+          //Serial.println("File opened...");
           //unsigned int fileSize = file.size();  // Get the file size.
           char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
-          debug(String(SECTORSIZE) + " bytes allocated");
-          debug("SaveAddress: " + String(getSaveAddress(getCacheIndex(channel, pattern))));
-          debug("cacheIndex: " + String(getCacheIndex(channel, pattern)));
+          //Serial.println(String(SECTORSIZE) + " bytes allocated");
+          //Serial.println("SaveAddress: " + String(getSaveAddress(getCacheIndex(channel, pattern))));
+          //Serial.println("cacheIndex: " + String(getCacheIndex(channel, pattern)));
 
           file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
           file.read(fileBuffer, SECTORSIZE);
-          debug("file read");
+          //Serial.println("file read");
         //  fileBuffer[SECTORSIZE] = '\0';               // Add the terminating null char.
-          debug(fileBuffer);                // Print the file to the serial monitor.
-          if(this->deserialize(channel, fileBuffer) ){
-            debug("file deserialized.");
-          } else {
-            debug("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ");
+          //Serial.println(fileBuffer);                // Print the file to the //Serial monitor.
+          if(this->deserialize(channel, fileBuffer) == false ){
+
+            file.close();
+            free(fileBuffer);
+            file = spiFlash->open(fileName);
+            Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. attempting to read cache...");
+            file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
+            file.read(fileBuffer, SECTORSIZE);
+            if(this->deserialize(channel, fileBuffer) == false ){
+              Serial.println(fileBuffer);
+              Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt");
+            };
+
           };
           file.close();
           free(fileBuffer);
         } else {
-          debug("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
+          Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
           free(fileName);
           return READ_JSON_ERROR;
         };
 
         free(fileName);
-        debug("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
+        //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
         return FILE_EXISTS;
       } else {
         free(fileName);
-        debug("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
+        //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
         return SAVEFILE_DOES_NOT_EXIST;
       }
       free(fileName);
@@ -399,26 +415,26 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
 bool FlashMemory::deserializeHash(uint8_t channel, char* json){
   StaticJsonBuffer<16384> jsonBuffer;
 
-  debug("jsonBuffer allocated");
+  //Serial.println("jsonBuffer allocated");
    JsonObject& jsonReader = jsonBuffer.parseObject(json);
-   debug("Json Reader Success: " + String(jsonReader.success())) ;
+   //Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
 
-   debug("JSON object Parsed");
+   //Serial.println("JSON object Parsed");
    sequenceArray[channel].stepCount    = jsonReader["stepCount"];
    sequenceArray[channel].beatCount    = jsonReader["beatCount"];
    sequenceArray[channel].quantizeKey  = jsonReader["quantizeKey"];
    sequenceArray[channel].quantizeScale = jsonReader["quantizeScale"];
    sequenceArray[channel].channel      = jsonReader["channel"];
    sequenceArray[channel].pattern = jsonReader["pattern"].as<uint8_t>();
-   debug("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); debug((const char *)jsonReader["pattern"]);
+   //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
    JsonArray& stepDataArray = jsonReader["stepData"];
-   debug("Step Data Array Success: " + String(stepDataArray.success())) ;
+   //Serial.println("Step Data Array Success: " + String(stepDataArray.success())) ;
 
-    debug("jsonArray declared");
+    //Serial.println("jsonArray declared");
 
     for (int i=0; i< jsonReader["stepCount"]; i++){
      if (i != int(stepDataArray[i]["i"]) ) {
-       debug("Step Data Index Mismatch Error");
+       Serial.println("Step Data Index Mismatch Error");
      };
      StepDatum stepDataBuf;
 
@@ -475,66 +491,66 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
   /*
   for (int i = 0; i<CACHE_COUNT; i++){
     while( getCachePattern(cacheOffset, i) == pattern && getCacheStatus(cacheOffset, i) != 0 ) {
-      debug("Delaying because pattern " + String(pattern) + " has pending save operation");
+      Serial.println("Delaying because pattern " + String(pattern) + " has pending save operation");
       cacheWriteLoop();
       delay(500);
     }
   }
 */
-  debug("[[-]]><{{{--}}}><[[-]] LOADING PATTERN: " + String(pattern) + " [[-]]><{{{--}}}><[[-]]");
+  //Serial.println("[[-]]><{{{--}}}><[[-]] LOADING PATTERN: " + String(pattern) + " [[-]]><{{{--}}}><[[-]]");
 //  printPattern();
 
 	for(int i=0; i < SEQUENCECOUNT; i++){
 
     if ( !(channelSelector & (1 << i) ) ){
-      debug("skipping loading channel " + String(i));
+      //Serial.println("skipping loading channel " + String(i));
       continue; // if channel is not selected to be loaded, don't load the channel!
     } else {
-      debug("Loading channel " + String(i));
+      //Serial.println("Loading channel " + String(i));
     };
 
-    debug("About to run readJsonReturn for channel: " + String(i));
+    //Serial.println("About to run readJsonReturn for channel: " + String(i));
 
     int readJsonReturn = this->readSequenceJSON(i, pattern);
 
     if ( readJsonReturn == SAVEFILE_DOES_NOT_EXIST )  {
-      debug("saveData not available, initializing sequence");
+      //Serial.println("saveData not available, initializing sequence");
       sequenceArray[i].initNewSequence(pattern, i);
-      debug("sequence initialized, saving sequence to JSON");
+      //Serial.println("sequence initialized, saving sequence to JSON");
       //saveSequenceJSON(i, pattern);
 
-      debug("Sequence successfully saved to JSON");
+      //Serial.println("Sequence successfully saved to JSON");
 
     } else if (readJsonReturn == 2) {
-      debug("READ JSON ERROR - info above");
+      //Serial.println("READ JSON ERROR - info above");
     }
 
-    debug("reading complete!");
+    //Serial.println("reading complete!");
 
   }
 
-  debug("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
+  //Serial.println("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
   currentPattern = pattern;
-  debug("[[-]]><{{{--}}}><[[-]] PATTERN: " + String(pattern) + " LOAD COMPLETE [[-]]><{{{--}}}><[[-]]");
+  //Serial.println("[[-]]><{{{--}}}><[[-]] PATTERN: " + String(pattern) + " LOAD COMPLETE [[-]]><{{{--}}}><[[-]]");
   //printPattern();
 }
 
 void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
-	//debug("currentPattern: " + String(currentPattern) + "\tSEQUENCECOUNT: " + String(SEQUENCECOUNT));
+	//Serial.println("currentPattern: " + String(currentPattern) + "\tSEQUENCECOUNT: " + String(SEQUENCECOUNT));
 	if(saveFirst){
     for(int i=0; i < SEQUENCECOUNT; i++){
   		//saveChannelPattern(i);
       //saveSequenceJSON(i, currentPattern);
       saveSequenceJSON(i, sequenceArray[i].pattern);
     }
-    debug("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
+    //Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	}
 
   if (instant || !playing) {
-    debug("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
+    //Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
     loadPattern(pattern, channelSelector);
   } else {
     queuePattern = pattern;
-    debug("Queueing pattern: " + String(pattern));
+    //Serial.println("Queueing pattern: " + String(pattern));
   }
 }

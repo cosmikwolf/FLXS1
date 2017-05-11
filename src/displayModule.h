@@ -55,6 +55,7 @@
 #define REGULAR4X      6
 #define BOLD4X         7
 #define STYLE1X         8
+#define MODALBOLD       9
 
 class DisplayModule
 {
@@ -109,6 +110,9 @@ class DisplayModule
 
     void modalPopup();
 
+    void modalDisplay();
+    void displayModal(uint16_t ms, uint8_t selector);
+
     void sequenceMenuDisplay();
     void inputMenuDisplay();
     void globalMenuDisplay();
@@ -133,6 +137,10 @@ class DisplayModule
     //void renderOnce_StringBox(Element element);
 private:
 
+    elapsedMillis modaltimer;
+    bool modalRefreshSwitch;
+    uint16_t modalMaxTime;
+    uint8_t modalSelect;
     Sequencer *sequenceArray;
     MasterClock* clockMaster;
 

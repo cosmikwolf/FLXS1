@@ -222,12 +222,16 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
   		stepData[stepNum].notePlaying = stepData[stepNum].pitch[0];
   	}
 
+	//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
     outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gate, 0);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
   } else {
     //Serial.println("Stopped trig note off");
     outputControl->noteOff(channel, stepData[stepNum].notePlaying, true );
+		//stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+		//stepData[stepNum].arpStatus = 0;
+
   }
 
 };

@@ -33,7 +33,7 @@ public:
   OutputController* outputControl;
   MasterClock* clockMaster;
 
-  void initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster);
+  void initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster, DisplayModule* display);
 
   void loop(uint16_t frequency);
 
@@ -92,6 +92,7 @@ public:
 private:
   Sequencer *sequenceArray;
   FlashMemory *saveFile;
+  DisplayModule *display;
   elapsedMicros inputTimer;
 };
 

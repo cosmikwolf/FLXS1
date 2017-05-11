@@ -30,14 +30,14 @@ void MidiModule::midiStopHandler(){
 }
 
 void MidiModule::midiNoteOffHandler(byte channel, byte note, byte velocity){
-  Serial.println(String("Note Off: ch=") + channel + ", note=" + note + ", velocity=" + velocity);
+//  Serial.println(String("Note Off: ch=") + channel + ", note=" + note + ", velocity=" + velocity);
 }
 
 void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
   if (velocity > 0) {
-    Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
+    //Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
   } else {
-    Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
+  //  Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
   }
 }
 

@@ -18,7 +18,7 @@ knobChange = 0;;
 
 };
 
-void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster){
+void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster, DisplayModule* display){
   Serial.println("button setup start");
 
   this->saveFile = saveFile;
@@ -27,6 +27,7 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   this->clockMaster= clockMaster;
   this->midplaneGPIO= midplaneGPIO;
   this->backplaneGPIO= backplaneGPIO;
+  this->display = display;
 
   midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
 
@@ -568,7 +569,7 @@ void InputModule::altButtonHandler(){
                  changeState(STATE_STEPCOUNT);
                }
              } else {
-               debug("going to channel button menu");
+              //Serial.println("going to channel button menu");
                channelButtonHandler(channelButton);
              }
          }
@@ -578,10 +579,22 @@ void InputModule::altButtonHandler(){
 
 
         case SW_PATTERN:
-        //  if(midplaneGPIO->pressed(SW_CH0)) sequenceArray[0].toggleMute();
-        //  if(midplaneGPIO->pressed(SW_CH1)) sequenceArray[1].toggleMute();
-        //  if(midplaneGPIO->pressed(SW_CH2)) sequenceArray[2].toggleMute();
-        //  if(midplaneGPIO->pressed(SW_CH3)) sequenceArray[3].toggleMute();
+          if(midplaneGPIO->pressed(SW_CH0)){
+            sequenceArray[0].toggleMute();
+            display->displayModal(750, MODAL_MUTE_CH1);
+          }
+          if(midplaneGPIO->pressed(SW_CH1)){
+             sequenceArray[1].toggleMute();
+             display->displayModal(750, MODAL_MUTE_CH2);
+           }
+          if(midplaneGPIO->pressed(SW_CH2)){
+             sequenceArray[2].toggleMute();
+             display->displayModal(750, MODAL_MUTE_CH3);
+           }
+          if(midplaneGPIO->pressed(SW_CH3)){
+             sequenceArray[3].toggleMute();
+             display->displayModal(750, MODAL_MUTE_CH4);
+           }
 
           if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
@@ -695,7 +708,7 @@ void InputModule::altButtonHandler(){
         if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
           //enable multi select mode -
           multiSelectStep = selectedStep;
-          debug("enable mutli select");
+         //Serial.println("enable mutli select");
         }
         // record which was the last step, and time, for double press purposes
 
@@ -722,7 +735,7 @@ void InputModule::altButtonHandler(){
 
         if (multiSelectStep == selectedStep){
           //disable multi select mode
-          debug("disable mutli select");
+         //Serial.println("disable mutli select");
           multiSelectStep = 255;
         }
       }

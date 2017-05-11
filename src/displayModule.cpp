@@ -39,10 +39,20 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.println("Zetaohm");
   delay(100);
   oled.setTextScale(1);
-  oled.setCursor(CENTER,48);
+  oled.setCursor(CENTER,40);
   oled.setTextColor(ORANGE);
   oled.setFont(&NeueHaasXBlack_28);//this will load the font
   oled.println("FLXS1");
+
+
+  oled.setCursor(CENTER,100);
+
+  oled.setTextScale(1);
+  oled.setFont(&PixelSquare_10);//this will load the font
+  oled.setTextColor(BLACK);
+
+  oled.println("version beta10");
+
     delay(1000);
   Serial.println("Display Initialization Complete");
 }
@@ -102,82 +112,89 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     }
 
 
-    if (previousMenu != currentMenu || previouslySelectedChannel != selectedChannel){
-       freeDisplayCache();
-       oled.fillScreen(background);
-       //Serial.println("Changing Menu: " + String(currentMenu));
-    }
 
-    switch(currentMenu) {
-      case PITCH_GATE_MENU:
-        stateDisplay_pitch(buf);
-      break;
-
-      case ARPEGGIO_MENU:
-        stateDisplay_arp(buf);
-      break;
-
-      case VELOCITY_MENU:
-        stateDisplay_velocity(buf);
-      break;
-
-      case SEQUENCE_MENU:
-        sequenceMenuDisplay();
-      break;
-
-      case INPUT_MENU:
-        inputMenuDisplay();
-      break;
-
-      case PATTERN_SELECT:
-        patternSelectDisplay();
-      break;
-
-      case INPUT_DEBUG_MENU:
-        inputDebugMenuDisplay();
+    if (modaltimer < modalMaxTime ) {
+      modalDisplay();
+    } else {
+      if (previousMenu != currentMenu || previouslySelectedChannel != selectedChannel || modalRefreshSwitch){
+          modalRefreshSwitch = false;
+         freeDisplayCache();
+         oled.fillScreen(background);
+         //Serial.println("Changing Menu: " + String(currentMenu));
+      }
+      switch(currentMenu) {
+        case PITCH_GATE_MENU:
+          stateDisplay_pitch(buf);
         break;
 
-      case TUNER_MENU:
-        channelTunerDisplay(buf);
-      break;
+        case ARPEGGIO_MENU:
+          stateDisplay_arp(buf);
+        break;
 
-      case CHANNEL_INPUT_MODE:
-        channelInputDisplay(buf);
-      break;
+        case VELOCITY_MENU:
+          stateDisplay_velocity(buf);
+        break;
 
-      case GLOBAL_MENU:
-        globalMenuDisplay();
-      break;
+        case SEQUENCE_MENU:
+          sequenceMenuDisplay();
+        break;
 
-      case TEMPO_MENU:
-        tempoMenuDisplay();
-      break;
+        case INPUT_MENU:
+          inputMenuDisplay();
+        break;
 
-      case CALIBRATION_MENU:
-        if (stepMode < STATE_CALIB_OUTPUT0_LOW) {
-          inputCalibrationMenuDisplay();
-        } else {
-          outputCalibrationMenuDisplay();
-        }
-      break;
+        case PATTERN_SELECT:
+          patternSelectDisplay();
+        break;
 
-      case MOD_MENU_1:
-        modMenu1_DisplayHandler();
-      break;
+        case INPUT_DEBUG_MENU:
+          inputDebugMenuDisplay();
+          break;
 
-      case MOD_MENU_2:
-        modMenu2_DisplayHandler();
-      break;
+        case TUNER_MENU:
+          channelTunerDisplay(buf);
+        break;
 
-      case NOTE_DISPLAY:
-        noteDisplayHandler();
-      break;
+        case CHANNEL_INPUT_MODE:
+          channelInputDisplay(buf);
+        break;
 
-      case MENU_MODAL:
-        modalPopup();
-      break;
+        case GLOBAL_MENU:
+          globalMenuDisplay();
+        break;
+
+        case TEMPO_MENU:
+          tempoMenuDisplay();
+        break;
+
+        case CALIBRATION_MENU:
+          if (stepMode < STATE_CALIB_OUTPUT0_LOW) {
+            inputCalibrationMenuDisplay();
+          } else {
+            outputCalibrationMenuDisplay();
+          }
+        break;
+
+        case MOD_MENU_1:
+          modMenu1_DisplayHandler();
+        break;
+
+        case MOD_MENU_2:
+          modMenu2_DisplayHandler();
+        break;
+
+        case NOTE_DISPLAY:
+          noteDisplayHandler();
+        break;
+
+        case MENU_MODAL:
+          modalPopup();
+        break;
+
+      }
 
     }
+
 
     // if (previousMenu != currentMenu){
     //   Serial.println("finished first loop of displaying new state");
@@ -193,6 +210,49 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
   };
 };
+void DisplayModule::displayModal(uint16_t ms, uint8_t select){
+  modaltimer = 0;
+  modalMaxTime = ms;
+  modalRefreshSwitch = true;
+  modalSelect = modalSelect;
+//  Serial.println("resetting modal timer");
+}
+
+void DisplayModule::modalDisplay(){
+  //Serial.println("displaying modal");
+  switch (modalSelect){
+    case MODAL_MUTE_CH1:
+      displayElement[0] = strdup("CH1 MUTE");
+      goto singleTextDisplay;
+    case MODAL_MUTE_CH2:
+      displayElement[0] = strdup("CH2 MUTE");
+      goto singleTextDisplay;
+    case MODAL_MUTE_CH3:
+      displayElement[0] = strdup("CH3 MUTE");
+      goto singleTextDisplay;
+    case MODAL_MUTE_CH4:
+      displayElement[0] = strdup("CH4 MUTE");
+      goto singleTextDisplay;
+    case MODAL_SELECT_CH1:
+      displayElement[0] = strdup("CHANNEL 1");
+      goto singleTextDisplay;
+    case MODAL_SELECT_CH2:
+      displayElement[0] = strdup("CHANNEL 2");
+      goto singleTextDisplay;
+    case MODAL_SELECT_CH3:
+      displayElement[0] = strdup("CHANNEL 3");
+      goto singleTextDisplay;
+    case MODAL_SELECT_CH4:
+      displayElement[0] = strdup("CHANNEL 4");
+      goto singleTextDisplay;
+
+      singleTextDisplay:
+      renderStringBox(0,  DISPLAY_LABEL,    18,  28, 96, 40, true, MODALBOLD, BLACK , WHITE);
+    break;
+  }
+
+}
+
 
 void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
   // renders a string box only once.
@@ -245,6 +305,14 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
         oled.setTextScale(2);
         break;
+
+      case MODALBOLD:
+      oled.setTextWrap(false);
+        oled.setCursor(CENTER,CENTER);
+        oled.setFont(&a04b03);
+        oled.setTextScale(2);
+        break;
+
     }
 
     oled.setTextColor(color1);

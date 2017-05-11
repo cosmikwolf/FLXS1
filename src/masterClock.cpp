@@ -207,7 +207,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 
 void MasterClock::internalClockTick(){
  //digitalWriteFast(DEBUG_PIN, HIGH);
-  debug("begin internal clock tick");
+ //Serial.println("begin internal clock tick");
         // int clock
 
   if (playing && !wasPlaying){
@@ -240,7 +240,7 @@ void MasterClock::internalClockTick(){
   }
 
 
-	debug("end internal clock tick");
+//Serial.println("end internal clock tick");
 
   //digitalWriteFast(DEBUG_PIN, LOW);
 }

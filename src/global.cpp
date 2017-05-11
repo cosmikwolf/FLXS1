@@ -93,11 +93,11 @@ uint8_t chordArray[27][3] = {
 {4,10,15}
 };
 
-void debug(String text){
-	if (debugBoolean == 1){
-		Serial.println(text);
-	}
-}
+// void//Serial.println(String text){
+// 	if (debugBoolean == 1){
+// 		Serial.println(text);
+// 	}
+//}
 
 int positive_modulo(int i, int n) {
 	return (i % n + n) % n;

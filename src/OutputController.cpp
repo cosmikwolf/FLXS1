@@ -427,7 +427,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)) );    // set CV voltage
 //delayMicroseconds(5);
   //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
-ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)));    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)));    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){

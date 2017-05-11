@@ -30,7 +30,7 @@ void Sequencer::clockReset(bool activeStepReset){
 
 //  firstPulse = 1;
   if(channel ==0 ){
-    debug("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(getCurrentFrame()));
+   //Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(getCurrentFrame()));
   }
 
 }

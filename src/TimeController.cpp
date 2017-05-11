@@ -20,9 +20,10 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   sequencerArray[2].initialize(2, 16, 4, (tempoX100/100), &outputControl);
   sequencerArray[3].initialize(3, 16, 4, (tempoX100/100), &outputControl);
 
-	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster);
 
 	display.initialize(sequencerArray, &clockMaster);
+
+	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster, &display);
 
 	ledArray.initialize(sequencerArray);
 
@@ -107,7 +108,7 @@ void TimeController::runLoopHandler() {
 		//clockMaster.ledRunSwitch = false;
 	}
 	if(timeControlTimer > 10000){
-    debug("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
+   //Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
   };
   timeControlTimer = 0;
 	// digitalWriteFast(PIN_EXT_RX, LOW);
@@ -115,7 +116,7 @@ void TimeController::runLoopHandler() {
 //	Serial.println("LED Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
 	buttonIo.loop(INPUT_INTERVAL);
 	if(timeControlTimer > 10000){
-    debug("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
+   //Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* BUTTON LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
   };
   timeControlTimer = 0;
 
@@ -128,7 +129,7 @@ void TimeController::runLoopHandler() {
 		// digitalWriteFast(DEBUG_PIN, LOW);
 		cacheWriteTimer=0;
 		if(timeControlTimer > 10000){
-      debug("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
+     //Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* CACHE LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
     }; timeControlTimer = 0;
 	}
 	// digitalWriteFast(PIN_EXT_RX, LOW);
