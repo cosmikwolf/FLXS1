@@ -69,7 +69,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	}
 };
 
-void Sequencer::toggleMute(){
+bool Sequencer::toggleMute(){
 	this->mute = !mute;
 
 	if (mute){
@@ -82,6 +82,8 @@ void Sequencer::toggleMute(){
 		}
 		outputControl->allNotesOff(channel);
 	}
+
+  return mute;
 
 };
 

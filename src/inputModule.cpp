@@ -92,7 +92,7 @@ void InputModule::loop(uint16_t frequency){
         case MOD_MENU_1:
         case MOD_MENU_2:
           if(backplaneGPIO->pressed(22)){
-            changeState(min_max_cycle(stepMode+knobChange, STATE_NOTEDISPLAY , STATE_ARPINTMOD ));
+            changeState(min_max_cycle(stepMode+knobChange, STATE_FIRSTSTEP , STATE_ARPINTMOD ));
           }
           break;
       }
@@ -105,7 +105,6 @@ void InputModule::loop(uint16_t frequency){
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
       case VELOCITY_MENU:
-
         channelPitchModeInputHandler();
       break;
       case SEQUENCE_MENU:
@@ -160,6 +159,10 @@ void InputModule::loop(uint16_t frequency){
         }
       break;
 
+      case SAVE_MENU:
+        saveMenuInputHandler();
+      break;
+
     }
   }
 
@@ -199,6 +202,9 @@ void InputModule::changeState(uint8_t targetState){
       break;
     case STATE_PATTERNSELECT:
       currentMenu = PATTERN_SELECT;
+      break;
+    case STATE_SAVE:
+      currentMenu = SAVE_MENU;
       break;
     case STATE_CALIBRATION:
       currentMenu = CALIBRATION_MENU;
@@ -267,7 +273,7 @@ void InputModule::patternSelectHandler(){
 
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
-      saveFile->changePattern(i, patternChannelSelector,  true, true);
+      saveFile->changePattern(i, patternChannelSelector, true);
 
       //delay(10);
       changeState(STATE_PITCH0);
@@ -494,7 +500,7 @@ void InputModule::channelButtonShiftMenuHandler(uint8_t channel){
   Serial.println("CALIB MENU " + String(channel) + "\t" + String(CALIBRATION_MENU));
 }
 
-void InputModule::channelButtonPatternSelectHandler(uint8_t channel){
+void InputModule::channelButtonChannelSelectorHandler(uint8_t channel){
   switch(channel){
     case 0:
       patternChannelSelector = patternChannelSelector ^ 0b0001;
@@ -548,8 +554,9 @@ void InputModule::altButtonHandler(){
 
          switch(currentMenu){
            case PATTERN_SELECT:
-            channelButtonPatternSelectHandler(channelButton);
-           break;
+           case SAVE_MENU:
+            channelButtonChannelSelectorHandler(channelButton);
+            break;
            case CALIBRATION_MENU:
             if (midplaneGPIO->pressed(SW_SHIFT)){
               calibrationSaveHandler();
@@ -573,35 +580,64 @@ void InputModule::altButtonHandler(){
                channelButtonHandler(channelButton);
              }
          }
-
-
         break;
 
 
         case SW_PATTERN:
+          if (midplaneGPIO->pressed(SW_SHIFT)){
+            for(int i=0; i<SEQUENCECOUNT; i++){
+              //saveDestination[i] = sequenceArray[i].pattern;
+              saveDestination[i] = currentPattern;
+            }
+            changeState(STATE_SAVE);
+            break;
+          }
+
+/*
           if(midplaneGPIO->pressed(SW_CH0)){
-            sequenceArray[0].toggleMute();
-            display->displayModal(750, MODAL_MUTE_CH1);
+            if( sequenceArray[0].toggleMute() ){
+              display->displayModal(750, MODAL_MUTE_CH1);
+            } else {
+              display->displayModal(750, MODAL_UNMUTE_CH1);
+            }
           }
           if(midplaneGPIO->pressed(SW_CH1)){
-             sequenceArray[1].toggleMute();
-             display->displayModal(750, MODAL_MUTE_CH2);
+             if( sequenceArray[1].toggleMute() ){
+               display->displayModal(750, MODAL_MUTE_CH2);
+             } else {
+               display->displayModal(750, MODAL_UNMUTE_CH2);
+             }
            }
           if(midplaneGPIO->pressed(SW_CH2)){
-             sequenceArray[2].toggleMute();
-             display->displayModal(750, MODAL_MUTE_CH3);
+             if( sequenceArray[2].toggleMute() ){
+               display->displayModal(750, MODAL_MUTE_CH3);
+             } else {
+               display->displayModal(750, MODAL_UNMUTE_CH3);
+             }
            }
           if(midplaneGPIO->pressed(SW_CH3)){
-             sequenceArray[3].toggleMute();
-             display->displayModal(750, MODAL_MUTE_CH4);
+             if( sequenceArray[3].toggleMute() ){
+               display->displayModal(750, MODAL_MUTE_CH4);
+             } else {
+               display->displayModal(750, MODAL_UNMUTE_CH4);
+             }
            }
-
+*/
           if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
-          if(currentMenu == PATTERN_SELECT){
-            changeState(STATE_PITCH0);
-          } else {
-            changeState(STATE_PATTERNSELECT);
+          switch(currentMenu){
+            case PATTERN_SELECT:
+              changeState(STATE_PITCH0);
+            break;
+            case SAVE_MENU:
+              saveFile->savePattern(patternChannelSelector, saveDestination);
+              changeState(STATE_PITCH0);
+              display->displayModal(750, MODAL_SAVE);
+
+            break;
+            default:
+              changeState(STATE_PATTERNSELECT);
+            break;
           }
         break;
 
@@ -614,18 +650,23 @@ void InputModule::altButtonHandler(){
           //  } else {
           //    changeState(STATE_STEPCOUNT);
           //  }
+          if (currentMenu == TEMPO_MENU){
+            changeState(min_max_cycle(stepMode+1, STATE_TEMPO , STATE_YAXISINPUT));
+          } else {
+            changeState(STATE_TEMPO);
+          }
          }
         break;
 
         case SW_SHIFT:
-
+          if (currentMenu == SAVE_MENU){
+            changeState(STATE_PITCH0);
+          }
         break;
 
         case SW_PGDN:
 
-          if (currentMenu == TEMPO_MENU){
-            changeState(min_max_cycle(stepMode+1, STATE_TEMPO , STATE_RESETINPUT));
-          }
+
 
           if (midplaneGPIO->pressed(SW_SHIFT)){
             changeState(STATE_TEMPO);
@@ -754,11 +795,11 @@ void InputModule::altButtonHandler(){
           case STATE_PITCH0:
         // just change the note
 
-            if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-              // if a note is not active, turn it on and give it a length.
-              sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
-              sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
-            }
+          //  if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+          //    // if a note is not active, turn it on and give it a length.
+          //    sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
+          //    sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
+          //  }
             // and finally set the new step value!
             // monophonic so pitch[0] only
             sequenceArray[selectedChannel].setStepPitch(selectedStep, min_max_cycle(sequenceArray[selectedChannel].getStepPitch(selectedStep, 0) + knobChange, 0,120), 0);
@@ -799,7 +840,7 @@ void InputModule::altButtonHandler(){
               }
               if (sequenceArray[selectedChannel].stepData[selectedStep].gateType > 0){
                 sequenceArray[selectedChannel].stepData[selectedStep].gateLength =  min_max(sequenceArray[selectedChannel].stepData[selectedStep].gateLength + knobChange, 0, 255);
-                Serial.println("Setting Gatelength: " + String(sequenceArray[selectedChannel].stepData[selectedStep].gateLength));
+              //  Serial.println("Setting Gatelength: " + String(sequenceArray[selectedChannel].stepData[selectedStep].gateLength));
               }
 
           break;
@@ -844,6 +885,49 @@ void InputModule::altButtonHandler(){
     }
 };
 
+
+void InputModule::saveMenuInputHandler(){
+  uint8_t chButtonMask = 0;
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+
+      if(midplaneGPIO->pressed(SW_CH0)){
+        chButtonMask |= 0b0001;
+      }
+      if(midplaneGPIO->pressed(SW_CH1)){
+        chButtonMask |= 0b0010;
+      }
+      if(midplaneGPIO->pressed(SW_CH2)){
+        chButtonMask |= 0b0100;
+      }
+      if(midplaneGPIO->pressed(SW_CH3)){
+        chButtonMask |= 0b1000;
+      }
+
+      // if channel buttons are pressed, matrix buttons sets individual channel destinations
+      if (chButtonMask & 0b0001) {
+        saveDestination[0]=i;
+      };
+      if (chButtonMask & 0b0010) {
+        saveDestination[1]=i;
+      };
+      if (chButtonMask & 0b0100) {
+        saveDestination[2]=i;
+      };
+      if (chButtonMask & 0b1000) {
+        saveDestination[3]=i;
+      };
+      if (chButtonMask == 0){
+        //if no ch buttons are pressed, matrix buttons sets save destination for all channels
+        saveDestination[0]=i;
+        saveDestination[1]=i;
+        saveDestination[2]=i;
+        saveDestination[3]=i;
+      }
+    }
+  }
+
+};
 
 void InputModule::channelEnvelopeModeInputHandler(){
 

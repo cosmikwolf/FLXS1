@@ -30,6 +30,7 @@ class LEDArray
   private:
     Sequencer *sequenceArray;
     elapsedMicros pixelTimer;
+    elapsedMillis blinkTimer;
     Adafruit_NeoPixel leds = Adafruit_NeoPixel(NUM_LEDS, DATA_PIN, NEO_GRBW + NEO_KHZ800);
   //  Adafruit_NeoPixel leds = Adafruit_NeoPixel(NUM_LEDS, DATA_PIN, NEO_GRB + NEO_KHZ800);
 

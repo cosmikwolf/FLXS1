@@ -73,6 +73,7 @@ void LEDArray::loop(uint16_t interval){
       case SEQUENCE_MENU:
       case MOD_MENU_1:
       case MOD_MENU_2:
+      case TEMPO_MENU:
         channelSequenceModeLEDHandler();
       break;
       case PITCH_GATE_MENU:
@@ -88,8 +89,10 @@ void LEDArray::loop(uint16_t interval){
 
       case INPUT_DEBUG_MENU:
       case PATTERN_SELECT:
+      case SAVE_MENU:
         for (int i=0; i < 16; i++){
           //leds[ledMapping[i]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
+
           leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
         }
 
@@ -100,7 +103,7 @@ void LEDArray::loop(uint16_t interval){
             leds.setPixelColor(ledChannelButtons[i], 64,64,64, 0);
           }
 
-/*          if( patternChannelSelector & (1<<i) ){
+/*        if( patternChannelSelector & (1<<i) ){
           //  leds[ledMapping[i+16]] = CHSV(int(millis()/10 +i*64)%255, 255, 255);
           } else {
           //  leds[ledMapping[i+16]] = CHSV(0,0,0);
@@ -132,6 +135,8 @@ void LEDArray::channelSequenceModeLEDHandler(){
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(iStep, 0)));
     }
   }
+
+
   if(playing){
     leds.setPixelColor(0, wheel(64));
   } else {
@@ -150,15 +155,16 @@ void LEDArray::channelSequenceModeLEDHandler(){
 
 }
 
+
 void LEDArray::channelPitchModeLEDHandler(){
+  if(blinkTimer > 6000000/tempoX100){
+    blinkTimer = 0;
+  }
+
   for (int i=0; i < 16; i++){
     if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
     //  leds[ledMapping[i]] = CRGB(255, 255, 255);
-      leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
-
-    } else if (getNote(i) == selectedStep) {
-    //  leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
-      leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5)%255));
+      leds.setPixelColor(ledMainMatrix[i], 127,127,127,255);
 
     } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
         //    leds[ledMapping[i]] = CHSV(0,0,0);
@@ -166,6 +172,12 @@ void LEDArray::channelPitchModeLEDHandler(){
     } else {
         //  leds[ledMapping[i]] = CHSV(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0),255,255);
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
+    }
+
+    if (getNote(i) == selectedStep && blinkTimer < 3000000/tempoX100) {
+    //  leds[ledMapping[i]] = CHSV(int(millis()/3)%255, 255, 255);
+      leds.setPixelColor(ledMainMatrix[i], 255,255,255,0);
+
     }
   }
   if(playing){

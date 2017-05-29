@@ -132,7 +132,8 @@ void Adafruit_NeoPixel::show(void) {
   // state, computes 'pin high' and 'pin low' values, and writes these back
   // to the PORT register as needed.
 
-  noInterrupts(); // Need 100% focus on instruction timing
+  //noInterrupts(); // Need 100% focus on instruction timing
+//  #define LEDSBUSY
 
 #ifdef __AVR__
 // AVR MCUs -- ATmega & ATtiny (no XMEGA) ---------------------------------
@@ -1519,7 +1520,8 @@ void Adafruit_NeoPixel::show(void) {
 // END ARCHITECTURE SELECT ------------------------------------------------
 
 
-  interrupts();
+  //interrupts();
+  //#undef LEDSBUSY
   endTime = micros(); // Save EOD time for latch on next call
 }
 
@@ -1715,16 +1717,3 @@ uint8_t Adafruit_NeoPixel::getBrightness(void) const {
 void Adafruit_NeoPixel::clear() {
   memset(pixels, 0, numBytes);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

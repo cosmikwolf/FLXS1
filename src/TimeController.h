@@ -23,6 +23,8 @@ class TimeController {
     void runLoopHandler();
     void masterClockHandler();
     void sequencerHandler();
+    void ledClockHandler();
+    void displayClockHandler();
     void midiClockHandler();
     void cacheWriteHandler();
 

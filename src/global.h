@@ -7,6 +7,7 @@
 
 #define kSerialSpeed 115200
 #define kMasterClockInterval 150
+#define kLedClockInterval 30000
 #define kSequenceTimerInterval 600
 #define kPeripheralLoopTimer 15000
 #define kMidiClockInterval  600
@@ -29,7 +30,7 @@
 #define FRAMES_PER_BEAT  4194304
 
 
-#define DISPLAY_INTERVAL 20000
+#define DISPLAY_INTERVAL 29000
 #define INPUT_INTERVAL 20000
 #define LED_INTERVAL 100000
 
@@ -79,7 +80,8 @@
 #define MOD_MENU_1        GLOBAL_MENU + 1
 #define MOD_MENU_2        MOD_MENU_1 + 1
 #define MENU_MODAL        MOD_MENU_2 +1
-#define NOTE_DISPLAY        MENU_MODAL +1
+#define NOTE_DISPLAY      MENU_MODAL +1
+#define SAVE_MENU         NOTE_DISPLAY +1
 
 //PITCH PAGE STEPMODES
 #define STATE_PITCH0       1
@@ -132,8 +134,11 @@
 #define STATE_PITCH3            STATE_PITCH2 +1
 #define STATE_TUNER             STATE_PITCH3 +1
 
+//SAVE MENU
+#define STATE_SAVE               STATE_TUNER +1
+
 // Calibration Menu
-#define STATE_CALIB_INPUT0_OFFSET      STATE_TUNER  + 1
+#define STATE_CALIB_INPUT0_OFFSET      STATE_SAVE  + 1
 #define STATE_CALIB_INPUT0_LOW      STATE_CALIB_INPUT0_OFFSET  + 1
 #define STATE_CALIB_INPUT0_HIGH     STATE_CALIB_INPUT0_LOW  + 1
 #define STATE_CALIB_INPUT1_OFFSET    STATE_CALIB_INPUT0_HIGH  + 1
@@ -179,10 +184,16 @@
 #define MODAL_SELECT_CH3       2
 #define MODAL_SELECT_CH4       3
 
-#define MODAL_MUTE_CH1       4
-#define MODAL_MUTE_CH2       5
-#define MODAL_MUTE_CH3       6
-#define MODAL_MUTE_CH4       7
+#define MODAL_MUTE_CH1         4
+#define MODAL_MUTE_CH2         5
+#define MODAL_MUTE_CH3         6
+#define MODAL_MUTE_CH4         7
+
+#define MODAL_UNMUTE_CH1       8
+#define MODAL_UNMUTE_CH2       9
+#define MODAL_UNMUTE_CH3       10
+#define MODAL_UNMUTE_CH4       11
+#define MODAL_SAVE             12
 
 #define DEBUG_PIN				    	 31
 #define PIN_EXT_AD_1   27
@@ -307,6 +318,7 @@ extern float   frequency;
 extern uint8_t selectedChannel;
 extern uint8_t selectedStep;
 extern uint8_t patternChannelSelector;
+extern uint8_t prevPtrnChannelSelector;
 extern uint8_t selectedCalibrationChannel;
 extern boolean extClock;
 extern uint8_t clockMode;
@@ -330,6 +342,9 @@ extern elapsedMicros startTime;
 extern uint16_t masterDebugCounter;
 
 extern uint32_t lfoClockCounter;
+
+//save file
+extern uint8_t saveDestination[4];
 
 //midi
 extern elapsedMicros testTimer;

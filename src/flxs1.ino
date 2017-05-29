@@ -25,9 +25,12 @@
 //OctoSK6812 octoLeds(NUMLEDS, displayMemory, drawingMemory, SK6812_GRBW);
 
 TimeController timeControl;
+
 IntervalTimer MasterClockTimer;
-IntervalTimer PeripheralLoopTimer;
+IntervalTimer LEDClockTimer;
 IntervalTimer SequencerTimer;
+//IntervalTimer DisplayLoopTimer;
+//IntervalTimer PeripheralLoopTimer;
 
 MidiModule midiControl;
 Sequencer sequence[SEQUENCECOUNT];
@@ -86,14 +89,22 @@ void setup() {
   //PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
   //PeripheralLoopTimer.priority(64);
 
+
+  LEDClockTimer.begin(LEDLoop,kLedClockInterval);
+  LEDClockTimer.priority(1);
+
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
   MasterClockTimer.priority(0);
 
+//  DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
+//  DisplayLoopTimer.priority(3);
+
   SequencerTimer.begin(sequencerLoop,kSequenceTimerInterval);
-  SequencerTimer.priority(1);
+  SequencerTimer.priority(2);
 
   //SPI.usingInterrupt(PeripheralLoopTimer);
   SPI.usingInterrupt(SequencerTimer);
+  //SPI.usingInterrupt(LEDClockTimer);
 
   //  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
   //  MIDITimer.priority(0);
@@ -201,6 +212,10 @@ void usbNoteOn(byte channel, byte note, byte velocity){
 // global wrapper to create pointer to ClockMaster member function
 // https://isocpp.org/wiki/faq/pointers-to-members
 void sequencerLoop(){
+//  #ifdef LEDSBUSY
+//    return;
+//  #endif
+
   usbMIDI.read();
   timeControl.midiClockHandler();
   timeControl.sequencerHandler();
@@ -208,6 +223,13 @@ void sequencerLoop(){
 
 void masterLoop(){
   timeControl.masterClockHandler();
+}
+
+void LEDLoop(){
+  timeControl.ledClockHandler();
+}
+void displayLoop(){
+  timeControl.displayClockHandler();
 }
 
 void peripheralLoop(){

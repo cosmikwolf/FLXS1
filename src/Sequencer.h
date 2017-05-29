@@ -32,7 +32,7 @@ class Sequencer
 		void 		clockStart(elapsedMicros startTime);
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
-		void 		toggleMute();
+		bool 		toggleMute();  //returns true if target was muted
 
 		void 		skipStep(uint8_t count);
     void    jumpToStep(uint8_t stepNum);

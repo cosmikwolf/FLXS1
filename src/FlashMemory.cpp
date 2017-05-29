@@ -166,8 +166,8 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
   seqSettingsArray.add(sequenceArray[channel].beatCount);
   seqSettingsArray.add(sequenceArray[channel].quantizeKey);
   seqSettingsArray.add(sequenceArray[channel].quantizeScale);
-  seqSettingsArray.add(sequenceArray[channel].channel);
-  seqSettingsArray.add(sequenceArray[channel].pattern);
+  seqSettingsArray.add(channel);
+  seqSettingsArray.add(pattern);
   seqSettingsArray.add(sequenceArray[channel].clockDivision);
   seqSettingsArray.add(sequenceArray[channel].gpio_reset);
   seqSettingsArray.add(sequenceArray[channel].gpio_yaxis);
@@ -535,16 +535,26 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
   //printPattern();
 }
 
-void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolean saveFirst, boolean instant){
+void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray){
+  for(int i=0; i < SEQUENCECOUNT; i++){
+    //need to skip the sequences that are masked out
+    if( patternChannelSelector & (1<<i) ){
+      saveSequenceJSON(i, destinationArray[i]);
+    }
+  }
+}
+
+
+void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolean instant){
 	//Serial.println("currentPattern: " + String(currentPattern) + "\tSEQUENCECOUNT: " + String(SEQUENCECOUNT));
-	if(saveFirst){
-    for(int i=0; i < SEQUENCECOUNT; i++){
+	//if(saveFirst){
+//    for(int i=0; i < SEQUENCECOUNT; i++){
   		//saveChannelPattern(i);
       //saveSequenceJSON(i, currentPattern);
-      saveSequenceJSON(i, sequenceArray[i].pattern);
-    }
+      //saveSequenceJSON(i, sequenceArray[i].pattern);
+  //  }
     //Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
-	}
+	//}
 
   if (instant || !playing) {
     //Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );

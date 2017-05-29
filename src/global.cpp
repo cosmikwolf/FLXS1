@@ -14,6 +14,7 @@ uint8_t previousState = 0;      // Display module + LED moduleextern
 uint8_t selectedChannel = 0;
 uint8_t selectedStep;
 uint8_t patternChannelSelector = 0b1111;
+uint8_t prevPtrnChannelSelector = 0;;
 float   probability;
 float   frequency;
 
@@ -62,6 +63,9 @@ uint16_t masterDebugCounter = 0;
 
 uint8_t selectedText = 0;
 uint8_t prevSelectedText = 255 ;
+
+//save file
+uint8_t saveDestination[4];
 
 uint8_t chordArray[27][3] = {
 {255,255,255},

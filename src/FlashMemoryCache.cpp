@@ -126,7 +126,7 @@ int FlashMemory::cacheWriteLoop(){
               file.seek(getSaveAddress(cacheIndex)); //seek to address
               file.write(fileBuffer, SECTORSIZE);
               cacheWriteTimer = 0;
-              Serial.println("Writing CH:" + String(channel) + "\tPT:" + String(pattern) + "\t" );
+            //  Serial.println("Writing CH:" + String(channel) + "\tPT:" + String(pattern) + "\t" );
             //  Serial.println(fileBuffer);
               file.close();    // close cache file
 

@@ -112,7 +112,6 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     }
 
 
-
     if (modaltimer < modalMaxTime ) {
       modalDisplay();
     } else {
@@ -187,6 +186,9 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           noteDisplayHandler();
         break;
 
+        case SAVE_MENU:
+          saveMenuDisplayHandler();
+          break;
         case MENU_MODAL:
           modalPopup();
         break;
@@ -214,7 +216,7 @@ void DisplayModule::displayModal(uint16_t ms, uint8_t select){
   modaltimer = 0;
   modalMaxTime = ms;
   modalRefreshSwitch = true;
-  modalSelect = modalSelect;
+  this->modalSelect = select;
 //  Serial.println("resetting modal timer");
 }
 
@@ -233,6 +235,19 @@ void DisplayModule::modalDisplay(){
     case MODAL_MUTE_CH4:
       displayElement[0] = strdup("CH4 MUTE");
       goto singleTextDisplay;
+    case MODAL_UNMUTE_CH1:
+      displayElement[0] = strdup("CH1 UNMUTE");
+      goto singleTextDisplay;
+    case MODAL_UNMUTE_CH2:
+      displayElement[0] = strdup("CH2 UNMUTE");
+      goto singleTextDisplay;
+    case MODAL_UNMUTE_CH3:
+      displayElement[0] = strdup("CH3 UNMUTE");
+      goto singleTextDisplay;
+    case MODAL_UNMUTE_CH4:
+      displayElement[0] = strdup("CH4 UNMUTE");
+      goto singleTextDisplay;
+
     case MODAL_SELECT_CH1:
       displayElement[0] = strdup("CHANNEL 1");
       goto singleTextDisplay;
@@ -244,6 +259,9 @@ void DisplayModule::modalDisplay(){
       goto singleTextDisplay;
     case MODAL_SELECT_CH4:
       displayElement[0] = strdup("CHANNEL 4");
+      goto singleTextDisplay;
+    case MODAL_SAVE:
+      displayElement[0] = strdup("SAVED");
       goto singleTextDisplay;
 
       singleTextDisplay:
@@ -825,6 +843,95 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
 
  }
 
+void DisplayModule::saveMenuDisplayHandler(){
+  if(prevPtrnChannelSelector != patternChannelSelector){
+    for (int i=0; i<8; i++){
+      free(displayCache[i]);
+      displayCache[i] = nullptr;
+    }
+  }
+  prevPtrnChannelSelector = patternChannelSelector;
+
+  displayElement[0] = strdup("CH1");
+  displayElement[1] = strdup("CH2");
+  displayElement[2] = strdup("CH3");
+  displayElement[3] = strdup("CH4");
+  if(patternChannelSelector & 0b0001){
+    sprintf(buf, "%02d", saveDestination[0]+1);
+    displayElement[4] = strdup(buf);
+  } else {
+    displayElement[4] = strdup("--");
+  }
+  if(patternChannelSelector & 0b0010){
+    sprintf(buf, "%02d", saveDestination[1]+1);
+    displayElement[5] = strdup(buf);
+  } else {
+    displayElement[5] = strdup("--");
+  }
+  if(patternChannelSelector & 0b0100){
+    sprintf(buf, "%02d", saveDestination[2]+1);
+    displayElement[6] = strdup(buf);
+  } else {
+    displayElement[6] = strdup("--");
+  }
+  if(patternChannelSelector & 0b1000){
+    sprintf(buf, "%02d", saveDestination[3]+1);
+    displayElement[7] = strdup(buf);
+  } else {
+    displayElement[7] = strdup("--");
+  }
+
+  displayElement[16] = strdup("PATTERN SAVE");
+  displayElement[17] = strdup("CH BUTTONS -> MASK SAVE");
+  displayElement[19] = strdup("4x4 MATRIX -> SET ALL INDEXES");
+  displayElement[21] = strdup("CH + MATRIX -> SET CH INDEX");
+
+  displayElement[18] = strdup("CHANNEL");
+
+  displayElement[22] = strdup("SAVE DESTINATION INDEX");
+
+  displayElement[20] = strdup("PATTERN->SAVE  SHIFT->EXIT ");
+
+  renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 8, false, STYLE1X, BLACK, PINK);
+  renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, BLACK, PINK);
+  renderStringBox(19, DISPLAY_LABEL, 0, 24, 128 , 8, false, REGULAR1X, BLACK, PINK);
+  renderStringBox(21, DISPLAY_LABEL, 0, 32, 128 , 8, false, REGULAR1X, BLACK, PINK);
+
+  renderStringBox(18, DISPLAY_LABEL, 0, 40, 128 , 8, false, REGULAR1X, BLACK, PINK);
+
+  if(patternChannelSelector & 0b0001){
+    renderStringBox( 0, DISPLAY_LABEL,  0, 48, 32 , 16, false, STYLE1X, BLACK, RED);
+  } else {
+    renderStringBox( 0, DISPLAY_LABEL,  0, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+  }
+  if(patternChannelSelector & 0b0010){
+    renderStringBox( 1, DISPLAY_LABEL, 32, 48, 32 , 16, false, STYLE1X, BLACK, GREEN);
+  } else {
+    renderStringBox( 1, DISPLAY_LABEL, 32, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+  }
+  if(patternChannelSelector & 0b0100){
+    renderStringBox( 2, DISPLAY_LABEL, 64, 48, 32 , 16, false, STYLE1X, BLACK, BLUE);
+  } else {
+    renderStringBox( 2, DISPLAY_LABEL, 64, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+  }
+  if(patternChannelSelector & 0b1000){
+    renderStringBox( 3, DISPLAY_LABEL, 96, 48, 32 , 16, false, STYLE1X, BLACK, PURPLE);
+  } else {
+    renderStringBox( 3, DISPLAY_LABEL, 96, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+  }
+
+  renderStringBox(22, DISPLAY_LABEL, 0, 64, 128 , 8, false, REGULAR1X, BLACK, PINK);
+
+
+  renderStringBox( 4, DISPLAY_LABEL,  0, 72, 32 , 16, false, STYLE1X, BLACK, RED);
+  renderStringBox( 5, DISPLAY_LABEL, 32, 72, 32 , 16, false, STYLE1X, BLACK, GREEN);
+  renderStringBox( 6, DISPLAY_LABEL, 64, 72, 32 , 16, false, STYLE1X, BLACK, BLUE);
+  renderStringBox( 7, DISPLAY_LABEL, 96, 72, 32 , 16, false, STYLE1X, BLACK, PURPLE);
+
+  renderStringBox(20, DISPLAY_LABEL, 0, 88, 128 , 8, false, REGULAR1X, BLACK, PINK);
+
+
+}
  void DisplayModule::noteDisplayHandler(){
 
 

@@ -20,7 +20,6 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   sequencerArray[2].initialize(2, 16, 4, (tempoX100/100), &outputControl);
   sequencerArray[3].initialize(3, 16, 4, (tempoX100/100), &outputControl);
 
-
 	display.initialize(sequencerArray, &clockMaster);
 
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster, &display);
@@ -104,7 +103,7 @@ void TimeController::runLoopHandler() {
 
 	elapsedMicros timeControlTimer = 0;
 	if (clockMaster.ledRunSwitch){
-		ledArray.loop(LED_INTERVAL);
+		//ledArray.loop(LED_INTERVAL);
 		//clockMaster.ledRunSwitch = false;
 	}
 	if(timeControlTimer > 10000){
@@ -147,6 +146,11 @@ void TimeController::runLoopHandler() {
 
 }
 
+void TimeController::ledClockHandler(){
+  ledArray.loop(0);
+}
+
+
 void TimeController::masterClockHandler(){
 	clockMaster.masterClockFunc();
 }
@@ -154,6 +158,15 @@ void TimeController::masterClockHandler(){
 void TimeController::sequencerHandler(){
 	clockMaster.sequencerFunc();
 }
+
+void TimeController::displayClockHandler(){
+//  if (clockMaster.ledRunSwitch){
+    display.displayLoop(0);
+  //  clockMaster.ledRunSwitch = false;
+  //}
+}
+
+
 
 void TimeController::midiClockHandler(){
 	midiControl->midiClockSyncFunc(serialMidi);
