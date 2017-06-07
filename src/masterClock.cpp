@@ -66,8 +66,9 @@ void MasterClock::masterClockFunc(){
 		if (clockCounter * kMasterClockInterval >  clockPeriod){
 			extClockCounter++;
 
-			if( extClockCounter >= EXTCLOCKDIV ){
+			if( extClockCounter >= EXTCLOCKDIV && playing){
 				outputControl->setClockOutput(HIGH);
+				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
 				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval));
 				masterDebugTimer = 0;
@@ -86,10 +87,10 @@ void MasterClock::masterClockFunc(){
   }
 	masterLoopTimer = 0;
 
-	if ((clockCounter * kMasterClockInterval >  clockPeriod/2 ) && outputControl->clockValue) {
-		outputControl->setClockOutput(LOW);
-		ledRunSwitch = true;
-		digitalWriteFast(PIN_EXT_AD_2, HIGH);
+	if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
+			outputControl->setClockOutput(LOW);
+			ledRunSwitch = true;
+			digitalWriteFast(PIN_EXT_AD_2, HIGH);
 	}
 
 	// digitalWriteFast(PIN_EXT_AD_2, LOW);
@@ -211,6 +212,8 @@ void MasterClock::internalClockTick(){
         // int clock
 
   if (playing && !wasPlaying){
+		serialMidi->sendRealTime(midi::Start);
+
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
     masterPulseCount = 0;

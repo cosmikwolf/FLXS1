@@ -144,7 +144,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         case SCALE_MENU:
           scaleMenuDisplay();
         break;
-        
+
         case PATTERN_SELECT:
           patternSelectDisplay();
         break;
@@ -648,7 +648,7 @@ void DisplayModule::inputMenuDisplay(){
  renderStringBox(0,  DISPLAY_LABEL,     0,    0, 128, 15, false, STYLE1X, background , foreground);
  renderStringBox(1,  DISPLAY_LABEL,     0,   16,  64,16, false, STYLE1X, background , foreground);
  //renderStringBox(2,  STATE_XAXISINPUT,  74,  16,  54,16, false, STYLE1X, background , foreground);
- renderStringBox(3,  DISPLAY_LABEL,     0,   32,  64,16, false, STYLE1X, background , foreground);
+ //renderStringBox(3,  DISPLAY_LABEL,     0,   32,  64,16, false, STYLE1X, background , foreground);
  //renderStringBox(4,  STATE_YAXISINPUT,  74,  32,  54,16, false, STYLE1X, background , foreground);
 
 }
@@ -667,14 +667,14 @@ void DisplayModule::inputMenuDisplay(){
   } else {
     displayElement[5] = strdup("NONE");
   }
-
-  displayElement[6] = strdup("Y-AXIS:");
-  if (sequenceArray[selectedChannel].gpio_yaxis < 4){
-   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
-   displayElement[7] = strdup(buf);
- } else {
-   displayElement[7] = strdup("NONE");
- }
+ //
+ //  displayElement[6] = strdup("Y-AXIS:");
+ //  if (sequenceArray[selectedChannel].gpio_yaxis < 4){
+ //   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+ //   displayElement[7] = strdup(buf);
+ // } else {
+ //   displayElement[7] = strdup("NONE");
+ // }
 
    switch(clockMode){
      case INTERNAL_CLOCK:
@@ -720,8 +720,8 @@ void DisplayModule::inputMenuDisplay(){
 
    renderStringBox(5,  STATE_RESETINPUT,  74, 62,54,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(6,  DISPLAY_LABEL,    0,  79,64,16, false, STYLE1X, background , foreground);
-   renderStringBox(7,  STATE_YAXISINPUT,     74,  79,54,16, false, STYLE1X, background , foreground);
+  //  renderStringBox(6,  DISPLAY_LABEL,    0,  79,64,16, false, STYLE1X, background , foreground);
+  //  renderStringBox(7,  STATE_YAXISINPUT,     74,  79,54,16, false, STYLE1X, background , foreground);
 
  }
 
