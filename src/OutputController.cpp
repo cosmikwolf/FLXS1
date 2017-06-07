@@ -353,7 +353,7 @@ void OutputController::inputRead(){
   backplaneGPIO->digitalWrite(8, 0);
 }
 
-void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -424,10 +424,10 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   //delayMicroseconds(5);
 //  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel],0)) );    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale) );    // set CV voltage
 //delayMicroseconds(5);
   //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2)));    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale) );    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
@@ -436,6 +436,97 @@ void OutputController::noteOn(uint8_t channel, uint8_t note, uint8_t velocity, u
   debugTimer1 = 0;
 
 };
+
+uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale){
+  uint32_t cents = 0;
+    switch (quantizeScale) {
+      case SEMITONE:
+        cents = semitone10thCent[note % semitoneNoteCount] + 12000 * note / semitoneNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case IONIAN:
+        cents = ionian10thCent[note % ionianNoteCount] + 12000 * note / ionianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case DORIAN:
+        cents = dorian10thCent[note % dorianNoteCount] + 12000 * note / dorianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case PHRYGIAN:
+        cents = phyrigan10thCent[note % phyriganNoteCount] + 12000 * note / phyriganNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case LYDIAN:
+        cents = lydian10thCent[note % lydianNoteCount] + 12000 * note / lydianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case MIXOLYDIAN:
+        cents = mixolydian10thCent[note % mixolydianNoteCount] + 12000 * note / mixolydianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case AEOLIAN:
+        cents = aeolian10thCent[note % aeolianNoteCount] + 12000 * note / aeolianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case LOCRIAN:
+        cents = locrian10thCent[note % locrianNoteCount] + 12000 * note / locrianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case BLUESMAJOR:
+        cents = bluesMajor10thCent[note % bluesMajorNoteCount] + 12000 * note / bluesMajorNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case BLUESMINOR:
+        cents = bluesMinor10thCent[note % bluesMinorNoteCount] + 12000 * note / bluesMinorNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case PENT_MAJOR:
+        cents = pentMajor10thCent[note % pentMajorNoteCount] + 12000 * note / pentMajorNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case PENT_MINOR:
+        cents = pentMinor10thCent[note % pentMinorNoteCount] + 12000 * note / pentMinorNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case FOLK:
+        cents = folk10thCent[note % folkNoteCount] + 12000 * note / folkNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case JAPANESE:
+        cents = japanese10thCent[note % japaneseNoteCount] + 12000 * note / japaneseNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case GAMELAN:
+        cents = gamelan10thCent[note % gamelanNoteCount] + 12000 * note / gamelanNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case GYPSY:
+        cents = gamelan10thCent[note % gamelanNoteCount] + 12000 * note / gamelanNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case ARABIAN:
+        cents = arabian10thCent[note % arabianNoteCount] + 12000 * note / arabianNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case FLAMENCO:
+        cents = flamenco10thCent[note % flamencoNoteCount] + 12000 * note / flamencoNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case WHOLETONE:
+        cents = wholetone10thCent[note % wholetoneNoteCount] + 12000 * note / wholetoneNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case PYTHAGOREAN:
+        cents = pythagorean10thCent[note % pythagoreanNoteCount] + 12000 * note / pythagoreanNoteCount ;
+        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+      case COLUNDI:
+        return map( colundiArrayX100[note], 0,1012,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+      break;
+    }
+}
+
+
 
 uint16_t OutputController::voltageOffset(uint8_t volts, uint8_t mapAddress){
   uint16_t twentyVolts = dacCalibrationPos[mapAddress]-dacCalibrationNeg[mapAddress];

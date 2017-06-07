@@ -92,12 +92,14 @@ class Sequencer
 		uint8_t 	syncStep;
 		uint8_t 	stepsPlayed;
 		uint8_t		quantizeKey;
-		uint8_t		quantizeScale;
+    uint8_t		quantizeMode;
+    uint8_t		quantizeScale;
 		uint8_t 	pattern;
 		uint8_t		channel;
 		uint8_t   beatCount;
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
+    uint8_t   skipStepCount;
 		uint8_t		gpio_gateinvert;
 		uint8_t		gpio_randompitch;
 		uint8_t		cv_arptypemod;

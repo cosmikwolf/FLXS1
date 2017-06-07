@@ -24,7 +24,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->firstStep 				= 0;
 	this->beatCount 				= 4;
 	this->quantizeKey 			= 0;
-	this->quantizeScale 		= 0;
+	this->quantizeMode 		= 0;
 	this->pattern 					= pattern;
 	this->channel 					= ch;
 	this->avgPulseLength 		= 20000;
@@ -133,21 +133,21 @@ uint8_t Sequencer::quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool 
 	uint16_t scaleExpanded;
 
 	switch(scale){
-		case 1: scaleExpanded = CHROMATIC         ; break;
-		case 2: scaleExpanded = MAJOR             ; break;
-		case 3: scaleExpanded = MINOR             ; break;
-		case 4: scaleExpanded = MAJORMINOR        ; break;
-		case 5: scaleExpanded = PENTATONIC_MAJOR  ; break;
-		case 6: scaleExpanded = PENTATONIC_MINOR  ; break;
-		case 7: scaleExpanded = PENTATONIC_BLUES  ; break;
-		case 8: scaleExpanded = IONIAN            ; break;
-		case 9: scaleExpanded = AEOLIAN           ; break;
-		case 10: scaleExpanded = DORIAN           ; break;
-		case 11: scaleExpanded = MIXOLYDIAN       ; break;
-		case 12: scaleExpanded = PHRYGIAN         ; break;
-		case 13: scaleExpanded = LYDIAN           ; break;
-		case 14: scaleExpanded = LOCRIAN          ; break;
-		default: scaleExpanded = CHROMATIC				; break;
+		// case 1: scaleExpanded = CHROMATIC         ; break;
+		// case 2: scaleExpanded = MAJOR             ; break;
+		// case 3: scaleExpanded = MINOR             ; break;
+		// case 4: scaleExpanded = MAJORMINOR        ; break;
+		// case 5: scaleExpanded = PENTATONIC_MAJOR  ; break;
+		// case 6: scaleExpanded = PENTATONIC_MINOR  ; break;
+		// case 7: scaleExpanded = PENTATONIC_BLUES  ; break;
+		// case 8: scaleExpanded = IONIAN            ; break;
+		// case 9: scaleExpanded = AEOLIAN           ; break;
+		// case 10: scaleExpanded = DORIAN           ; break;
+		// case 11: scaleExpanded = MIXOLYDIAN       ; break;
+		// case 12: scaleExpanded = PHRYGIAN         ; break;
+		// case 13: scaleExpanded = LYDIAN           ; break;
+		// case 14: scaleExpanded = LOCRIAN          ; break;
+		// default: scaleExpanded = CHROMATIC				; break;
 	}
 
 	//Serial.println("Original Scale:\t" + String(scaleExpanded, BIN) );
@@ -218,14 +218,14 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
 
   if (onOff){
   //  Serial.println("Stopped trig note on");
-    if (quantizeScale > 0){
-  		stepData[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[0], quantizeKey, quantizeScale, 1);
-  	} else {
+    // if (quantizeMode > 0){
+  	// 	stepData[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[0], quantizeKey, quantizeMode, 1);
+  	// } else {
   		stepData[stepNum].notePlaying = stepData[stepNum].pitch[0];
-  	}
+  //	}
 
 	//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
-    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gate, 0);
+    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gate, 0, quantizeScale);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
   } else {
@@ -325,11 +325,11 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	//if (quantizeKey == 1){
 	//	stepData[stepNum].notePlaying = quantizePitch(playPitch, aminor, 1);
-	if (quantizeScale > 0){
-		stepData[stepNum].notePlaying = quantizePitch(playPitch, quantizeKey, quantizeScale, 1);
-	} else {
+	//if (quantizeMode > 0){
+//		stepData[stepNum].notePlaying = quantizePitch(playPitch, quantizeKey, quantizeMode, 1);
+//	} else {
 		stepData[stepNum].notePlaying = playPitch;
-	}
+//	}
 	//Serial.println("noteOn"); delay(10);
 
 	//BEGIN INPUT MAPPING SECTION
@@ -364,7 +364,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION
-	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig, tieFlag);
+	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig, tieFlag, quantizeScale);
   tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true);
 
 	stepData[stepNum].arpStatus++;

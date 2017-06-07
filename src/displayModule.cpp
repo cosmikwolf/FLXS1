@@ -45,13 +45,12 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.println("FLXS1");
 
 
-  oled.setCursor(CENTER,100);
-
+  oled.setCursor(64,100);
   oled.setTextScale(1);
   oled.setFont(&PixelSquare_10);//this will load the font
-  oled.setTextColor(BLACK);
+  oled.setTextColor(NAVY);
 
-  oled.println("version beta10");
+  oled.println("v0.11b");
 
     delay(1000);
   Serial.println("Display Initialization Complete");
@@ -142,6 +141,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           inputMenuDisplay();
         break;
 
+        case SCALE_MENU:
+          scaleMenuDisplay();
+        break;
+        
         case PATTERN_SELECT:
           patternSelectDisplay();
         break;
@@ -408,7 +411,19 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
   displayElement[0] = strdup(buf);
 
-  displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
+switch(sequenceArray[selectedChannel].quantizeScale){
+  case COLUNDI:
+    displayElement[1] = strdup(colundiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
+  break;
+
+  case SEMITONE:
+    displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
+  break;
+
+  default:
+  displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]).c_str());
+
+}
 
   sprintf(buf, "GATE%d", selectedChannel+1);
 
@@ -453,7 +468,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
   sprintf(buf, "CV%dA Arp PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
   displayElement[0] = strdup(buf);
-  displayElement[1]  = strdup("TYPE");
+  displayElement[1]  = strdup("ALGO");
   const char*  arpTypeArray[] = { "OFF","UP","DOWN","UP DN 1","UP DN 2","RANDOM" };
   displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
@@ -548,14 +563,21 @@ void DisplayModule::stateDisplay_arp(char *buf){
    }
    displayElement[4] = strdup(buf);
 
-   displayElement[5] = strdup("KEY:");
-   char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
-   char *scaleArray[] = { "     OFF", "CHROMATK", "MAJOR", "MINOR", "MAJMINOR", "PENT_MAJOR", "PENT_MINOR", "PENT_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
+   sprintf(buf, "SKIP %d:", sequenceArray[selectedChannel].skipStepCount);
 
-   displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
-   displayElement[7] = strdup("MODE:");
+   displayElement[5] = strdup(buf);
 
-   displayElement[8] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
+   if (sequenceArray[selectedChannel].gpio_yaxis < 4){
+    sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+    displayElement[6] = strdup(buf);
+  } else {
+    displayElement[6] = strdup("--");
+  }
+
+   displayElement[7] = strdup("--");
+
+
+   displayElement[8] = strdup("--");
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
 
@@ -568,13 +590,46 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(3,  DISPLAY_LABEL,        0, 47,90,17, false, STYLE1X, background , foreground);
    renderStringBox(4,  STATE_BEATCOUNT,     90, 47, 37,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(5,  DISPLAY_LABEL,        0,  63,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_QUANTIZEKEY,     96, 63,32,17, false, STYLE1X, background , foreground);
+   renderStringBox(5,  STATE_SKIPSTEPCOUNT,   0,  63,96,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_YAXISINPUT,     96, 63,32,17, false, STYLE1X, background , foreground);
 
    renderStringBox(7,  DISPLAY_LABEL,        0, 79,50,17, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_QUANTIZESCALE,    50, 79,78,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_quantizeMode,    50, 79,78,17, false, STYLE1X, background , foreground);
 
  }
+
+void DisplayModule::scaleMenuDisplay(){
+     sprintf(buf, "CH%d QUANTIZER", selectedChannel+1);
+
+     displayElement[0] = strdup(buf);
+
+     displayElement[9] = strdup("SCALE:");
+     char *scaleArray[] = {"semitone", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone", "pythagorean", "colundi"};
+
+      displayElement[10] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
+
+     displayElement[5] = strdup("KEY:");
+     char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
+     char *modeArray[] = { "     OFF", "CHROMATK", "MAJOR", "MINOR", "MAJMINOR", "PENT_MAJOR", "PENT_MINOR", "PENT_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
+
+     displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
+     displayElement[7] = strdup("MODE:");
+
+     displayElement[8] = strdup(modeArray[sequenceArray[selectedChannel].quantizeMode]);
+
+     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+
+     renderStringBox(9,  DISPLAY_LABEL,    0, 15,48,17, false, STYLE1X, background , foreground);
+     renderStringBox(10,  STATE_SCALE,    48, 15,80,17, false, STYLE1X, background , foreground);
+
+     renderStringBox(5,  DISPLAY_LABEL,        0, 31,48,17, false, STYLE1X, background , foreground);
+     renderStringBox(6,  STATE_QUANTIZEKEY,     48, 31,80,17, false, STYLE1X, background , foreground);
+
+     renderStringBox(7,  DISPLAY_LABEL,        0, 47,48,17, false, STYLE1X, background , foreground);
+     renderStringBox(8,  STATE_quantizeMode,     48, 47, 80,17, false, STYLE1X, background , foreground);
+
+};
+
 
 void DisplayModule::inputMenuDisplay(){
   sprintf(buf, "CH%d INPUT MAP", selectedChannel+1);

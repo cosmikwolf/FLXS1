@@ -165,7 +165,7 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
   seqSettingsArray.add(sequenceArray[channel].stepCount);
   seqSettingsArray.add(sequenceArray[channel].beatCount);
   seqSettingsArray.add(sequenceArray[channel].quantizeKey);
-  seqSettingsArray.add(sequenceArray[channel].quantizeScale);
+  seqSettingsArray.add(sequenceArray[channel].quantizeMode);
   seqSettingsArray.add(channel);
   seqSettingsArray.add(pattern);
   seqSettingsArray.add(sequenceArray[channel].clockDivision);
@@ -218,7 +218,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
    sequenceArray[channel].stepCount    = jsonReader["settings"][0];
    sequenceArray[channel].beatCount    = jsonReader["settings"][1];
    sequenceArray[channel].quantizeKey  = jsonReader["settings"][2];
-   sequenceArray[channel].quantizeScale= jsonReader["settings"][3];
+   sequenceArray[channel].quantizeMode= jsonReader["settings"][3];
    sequenceArray[channel].channel      = jsonReader["settings"][4];
    sequenceArray[channel].pattern      = jsonReader["settings"][5];
    sequenceArray[channel].clockDivision= jsonReader["settings"][6];
@@ -305,7 +305,7 @@ void FlashMemory::serializeHash(char* fileBuffer, uint8_t channel, uint8_t patte
   root["stepCount"]     = sequenceArray[channel].stepCount;
   root["beatCount"]     = sequenceArray[channel].beatCount;
   root["quantizeKey"]   = sequenceArray[channel].quantizeKey;
-  root["quantizeScale"] = sequenceArray[channel].quantizeScale;
+  root["quantizeMode"] = sequenceArray[channel].quantizeMode;
   root["channel"]       = sequenceArray[channel].channel;
   root["pattern"]       = sequenceArray[channel].pattern;
   JsonArray& stepDataArray = root.createNestedArray("stepData");
@@ -423,7 +423,7 @@ bool FlashMemory::deserializeHash(uint8_t channel, char* json){
    sequenceArray[channel].stepCount    = jsonReader["stepCount"];
    sequenceArray[channel].beatCount    = jsonReader["beatCount"];
    sequenceArray[channel].quantizeKey  = jsonReader["quantizeKey"];
-   sequenceArray[channel].quantizeScale = jsonReader["quantizeScale"];
+   sequenceArray[channel].quantizeMode = jsonReader["quantizeMode"];
    sequenceArray[channel].channel      = jsonReader["channel"];
    sequenceArray[channel].pattern = jsonReader["pattern"].as<uint8_t>();
    //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);

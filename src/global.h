@@ -70,7 +70,8 @@
 #define	PITCH_GATE_MENU   1
 #define	ARPEGGIO_MENU     PITCH_GATE_MENU + 1
 #define	SEQUENCE_MENU     ARPEGGIO_MENU + 1
-#define	INPUT_MENU        SEQUENCE_MENU + 1
+#define	SCALE_MENU        SEQUENCE_MENU + 1
+#define	INPUT_MENU        SCALE_MENU + 1
 #define	TUNER_MENU        INPUT_MENU + 1
 #define	VELOCITY_MENU     TUNER_MENU + 1
 #define	CALIBRATION_MENU  VELOCITY_MENU + 1
@@ -106,10 +107,13 @@
 #define STATE_FIRSTSTEP       STATE_NOTEDISPLAY +1
 #define STATE_STEPCOUNT       STATE_FIRSTSTEP +1
 #define STATE_BEATCOUNT       STATE_STEPCOUNT +1
-#define STATE_QUANTIZEKEY      STATE_BEATCOUNT+1
-#define STATE_QUANTIZESCALE    STATE_QUANTIZEKEY+1
+#define STATE_SKIPSTEPCOUNT   STATE_BEATCOUNT + 1
+#define STATE_YAXISINPUT       STATE_SKIPSTEPCOUNT +1
+#define STATE_SCALE            STATE_YAXISINPUT+1
+#define STATE_QUANTIZEKEY      STATE_SCALE+1
+#define STATE_quantizeMode    STATE_QUANTIZEKEY+1
 // MOD MENU 1
-#define STATE_GATEMOD          STATE_QUANTIZESCALE +1
+#define STATE_GATEMOD          STATE_quantizeMode +1
 #define STATE_GATEINVERT       STATE_GATEMOD +1
 #define STATE_RANDOMPITCH      STATE_GATEINVERT +1
 #define STATE_PITCHMOD         STATE_RANDOMPITCH +1
@@ -123,9 +127,8 @@
 #define STATE_TEMPO            STATE_ARPINTMOD +1
 #define STATE_EXTCLOCK         STATE_TEMPO +1
 #define STATE_RESETINPUT       STATE_EXTCLOCK +1
-#define STATE_YAXISINPUT       STATE_RESETINPUT +1
 
-#define STATE_PATTERNSELECT     STATE_YAXISINPUT  +1
+#define STATE_PATTERNSELECT     STATE_RESETINPUT  +1
 #define STATE_CALIBRATION       STATE_PATTERNSELECT +1
 #define STATE_INPUTDEBUG        STATE_CALIBRATION +1
 #define STATE_GLOBAL            STATE_INPUTDEBUG +1
@@ -213,23 +216,45 @@
 #define MIDI_CONTINE   251
 #define MIDI_STOP   252
 
+#define SEMITONE         0
+#define IONIAN           1
+#define DORIAN           2
+#define PHRYGIAN         3
+#define LYDIAN           4
+#define MIXOLYDIAN       5
+#define AEOLIAN          6
+#define LOCRIAN          7
+#define BLUESMAJOR       8
+#define BLUESMINOR       9
+#define PENT_MAJOR      10
+#define PENT_MINOR      11
+#define FOLK            12
+#define JAPANESE        13
+#define GAMELAN         14
+#define GYPSY           15
+#define ARABIAN         16
+#define FLAMENCO        17
+#define WHOLETONE       18
+#define PYTHAGOREAN     19
+#define COLUNDI         20
+
 //these 12 bit INTs define chromatic scales
 //the bit position indicates scale degree
 
-#define CHROMATIC         0b111111111111
-#define MAJOR             0b101011010101
-#define MINOR             0b101101010101
-#define MAJORMINOR        0b101111010101
-#define PENTATONIC_MAJOR  0b101001010100
-#define PENTATONIC_MINOR  0b100101010010
-#define PENTATONIC_BLUES  0b100101010010
-#define IONIAN            0b101011010101
-#define AEOLIAN           0b101101011010
-#define DORIAN            0b101101010110
-#define MIXOLYDIAN        0b101011010110
-#define PHRYGIAN          0b110101011010
-#define LYDIAN            0b101010110101
-#define LOCRIAN           0b110101101010
+//#define CHROMATIC         0b111111111111
+//#define MAJOR             0b101011010101
+//#define MINOR             0b101101010101
+//#define MAJORMINOR        0b101111010101
+//#define PENTATONIC_MAJOR  0b101001010100
+//#define PENTATONIC_MINOR  0b100101010010
+//#define PENTATONIC_BLUES  0b100101010010
+//#define IONIAN            0b101011010101
+//#define AEOLIAN           0b101101011010
+//#define DORIAN            0b101101010110
+//#define MIXOLYDIAN        0b101011010110
+//#define PHRYGIAN          0b110101011010
+//#define LYDIAN            0b101010110101
+//#define LOCRIAN           0b110101101010
 
 #define POSITIVE 1
 #define NEGATIVE 0
@@ -328,7 +353,7 @@ extern uint8_t currentPattern;
 extern uint8_t queuePattern;
 extern boolean playing;
 extern uint8_t chordArray[27][3];
-
+extern uint16_t colundiArrayX100[56];
 extern uint8_t stepModeOrder[1][MAX_STATE_COUNT];
 
 // MasterClock
