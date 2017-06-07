@@ -353,7 +353,7 @@ void OutputController::inputRead(){
   backplaneGPIO->digitalWrite(8, 0);
 }
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -436,94 +436,77 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   debugTimer1 = 0;
 
 };
+uint8_t OutputController::quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction){
 
-uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale){
+	uint8_t count = 0;
+	uint16_t scaleExpanded;
+
+	switch(quantizeMode){
+    case SEMITONE:    scaleExpanded = SEMITONE_BIN;    break;
+    case IONIAN:      scaleExpanded = IONIAN_BIN;      break;
+    case DORIAN:      scaleExpanded = DORIAN_BIN;      break;
+    case PHRYGIAN:    scaleExpanded = PHRYGIAN_BIN;    break;
+    case LYDIAN:      scaleExpanded = LYDIAN_BIN;      break;
+    case MIXOLYDIAN:  scaleExpanded = MIXOLYDIAN_BIN;  break;
+    case AEOLIAN:     scaleExpanded = AEOLIAN_BIN;     break;
+    case LOCRIAN:     scaleExpanded = LOCRIAN_BIN;     break;
+    case BLUESMAJOR:  scaleExpanded = BLUESMAJOR_BIN;  break;
+    case BLUESMINOR:  scaleExpanded = BLUESMINOR_BIN;  break;
+    case PENT_MAJOR:  scaleExpanded = PENT_MAJOR_BIN;  break;
+    case PENT_MINOR:  scaleExpanded = PENT_MINOR_BIN;  break;
+    case FOLK:        scaleExpanded = FOLK_BIN;        break;
+    case JAPANESE:    scaleExpanded = JAPANESE_BIN;    break;
+    case GAMELAN:     scaleExpanded = GAMELAN_BIN;     break;
+    case GYPSY:       scaleExpanded = GYPSY_BIN;       break;
+    case ARABIAN:     scaleExpanded = ARABIAN_BIN;     break;
+    case FLAMENCO:    scaleExpanded = FLAMENCO_BIN;    break;
+    case WHOLETONE:   scaleExpanded = WHOLETONE_BIN;   break;
+		default:          scaleExpanded = SEMITONE_BIN;    break;
+	}
+
+
+	//Serial.println("Original Scale:\t" + String(scaleExpanded, BIN) );
+	for (int i=0; i< quantizeKey; i++){
+		//bitwise rotation - 11 bits rotate to the right. Do it once for each scale degree
+		scaleExpanded = (scaleExpanded >> 1) | ((0b01 & scaleExpanded) << 11);
+	}
+	//Serial.println("Shifted to " + String(quantizeKey) + "\t" + String(scaleExpanded, BIN) );
+
+	while ( (0b100000000000 >> (note % 12) ) & ~scaleExpanded ) {
+		if (direction){
+			note += 1;
+		} else {
+			note -= 1;
+		}
+		count += 1;
+		if (count > 12) {
+			break; // emergency break if while loop goes OOC
+		}
+	}
+	return note;
+}
+
+uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey){
   uint32_t cents = 0;
+  uint16_t quantNote = 0;
     switch (quantizeScale) {
       case SEMITONE:
-        cents = semitone10thCent[note % semitoneNoteCount] + 12000 * note / semitoneNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case IONIAN:
-        cents = ionian10thCent[note % ionianNoteCount] + 12000 * note / ionianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case DORIAN:
-        cents = dorian10thCent[note % dorianNoteCount] + 12000 * note / dorianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case PHRYGIAN:
-        cents = phyrigan10thCent[note % phyriganNoteCount] + 12000 * note / phyriganNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case LYDIAN:
-        cents = lydian10thCent[note % lydianNoteCount] + 12000 * note / lydianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case MIXOLYDIAN:
-        cents = mixolydian10thCent[note % mixolydianNoteCount] + 12000 * note / mixolydianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case AEOLIAN:
-        cents = aeolian10thCent[note % aeolianNoteCount] + 12000 * note / aeolianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case LOCRIAN:
-        cents = locrian10thCent[note % locrianNoteCount] + 12000 * note / locrianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case BLUESMAJOR:
-        cents = bluesMajor10thCent[note % bluesMajorNoteCount] + 12000 * note / bluesMajorNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case BLUESMINOR:
-        cents = bluesMinor10thCent[note % bluesMinorNoteCount] + 12000 * note / bluesMinorNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case PENT_MAJOR:
-        cents = pentMajor10thCent[note % pentMajorNoteCount] + 12000 * note / pentMajorNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case PENT_MINOR:
-        cents = pentMinor10thCent[note % pentMinorNoteCount] + 12000 * note / pentMinorNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case FOLK:
-        cents = folk10thCent[note % folkNoteCount] + 12000 * note / folkNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case JAPANESE:
-        cents = japanese10thCent[note % japaneseNoteCount] + 12000 * note / japaneseNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case GAMELAN:
-        cents = gamelan10thCent[note % gamelanNoteCount] + 12000 * note / gamelanNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case GYPSY:
-        cents = gamelan10thCent[note % gamelanNoteCount] + 12000 * note / gamelanNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case ARABIAN:
-        cents = arabian10thCent[note % arabianNoteCount] + 12000 * note / arabianNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case FLAMENCO:
-        cents = flamenco10thCent[note % flamencoNoteCount] + 12000 * note / flamencoNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
-      break;
-      case WHOLETONE:
-        cents = wholetone10thCent[note % wholetoneNoteCount] + 12000 * note / wholetoneNoteCount ;
+        quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
         return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
       break;
       case PYTHAGOREAN:
-        cents = pythagorean10thCent[note % pythagoreanNoteCount] + 12000 * note / pythagoreanNoteCount ;
+        quantNote = quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
+        cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
         return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
       break;
       case COLUNDI:
         return map( colundiArrayX100[note], 0,1012,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
       break;
+
     }
+
+
+
 }
 
 

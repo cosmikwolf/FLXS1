@@ -216,7 +216,7 @@
 #define MIDI_CONTINE   251
 #define MIDI_STOP   252
 
-#define SEMITONE         0
+#define CHROMATIC         0
 #define IONIAN           1
 #define DORIAN           2
 #define PHRYGIAN         3
@@ -235,26 +235,16 @@
 #define ARABIAN         16
 #define FLAMENCO        17
 #define WHOLETONE       18
-#define PYTHAGOREAN     19
-#define COLUNDI         20
+
+#define SEMITONE        0
+#define PYTHAGOREAN     1
+#define COLUNDI         2
+
 
 //these 12 bit INTs define chromatic scales
 //the bit position indicates scale degree
 
-//#define CHROMATIC         0b111111111111
-//#define MAJOR             0b101011010101
-//#define MINOR             0b101101010101
-//#define MAJORMINOR        0b101111010101
-//#define PENTATONIC_MAJOR  0b101001010100
-//#define PENTATONIC_MINOR  0b100101010010
-//#define PENTATONIC_BLUES  0b100101010010
-//#define IONIAN            0b101011010101
-//#define AEOLIAN           0b101101011010
-//#define DORIAN            0b101101010110
-//#define MIXOLYDIAN        0b101011010110
-//#define PHRYGIAN          0b110101011010
-//#define LYDIAN            0b101010110101
-//#define LOCRIAN           0b110101101010
+
 
 #define POSITIVE 1
 #define NEGATIVE 0
