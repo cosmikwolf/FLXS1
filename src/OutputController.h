@@ -49,9 +49,6 @@
 #define FLAMENCO_BIN        0b110011011010
 #define WHOLETONE_BIN       0b101010101010
 
-
-const uint16_t folk10thCent[8]         = { 0, 1000, 3000, 4000, 5000, 7000, 8000, 10000 };
-
 class OutputController {
 public:
   void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc);

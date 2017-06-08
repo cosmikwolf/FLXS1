@@ -424,10 +424,10 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   //serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
   //delayMicroseconds(5);
 //  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel],0)) );    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
 //delayMicroseconds(5);
   //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale) );    // set CV voltage
+  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
 //  delayMicroseconds(5);
   //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(cvInputRaw[channel]));
   if (gate){
@@ -436,6 +436,7 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   debugTimer1 = 0;
 
 };
+
 uint8_t OutputController::quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction){
 
 	uint8_t count = 0;
@@ -491,8 +492,8 @@ uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t qu
   uint16_t quantNote = 0;
     switch (quantizeScale) {
       case SEMITONE:
-        quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+        quantNote = quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
+        return map( quantNote, 0, 120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
       break;
       case PYTHAGOREAN:
         quantNote = quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);

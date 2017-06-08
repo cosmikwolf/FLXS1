@@ -141,7 +141,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           inputMenuDisplay();
         break;
 
-        case SCALE_MENU:
+        case QUANTIZE_MENU:
           scaleMenuDisplay();
         break;
 
@@ -407,7 +407,7 @@ void DisplayModule::renderString(uint8_t index, uint8_t highlight, int16_t x, in
 
 void DisplayModule::stateDisplay_pitch(char*buf){
 
-  sprintf(buf, "CV%d PITCH PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1);
+  sprintf(buf, "cv%d.pitch ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
 
   displayElement[0] = strdup(buf);
 
@@ -425,17 +425,17 @@ switch(sequenceArray[selectedChannel].quantizeScale){
 
 }
 
-  sprintf(buf, "GATE%d", selectedChannel+1);
+  sprintf(buf, "gate%d", selectedChannel+1);
 
   displayElement[4] = strdup(buf);
 
   if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-    displayElement[5] = strdup("REST");
+    displayElement[5] = strdup("rest");
   } else {
     sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
     displayElement[5] = strdup(buf);
   }
-  displayElement[6] = strdup("GLIDE");
+  displayElement[6] = strdup("glide");
   if (sequenceArray[selectedChannel].stepData[selectedStep].glide == 0) {
     sprintf(buf, "off");
   } else {
@@ -443,8 +443,8 @@ switch(sequenceArray[selectedChannel].quantizeScale){
   }
   displayElement[9] = strdup(buf);
 
-  displayElement[8] = strdup("TYPE:");
-  String gateTypeArray[] = { "OFF", "ON", "TIE","1HIT" };
+  displayElement[8] = strdup("type:");
+  String gateTypeArray[] = { "off", "on", "tie","1hit" };
   displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
 
   //digitalWriteFast(PIN_EXT_RX, HIGH);
@@ -466,22 +466,22 @@ switch(sequenceArray[selectedChannel].quantizeScale){
 
 void DisplayModule::stateDisplay_arp(char *buf){
 
-  sprintf(buf, "CV%dA Arp PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  sprintf(buf, "cv%dA.arp ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
   displayElement[0] = strdup(buf);
-  displayElement[1]  = strdup("ALGO");
-  const char*  arpTypeArray[] = { "OFF","UP","DOWN","UP DN 1","UP DN 2","RANDOM" };
+  displayElement[1]  = strdup("algo");
+  const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
   displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
-  displayElement[4] = strdup("SPEED");
+  displayElement[4] = strdup("speed");
   sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
   displayElement[5] = strdup(buf);
   sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
   displayElement[6] = strdup(buf);
 
-  displayElement[8] = strdup("OCTVE");
+  displayElement[8] = strdup("octve");
   sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
   displayElement[9] = strdup(buf);
-  displayElement[10] = strdup("INTVL");
+  displayElement[10] = strdup("intvl");
 
     const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
 
@@ -505,16 +505,17 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
-   sprintf(buf, "CV%dB LFO  PT:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+
+   sprintf(buf, "cv%dB LFO  ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
    displayElement[0] = strdup(buf);
-   displayElement[1] = strdup("LEVEL:");
+   displayElement[1] = strdup("level:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
    displayElement[2] = strdup(buf);
-   displayElement[3] = strdup("TYPE:");
-   char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "RoundSq" };
+   displayElement[3] = strdup("type:");
+   char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
    displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
-   displayElement[5] = strdup("LFO SPD:");
+   displayElement[5] = strdup("LFO spd:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
    displayElement[6] = strdup(buf);
@@ -538,21 +539,21 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
  void DisplayModule::sequenceMenuDisplay(){
 
-   sprintf(buf, "CH%d SETTINGS", selectedChannel+1);
+   sprintf(buf, "ch%d settings", selectedChannel+1);
 
    displayElement[0] = strdup(buf);
 
-   displayElement[9] = strdup("FIRST STEP:");
+   displayElement[9] = strdup("first step:");
    sprintf(buf, "%d", sequenceArray[selectedChannel].firstStep+1);
    displayElement[10] = strdup(buf);
 
 
-   displayElement[1] = strdup("STEP COUNT:");
+   displayElement[1] = strdup("step count:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepCount);
    displayElement[2] = strdup(buf);
 
-   displayElement[3] = strdup("CLOCK DIV:");
+   displayElement[3] = strdup("clock div:");
 
    if (sequenceArray[selectedChannel].clockDivision == 1){
      sprintf(buf, "%d", sequenceArray[selectedChannel].clockDivision);
@@ -563,7 +564,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
    }
    displayElement[4] = strdup(buf);
 
-   sprintf(buf, "SKIP %d:", sequenceArray[selectedChannel].skipStepCount);
+   sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
 
    displayElement[5] = strdup(buf);
 
@@ -574,10 +575,10 @@ void DisplayModule::stateDisplay_arp(char *buf){
     displayElement[6] = strdup("--");
   }
 
-   displayElement[7] = strdup("--");
+   displayElement[7] = strdup("");
 
 
-   displayElement[8] = strdup("--");
+   displayElement[8] = strdup("");
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
 
@@ -594,39 +595,47 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(6,  STATE_YAXISINPUT,     96, 63,32,17, false, STYLE1X, background , foreground);
 
    renderStringBox(7,  DISPLAY_LABEL,        0, 79,50,17, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_quantizeMode,    50, 79,78,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_QUANTIZEMODE,    50, 79,78,17, false, STYLE1X, background , foreground);
 
  }
 
 void DisplayModule::scaleMenuDisplay(){
-     sprintf(buf, "CH%d QUANTIZER", selectedChannel+1);
+   sprintf(buf, "ch%d quantizer", selectedChannel+1);
 
      displayElement[0] = strdup(buf);
 
-     displayElement[9] = strdup("SCALE:");
-     char *scaleArray[] = {"semitone", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone", "pythagorean", "colundi"};
+     displayElement[9] = strdup("scale:");
+     char *scaleArray[] = {"semitone", "pythagorean", "colundi"};
 
       displayElement[10] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
 
-     displayElement[5] = strdup("KEY:");
-     char *keyArray[] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
-     char *modeArray[] = { "     OFF", "CHROMATK", "MAJOR", "MINOR", "MAJMINOR", "PENT_MAJOR", "PENT_MINOR", "PENT_BLUES", "IONIAN", "AEOLIAN", "DORIAN", "MIXOLYDN", "PHRYGIAN", "LYDIAN", "LOCRIAN" };
-
+     displayElement[5] = strdup("key:");
+     char *keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
      displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
-     displayElement[7] = strdup("MODE:");
+     displayElement[7] = strdup("mode:");
+     char *modeArray[] = {"chromatic", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone" };
 
-     displayElement[8] = strdup(modeArray[sequenceArray[selectedChannel].quantizeMode]);
+     switch(sequenceArray[selectedChannel].quantizeScale){
+       case SEMITONE:
+       case PYTHAGOREAN:
+         displayElement[8] = strdup(modeArray[sequenceArray[selectedChannel].quantizeMode]);
+       break;
+       case COLUNDI:
+         displayElement[8] = strdup("--");
+       break;
+     }
+
 
      renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
 
      renderStringBox(9,  DISPLAY_LABEL,    0, 15,48,17, false, STYLE1X, background , foreground);
-     renderStringBox(10,  STATE_SCALE,    48, 15,80,17, false, STYLE1X, background , foreground);
+     renderStringBox(10,  STATE_QUANTIZESCALE,    48, 15,80,17, false, STYLE1X, background , foreground);
 
      renderStringBox(5,  DISPLAY_LABEL,        0, 31,48,17, false, STYLE1X, background , foreground);
      renderStringBox(6,  STATE_QUANTIZEKEY,     48, 31,80,17, false, STYLE1X, background , foreground);
 
      renderStringBox(7,  DISPLAY_LABEL,        0, 47,48,17, false, STYLE1X, background , foreground);
-     renderStringBox(8,  STATE_quantizeMode,     48, 47, 80,17, false, STYLE1X, background , foreground);
+     renderStringBox(8,  STATE_QUANTIZEMODE,     48, 47, 80,17, false, STYLE1X, background , foreground);
 
 };
 
@@ -726,10 +735,10 @@ void DisplayModule::inputMenuDisplay(){
  }
 
  void DisplayModule::modMenu1_DisplayHandler(){
-   sprintf(buf, "CH%d MOD CONFG", selectedChannel+1);
+   sprintf(buf, "ch%d mod confg", selectedChannel+1);
    displayElement[0] = strdup(buf);
 
-   displayElement[1] = strdup("GATELNGTH:");
+   displayElement[1] = strdup("gatelngth:");
 
    if (sequenceArray[selectedChannel].cv_gatemod < 4){
     sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_gatemod +1 );
@@ -737,15 +746,15 @@ void DisplayModule::inputMenuDisplay(){
   } else {
     displayElement[2] = strdup("OFF");
   }
-  displayElement[3] = strdup("GATEINVRT:");
+  displayElement[3] = strdup("gateinvrt:");
 
   if (sequenceArray[selectedChannel].gpio_gateinvert < 4){
-   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_gateinvert +1 );
+   sprintf(buf, "gt%d", sequenceArray[selectedChannel].gpio_gateinvert +1 );
    displayElement[4] = strdup(buf);
  } else {
-   displayElement[4] = strdup("OFF");
+   displayElement[4] = strdup("off");
  }
- displayElement[5] = strdup("RNDMPTCH:");
+ displayElement[5] = strdup("rndmptch:");
 
  if (sequenceArray[selectedChannel].gpio_randompitch < 4){
   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_randompitch +1 );
@@ -753,22 +762,22 @@ void DisplayModule::inputMenuDisplay(){
 } else {
   displayElement[6] = strdup("OFF");
 }
-displayElement[7] = strdup("TRNSPOSE:");
+displayElement[7] = strdup("trnspose:");
 
 if (sequenceArray[selectedChannel].cv_pitchmod < 4){
- sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_pitchmod +1 );
+ sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_pitchmod +1 );
  displayElement[8] = strdup(buf);
 } else {
- displayElement[8] = strdup("OFF");
+ displayElement[8] = strdup("off");
 }
 
-displayElement[9] = strdup("GLIDETIME:");
+displayElement[9] = strdup("glidetime:");
 
 if (sequenceArray[selectedChannel].cv_glidemod < 4){
- sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_glidemod +1 );
+ sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_glidemod +1 );
  displayElement[10] = strdup(buf);
 } else {
- displayElement[10] = strdup("OFF");
+ displayElement[10] = strdup("off");
 }
 
    renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , foreground);
@@ -786,40 +795,40 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
  };
 
  void DisplayModule::modMenu2_DisplayHandler(){
-   sprintf(buf, "CH%d MOD CONFG", selectedChannel+1);
+   sprintf(buf, "ch%d mod confg", selectedChannel+1);
    displayElement[0] = strdup(buf);
 
-   displayElement[1] = strdup("ARP TYPE:");
+   displayElement[1] = strdup("arp type:");
 
    if (sequenceArray[selectedChannel].cv_arptypemod < 4){
-    sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arptypemod +1 );
+    sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_arptypemod +1 );
     displayElement[2] = strdup(buf);
   } else {
-    displayElement[2] = strdup("OFF");
+    displayElement[2] = strdup("off");
   }
-  displayElement[3] = strdup("ARP SPEED:");
+  displayElement[3] = strdup("arp speed:");
 
   if (sequenceArray[selectedChannel].cv_arpspdmod < 4){
-   sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arpspdmod +1 );
+   sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_arpspdmod +1 );
    displayElement[4] = strdup(buf);
  } else {
-   displayElement[4] = strdup("OFF");
+   displayElement[4] = strdup("off");
  }
- displayElement[5] = strdup("ARP OCTVE:");
+ displayElement[5] = strdup("arp octve:");
 
  if (sequenceArray[selectedChannel].cv_arpoctmod < 4){
-  sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arpoctmod +1 );
+  sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_arpoctmod +1 );
   displayElement[6] = strdup(buf);
 } else {
-  displayElement[6] = strdup("OFF");
+  displayElement[6] = strdup("off");
 }
-displayElement[7] = strdup("ARP INTVL:");
+displayElement[7] = strdup("arp intvl:");
 
 if (sequenceArray[selectedChannel].cv_arpintmod < 4){
- sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_arpintmod +1 );
+ sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_arpintmod +1 );
  displayElement[8] = strdup(buf);
 } else {
- displayElement[8] = strdup("OFF");
+ displayElement[8] = strdup("off");
 }
 /*
 displayElement[9] = strdup("GLIDETIME:");
@@ -871,8 +880,8 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
    displayElement[15] = strdup("16");
 
    displayElement[16] = strdup("PATTERN SELECT");
-   sprintf(buf, "Current: %02d", currentPattern );
-   sprintf(buf, "CH1:%02d CH2:%02d CH3:%02d CH4:%02d ", sequenceArray[0].pattern+1,sequenceArray[1].pattern+1, sequenceArray[2].pattern+1, sequenceArray[3].pattern+1 );
+   sprintf(buf, "current: %02d", currentPattern );
+   sprintf(buf, "ch1:%02d ch2:%02d ch3:%02d ch4:%02d ", sequenceArray[0].pattern+1,sequenceArray[1].pattern+1, sequenceArray[2].pattern+1, sequenceArray[3].pattern+1 );
    displayElement[17] = strdup(buf);
 
    renderStringBox( 0, DISPLAY_LABEL,  0, 30, 32 , 16, false, STYLE1X, BLACK, RED);
@@ -907,10 +916,10 @@ void DisplayModule::saveMenuDisplayHandler(){
   }
   prevPtrnChannelSelector = patternChannelSelector;
 
-  displayElement[0] = strdup("CH1");
-  displayElement[1] = strdup("CH2");
-  displayElement[2] = strdup("CH3");
-  displayElement[3] = strdup("CH4");
+  displayElement[0] = strdup("ch1");
+  displayElement[1] = strdup("ch2");
+  displayElement[2] = strdup("ch3");
+  displayElement[3] = strdup("ch4");
   if(patternChannelSelector & 0b0001){
     sprintf(buf, "%02d", saveDestination[0]+1);
     displayElement[4] = strdup(buf);
@@ -947,10 +956,10 @@ void DisplayModule::saveMenuDisplayHandler(){
 
   displayElement[20] = strdup("PATTERN->SAVE  SHIFT->EXIT ");
 
-  renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 8, false, STYLE1X, BLACK, PINK);
-  renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, BLACK, PINK);
-  renderStringBox(19, DISPLAY_LABEL, 0, 24, 128 , 8, false, REGULAR1X, BLACK, PINK);
-  renderStringBox(21, DISPLAY_LABEL, 0, 32, 128 , 8, false, REGULAR1X, BLACK, PINK);
+  renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 16, false, STYLE1X, RED, BLACK);
+  renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, RED, BLACK);
+  renderStringBox(19, DISPLAY_LABEL, 0, 24, 128 , 8, false, REGULAR1X, RED, BLACK);
+  renderStringBox(21, DISPLAY_LABEL, 0, 32, 128 , 8, false, REGULAR1X, RED, BLACK);
 
   renderStringBox(18, DISPLAY_LABEL, 0, 40, 128 , 8, false, REGULAR1X, BLACK, PINK);
 

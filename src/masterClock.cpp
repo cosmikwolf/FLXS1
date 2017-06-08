@@ -60,8 +60,10 @@ void MasterClock::masterClockFunc(){
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
 		if (extClockCounter > EXTCLOCKDIV - 1  && clockCounter * kMasterClockInterval>  clockPeriod - 3000){
 			digitalWriteFast(PIN_EXT_AD_2, LOW);
-			ledRunSwitch = false;
-		}
+			displayRunSwitch = false;
+		} else {
+      displayRunSwitch = true;
+    }
 
 		if (clockCounter * kMasterClockInterval >  clockPeriod){
 			extClockCounter++;
@@ -89,7 +91,7 @@ void MasterClock::masterClockFunc(){
 
 	if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
 			outputControl->setClockOutput(LOW);
-			ledRunSwitch = true;
+			displayRunSwitch = true;
 			digitalWriteFast(PIN_EXT_AD_2, HIGH);
 	}
 
@@ -202,7 +204,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 	for (int i=0; i< SEQUENCECOUNT; i++){
 		sequenceArray[i].runSequence();
 	}
-	ledRunSwitch = true;
+	displayRunSwitch = true;
 
 }
 

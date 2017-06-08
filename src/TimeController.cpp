@@ -102,10 +102,6 @@ void TimeController::runLoopHandler() {
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	elapsedMicros timeControlTimer = 0;
-	if (clockMaster.ledRunSwitch){
-		//ledArray.loop(LED_INTERVAL);
-		//clockMaster.ledRunSwitch = false;
-	}
 	if(timeControlTimer > 10000){
    //Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* LED LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));
   };
@@ -134,7 +130,10 @@ void TimeController::runLoopHandler() {
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
 	//Serial.println("Cache Loop timer: " + String(timeControlTimer)); timeControlTimer = 0;
-	display.displayLoop(DISPLAY_INTERVAL);
+  if (clockMaster.displayRunSwitch){
+    display.displayLoop(DISPLAY_INTERVAL);
+    //clockMaster.displayRunSwitch = false;
+  }
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
 	//if(timeControlTimer > 10000){	Serial.println("*&*&*&*&*&&*&&*&*&*&*&*&* DISPLAY LOOP TOOK MORE THAN 10MS: " + String(timeControlTimer));	}; timeControlTimer = 0;
@@ -160,9 +159,9 @@ void TimeController::sequencerHandler(){
 }
 
 void TimeController::displayClockHandler(){
-//  if (clockMaster.ledRunSwitch){
+//  if (clockMaster.displayRunSwitch){
     display.displayLoop(0);
-  //  clockMaster.ledRunSwitch = false;
+  //  clockMaster.displayRunSwitch = false;
   //}
 }
 

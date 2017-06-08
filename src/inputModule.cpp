@@ -91,7 +91,7 @@ void InputModule::loop(uint16_t frequency){
         case SEQUENCE_MENU:
         case MOD_MENU_1:
         case MOD_MENU_2:
-        case SCALE_MENU:
+        case QUANTIZE_MENU:
           if(backplaneGPIO->pressed(22)){
             changeState(min_max_cycle(stepMode+knobChange, STATE_FIRSTSTEP , STATE_ARPINTMOD ));
           }
@@ -111,7 +111,7 @@ void InputModule::loop(uint16_t frequency){
       case SEQUENCE_MENU:
       case MOD_MENU_1:
       case MOD_MENU_2:
-      case SCALE_MENU:
+      case QUANTIZE_MENU:
         sequenceMenuHandler();
       break;
       case INPUT_MENU:
@@ -199,10 +199,10 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_YAXISINPUT:
       currentMenu = SEQUENCE_MENU;
       break;
-    case STATE_SCALE:
+    case STATE_QUANTIZESCALE:
     case STATE_QUANTIZEKEY:
-    case STATE_quantizeMode:
-      currentMenu = SCALE_MENU;
+    case STATE_QUANTIZEMODE:
+      currentMenu = QUANTIZE_MENU;
       break;
     case STATE_NOTEDISPLAY:
       currentMenu = NOTE_DISPLAY;
@@ -343,7 +343,7 @@ void InputModule::sequenceMenuHandler(){
   }
   if(knobChange){
     if ( backplaneGPIO->pressed(22) ) {// Encoder Switch
-    //  changeState(min_max_cycle(stepMode + knobChange,  STATE_STEPCOUNT,  STATE_quantizeMode));
+    //  changeState(min_max_cycle(stepMode + knobChange,  STATE_STEPCOUNT,  STATE_QUANTIZEMODE));
     } else {
       switch(stepMode){
         case STATE_FIRSTSTEP:
@@ -368,9 +368,13 @@ void InputModule::sequenceMenuHandler(){
         case STATE_QUANTIZEKEY:
           sequenceArray[selectedChannel].quantizeKey = positive_modulo(sequenceArray[selectedChannel].quantizeKey + knobChange, 12);
           break;
-        case STATE_quantizeMode:
-          sequenceArray[selectedChannel].quantizeMode = positive_modulo(sequenceArray[selectedChannel].quantizeMode + knobChange, 15);
+        case STATE_QUANTIZEMODE:
+          sequenceArray[selectedChannel].quantizeMode = positive_modulo(sequenceArray[selectedChannel].quantizeMode + knobChange, 19);
           break;
+        case STATE_QUANTIZESCALE:
+          sequenceArray[selectedChannel].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 3);
+          break;
+
         case STATE_RESETINPUT:
           sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
           break;
@@ -411,16 +415,14 @@ void InputModule::sequenceMenuHandler(){
           sequenceArray[selectedChannel].cv_arpintmod = positive_modulo(sequenceArray[selectedChannel].cv_arpintmod + knobChange, 5);
         break;
 
-        case STATE_SCALE:
-          sequenceArray[selectedChannel].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 20);
-          break;
 
-          case STATE_YAXISINPUT:
-            sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
-          break;
-          case STATE_SKIPSTEPCOUNT:
-            sequenceArray[selectedChannel].skipStepCount = positive_modulo(sequenceArray[selectedChannel].skipStepCount + knobChange, 16);
-          break;
+        case STATE_YAXISINPUT:
+          sequenceArray[selectedChannel].gpio_yaxis = positive_modulo(sequenceArray[selectedChannel].gpio_yaxis + knobChange, 5);
+        break;
+
+        case STATE_SKIPSTEPCOUNT:
+          sequenceArray[selectedChannel].skipStepCount = positive_modulo(sequenceArray[selectedChannel].skipStepCount + knobChange, 16);
+        break;
 
 
 
@@ -590,10 +592,21 @@ void InputModule::altButtonHandler(){
                  channelButtonShiftHandler(channelButton);
                }
              } else if (selectedChannel == channelButton ) {
-               if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
-                 changeState(min_max_cycle(stepMode+1, STATE_FIRSTSTEP-1, STATE_YAXISINPUT));
-               } else {
-                 changeState(STATE_STEPCOUNT);
+               switch(currentMenu){
+                 case SEQUENCE_MENU:
+                 changeState(STATE_QUANTIZESCALE);
+                 break;
+                 case QUANTIZE_MENU:
+                 changeState(STATE_GATEMOD);
+                 break;
+                 case MOD_MENU_1:
+                 changeState(STATE_ARPTYPEMOD);
+                 break;
+                 case MOD_MENU_2:
+                 changeState(STATE_FIRSTSTEP);
+                 break;
+                 default:
+                 changeState(STATE_FIRSTSTEP);
                }
              } else {
               //Serial.println("going to channel button menu");

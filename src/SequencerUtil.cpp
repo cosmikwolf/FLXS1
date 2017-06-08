@@ -31,7 +31,8 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->clockDivision 		= 4;
 	this->gpio_reset 				= 5;
 	this->gpio_yaxis 				= 5;
-	this->cv_arptypemod 			  = 5;
+  this->skipStepCount     = 4;
+	this->cv_arptypemod 		= 5;
 	this->gpio_gateinvert 	= 5;
 	this->gpio_randompitch 	= 5;
 	this->cv_arpspdmod 			= 5;
@@ -187,7 +188,7 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
 
   if(gpio_yaxis == inputNum){
 		if(playing){
-			this->skipStep(4);
+			this->skipStep(skipStepCount);
 		}
   }
 

@@ -40,7 +40,7 @@ public:
   elapsedMicros masterLoopTimer;
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
-  boolean ledRunSwitch;
+  boolean displayRunSwitch;
   uint8_t beatPulseIndex;
   uint8_t clickCounter;
   boolean firstRun;
