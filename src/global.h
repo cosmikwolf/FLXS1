@@ -380,8 +380,8 @@ extern uint16_t  adcCalibrationOffset[4];
 extern uint16_t cvInputRaw[4];
 extern int8_t cvInputMapped[5];
 extern int16_t cvInputMapped1024[4];
-extern uint8_t	gateInputRose[5];
-extern uint8_t	gateInputRaw[5];
+extern uint8_t	gateInputRose[9];
+extern uint8_t	gateInputRaw[9];
 
 extern uint8_t dacMap[8];
 

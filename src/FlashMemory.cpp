@@ -171,7 +171,7 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
   seqSettingsArray.add(sequenceArray[channel].clockDivision);
   seqSettingsArray.add(sequenceArray[channel].gpio_reset);
   seqSettingsArray.add(sequenceArray[channel].gpio_yaxis);
-  seqSettingsArray.add(sequenceArray[channel].gpio_gateinvert);
+  seqSettingsArray.add(sequenceArray[channel].gpio_gatemute);
   seqSettingsArray.add(sequenceArray[channel].gpio_randompitch);
   seqSettingsArray.add(sequenceArray[channel].cv_arptypemod);
   seqSettingsArray.add(sequenceArray[channel].cv_arpspdmod);
@@ -224,7 +224,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
    sequenceArray[channel].clockDivision= jsonReader["settings"][6];
    sequenceArray[channel].gpio_reset   = jsonReader["settings"][7];
    sequenceArray[channel].gpio_yaxis   = jsonReader["settings"][8];
-   sequenceArray[channel].gpio_gateinvert= jsonReader["settings"][9];
+   sequenceArray[channel].gpio_gatemute= jsonReader["settings"][9];
    sequenceArray[channel].gpio_randompitch = jsonReader["settings"][10];
    sequenceArray[channel].cv_arptypemod   = jsonReader["settings"][11];
    sequenceArray[channel].cv_arpspdmod = jsonReader["settings"][12];

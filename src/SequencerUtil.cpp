@@ -33,7 +33,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->gpio_yaxis 				= 5;
   this->skipStepCount     = 4;
 	this->cv_arptypemod 		= 5;
-	this->gpio_gateinvert 	= 5;
+	this->gpio_gatemute 	  = 5;
 	this->gpio_randompitch 	= 5;
 	this->cv_arpspdmod 			= 5;
 	this->cv_arpoctmod 			= 5;
@@ -341,8 +341,8 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	stepData[stepNum].notePlaying += cvInputMapped[cv_pitchmod]/4;
 	uint8_t glideVal = min_max(stepData[stepNum].glide + cvInputMapped[cv_glidemod], 0, 255);
 
-	if(gateInputRaw[gpio_gateinvert]){
-		gateTrig = !gateTrig;
+	if(gateInputRaw[gpio_gatemute]){
+		gateTrig = false;
 	}
 
 	if(stepData[stepNum].arpType == ARPTYPE_OFF){

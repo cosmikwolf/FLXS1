@@ -100,7 +100,7 @@ class Sequencer
 		uint8_t	  gpio_reset;
 		uint8_t		gpio_yaxis;
     uint8_t   skipStepCount;
-		uint8_t		gpio_gateinvert;
+		uint8_t		gpio_gatemute;
 		uint8_t		gpio_randompitch;
 		uint8_t		cv_arptypemod;
 		uint8_t		cv_arpspdmod;

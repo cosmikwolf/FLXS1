@@ -388,7 +388,7 @@ void InputModule::sequenceMenuHandler(){
           sequenceArray[selectedChannel].cv_gatemod = positive_modulo(sequenceArray[selectedChannel].cv_gatemod + knobChange, 5);
         break;
         case STATE_GATEINVERT:
-          sequenceArray[selectedChannel].gpio_gateinvert = positive_modulo(sequenceArray[selectedChannel].gpio_gateinvert + knobChange, 5);
+          sequenceArray[selectedChannel].gpio_gatemute = positive_modulo(sequenceArray[selectedChannel].gpio_gatemute + knobChange, 5);
         break;
 
         case STATE_RANDOMPITCH:

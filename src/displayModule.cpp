@@ -622,8 +622,11 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[5] = strdup(buf);
 
-   if (sequenceArray[selectedChannel].gpio_yaxis < 4){
-    sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+  if (sequenceArray[selectedChannel].gpio_yaxis < 4){
+    sprintf(buf, "gi%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
+    displayElement[6] = strdup(buf);
+  } else if (sequenceArray[selectedChannel].gpio_yaxis > 5){
+    sprintf(buf, "ch%d", sequenceArray[selectedChannel].gpio_yaxis +1 );
     displayElement[6] = strdup(buf);
   } else {
     displayElement[6] = strdup("--");
@@ -800,10 +803,10 @@ void DisplayModule::inputMenuDisplay(){
   } else {
     displayElement[2] = strdup("OFF");
   }
-  displayElement[3] = strdup("gate mute:");
+  displayElement[3] = strdup("gatemute:");
 
-  if (sequenceArray[selectedChannel].gpio_gateinvert < 4){
-   sprintf(buf, "gt%d", sequenceArray[selectedChannel].gpio_gateinvert +1 );
+  if (sequenceArray[selectedChannel].gpio_gatemute < 4){
+   sprintf(buf, "gt%d", sequenceArray[selectedChannel].gpio_gatemute +1 );
    displayElement[4] = strdup(buf);
  } else {
    displayElement[4] = strdup("off");

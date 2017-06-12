@@ -28,8 +28,8 @@ public:
 
   bool masterDebugSwitch;
 
-  bool gateTrig[4];
-  bool gatePrevState[4];
+  bool gateTrig[9];
+  bool gatePrevState[9];
   elapsedMicros pulseTimer;
   uint32_t clockCounter;
   uint32_t extClockCounter;

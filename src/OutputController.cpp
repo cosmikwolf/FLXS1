@@ -328,6 +328,7 @@ void OutputController::inputRead(){
   cvInputRaw[1] = adc->analogRead(A12, ADC_1);
   cvInputRaw[2] = adc->analogRead(A13, ADC_1);
   cvInputRaw[3] = adc->analogRead(A10, ADC_1);
+
   for(int ch=0; ch < SEQUENCECOUNT; ch++){
     //cvInputMapped[ch] = map(cvInputRaw[ch], adcCalibrationNeg[ch], adcCalibrationPos[ch], -60, 60) +1;
 
@@ -348,6 +349,16 @@ void OutputController::inputRead(){
   gateInputRose[1]  = backplaneGPIO->rose(5);
   gateInputRose[2]  = backplaneGPIO->rose(6);
   gateInputRose[3]  = backplaneGPIO->rose(7);
+
+  for (int i=0; i < 4; i++ ){ // might be able to do this with -> rose too... not sure. need to test.
+    if( gateInputRaw[i+4] != backplaneGPIO->cacheCheck(i)){
+      gateInputRose[i+4] = true;
+    } else {
+      gateInputRose[i+4] = false;
+    }
+    gateInputRaw[i+4] = backplaneGPIO->cacheCheck(i);
+  }
+
   //reset SR Latch
   backplaneGPIO->digitalWrite(8, 1);
   backplaneGPIO->digitalWrite(8, 0);
