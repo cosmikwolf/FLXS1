@@ -197,6 +197,8 @@
 #define MODAL_UNMUTE_CH3       10
 #define MODAL_UNMUTE_CH4       11
 #define MODAL_SAVE             12
+#define MODAL_ERASEARMED       13
+#define MODAL_ERASED           14
 
 #define DEBUG_PIN				    	 31
 #define PIN_EXT_AD_1   27

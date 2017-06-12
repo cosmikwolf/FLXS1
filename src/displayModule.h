@@ -15,6 +15,7 @@
 #include "_fonts/PixelSquare_10.c"
 #include "_fonts/PixelSquareBold_10.c"
 #include "_fonts/a04b03.c"
+#include "_fonts/flxs1_menu.c"
 #include "_fonts/NeueHaasXBlack_28.c"
 
 #ifndef _display_h_
@@ -56,6 +57,8 @@
 #define BOLD4X         7
 #define STYLE1X         8
 #define MODALBOLD       9
+
+#define COLUNDINOTECOUNT  55
 
 class DisplayModule
 {
@@ -111,6 +114,7 @@ class DisplayModule
     void modalPopup();
 
     void modalDisplay();
+    void displayModal(uint16_t ms, uint8_t select, uint8_t chSelector);
     void displayModal(uint16_t ms, uint8_t selector);
     void saveMenuDisplayHandler();
 
@@ -143,6 +147,7 @@ private:
     bool modalRefreshSwitch;
     uint16_t modalMaxTime;
     uint8_t modalSelect;
+    uint8_t chSelector;
     Sequencer *sequenceArray;
     MasterClock* clockMaster;
 

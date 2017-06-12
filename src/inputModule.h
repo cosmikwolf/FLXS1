@@ -72,6 +72,9 @@ public:
   void resetKnobValues();
   void changeState(uint8_t state);
 
+  elapsedMillis chRecEraseTimer;
+  bool chRecEraseSwitch;
+  uint8_t chPressedSelector;
   uint8_t buttonMode;
   uint8_t lastSelectedStep;
   elapsedMillis selectedStepTimer;

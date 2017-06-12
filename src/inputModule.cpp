@@ -270,7 +270,7 @@ void InputModule::changeState(uint8_t targetState){
     break;
   }
 
-  this->resetKnobValues();
+  //this->resetKnobValues();
 }
 
 // STATE VARIABLE INPUT HANDLERS
@@ -555,7 +555,7 @@ void InputModule::channelButtonHandler(uint8_t channel){
 void InputModule::altButtonHandler(){
 
   uint8_t channelButton;
-
+  //chPressedSelector = 0;
   for (int i=16; i <28; i++){
     if (midplaneGPIO->fell(i) ){
       switch (i){
@@ -585,6 +585,21 @@ void InputModule::altButtonHandler(){
             }
            break;
            default:
+
+              if (midplaneGPIO->pressed(SW_CH0)){
+                  chPressedSelector = chPressedSelector | 0b0001;
+              } else {chPressedSelector = chPressedSelector & ~0b0001;}
+              if (midplaneGPIO->pressed(SW_CH1)){
+                  chPressedSelector = chPressedSelector | 0b0010;
+              } else {chPressedSelector = chPressedSelector & ~0b0010;}
+              if (midplaneGPIO->pressed(SW_CH2)){
+                  chPressedSelector = chPressedSelector | 0b0100;
+              } else {chPressedSelector = chPressedSelector & ~0b0100;}
+              if (midplaneGPIO->pressed(SW_CH3)){
+                  chPressedSelector = chPressedSelector | 0b1000;
+              } else {chPressedSelector = chPressedSelector & ~0b1000;}
+
+
              if (midplaneGPIO->pressed(SW_SHIFT)){
                if(midplaneGPIO->pressed(SW_MENU)){
                  channelButtonShiftMenuHandler(channelButton);
@@ -615,6 +630,15 @@ void InputModule::altButtonHandler(){
          }
         break;
 
+        case SW_REC:
+          if (chPressedSelector && chRecEraseTimer > 750){
+              chRecEraseTimer = 0;
+              display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
+          } else if (chPressedSelector && chRecEraseTimer < 750) {
+              display->displayModal(750, MODAL_ERASED, chPressedSelector);
+          }
+
+        break;
 
         case SW_PATTERN:
           if (midplaneGPIO->pressed(SW_SHIFT)){
@@ -626,7 +650,7 @@ void InputModule::altButtonHandler(){
             break;
           }
 
-/*
+
           if(midplaneGPIO->pressed(SW_CH0)){
             if( sequenceArray[0].toggleMute() ){
               display->displayModal(750, MODAL_MUTE_CH1);
@@ -655,7 +679,7 @@ void InputModule::altButtonHandler(){
                display->displayModal(750, MODAL_UNMUTE_CH4);
              }
            }
-*/
+
           if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
           switch(currentMenu){
@@ -736,9 +760,6 @@ void InputModule::altButtonHandler(){
           playing = !playing;
           break;
 
-          case SW_REC:
-
-          break;
         }
       }
     }

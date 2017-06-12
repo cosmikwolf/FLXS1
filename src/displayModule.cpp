@@ -215,7 +215,14 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
   };
 };
+
+void DisplayModule::displayModal(uint16_t ms, uint8_t select, uint8_t chSelector){
+  displayModal(ms, select);
+  this->chSelector = chSelector;
+}
+
 void DisplayModule::displayModal(uint16_t ms, uint8_t select){
+  chSelector = 0;
   modaltimer = 0;
   modalMaxTime = ms;
   modalRefreshSwitch = true;
@@ -226,6 +233,53 @@ void DisplayModule::displayModal(uint16_t ms, uint8_t select){
 void DisplayModule::modalDisplay(){
   //Serial.println("displaying modal");
   switch (modalSelect){
+    case MODAL_ERASEARMED:
+    displayElement[0] = strdup("CLEAR ARMED");
+
+    goto singleTextDisplay;
+    case MODAL_ERASED:
+      switch (chSelector){
+        case 0b0001:
+          displayElement[0] = strdup("CH1\nCLEARED");
+          break;
+        case 0b0010:
+          displayElement[0] = strdup("CH2\nCLEARED");
+          break;
+        case 0b0011:
+          displayElement[0] = strdup("1.2\nCLEARED");
+          break;
+        case 0b0100:
+          displayElement[0] = strdup("CH3\nCLEARED");
+          break;
+        case 0b0101:
+          displayElement[0] = strdup("1.3\nCLEARED");
+          break;
+        case 0b0111:
+          displayElement[0] = strdup("1.2.3\nCLEARED");
+          break;
+        case 0b1000:
+          displayElement[0] = strdup("CH4\nCLEARED");
+          break;
+        case 0b1001:
+          displayElement[0] = strdup("4.1\nCLEARED");
+          break;
+        case 0b1010:
+          displayElement[0] = strdup("4.2\nCLEARED");
+          break;
+        case 0b1011:
+          displayElement[0] = strdup("4.2.1\nCLEARED");
+          break;
+        case 0b1100:
+          displayElement[0] = strdup("4.3\nCLEARED");
+          break;
+        case 0b1101:
+          displayElement[0] = strdup("4.3.1\nCLEARED");
+          break;
+        case 0b1111:
+          displayElement[0] = strdup("ALL\nCLEARED");
+          break;      }
+
+      goto singleTextDisplay;
     case MODAL_MUTE_CH1:
       displayElement[0] = strdup("CH1 MUTE");
       goto singleTextDisplay;
@@ -322,9 +376,9 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
         break;
       case STYLE1X:
         oled.setCursor(x+1,y+1);
-        oled.setFont(&a04b03);
+        oled.setFont(&flxs1_menu);
 
-        oled.setTextScale(2);
+        oled.setTextScale(1);
         break;
 
       case MODALBOLD:
@@ -413,7 +467,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
 switch(sequenceArray[selectedChannel].quantizeScale){
   case COLUNDI:
-    displayElement[1] = strdup(colundiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
+    displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
   break;
 
   case SEMITONE:
@@ -735,10 +789,10 @@ void DisplayModule::inputMenuDisplay(){
  }
 
  void DisplayModule::modMenu1_DisplayHandler(){
-   sprintf(buf, "ch%d mod confg", selectedChannel+1);
+   sprintf(buf, "ch%d modulation cfg", selectedChannel+1);
    displayElement[0] = strdup(buf);
 
-   displayElement[1] = strdup("gatelngth:");
+   displayElement[1] = strdup("gate length:");
 
    if (sequenceArray[selectedChannel].cv_gatemod < 4){
     sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_gatemod +1 );
@@ -746,7 +800,7 @@ void DisplayModule::inputMenuDisplay(){
   } else {
     displayElement[2] = strdup("OFF");
   }
-  displayElement[3] = strdup("gateinvrt:");
+  displayElement[3] = strdup("gate mute:");
 
   if (sequenceArray[selectedChannel].gpio_gateinvert < 4){
    sprintf(buf, "gt%d", sequenceArray[selectedChannel].gpio_gateinvert +1 );
@@ -754,7 +808,7 @@ void DisplayModule::inputMenuDisplay(){
  } else {
    displayElement[4] = strdup("off");
  }
- displayElement[5] = strdup("rndmptch:");
+ displayElement[5] = strdup("random pitch:");
 
  if (sequenceArray[selectedChannel].gpio_randompitch < 4){
   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_randompitch +1 );
@@ -762,7 +816,7 @@ void DisplayModule::inputMenuDisplay(){
 } else {
   displayElement[6] = strdup("OFF");
 }
-displayElement[7] = strdup("trnspose:");
+displayElement[7] = strdup("transpose:");
 
 if (sequenceArray[selectedChannel].cv_pitchmod < 4){
  sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_pitchmod +1 );
@@ -771,7 +825,7 @@ if (sequenceArray[selectedChannel].cv_pitchmod < 4){
  displayElement[8] = strdup("off");
 }
 
-displayElement[9] = strdup("glidetime:");
+displayElement[9] = strdup("glide time:");
 
 if (sequenceArray[selectedChannel].cv_glidemod < 4){
  sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_glidemod +1 );
