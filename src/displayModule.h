@@ -27,7 +27,7 @@
   */
 #define NAVY            0x000F      /*   0,   0, 128 */
 #define LIGHTBLUE       0x421F
-#define DARKGREEN       0x03E0      /*   0, 128,   0 */
+#define DARKGREEN       0x67E0      /*   0, 128,   0 */
 #define DARKCYAN        0x03EF      /*   0, 128, 128 */
 #define MAROON          0x7800      /* 128,   0,   0 */
 #define PURPLE          0x780F      /* 128,   0, 128 */
@@ -35,8 +35,11 @@
 #define LIGHTGREY       0xC618      /* 192, 192, 192 */
 #define DARKGREY        0x7BEF      /* 128, 128, 128 */
 #define ORANGE          0xFD20      /* 255, 165,   0 */
+#define LIGHTORANGE     0xFEAF      /* 255, 165,   0 */
+#define LIGHTGREEN      0xAFEF      /* 255, 165,   0 */
 #define GREENYELLOW     0xAFE5      /* 173, 255,  47 */
 #define PINK            0xF81F
+#define LIGHTPINK            0xFCFF
 #define DARKPURPLE      0x48B3
 
 #define MAX_DISPLAY_ELEMENTS 30
@@ -133,7 +136,7 @@ class DisplayModule
     void inputCalibrationMenuDisplay();
     void outputCalibrationMenuDisplay();
     void inputDebugMenuDisplay();
-    uint16_t foreground, background;
+    uint16_t foreground, background, contrastColor;
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 

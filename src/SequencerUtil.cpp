@@ -197,7 +197,9 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
 
 void Sequencer::skipStep(uint8_t count){
 //Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
-
+  if (count == 0){
+    count = random(1, 16);
+  }
   uint16_t oldPpqPulseIndex = ppqPulseIndex;
   ppqPulseIndex = (ppqPulseIndex + count*pulsesPerBeat/clockDivision) % (pulsesPerBeat*stepCount/clockDivision );
   for(int stepNum = 0; stepNum < stepCount; stepNum++){

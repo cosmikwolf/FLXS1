@@ -38,10 +38,11 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(2);
   oled.println("Zetaohm");
   delay(100);
-  oled.setTextScale(1);
   oled.setCursor(CENTER,40);
   oled.setTextColor(ORANGE);
-  oled.setFont(&NeueHaasXBlack_28);//this will load the font
+  oled.setFont(&a04b03);//this will load the font
+  oled.setTextScale(4);
+
   oled.println("FLXS1");
 
 
@@ -95,18 +96,22 @@ void DisplayModule::displayLoop(uint16_t frequency) {
       case 0:
         foreground = ORANGE;
         background = BLACK;
+        contrastColor = LIGHTORANGE;
         break;
       case 1:
-        foreground = GREENYELLOW;
+        foreground = DARKGREEN;
         background = BLACK;
+        contrastColor = LIGHTGREEN;
         break;
       case 2:
         foreground = PINK;
         background = BLACK;
+        contrastColor = LIGHTPINK;
         break;
       case 3:
         foreground = RED;
         background = BLACK;
+        contrastColor = LIGHTGREY;
         break;
     }
 
@@ -234,75 +239,97 @@ void DisplayModule::modalDisplay(){
   //Serial.println("displaying modal");
   switch (modalSelect){
     case MODAL_ERASEARMED:
-    displayElement[0] = strdup("CLEAR ARMED");
+    displayElement[0] = strdup("press again");
+    displayElement[1] = strdup("to clear");
 
     goto singleTextDisplay;
     case MODAL_ERASED:
       switch (chSelector){
         case 0b0001:
-          displayElement[0] = strdup("CH1\nCLEARED");
+        displayElement[0] = strdup("Channel 1");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b0010:
-          displayElement[0] = strdup("CH2\nCLEARED");
+        displayElement[0] = strdup("Channel 2");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b0011:
-          displayElement[0] = strdup("1.2\nCLEARED");
+          displayElement[0] = strdup("CH1 + CH2");
+          displayElement[1] = strdup("CLEARED");
           break;
         case 0b0100:
-          displayElement[0] = strdup("CH3\nCLEARED");
+        displayElement[0] = strdup("Channel 3");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b0101:
-          displayElement[0] = strdup("1.3\nCLEARED");
+        displayElement[0] = strdup("CH1 + CH3");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b0111:
-          displayElement[0] = strdup("1.2.3\nCLEARED");
+        displayElement[0] = strdup("CH1 CH2 CH3");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1000:
-          displayElement[0] = strdup("CH4\nCLEARED");
+        displayElement[0] = strdup("Channel 4");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1001:
-          displayElement[0] = strdup("4.1\nCLEARED");
+        displayElement[0] = strdup("CH1 + CH4");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1010:
-          displayElement[0] = strdup("4.2\nCLEARED");
+        displayElement[0] = strdup("CH4 CH2");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1011:
-          displayElement[0] = strdup("4.2.1\nCLEARED");
+        displayElement[0] = strdup("CH4 CH2 CH1");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1100:
-          displayElement[0] = strdup("4.3\nCLEARED");
+        displayElement[0] = strdup("CH3 + CH4");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1101:
-          displayElement[0] = strdup("4.3.1\nCLEARED");
+        displayElement[0] = strdup("CH4 CH3 CH1");
+        displayElement[1] = strdup("CLEARED");
           break;
         case 0b1111:
-          displayElement[0] = strdup("ALL\nCLEARED");
+        displayElement[0] = strdup("all channels");
+        displayElement[1] = strdup("cleared");
           break;      }
 
       goto singleTextDisplay;
     case MODAL_MUTE_CH1:
-      displayElement[0] = strdup("CH1 MUTE");
+    displayElement[0] = strdup("CH1");
+    displayElement[1] = strdup("MUTE");
       goto singleTextDisplay;
     case MODAL_MUTE_CH2:
-      displayElement[0] = strdup("CH2 MUTE");
+      displayElement[0] = strdup("CH2");
+      displayElement[1] = strdup("MUTE");
       goto singleTextDisplay;
     case MODAL_MUTE_CH3:
-      displayElement[0] = strdup("CH3 MUTE");
+      displayElement[0] = strdup("CH3");
+      displayElement[1] = strdup("MUTE");
       goto singleTextDisplay;
     case MODAL_MUTE_CH4:
-      displayElement[0] = strdup("CH4 MUTE");
+      displayElement[0] = strdup("CH4");
+      displayElement[1] = strdup("MUTE");
       goto singleTextDisplay;
     case MODAL_UNMUTE_CH1:
-      displayElement[0] = strdup("CH1 UNMUTE");
+      displayElement[0] = strdup("CH1");
+      displayElement[1] = strdup("UNMUTE");
       goto singleTextDisplay;
     case MODAL_UNMUTE_CH2:
-      displayElement[0] = strdup("CH2 UNMUTE");
+      displayElement[0] = strdup("CH2");
+      displayElement[1] = strdup("UNMUTE");
       goto singleTextDisplay;
     case MODAL_UNMUTE_CH3:
-      displayElement[0] = strdup("CH3 UNMUTE");
+      displayElement[0] = strdup("CH3");
+      displayElement[1] = strdup("UNMUTE");
       goto singleTextDisplay;
     case MODAL_UNMUTE_CH4:
-      displayElement[0] = strdup("CH4 UNMUTE");
+      displayElement[0] = strdup("CH4");
+      displayElement[1] = strdup("UNMUTE");
       goto singleTextDisplay;
 
     case MODAL_SELECT_CH1:
@@ -322,7 +349,19 @@ void DisplayModule::modalDisplay(){
       goto singleTextDisplay;
 
       singleTextDisplay:
-      renderStringBox(0,  DISPLAY_LABEL,    18,  28, 96, 40, true, MODALBOLD, BLACK , WHITE);
+
+    //  if(!displayElement[0]){
+    displayElement[5] = strdup(" ");
+
+      renderStringBox(5,  DISPLAY_LABEL,    18,  18, 96, 51, true, MODALBOLD, BLACK , WHITE);
+      renderStringBox(0,  DISPLAY_LABEL,    20,  24, 92, 20, false, MODALBOLD, BLACK , WHITE);
+      renderStringBox(1,  DISPLAY_LABEL,    20,  48, 92, 20, false, MODALBOLD, BLACK , WHITE);
+    //  } else {
+    //    renderStringBox(0,  DISPLAY_LABEL,    18,  28, 96, 20, true, MODALBOLD, BLACK , WHITE);
+    //    renderStringBox(1,  DISPLAY_LABEL,    18,  64, 96, 20, true, MODALBOLD, BLACK , WHITE);
+    //  }
+
+
     break;
   }
 
@@ -382,10 +421,10 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
         break;
 
       case MODALBOLD:
-      oled.setTextWrap(false);
-        oled.setCursor(CENTER,CENTER);
-        oled.setFont(&a04b03);
-        oled.setTextScale(2);
+        oled.setTextWrap(false);
+        oled.setCursor(CENTER,y);
+        oled.setFont(&flxs1_menu);
+        oled.setTextScale(1);
         break;
 
     }
@@ -502,7 +541,7 @@ switch(sequenceArray[selectedChannel].quantizeScale){
   displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
 
   //digitalWriteFast(PIN_EXT_RX, HIGH);
-  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , contrastColor); //  digitalWriteFast(PIN_EXT_RX, LOW);
 
   renderStringBox(1,  STATE_PITCH0, 0, 15 , 128, 29, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
 
@@ -542,7 +581,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
       //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
 
-   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
 
    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_ARPTYPE,     60, 20,68,17, false, STYLE1X, background , foreground);
@@ -575,7 +614,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
    displayElement[6] = strdup(buf);
 
 
-   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
 
    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
@@ -618,7 +657,11 @@ void DisplayModule::stateDisplay_arp(char *buf){
    }
    displayElement[4] = strdup(buf);
 
-   sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
+   if(sequenceArray[selectedChannel].skipStepCount == 0){
+     sprintf(buf, "skip random:" );
+   } else {
+     sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);     
+   }
 
    displayElement[5] = strdup(buf);
 
@@ -637,7 +680,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[8] = strdup("");
 
-   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
 
    renderStringBox(9,  DISPLAY_LABEL,       0, 15,95,17, false, STYLE1X, background , foreground);
    renderStringBox(10,  STATE_FIRSTSTEP,    96, 15,32,17, false, STYLE1X, background , foreground);
@@ -683,7 +726,7 @@ void DisplayModule::scaleMenuDisplay(){
      }
 
 
-     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , foreground);
+     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
 
      renderStringBox(9,  DISPLAY_LABEL,    0, 15,48,17, false, STYLE1X, background , foreground);
      renderStringBox(10,  STATE_QUANTIZESCALE,    48, 15,80,17, false, STYLE1X, background , foreground);
@@ -711,7 +754,7 @@ void DisplayModule::inputMenuDisplay(){
  }
 */
 
- renderStringBox(0,  DISPLAY_LABEL,     0,    0, 128, 15, false, STYLE1X, background , foreground);
+ renderStringBox(0,  DISPLAY_LABEL,     0,    0, 128, 15, false, STYLE1X, background , contrastColor);
  renderStringBox(1,  DISPLAY_LABEL,     0,   16,  64,16, false, STYLE1X, background , foreground);
  //renderStringBox(2,  STATE_XAXISINPUT,  74,  16,  54,16, false, STYLE1X, background , foreground);
  //renderStringBox(3,  DISPLAY_LABEL,     0,   32,  64,16, false, STYLE1X, background , foreground);
@@ -775,7 +818,7 @@ void DisplayModule::inputMenuDisplay(){
 
 
    }
-   renderStringBox(0,  DISPLAY_LABEL, 0, 0 , 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(0,  DISPLAY_LABEL, 0, 0 , 128, 15, false, STYLE1X, background , contrastColor);
 
    renderStringBox(1,  STATE_TEMPO, 0, 16 , 128, 29, false, BOLD4X, background , foreground);
 
@@ -792,7 +835,7 @@ void DisplayModule::inputMenuDisplay(){
  }
 
  void DisplayModule::modMenu1_DisplayHandler(){
-   sprintf(buf, "ch%d modulation cfg", selectedChannel+1);
+   sprintf(buf, "ch%d modulation 1", selectedChannel+1);
    displayElement[0] = strdup(buf);
 
    displayElement[1] = strdup("gate length:");
@@ -837,7 +880,7 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
  displayElement[10] = strdup("off");
 }
 
-   renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , contrastColor);
    renderStringBox(1,  DISPLAY_LABEL,      0,   15,  64,16, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_GATEMOD,     96,   15,  32,16, false, STYLE1X, background , foreground);
    renderStringBox(3,  DISPLAY_LABEL,      0,   31,  64,16, false, STYLE1X, background , foreground);
@@ -852,7 +895,7 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
  };
 
  void DisplayModule::modMenu2_DisplayHandler(){
-   sprintf(buf, "ch%d mod confg", selectedChannel+1);
+   sprintf(buf, "ch%d modulation 2", selectedChannel+1);
    displayElement[0] = strdup(buf);
 
    displayElement[1] = strdup("arp type:");
@@ -897,7 +940,7 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
  displayElement[10] = strdup("OFF");
 }
 */
-   renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , foreground);
+   renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , contrastColor);
    renderStringBox(1,  DISPLAY_LABEL,      0,   15,  64,16, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_ARPTYPEMOD,     96,   15,  32,16, false, STYLE1X, background , foreground);
    renderStringBox(3,  DISPLAY_LABEL,      0,   31,  64,16, false, STYLE1X, background , foreground);
@@ -1336,7 +1379,7 @@ prevSelectedText = selectedText;
 
 
  void DisplayModule::globalMenuDisplay(){
-
+/*
    displayElement[0] = strdup("GLOBAL MENU");
    displayElement[1] = strdup("INIT CH");
    displayElement[2] = strdup("INIT PAT");
@@ -1353,5 +1396,5 @@ prevSelectedText = selectedText;
    renderStringBox(6, DISPLAY_LABEL, 64 , 32 , 64 , 16, false, STYLE1X, WHITE, BLUE);
 
    sprintf(buf, "step: %d", selectedStep);
-
+*/
  }

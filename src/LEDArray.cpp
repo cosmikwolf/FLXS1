@@ -98,7 +98,7 @@ void LEDArray::loop(uint16_t interval){
 
         for (int i=0; i < 4; i++){
           if( patternChannelSelector & (1<<i) ){
-            leds.setPixelColor(ledChannelButtons[i], 0,0,0, 255);
+            leds.setPixelColor(ledChannelButtons[i], 0,0,0, 200);
           } else {
             leds.setPixelColor(ledChannelButtons[i], 64,64,64, 0);
           }
@@ -143,16 +143,7 @@ void LEDArray::channelSequenceModeLEDHandler(){
     leds.setPixelColor(0, wheel(255));
   }
 
-  for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-    leds.setPixelColor(ledChannelButtons[i], wheel(millis()/100));
-
-    } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
-    }
-  }
-
+  channelLEDHandler();
 }
 
 
@@ -206,18 +197,27 @@ void LEDArray::channelPitchModeLEDHandler(){
       leds.setPixelColor(22, wheel(255));
     break;
   }
+  channelLEDHandler();
+};
+
+void LEDArray::channelLEDHandler(){
   for (int i=0; i < 4; i++){
     if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-    leds.setPixelColor(ledChannelButtons[i], wheel(0));
-
+      if(sequenceArray[i].mute == true){
+        leds.setPixelColor(ledChannelButtons[i], 127, 0,0,32);
+      } else {
+        leds.setPixelColor(ledChannelButtons[i], 0, 0,127,64);
+      }
     } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
+      if(sequenceArray[i].mute == true){
+        leds.setPixelColor(ledChannelButtons[i], 127, 0,0,0);
+      } else {
+        leds.setPixelColor(ledChannelButtons[i], 0, 127,0,0);
+      }
     }
   }
 
-};
-
+}
 void LEDArray::channelGateModeLEDHandler(){
   for (int i=0; i < 4; i++){
     if (selectedChannel == i) {

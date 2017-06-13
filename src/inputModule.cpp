@@ -453,7 +453,7 @@ void InputModule::inputMenuHandler(){
 }
 
 void InputModule::globalMenuHandler(){
-  if (midplaneGPIO->fell(0)){
+  /*if (midplaneGPIO->fell(0)){
     Serial.println("Initializing sequence");
     sequenceArray[selectedChannel].initNewSequence(currentPattern, selectedChannel);
       changeState(STATE_PITCH0);
@@ -501,6 +501,8 @@ void InputModule::globalMenuHandler(){
     changeState(STATE_PITCH0);
 
   }
+  */
+  changeState(STATE_PITCH0);
 }
 
 
@@ -631,12 +633,6 @@ void InputModule::altButtonHandler(){
         break;
 
         case SW_REC:
-          if (chPressedSelector && chRecEraseTimer > 750){
-              chRecEraseTimer = 0;
-              display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
-          } else if (chPressedSelector && chRecEraseTimer < 750) {
-              display->displayModal(750, MODAL_ERASED, chPressedSelector);
-          }
 
         break;
 
@@ -743,16 +739,47 @@ void InputModule::altButtonHandler(){
         break;
 
         case SW_STOP:
-          if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-            for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
-              outputControl->allNotesOff(channel);
-            }
-          }
-          playing = false;
+          chPressedSelector = 0;
+          if (midplaneGPIO->pressed(SW_CH0)){
+              chPressedSelector = chPressedSelector | 0b0001;
+          } else {chPressedSelector = chPressedSelector & ~0b0001;}
+          if (midplaneGPIO->pressed(SW_CH1)){
+              chPressedSelector = chPressedSelector | 0b0010;
+          } else {chPressedSelector = chPressedSelector & ~0b0010;}
+          if (midplaneGPIO->pressed(SW_CH2)){
+              chPressedSelector = chPressedSelector | 0b0100;
+          } else {chPressedSelector = chPressedSelector & ~0b0100;}
+          if (midplaneGPIO->pressed(SW_CH3)){
+              chPressedSelector = chPressedSelector | 0b1000;
+          } else {chPressedSelector = chPressedSelector & ~0b1000;}
 
-          for(int s = 0; s < SEQUENCECOUNT; s++){
-            sequenceArray[s].clockReset(true);
+
+          if (chPressedSelector && chRecEraseTimer > 750){
+              chRecEraseTimer = 0;
+              display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
+          } else if (chPressedSelector && chRecEraseTimer < 750) {
+              for(int i=0; i<4; i++){
+                if ((0b001 << i) & chPressedSelector){
+                  Serial.println("Deleting channel " + String(i));
+                  sequenceArray[i].initNewSequence(currentPattern, i);
+                }
+              }
+              display->displayModal(750, MODAL_ERASED, chPressedSelector);
+          } else {
+            if (!playing){ //if the sequence is already paused, stop kills all internal sound.
+              for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
+                outputControl->allNotesOff(channel);
+              }
+            }
+            playing = false;
+
+            for(int s = 0; s < SEQUENCECOUNT; s++){
+              sequenceArray[s].clockReset(true);
+            }
+
+
           }
+
           break;
 
         // right two, bottom up
@@ -1020,8 +1047,9 @@ void InputModule::debugScreenInputHandler(){
 }
 
 void InputModule::resetKnobValues(){
-	knobRead = 0;
-	knob.write(0);
+	knob.write(knob.read()%4);
+  knobRead = -1 * knob.read()/2;
+  knobPrevious = knobRead;
 	//Serial.println("resetting knob: " + String(knob.read()));
 };
 
