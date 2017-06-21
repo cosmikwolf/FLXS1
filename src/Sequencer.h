@@ -6,6 +6,7 @@
 #ifndef _Sequencer_h_
 #define _Sequencer_h_
 
+
 class OutputController;
 
 class Sequencer
@@ -24,6 +25,8 @@ class Sequencer
 		void    noteShutOff(uint8_t stepNum, bool gateOff);
 
     void    stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
+
+    int32_t getFramesRemaining(uint8_t stepNum);
 
 		uint32_t 		calculateStepTimers();
 		uint32_t    framesPerSequence();
@@ -85,11 +88,15 @@ class Sequencer
 		//uint32_t  ppqSequenceTime();
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
+
+    bool      swingSwitch;
+    bool      justReset;
+    uint8_t 	swingCount;
+    uint8_t   swingX100;
 		uint8_t	 	activeStep;
     uint8_t   firstStep; //first step to be played
 		uint8_t 	stepCount;
     uint8_t   playDirection; //forward, backward, pendulum
-		uint8_t 	syncStep;
 		uint8_t 	stepsPlayed;
 		uint8_t		quantizeKey;
     uint8_t		quantizeMode;
@@ -97,11 +104,13 @@ class Sequencer
 		uint8_t 	pattern;
 		uint8_t		channel;
 		uint8_t   beatCount;
-		uint8_t	  gpio_reset;
-		uint8_t		gpio_yaxis;
+		int8_t	  gpio_reset;
+		int8_t		gpio_skipstep;
     uint8_t   skipStepCount;
-		uint8_t		gpio_gatemute;
-		uint8_t		gpio_randompitch;
+		int8_t		gpio_gatemute;
+		int8_t		gpio_randompitch;
+    uint8_t		randomLow;
+    uint8_t		randomHigh;
 		uint8_t		cv_arptypemod;
 		uint8_t		cv_arpspdmod;
 		uint8_t		cv_arpoctmod;
@@ -131,13 +140,7 @@ class Sequencer
 		uint16_t	ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
 
-		uint8_t 	lowEndStep;
-		uint8_t 	stepsSinceResync;  //temp vars that i have to keep around because data corruption
-		uint8_t	resyncSinceReset;
-
-		uint32_t	avgPulseLength;
 		uint32_t	framesPerPulse;
-		uint8_t	  zeroSequenceCount;
 
 		uint32_t	clockSinceLastPulse;
 

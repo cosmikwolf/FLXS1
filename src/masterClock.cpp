@@ -111,10 +111,10 @@ void MasterClock::sequencerFunc(void){
 		return;
 	}
 
-	for(int i=0; i < 4; i++){
+	for(int i=0; i < 8; i++){
 		for(int n=0; n<4; n++){
 			if (gateInputRose[i] == true){
-				sequenceArray[n].gateInputTrigger(i);
+				sequenceArray[n].gateInputTrigger(i+1); // add one to accomodate for mapping
 			}
 		}
 	}

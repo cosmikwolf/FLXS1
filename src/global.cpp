@@ -50,7 +50,7 @@ uint16_t  adcCalibrationNeg[4] = {65300, 65300, 65300, 65300};
 uint16_t  adcCalibrationOffset[4] = {33237,33237,33237,33237};
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
-uint16_t  cvInputRaw[4];
+uint16_t  cvInputRaw[12];
 int8_t    cvInputMapped[5];
 int16_t   cvInputMapped1024[4];
 uint8_t		gateInputRaw[9];
@@ -126,6 +126,30 @@ int min_max(int value, int min, int max){
 	} else {
 		return value;
 	}
+}
+
+int min_max_skip(int original, int change, int min, int max, int skip){
+  int returnValue;
+	if (original+change < min){
+		returnValue = min;
+	} else if( original+change > max){
+		returnValue = max;
+	} else {
+		returnValue = original+change;
+	}
+  if (returnValue == skip){
+    if (returnValue == max){
+      return returnValue - 1;
+    } else {
+      if (change > 0){
+        return returnValue +1;
+      } else {
+        return returnValue - 1;
+      }
+    }
+  } else {
+    return returnValue;
+  }
 }
 
 int min_max_cycle(int value, int min, int max){

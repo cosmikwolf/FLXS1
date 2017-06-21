@@ -331,15 +331,31 @@ void OutputController::inputRead(){
 
   for(int ch=0; ch < SEQUENCECOUNT; ch++){
     //cvInputMapped[ch] = map(cvInputRaw[ch], adcCalibrationNeg[ch], adcCalibrationPos[ch], -60, 60) +1;
-
     if (cvInputRaw[ch] < adcCalibrationOffset[ch] ){
       cvInputMapped1024[ch] = map( cvInputRaw[ch], adcCalibrationPos[ch], adcCalibrationOffset[ch], 1024, 0);
     }else {
       cvInputMapped1024[ch] = map( cvInputRaw[ch], adcCalibrationOffset[ch], adcCalibrationNeg[ch] , 0, -1024);
     }
     cvInputMapped[ch] = map( cvInputMapped1024[ch], -1024, 1024, -64, 64) ;
-
   }
+
+  for( int i=4; i < 13; i++){
+    switch (i){
+      case 4:
+      case 6:
+      case 8:
+      case 10:
+      cvInputMapped[i] = cvInputRaw[i] - 24;
+      break;
+      case 5:
+      case 7:
+      case 9:
+      case 11:
+      cvInputMapped[i] = map(cvInputRaw[i], -16384,16384, -64, 64 );
+      break;
+    }
+  }
+
   gateInputRaw[0]  = !backplaneGPIO->pressed(4);
   gateInputRaw[1]  = !backplaneGPIO->pressed(5);
   gateInputRaw[2]  = !backplaneGPIO->pressed(6);
@@ -350,19 +366,64 @@ void OutputController::inputRead(){
   gateInputRose[2]  = backplaneGPIO->rose(6);
   gateInputRose[3]  = backplaneGPIO->rose(7);
 
-  for (int i=0; i < 4; i++ ){ // might be able to do this with -> rose too... not sure. need to test.
-    if( gateInputRaw[i+4] != backplaneGPIO->cacheCheck(i)){
-      gateInputRose[i+4] = true;
-    } else {
-      gateInputRose[i+4] = false;
-    }
-    gateInputRaw[i+4] = backplaneGPIO->cacheCheck(i);
+for (int i=0; i < 4; i++ ){ // might be able to do this with -> rose too... not sure. need to test.
+  if (backplaneGPIO->cacheCheck(i) && (gateInputRaw[i+4] != backplaneGPIO->cacheCheck(i) ) ){
+    gateInputRose[i+4] = true;
+  } else {
+    gateInputRose[i+4] = false;
   }
+  gateInputRaw[i+4] = backplaneGPIO->cacheCheck(i);
+}
 
   //reset SR Latch
   backplaneGPIO->digitalWrite(8, 1);
   backplaneGPIO->digitalWrite(8, 0);
 }
+
+uint16_t OutputController::cvInputCheck(uint8_t mapValue){
+  if (mapValue == 0){
+    return 0;
+  } else {
+    return cvInputMapped[mapValue-1];
+  };
+
+}
+
+bool OutputController::gpioCheck(int8_t mapValue){
+  // for gpiocheck - needs rename - values that are less than
+  // values that are 0 are unmapped
+  // values that are negative are percentage chance
+  // values between 1-4 are Gate inputs
+  // values 5, 6, 7, 8 are internally mapped gates from each channel
+  switch(mapValue){
+      case 0: // no mapping
+        return 0;
+      break;
+      case 1: gateInputRaw[0]; break; //gate input 1
+      case 2: gateInputRaw[1]; break; //gate input 2
+      case 3: gateInputRaw[2]; break; //gate input 3
+      case 4: gateInputRaw[3]; break; //gate input 4
+
+      case 5: gateInputRaw[4]; break; //gate out ch1
+      case 6: gateInputRaw[5]; break; //gate out ch2
+      case 7: gateInputRaw[6]; break; //gate out ch3
+      case 8: gateInputRaw[7]; break; //gate out ch4
+
+      case -1: return (random(100) > 90); break;
+      case -2: return (random(100) > 80); break;
+      case -3: return (random(100) > 70); break;
+      case -4: return (random(100) > 60); break;
+      case -5: return (random(100) > 50); break;
+      case -6: return (random(100) > 40); break;
+      case -7: return (random(100) > 30); break;
+      case -8: return (random(100) > 20); break;
+      case -9: return (random(100) > 10); break;
+
+  }
+
+
+
+};
 
 void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
@@ -374,6 +435,10 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
 -5v - 17210
 -10v  1540
 */
+  // update modulation destinations
+  cvInputRaw[4+2*channel] = note;
+//  cvInputMapped[4+2*channel] = note;
+
   //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide) + "\tgate: " + String(gate));
   if (gate){
     if(backplaneGPIO->cacheCheck(channel) == 1 && tieFlag == 0){
@@ -589,6 +654,8 @@ void OutputController::lfoUpdate(uint8_t channel){
 
   //lfoAmplitude[channel]
   //lfoRheoSet[channel]
+  // update modulation destinations
+  cvInputRaw[4+2*channel+1] = voltageLevel;
 
   //if (lfoRheoSet[channel] == 1){
     if (outputMap(channel, RHEOCHANNELCC) == 0){

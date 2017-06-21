@@ -3,6 +3,13 @@
 #ifndef _global_h_
 #define _global_h_
 
+#ifdef min
+#undef min
+#endif
+
+#define min(X, Y)  ((X) < (Y) ? (X) : (Y))
+#define max(X, Y)  ((X) > (Y) ? (X) : (Y))
+
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
@@ -103,20 +110,28 @@
 #define STATE_LFOSPEED      STATE_VELOCITYTYPE +1
 
 //SEQUENCE MENU
-#define STATE_NOTEDISPLAY       STATE_LFOSPEED +1
+#define STATE_NOTEDISPLAY     STATE_LFOSPEED +1
 #define STATE_FIRSTSTEP       STATE_NOTEDISPLAY +1
 #define STATE_STEPCOUNT       STATE_FIRSTSTEP +1
 #define STATE_BEATCOUNT       STATE_STEPCOUNT +1
 #define STATE_SKIPSTEPCOUNT   STATE_BEATCOUNT + 1
-#define STATE_YAXISINPUT       STATE_SKIPSTEPCOUNT +1
-#define STATE_QUANTIZESCALE            STATE_YAXISINPUT+1
+#define STATE_SKIPSTEP        STATE_SKIPSTEPCOUNT +1
+#define STATE_SWING           STATE_SKIPSTEP +1
+
+//QUANTIZE MENU
+#define STATE_QUANTIZESCALE    STATE_SWING+1
 #define STATE_QUANTIZEKEY      STATE_QUANTIZESCALE+1
 #define STATE_QUANTIZEMODE    STATE_QUANTIZEKEY+1
 // MOD MENU 1
 #define STATE_GATEMOD          STATE_QUANTIZEMODE +1
-#define STATE_GATEINVERT       STATE_GATEMOD +1
-#define STATE_RANDOMPITCH      STATE_GATEINVERT +1
-#define STATE_PITCHMOD         STATE_RANDOMPITCH +1
+#define STATE_GATEMUTE       STATE_GATEMOD +1
+#define STATE_RANDOMPITCH      STATE_GATEMUTE +1
+#define STATE_RANDOMHIGH      STATE_RANDOMPITCH +1
+#define STATE_RANDOMLOW      STATE_RANDOMHIGH +1
+
+
+
+#define STATE_PITCHMOD         STATE_RANDOMLOW +1
 #define STATE_GLIDEMOD         STATE_PITCHMOD +1
 // MOD MENU 2
 #define STATE_ARPTYPEMOD       STATE_GLIDEMOD +1
@@ -377,7 +392,7 @@ extern uint16_t  dacCalibrationPos[8];
 extern uint16_t  adcCalibrationPos[4];
 extern uint16_t  adcCalibrationNeg[4];
 extern uint16_t  adcCalibrationOffset[4];
-extern uint16_t cvInputRaw[4];
+extern uint16_t cvInputRaw[12];
 extern int8_t cvInputMapped[5];
 extern int16_t cvInputMapped1024[4];
 extern uint8_t	gateInputRose[9];
@@ -389,10 +404,12 @@ extern uint8_t selectedText;
 extern uint8_t prevSelectedText;
 
 //void//Serial.println(String text);
+
 int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);
 int min_max_cycle(int value, int min, int max);
+int min_max_skip(int original, int change, int min, int max, int skip);
 
 int intFloatHundreds(int value);
 int intFloatTensOnes(int value);

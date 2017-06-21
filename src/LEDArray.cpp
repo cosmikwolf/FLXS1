@@ -74,6 +74,7 @@ void LEDArray::loop(uint16_t interval){
       case MOD_MENU_1:
       case MOD_MENU_2:
       case TEMPO_MENU:
+      case QUANTIZE_MENU:
         channelSequenceModeLEDHandler();
       break;
       case PITCH_GATE_MENU:

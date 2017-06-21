@@ -115,6 +115,8 @@ class DisplayModule
     void channelInputDisplay(char *buf);
 
     void modalPopup();
+    void gateMappingText(char *buf, int8_t mapping);
+    void cvMappingText(char *buf, int8_t mapping);
 
     void modalDisplay();
     void displayModal(uint16_t ms, uint8_t select, uint8_t chSelector);

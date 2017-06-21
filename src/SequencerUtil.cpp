@@ -9,7 +9,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->stepCount = stepCount;
 	this->beatCount = beatCount;
   this->clockDivision = 4;
-
+  this->swingX100 = 20;
 	this->tempoX100 = tempoX100;
 	//this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
@@ -20,6 +20,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 
 void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	Serial.println("*&*&*&*& Initializing pattern: " + String(pattern) + " channel: " + String(ch));
+
   this->stepCount 				= 16;
   this->firstStep 				= 0;
 	this->beatCount 				= 4;
@@ -27,20 +28,19 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->quantizeMode 		= 0;
 	this->pattern 					= pattern;
 	this->channel 					= ch;
-	this->avgPulseLength 		= 20000;
   this->clockDivision 		= 4;
-	this->gpio_reset 				= 5;
-	this->gpio_yaxis 				= 5;
+	this->gpio_reset 				= 0;
+	this->gpio_skipstep 	  = 0;
   this->skipStepCount     = 4;
-	this->cv_arptypemod 		= 5;
-	this->gpio_gatemute 	  = 5;
-	this->gpio_randompitch 	= 5;
-	this->cv_arpspdmod 			= 5;
-	this->cv_arpoctmod 			= 5;
-	this->cv_arpintmod 			= 5;
-	this->cv_pitchmod 			= 5;
-	this->cv_gatemod 				= 5;
-	this->cv_glidemod 			= 5;
+	this->cv_arptypemod 		= 0;
+	this->gpio_gatemute 	  = 0;
+	this->gpio_randompitch 	= 0;
+	this->cv_arpspdmod 			= 0;
+	this->cv_arpoctmod 			= 0;
+	this->cv_arpintmod 			= 0;
+	this->cv_pitchmod 			= 0;
+	this->cv_gatemod 				= 0;
+	this->cv_glidemod 			= 0;
 	this->mute 							= 0;
   this->fill              = 0;
   this->skipNextNoteTrigger = 0;
@@ -182,16 +182,28 @@ int Sequencer::positive_modulo(int i, int n) {
 
 
 void Sequencer::gateInputTrigger(uint8_t inputNum){
+  if (inputNum == channel + 5){
+    return; //don't let a channel reset or y axis itself.
+  }
   if (gpio_reset == inputNum){
     this->clockReset(true);
   }
 
-  if(gpio_yaxis == inputNum){
+  if(gpio_skipstep == inputNum){
 		if(playing){
 			this->skipStep(skipStepCount);
 		}
   }
+};
+int32_t Sequencer::getFramesRemaining(uint8_t stepNum){
 
+//   if (swingSwitch){
+//     return stepData[stepNum].framesRemaining;
+// //    return stepData[stepNum].framesRemaining + (getStepLength() * swingX100 )/ 100;
+//   } else {
+//     return stepData[stepNum].framesRemaining;
+//   }
+  return stepData[stepNum].framesRemaining;
 
 };
 
@@ -336,14 +348,16 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	//Serial.println("noteOn"); delay(10);
 
 	//BEGIN INPUT MAPPING SECTION
-	if (gateInputRaw[gpio_randompitch]){
-		stepData[stepNum].notePlaying = random(0, 127);
+//	if (gateInputRaw[gpio_randompitch]){
+  if( outputControl->gpioCheck(gpio_randompitch) ){
+		stepData[stepNum].notePlaying = constrain(random(stepData[stepNum].notePlaying-randomLow, stepData[stepNum].notePlaying+randomHigh),0, 127);
 	}
 
-	stepData[stepNum].notePlaying += cvInputMapped[cv_pitchmod]/4;
-	uint8_t glideVal = min_max(stepData[stepNum].glide + cvInputMapped[cv_glidemod], 0, 255);
+	stepData[stepNum].notePlaying += outputControl->cvInputCheck(cv_pitchmod);
+	uint8_t glideVal = min_max(stepData[stepNum].glide + outputControl->cvInputCheck(cv_glidemod), 0, 255);
 
-	if(gateInputRaw[gpio_gatemute]){
+	//if(gateInputRaw[gpio_gatemute]){
+  if( outputControl->gpioCheck(gpio_gatemute) ){
 		gateTrig = false;
 	}
 
@@ -351,14 +365,14 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-		stepData[stepNum].framesRemaining = min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 64 ) * FRAMES_PER_BEAT * clockDivisionNum() / (8*clockDivisionDen());
-		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen());
-		//Serial.println("Setting note with gate length: " + String(min_max(2*stepData[stepNum].gateLength+2 + cvInputMapped[cv_gatemod], 1, 256 ))  + "\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
+		stepData[stepNum].framesRemaining = min_max(2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod), 1, 64 ) * FRAMES_PER_BEAT * clockDivisionNum() / (8*clockDivisionDen());
+		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen()); //stop notes 1/8 early
 
 
 	} else {
 		stepData[stepNum].framesRemaining = FRAMES_PER_BEAT * clockDivisionNum() * getArpSpeedNumerator(stepNum) / (clockDivisionDen() * getArpSpeedDenominator(stepNum));
-		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/2;
+		//stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/3;
+    stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen()); // stop notes 1/8 early.
 
 		//Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
 
