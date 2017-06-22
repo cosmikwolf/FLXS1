@@ -13,7 +13,7 @@
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 150
+#define kMasterClockInterval 500
 #define kLedClockInterval 30000
 #define kSequenceTimerInterval 600
 #define kPeripheralLoopTimer 15000
@@ -21,7 +21,6 @@
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
-
 
 #define DEBUG
 
@@ -36,10 +35,9 @@
 //#define FRAMES_PER_BEAT  16777216
 #define FRAMES_PER_BEAT  4194304
 
-
-#define DISPLAY_INTERVAL 29000
-#define INPUT_INTERVAL 20000
-#define LED_INTERVAL 100000
+#define DISPLAY_INTERVAL 30000
+#define INPUT_INTERVAL 10000
+#define LED_INTERVAL 50000
 
 #define PLAY_FORWARD          0
 #define PLAY_REVERSE          1

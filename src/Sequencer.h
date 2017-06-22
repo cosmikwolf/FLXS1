@@ -42,7 +42,8 @@ class Sequencer
 
 		void    masterClockPulse();
 
-    void    getActiveStep(uint32_t frame);
+    bool    isFrameSwinging(uint32_t frame);
+
     int     getActivePage();
 
 		int  		positive_modulo(int i, int n);
@@ -56,7 +57,6 @@ class Sequencer
     void    setPlayRange(uint8_t first, uint8_t last);
 		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
-
 
 		void 		gateInputTrigger(uint8_t inputNum);
 
@@ -80,7 +80,7 @@ class Sequencer
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint8_t   getArpCount(uint8_t stepNum);
-
+    uint32_t  getArpStartFrame(uint8_t stepNum, uint8_t arpNum);
 		uint8_t  getArpSpeedNumerator(uint8_t stepNum);
 		uint8_t  getArpSpeedDenominator(uint8_t stepNum);
 
@@ -90,14 +90,19 @@ class Sequencer
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
 
     bool      swingSwitch;
-    bool      justReset;
+    bool      swinging;
     uint8_t 	swingCount;
-    uint8_t   swingX100;
 		uint8_t	 	activeStep;
     uint8_t   firstStep; //first step to be played
 		uint8_t 	stepCount;
-    uint8_t   playDirection; //forward, backward, pendulum
 		uint8_t 	stepsPlayed;
+
+    uint8_t   swingX100;
+    uint8_t   playDirection; //forward, backward, pendulum
+    uint8_t   skipStepCount;
+    uint8_t		randomLow;
+    uint8_t		randomHigh;
+
 		uint8_t		quantizeKey;
     uint8_t		quantizeMode;
     uint8_t		quantizeScale;
@@ -106,11 +111,8 @@ class Sequencer
 		uint8_t   beatCount;
 		int8_t	  gpio_reset;
 		int8_t		gpio_skipstep;
-    uint8_t   skipStepCount;
 		int8_t		gpio_gatemute;
 		int8_t		gpio_randompitch;
-    uint8_t		randomLow;
-    uint8_t		randomHigh;
 		uint8_t		cv_arptypemod;
 		uint8_t		cv_arpspdmod;
 		uint8_t		cv_arpoctmod;
@@ -123,9 +125,9 @@ class Sequencer
     bool      skipNextNoteTrigger;
     bool      channelPlaying;
     bool      tieFlag;
-		uint8_t arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
-		uint8_t arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
-		int8_t arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];
+		uint8_t   arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
+		uint8_t   arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
+		int8_t    arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];
 
 		int8_t 	  clockDivision;
 
@@ -139,11 +141,8 @@ class Sequencer
 		uint8_t	 	lastActiveStep;
 		uint16_t	ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
-
 		uint32_t	framesPerPulse;
-
 		uint32_t	clockSinceLastPulse;
-
 		uint32_t 	avgClocksPerPulse;
 		uint32_t 	tempoX100;
 

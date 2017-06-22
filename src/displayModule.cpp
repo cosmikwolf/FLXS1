@@ -47,11 +47,11 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
 
 
   oled.setCursor(64,100);
-  oled.setTextScale(1);
-  oled.setFont(&PixelSquare_10);//this will load the font
+  oled.setTextScale(2);
+  oled.setFont(&flxs1_menu);//this will load the font
   oled.setTextColor(NAVY);
 
-  oled.println("v0.11b");
+  oled.println("v0.13b");
 
     delay(1000);
   Serial.println("Display Initialization Complete");
