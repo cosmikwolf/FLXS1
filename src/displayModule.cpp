@@ -31,27 +31,25 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.println("FASISM");      delay(50);
   oled.fillScreen(BLUE, GREEN);      delay(100);
   oled.fillScreen(PURPLE, NAVY);       delay(100);
-  oled.fillScreen(NAVY,RED);
+  oled.fillScreen(LIGHTPINK,LIGHTGREEN);
   oled.setCursor(CENTER,8);
-  oled.setTextColor(ORANGE);
+  oled.setTextColor(BLACK);
   oled.setFont(&LadyRadical_16);//this will load the font
   oled.setTextScale(2);
   oled.println("Zetaohm");
   delay(100);
-  oled.setCursor(CENTER,40);
-  oled.setTextColor(ORANGE);
-  oled.setFont(&a04b03);//this will load the font
-  oled.setTextScale(4);
+  oled.setFont(&NeueHaasXBlack_28);//this will load the font
 
+  oled.setCursor(CENTER,35);
+  oled.setTextColor(BLACK);
+  oled.setTextScale(1);
   oled.println("FLXS1");
-
-
-  oled.setCursor(64,100);
-  oled.setTextScale(2);
   oled.setFont(&flxs1_menu);//this will load the font
-  oled.setTextColor(NAVY);
 
-  oled.println("v0.13b");
+  oled.setTextScale(1);
+  oled.setCursor(CENTER,110);
+  oled.setTextColor(DARK_GREY);
+  oled.println("firmware v013");
 
     delay(1000);
   Serial.println("Display Initialization Complete");
@@ -813,12 +811,9 @@ void DisplayModule::inputMenuDisplay(){
    displayElement[2] = strdup("SYNC");
    displayElement[4] = strdup("RESET:");
 
-   if (sequenceArray[selectedChannel].gpio_reset < 4){
-    sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_reset +1 );
-    displayElement[5] = strdup(buf);
-  } else {
-    displayElement[5] = strdup("NONE");
-  }
+  gateMappingText(buf, sequenceArray[selectedChannel].gpio_reset);
+  displayElement[5] = strdup(buf);
+
  //
  //  displayElement[6] = strdup("Y-AXIS:");
  //  if (sequenceArray[selectedChannel].gpio_skipstep < 4){

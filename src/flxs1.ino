@@ -49,8 +49,8 @@ void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
 //  while (!Serial) ; // wait for serial monitor window to open
-//  AudioMemory(25);
-//  notefreq.begin(.15);
+  //AudioMemory(25);
+  //notefreq.begin(.15);
   //delay(1500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");

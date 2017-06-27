@@ -1,5 +1,15 @@
 Release Notes
 
+Beta13: WARNING: SAVE FILES WON'T LOAD PROPERLY
+    - Does not automatically load a sequence upon startup
+    - Internal Modulation + Probability!!
+      - New probability modulation parameters
+      - New internal modulation parameters
+        - Gate and CV outs can be routed to modulation destinations
+    - Swing has been implemented.
+      -
+
+
 
 Beta12:
     - Y Axis sequencing has been re labeled as "Skip X"

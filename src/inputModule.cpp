@@ -304,13 +304,13 @@ void InputModule::tempoMenuHandler(){
     } else {
       switch (stepMode){
         case STATE_TEMPO:
-          if (tempoX100 > 100100) {
-            tempoX100 = 100100;
-          }
-          tempoX100 = positive_modulo(tempoX100 + knobChange*100, 100100 );
-          if(tempoX100 == 0){
-            tempoX100 = 100;
-          }
+        //  if (tempoX100 > 100200) {
+        //    tempoX100 = 100200;
+        //  }
+          tempoX100 = min_max_cycle(tempoX100 + knobChange*100, 100, 100000 );
+        //  if(tempoX100 == 0){
+        //    tempoX100 = 100;
+        //  }
           clockMaster->changeTempo(tempoX100);
         break;
 
@@ -319,7 +319,7 @@ void InputModule::tempoMenuHandler(){
         break;
 
         case STATE_RESETINPUT:
-          sequenceArray[selectedChannel].gpio_reset = positive_modulo(sequenceArray[selectedChannel].gpio_reset + knobChange, 5);
+          sequenceArray[selectedChannel].gpio_reset = min_max(sequenceArray[selectedChannel].gpio_reset + knobChange, 0,8);
         break;
 
 
@@ -430,7 +430,7 @@ void InputModule::sequenceMenuHandler(){
         break;
 
         case STATE_SWING:
-          sequenceArray[selectedChannel].swingX100 = positive_modulo(sequenceArray[selectedChannel].swingX100 + knobChange, 127);
+          sequenceArray[selectedChannel].swingX100 = min_max(sequenceArray[selectedChannel].swingX100 + knobChange, 1,99);
         break;
 
 

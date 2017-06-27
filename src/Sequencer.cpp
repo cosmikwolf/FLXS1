@@ -14,11 +14,15 @@
 
 
 void Sequencer::clockReset(bool activeStepReset){
+  ppqPulseIndex = 0;
+
   if (activeStepReset){
     swingSwitch = 0;
+    firstPulse = true;
+
+//    ppqPulseIndex = -1;
   }
 
-  ppqPulseIndex = 0;
   clockSinceLastPulse = 0;
   getCurrentFrame();
 
@@ -78,15 +82,23 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     return;
   }
 
-  ppqPulseIndex++;
+
+  if (firstPulse == false){
+    avgClocksPerPulse = clockSinceLastPulse ;// ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
+    ppqPulseIndex++;
+
+  }  else {
+//    ppqPulseIndex++; // a little hack to make midi sync work properly!
+  }
+
+  firstPulse = false;
+  clockSinceLastPulse = 0;
+
   if (ppqPulseIndex > pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() ){
     this->clockReset(false);
-    ppqPulseIndex = 0;
   }
   //ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() );
 
-	avgClocksPerPulse = clockSinceLastPulse ;// ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
-  clockSinceLastPulse = 0;
   framesPerPulse = FRAMES_PER_BEAT / pulsesPerBeat;
 };
 
@@ -102,13 +114,6 @@ uint32_t Sequencer::getCurrentFrame(){
   }
 
   //return ((ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse) + (firstStep * getStepLength()))% (MAX_STEPS_PER_SEQUENCE * getStepLength());
-  if (swingCount % 2){
-    swinging = true;
-  //  swingOffset = (getStepLength() * swingX100) / 100;
-  } else {
-    swinging = false;
-  //  swingOffset = 0;
-  }
 
     currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
     lastActiveStep = activeStep;
@@ -133,14 +138,26 @@ uint32_t Sequencer::getCurrentFrame(){
   } else if (playDirection == PLAY_FORWARD) {
     preSwingActivestep = firstStep + currentFrame / getStepLength();
 
-    if((swingSwitch + preSwingActivestep % 2) & (currentFrame%getStepLength() <= getStepLength() * swingX100/100 )){
+    if( (swingX100 > 50 )
+      &( (swingSwitch + preSwingActivestep) % 2)
+      & (currentFrame%getStepLength() <= getStepLength() * (2*swingX100-100)/100 )){
       // if the current frame liees when the activeStep has advanced according to master clock,
       // but before the point where it should retrigger, keep activestep 1 step behind
       // swing step has not begun yet.
       activeStep = preSwingActivestep - 1;
       swinging = false;
+    } else if(   (swingX100 < 50 )
+              & !((swingSwitch + preSwingActivestep) % 2)
+              & (currentFrame%getStepLength() >= getStepLength() * (2*swingX100)/100 ) ){
+      activeStep = preSwingActivestep + 1;
+      swinging = true;
     } else {
       activeStep = preSwingActivestep;
+      if (swingCount % 2){
+        swinging = true;
+      } else {
+        swinging = false;
+      }
     }
   };
 

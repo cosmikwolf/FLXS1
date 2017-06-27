@@ -9,7 +9,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->stepCount = stepCount;
 	this->beatCount = beatCount;
   this->clockDivision = 4;
-  this->swingX100 = 20;
+  this->swingX100 = 50;
 	this->tempoX100 = tempoX100;
 	//this->beatLength = 60000000/(tempoX100/100);
 	this->calculateStepTimers();
@@ -24,6 +24,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->stepCount 				= 16;
   this->firstStep 				= 0;
 	this->beatCount 				= 4;
+  this->swingX100        = 50;
 	this->quantizeKey 			= 0;
 	this->quantizeMode 		= 0;
 	this->pattern 					= pattern;
@@ -369,20 +370,35 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-    stepData[stepNum].framesRemaining += 2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod);
-		stepData[stepNum].framesRemaining = min_max(stepData[stepNum].framesRemaining, 1, 64 ) * FRAMES_PER_BEAT * clockDivisionNum() / (8*clockDivisionDen());
+    stepData[stepNum].framesRemaining += (2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod) )*   FRAMES_PER_BEAT * clockDivisionNum() / (8*clockDivisionDen());
 
-		stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen()); //stop notes 1/8 early
 
-    if (swinging){
-      stepData[stepNum].framesRemaining *= (100+swingX100);
-      stepData[stepNum].framesRemaining /= 100;
-    } else {
-      stepData[stepNum].framesRemaining *= (100-swingX100);
-      stepData[stepNum].framesRemaining /= 100;
+    if (swingX100 != 50 ){
+      if (swinging){
+        stepData[stepNum].framesRemaining += (((stepData[stepNum].framesRemaining-1)%getStepLength())*(2*swingX100-100)/100)+1;
+      } else {
+        stepData[stepNum].framesRemaining -= (((stepData[stepNum].framesRemaining-1)%getStepLength())*(2*swingX100-100)/100)+1;
+      }
     }
+    //stepData[stepNum].arpLastFrame =  stepData[stepNum].framesRemaining / 4;
+  //  stepData[stepNum].arpLastFrame =  getStepLength()/;
+    if( stepData[stepNum].framesRemaining < getStepLength()){
+      stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining /8;
+    } else {
+      stepData[stepNum].arpLastFrame = getStepLength()/8;
+    }
+  /*  Serial.println(
+    "stepNum: " + String(stepNum) +
+    "\tgateLength: " + String(stepData[stepNum].gateLength) +
+    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+    "\tswing: "  + String(swingX100) +
+    "\tswinging: " + String(swinging) +
+    "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+    "\tgetStepLength: " + String(getStepLength()) +
+    "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
+    "\t(2*swingX100-100): " + String((2*swingX100-100))
+  );*/
 
-    stepData[stepNum].arpLastFrame =  stepData[stepNum].framesRemaining / 4;
 
 	} else {
 
@@ -395,10 +411,10 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
     //stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen()); // stop notes 1/8 early.
 
     if (swinging){
-      stepData[stepNum].framesRemaining *= (100+swingX100);
+      stepData[stepNum].framesRemaining *= 200 - 2*swingX100;
       stepData[stepNum].framesRemaining /= 100;
     } else {
-      stepData[stepNum].framesRemaining *= (100-swingX100);
+      stepData[stepNum].framesRemaining *= 2*swingX100;
       stepData[stepNum].framesRemaining /= 100;
     }
 
@@ -434,17 +450,19 @@ uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint8_t arpNum){
   uint32_t arpFrames = arpNum * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum);
 
   if (isFrameSwinging(stepFrames+arpFrames)){
-//    return stepFrames + getStepLength()*(arpFrames/getStepLength()) + (arpFrames%getStepLength())*(100-swingX100)/100 + getStepLength()*(swingX100)/100;
-  //  return stepFrames + getStepLength()*(arpFrames/getStepLength()) + (getStepLength()*swingX100)/100+ ((arpFrames%getStepLength())*(100-swingX100))/100 ;
-    stepFrames += getStepLength()*(arpFrames/getStepLength()-1);
-    stepFrames += ((arpFrames%getStepLength())*(100-swingX100))/100;
-    stepFrames += (getStepLength()*(100+swingX100))/100;
+    //  return stepFrames + getStepLength()*(arpFrames/getStepLength()) + (arpFrames%getStepLength())*(100-swingX100)/100 + getStepLength()*(swingX100)/100;
+    //  return stepFrames + getStepLength()*(arpFrames/getStepLength()) + (getStepLength()*swingX100)/100+ ((arpFrames%getStepLength())*(100-swingX100))/100 ;
+
+
+
+    stepFrames += getStepLength()*(arpFrames/getStepLength());
+    stepFrames += ((arpFrames%getStepLength())*(200-2*swingX100))/100;
     return stepFrames;
   } else {
 //   return stepFrames + getStepLength()*(arpFrames/getStepLength()) + (arpFrames%getStepLength())*(100+swingX100)/100 ;
   //  return stepFrames + getStepLength()*(arpFrames/getStepLength()) + ((arpFrames%getStepLength())*(100+swingX100))/100  ;
     stepFrames += getStepLength()*(arpFrames/getStepLength());
-    stepFrames += ((arpFrames%getStepLength())*(100+swingX100))/100;
+    stepFrames += ((arpFrames%getStepLength())*(2*swingX100))/100;
     return stepFrames;
  }
 };

@@ -139,7 +139,7 @@ class Sequencer
 
 
 		uint8_t	 	lastActiveStep;
-		uint16_t	ppqPulseIndex;
+		int16_t	ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
 		uint32_t	framesPerPulse;
 		uint32_t	clockSinceLastPulse;
