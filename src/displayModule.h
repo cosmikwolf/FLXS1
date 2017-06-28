@@ -113,6 +113,8 @@ class DisplayModule
 
     void channelTunerDisplay(char *buf);
     void channelInputDisplay(char *buf);
+    
+    void multiSelectMenu(char *buf);
 
     void modalPopup();
     void gateMappingText(char *buf, int8_t mapping);
@@ -138,6 +140,7 @@ class DisplayModule
     void inputCalibrationMenuDisplay();
     void outputCalibrationMenuDisplay();
     void inputDebugMenuDisplay();
+
     uint16_t foreground, background, contrastColor;
 
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;

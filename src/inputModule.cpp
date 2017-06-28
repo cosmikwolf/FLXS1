@@ -266,6 +266,9 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_CALIBRATION_SAVE_MODAL:
       currentMenu = MENU_MODAL;
       break;
+    case STATE_MULTISELECT:
+      currentMenu = MENU_MULTISELECT;
+      break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;
@@ -731,7 +734,7 @@ void InputModule::altButtonHandler(){
 
 
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            changeState(STATE_TEMPO);
+            changeState(STATE_MULTISELECT);
           } else {
             notePage = positive_modulo(notePage - 1, 4);
           }

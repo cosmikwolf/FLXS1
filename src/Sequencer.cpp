@@ -133,7 +133,7 @@ uint32_t Sequencer::getCurrentFrame(){
   if (playDirection == PLAY_REVERSE) {
     preSwingActivestep = firstStep + stepCount - currentFrame / getStepLength();
 
-    activeStep = preSwingActivestep;
+    activeStep = min_max(preSwingActivestep, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
   //  activeStep = firstStep + stepCount - max(lastStepFrame,(currentFrame-swingOffset )) / getStepLength() - 1 ;
   } else if (playDirection == PLAY_FORWARD) {
     preSwingActivestep = firstStep + currentFrame / getStepLength();
@@ -144,15 +144,15 @@ uint32_t Sequencer::getCurrentFrame(){
       // if the current frame liees when the activeStep has advanced according to master clock,
       // but before the point where it should retrigger, keep activestep 1 step behind
       // swing step has not begun yet.
-      activeStep = preSwingActivestep - 1;
+      activeStep = min_max(preSwingActivestep - 1, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
       swinging = false;
     } else if(   (swingX100 < 50 )
               & !((swingSwitch + preSwingActivestep) % 2)
               & (currentFrame%getStepLength() >= getStepLength() * (2*swingX100)/100 ) ){
-      activeStep = preSwingActivestep + 1;
+      activeStep = min_max(preSwingActivestep + 1, firstStep, MAX_STEPS_PER_SEQUENCE - 1 );
       swinging = true;
     } else {
-      activeStep = preSwingActivestep;
+      activeStep = min_max(preSwingActivestep, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
       if (swingCount % 2){
         swinging = true;
       } else {
@@ -183,7 +183,7 @@ bool Sequencer::isFrameSwinging(uint32_t frame){
   if (playDirection == PLAY_REVERSE) {
     preSwingActivestep = firstStep + stepCount - frame / getStepLength();
 
-    activeStep = preSwingActivestep;
+    //activeStep = preSwingActivestep;
   //  activeStep = firstStep + stepCount - max(lastStepFrame,(frame -swingOffset )) / getStepLength() - 1 ;
   } else if (playDirection == PLAY_FORWARD) {
     preSwingActivestep = firstStep + frame / getStepLength();

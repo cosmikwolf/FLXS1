@@ -199,6 +199,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           modalPopup();
         break;
 
+        case MENU_MULTISELECT:
+          multiSelectMenu(buf);
+        break;
+
       }
 
     }
@@ -494,6 +498,13 @@ void DisplayModule::renderString(uint8_t index, uint8_t highlight, int16_t x, in
   }
 }
 
+void DisplayModule::multiSelectMenu(char* buf){
+  sprintf(buf, "multi select" );
+
+  displayElement[0] = strdup(buf);
+  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , contrastColor); //  digitalWriteFast(PIN_EXT_RX, LOW);
+
+};
 
 
 void DisplayModule::stateDisplay_pitch(char*buf){
