@@ -88,6 +88,10 @@ void LEDArray::loop(uint16_t interval){
         channelStepModeLEDHandler();
       break;
 
+      case MENU_MULTISELECT:
+        multiSelectLEDHandler();
+      break;
+
       case INPUT_DEBUG_MENU:
       case PATTERN_SELECT:
       case SAVE_MENU:
@@ -146,6 +150,18 @@ void LEDArray::channelSequenceModeLEDHandler(){
 
   channelLEDHandler();
 }
+
+void LEDArray::multiSelectLEDHandler(){
+  for (int i=0; i < 16; i++){
+    if (multiSelection[getNote(i)]){
+      leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
+    } else {
+      leds.setPixelColor(ledMainMatrix[i], 64,0,0,0);
+    }
+  }
+
+  channelLEDHandler();
+};
 
 
 void LEDArray::channelPitchModeLEDHandler(){

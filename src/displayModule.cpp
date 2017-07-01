@@ -154,7 +154,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
         case INPUT_DEBUG_MENU:
           inputDebugMenuDisplay();
-          break;
+        break;
 
         case TUNER_MENU:
           channelTunerDisplay(buf);

@@ -8,6 +8,10 @@
 #endif
 
 #define min(X, Y)  ((X) < (Y) ? (X) : (Y))
+
+#ifdef max
+#undef max
+#endif
 #define max(X, Y)  ((X) > (Y) ? (X) : (Y))
 
 #define SEQUENCECOUNT         4
@@ -399,7 +403,8 @@ extern uint8_t	gateInputRose[9];
 extern uint8_t	gateInputRaw[9];
 
 extern uint8_t dacMap[8];
-
+extern bool multiSelection[64];
+extern bool multiSelectSwitch;
 extern uint8_t selectedText;
 extern uint8_t prevSelectedText;
 

@@ -60,6 +60,7 @@ public:
   void inputMenuHandler();
   void globalMenuHandler();
   void tempoMenuHandler();
+  void setStepData(uint8_t channel, uint8_t stepNum, uint8_t change);
 
   void modMenu1_InputHandler();
   void modMenu2_InputHandler();
@@ -86,8 +87,6 @@ public:
   int8_t menuSelector;
   int8_t instBuffer;
   int16_t stepModeBuffer;
-
-  uint8_t multiSelectStep;
 
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;

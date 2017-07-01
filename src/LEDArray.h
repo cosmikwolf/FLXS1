@@ -27,6 +27,8 @@ class LEDArray
     void channelEnvelopeModeLEDHandler();
     void channelStepModeLEDHandler();
     void channelLEDHandler();
+    void multiSelectLEDHandler();
+
   private:
     Sequencer *sequenceArray;
     elapsedMicros pixelTimer;

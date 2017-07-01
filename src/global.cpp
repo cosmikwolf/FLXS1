@@ -50,6 +50,9 @@ uint16_t  adcCalibrationNeg[4] = {65300, 65300, 65300, 65300};
 uint16_t  adcCalibrationOffset[4] = {33237,33237,33237,33237};
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
+bool multiSelection[64] = {0};
+bool multiSelectSwitch = false;
+
 uint16_t  cvInputRaw[12];
 int8_t    cvInputMapped[5];
 int16_t   cvInputMapped1024[4];
