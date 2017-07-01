@@ -509,7 +509,11 @@ void DisplayModule::multiSelectMenu(char* buf){
 
 void DisplayModule::stateDisplay_pitch(char*buf){
 
-  sprintf(buf, "cv%d.pitch ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  if(multiSelectSwitch){
+    sprintf(buf, "cv%d.pitch ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  } else {
+    sprintf(buf, "cv%d.pitch ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  }
 
   displayElement[0] = strdup(buf);
 
