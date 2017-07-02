@@ -75,21 +75,33 @@ void LEDArray::loop(uint16_t interval){
       case MOD_MENU_2:
       case TEMPO_MENU:
       case QUANTIZE_MENU:
-        channelSequenceModeLEDHandler();
+          channelSequenceModeLEDHandler();
       break;
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
-        channelPitchModeLEDHandler();
+        if(multiSelectSwitch){
+          multiSelectLEDHandler();
+        } else {
+          channelPitchModeLEDHandler();
+        }
       break;
       case VELOCITY_MENU:
-        channelGateModeLEDHandler();
+        if(multiSelectSwitch){
+          multiSelectLEDHandler();
+        } else {
+          channelGateModeLEDHandler();
+        }
       break;
       case CHANNEL_STEP_MODE:
-        channelStepModeLEDHandler();
+        if(multiSelectSwitch){
+          multiSelectLEDHandler();
+        } else {
+          channelStepModeLEDHandler();
+        }
       break;
 
       case MENU_MULTISELECT:
-        multiSelectLEDHandler();
+      //  multiSelectLEDHandler();
       break;
 
       case INPUT_DEBUG_MENU:

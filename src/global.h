@@ -10,7 +10,7 @@
 #define min(X, Y)  ((X) < (Y) ? (X) : (Y))
 
 #ifdef max
-#undef max
+  #undef max
 #endif
 #define max(X, Y)  ((X) > (Y) ? (X) : (Y))
 

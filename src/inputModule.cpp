@@ -70,6 +70,9 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   }
 
 }
+void InputModule::multiSelectInputHandler(){
+
+};
 
 void InputModule::loop(uint16_t frequency){
   if (inputTimer > frequency){
@@ -106,7 +109,11 @@ void InputModule::loop(uint16_t frequency){
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
       case VELOCITY_MENU:
-        channelPitchModeInputHandler();
+        if(multiSelectSwitch){
+          multiSelectInputHandler();
+        } else{
+          channelPitchModeInputHandler();
+        }
       break;
       case SEQUENCE_MENU:
       case MOD_MENU_1:
@@ -267,7 +274,7 @@ void InputModule::changeState(uint8_t targetState){
       currentMenu = MENU_MODAL;
       break;
     case STATE_MULTISELECT:
-      currentMenu = MENU_MULTISELECT;
+    //  currentMenu = MENU_MULTISELECT;
       break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
@@ -792,7 +799,7 @@ void InputModule::altButtonHandler(){
 
         // right two, bottom up
           case SW_PLAY:
-          playing = !playing;
+            playing = !playing;
           break;
 
         }
@@ -875,7 +882,7 @@ void InputModule::altButtonHandler(){
 
 };
 
-void InputModule::setStepData(uint8_t channel, uint8_t stepNum, uint8_t change){
+void InputModule::setStepData(uint8_t channel, uint8_t stepNum, int change){
     //knobPrev = knobRead;
     uint8_t chrd;
 
@@ -930,7 +937,8 @@ void InputModule::setStepData(uint8_t channel, uint8_t stepNum, uint8_t change){
             }
             if (sequenceArray[channel].stepData[stepNum].gateType > 0){
               sequenceArray[channel].stepData[stepNum].gateLength =  min_max(sequenceArray[channel].stepData[stepNum].gateLength + change, 0, 255);
-            //  Serial.println("Setting Gatelength: " + String(sequenceArray[channel].stepData[stepNum].gateLength));
+            //  Serial.println("Setting Gatelength: " + String(sequenceArray[channel].stepData[stepNum].gateLength) + " change: " + String(change));
+
             }
 
         break;

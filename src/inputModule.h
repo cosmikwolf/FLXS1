@@ -53,6 +53,7 @@ public:
   void channelEnvelopeModeInputHandler();
   void channelStepModeInputHandler();
   void channelInputInputHandler();
+  void multiSelectInputHandler();
 
   void saveMenuInputHandler();
   void sequenceMenuHandler();
@@ -60,7 +61,7 @@ public:
   void inputMenuHandler();
   void globalMenuHandler();
   void tempoMenuHandler();
-  void setStepData(uint8_t channel, uint8_t stepNum, uint8_t change);
+  void setStepData(uint8_t channel, uint8_t stepNum, int change);
 
   void modMenu1_InputHandler();
   void modMenu2_InputHandler();

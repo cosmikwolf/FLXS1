@@ -375,9 +375,9 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
     if (swingX100 != 50 ){
       if (swinging){
-        stepData[stepNum].framesRemaining += (((stepData[stepNum].framesRemaining-1)%getStepLength())*(2*swingX100-100)/100)+1;
+      //  stepData[stepNum].framesRemaining -= (((stepData[stepNum].framesRemaining)%getStepLength())*(2*swingX100-100)/100)+1;
       } else {
-        stepData[stepNum].framesRemaining -= (((stepData[stepNum].framesRemaining-1)%getStepLength())*(2*swingX100-100)/100)+1;
+      //  stepData[stepNum].framesRemaining += (((stepData[stepNum].framesRemaining)%getStepLength())*(2*swingX100-100)/100)+1;
       }
     }
     //stepData[stepNum].arpLastFrame =  stepData[stepNum].framesRemaining / 4;
@@ -387,6 +387,8 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
     } else {
       stepData[stepNum].arpLastFrame = getStepLength()/8;
     }
+
+//		stepData[stepNum].arpLastFrame =
   /*  Serial.println(
     "stepNum: " + String(stepNum) +
     "\tgateLength: " + String(stepData[stepNum].gateLength) +
