@@ -121,7 +121,6 @@ void setup() {
   pinMode(24,OUTPUT);
   digitalWrite(3, LOW);
   digitalWrite(24, LOW);
-  Serial.println("Freeram: " + String(FreeRam2()));
 
   pinMode(1,OUTPUT);
   digitalWrite(1, LOW);

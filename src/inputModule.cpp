@@ -18,7 +18,7 @@ knobChange = 0;;
 
 };
 
-void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster, DisplayModule* display){
+void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster, DisplayModule* display, GlobalVariable* globalObj){
   Serial.println("button setup start");
 
   this->saveFile = saveFile;
@@ -27,6 +27,7 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   this->clockMaster= clockMaster;
   this->midplaneGPIO= midplaneGPIO;
   this->backplaneGPIO= backplaneGPIO;
+  this->globalObj = globalObj;
   this->display = display;
 
   midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
@@ -71,8 +72,238 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
 
 }
 void InputModule::multiSelectInputHandler(){
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+      // select the step
+      selectedStep = getNote(i);
+
+      buttonMode = BUTTON_MODE_MULTISELECT;
+      globalObj->multiSelection[getNote(i)] =  !globalObj->multiSelection[getNote(i)];
+      Serial.println("Setting " + String(getNote(i)) + " to " + String(globalObj->multiSelection[getNote(i)]));
+    };
+  };
+
+  if (knobChange){
+    backplaneGPIO->update();
+    if ( midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
+      changeState(min_max(stepMode + knobChange,STATE_PITCH0, STATE_LFOSPEED));
+    } else {
+      switch(stepMode){
+        case STATE_PITCH0:
+          globalObj->multi_pitch_switch = true;
+          globalObj->multi_pitch += knobChange;
+          break;
+        case STATE_CHORD:
+          globalObj->multi_chord_switch = true;
+          globalObj->multi_chord += knobChange;
+          break;
+        case STATE_GATETYPE:
+          globalObj->multi_gateType_switch = true;
+          globalObj->multi_gateType = min_max(globalObj->multi_gateType + knobChange, 0, 3);
+          break;
+        case STATE_GATELENGTH:
+          globalObj->multi_gateLength_switch = true;
+          globalObj->multi_gateLength = min_max(globalObj->multi_gateLength + knobChange, 0, 64);
+
+          break;
+        case STATE_ARPTYPE:
+          globalObj->multi_arpType_switch = true;
+          globalObj->multi_arpType += knobChange;
+          break;
+        case STATE_ARPOCTAVE:
+          globalObj->multi_arpOctave_switch = true;
+          globalObj->multi_arpOctave += knobChange;
+          break;
+        case STATE_ARPSPEEDNUM:
+          globalObj->multi_arpSpdNum_switch = true;
+          globalObj->multi_arpSpdNum += knobChange;
+          break;
+        case STATE_ARPSPEEDDEN:
+          globalObj->multi_arpSpdDen_switch = true;
+          globalObj->multi_arpSpdDen += knobChange;
+          break;
+        case STATE_GLIDE:
+          globalObj->multi_glide_switch = true;
+          globalObj->multi_glide += knobChange;
+          break;
+        case STATE_BEATCOUNT:
+          globalObj->multi_beatDiv_switch = true;
+          globalObj->multi_beatDiv += knobChange;
+          break;
+        case STATE_VELOCITY:
+          globalObj->multi_velocity_switch = true;
+          globalObj->multi_velocity += knobChange;
+          break;
+        case STATE_VELOCITYTYPE:
+          globalObj->multi_velocityType_switch = true;
+          globalObj->multi_velocityType += knobChange;
+          break;
+        case STATE_LFOSPEED:
+          globalObj->multi_lfoSpeed_switch = true;
+          globalObj->multi_lfoSpeed += knobChange;
+          break;
+      }
+
+      for(int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
+        if(globalObj->multiSelection[i]){ // if step is selected in multi select
+
+          switch(stepMode){
+            case STATE_PITCH0:
+              sequenceArray[selectedChannel].setStepPitch(i, min_max_cycle(globalObj->multi_pitch, 0,120), 0);
+
+              Serial.println("Changing pitch - knobChange: : " + String(knobChange) + "\tmultiPitch: " + String(globalObj->multi_pitch));
+
+              break;
+            case STATE_CHORD:
+            //  setStepAbsolute(selectedChannel, i, globalObj->multi_chord);
+              break;
+
+            case STATE_GATETYPE:
+             sequenceArray[selectedChannel].stepData[i].gateType =  globalObj->multi_gateType;
+           //sequenceArray[selectedChannel].stepData[i].gateType =  min_max(globalObj->multi_gateType, 0, 3);
+             Serial.println("Changing gatetype - knobChange: : " + String(knobChange) + "\tglobalObj->multi_gateType: " + String(globalObj->multi_gateType) + "\tquant vale: " + String(globalObj->multi_gateType) );
+
+              break;
+            case STATE_GATELENGTH:
+                if ( globalObj->multi_gateLength == 0  ) {
+                  sequenceArray[selectedChannel].stepData[i].gateType = GATETYPE_REST;
+                } else if(globalObj->multi_gateLength > 0) {
+                  if (sequenceArray[selectedChannel].stepData[i].gateType == GATETYPE_REST){
+                    sequenceArray[selectedChannel].stepData[i].gateType = GATETYPE_STEP;
+                  }
+                }
+
+                sequenceArray[selectedChannel].stepData[i].gateLength =  min_max(globalObj->multi_gateLength, 0, 255);
+              break;
+            case STATE_ARPTYPE:
+              sequenceArray[selectedChannel].stepData[i].arpType = min_max(globalObj->multi_arpType, 0, 5);
+
+              break;
+            case STATE_ARPOCTAVE:
+              sequenceArray[selectedChannel].stepData[i].arpOctave=  min_max(globalObj->multi_arpOctave, 1, 5);
+            break;
+            case STATE_ARPSPEEDNUM:
+              sequenceArray[selectedChannel].stepData[i].arpSpdNum = min_max(globalObj->multi_arpSpdNum, 1, 16) ;
+
+              break;
+            case STATE_ARPSPEEDDEN:
+              sequenceArray[selectedChannel].stepData[i].arpSpdDen = min_max(globalObj->multi_arpSpdDen, 1, 64);
+
+              break;
+            case STATE_GLIDE:
+              sequenceArray[selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 128);
+              break;
+            case STATE_VELOCITY:
+              sequenceArray[selectedChannel].stepData[i].velocity =  positive_modulo(globalObj->multi_velocity, 127);
+
+              break;
+            case STATE_VELOCITYTYPE:
+              sequenceArray[selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 4);
+
+              break;
+            case STATE_LFOSPEED:
+              sequenceArray[selectedChannel].stepData[i].lfoSpeed = min_max(globalObj->multi_lfoSpeed, 1, 255);
+
+              break;
+          }
+        }
+      }
+    }
+  }
 
 };
+
+
+void InputModule::setStepAbsolute(uint8_t channel, uint8_t stepNum, int value){
+    //knobPrev = knobRead;
+    /*
+    uint8_t chrd;
+
+//      if (midplaneGPIO->pressed(selectedStep%16) ){
+
+      switch (stepMode) {
+        case STATE_PITCH0:
+      // just change the note
+
+        //  if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+        //    // if a note is not active, turn it on and give it a length.
+        //    sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
+        //    sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
+        //  }
+          // and finally set the new step value!
+          // monophonic so pitch[0] only
+          sequenceArray[channel].setStepPitch(stepNum, min_max_cycle(value, 0,120), 0);
+          if(!playing){
+            sequenceArray[channel].stoppedTrig(stepNum, true, false);
+          }
+
+        break;
+
+        case STATE_PITCH1:
+          sequenceArray[channel].setStepPitch(stepNum, positive_modulo(value, 1), 72);
+        break;
+
+        case STATE_PITCH2:
+          sequenceArray[channel].setStepPitch(stepNum, positive_modulo(value, 2), 72);
+        break;
+
+        case STATE_PITCH3:
+          sequenceArray[channel].setStepPitch(stepNum, positive_modulo(value, 3), 72);
+        break;
+
+        case STATE_CHORD:
+          //chrd = positive_modulo(sequenceArray[channel].stepData[stepNum].chord + change, 27);
+          // sequenceArray[channel].stepData[stepNum].chord = chrd;
+          // sequenceArray[channel].setStepPitch(stepNum, chordArray[chrd][0],1);
+          // sequenceArray[channel].setStepPitch(stepNum, chordArray[chrd][1],2);
+          // sequenceArray[channel].setStepPitch(stepNum, chordArray[chrd][2],3);
+        break;
+
+        case STATE_GATELENGTH:
+
+            if ( value == 0  ) {
+              sequenceArray[channel].stepData[stepNum].gateType = GATETYPE_REST;
+            } else if(value > 0) {
+              if (sequenceArray[channel].stepData[stepNum].gateType == GATETYPE_REST){
+                sequenceArray[channel].stepData[stepNum].gateType = GATETYPE_STEP;
+              }
+            }
+
+            sequenceArray[channel].stepData[stepNum].gateLength =  min_max(value, 0, 255);
+        break;
+
+        case STATE_GATETYPE:
+          //sequenceArray[channel].stepData[stepNum].gateType =  min_max(value, 0, 3);
+          break;
+
+        case STATE_GLIDE:
+          //sequenceArray[channel].stepData[stepNum].glide =  min_max(value, 0, 128);
+          break;
+
+        case STATE_ARPTYPE:
+        break;
+
+        case STATE_ARPSPEEDNUM:
+        break;
+        case STATE_ARPSPEEDDEN:
+        break;
+
+        case STATE_ARPOCTAVE:
+          sequenceArray[channel].stepData[stepNum].arpOctave=  min_max(value, 1, 5);
+        break;
+
+        case STATE_VELOCITY:
+          sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(value, 127);
+        break;
+        case STATE_VELOCITYTYPE:
+          sequenceArray[channel].stepData[stepNum].velocityType = min_max(value, 0, 4);
+        break;
+        case STATE_LFOSPEED:
+          sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(value, 1, 255);
+        break;
+      }
+      */
+}
 
 void InputModule::loop(uint16_t frequency){
   if (inputTimer > frequency){
@@ -109,7 +340,7 @@ void InputModule::loop(uint16_t frequency){
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
       case VELOCITY_MENU:
-        if(multiSelectSwitch){
+        if(globalObj->multiSelectSwitch){
           multiSelectInputHandler();
         } else{
           channelPitchModeInputHandler();
@@ -178,7 +409,7 @@ void InputModule::loop(uint16_t frequency){
 }
 
 void InputModule::changeState(uint8_t targetState){
-//  Serial.println("change state: " + String(targetState));
+  Serial.println("change state: " + String(targetState));
   stepMode = targetState;
   switch (stepMode) {
     case STATE_PITCH0:
@@ -592,7 +823,7 @@ void InputModule::altButtonHandler(){
          switch(currentMenu){
            case PATTERN_SELECT:
            case SAVE_MENU:
-            multiSelectSwitch = false;
+            globalObj->multiSelectSwitch = false;
 
             channelButtonChannelSelectorHandler(channelButton);
             break;
@@ -652,7 +883,7 @@ void InputModule::altButtonHandler(){
         break;
 
         case SW_PATTERN:
-          multiSelectSwitch = false;
+          globalObj->multiSelectSwitch = false;
 
           if (midplaneGPIO->pressed(SW_SHIFT)){
             for(int i=0; i<SEQUENCECOUNT; i++){
@@ -737,7 +968,7 @@ void InputModule::altButtonHandler(){
         case SW_PGDN:
 
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            multiSelectSwitch = true;
+            globalObj->multiSelectSwitch = true;
             changeState(STATE_PITCH0);
           } else {
             notePage = positive_modulo(notePage - 1, 4);
@@ -815,7 +1046,8 @@ void InputModule::altButtonHandler(){
         // select the step
         selectedStep = getNote(i);
 
-        buttonMode = BUTTON_MODE_XOX;
+          buttonMode = BUTTON_MODE_XOX;
+
         //  changeState(STATE_PITCH0);
         // i is the first step pressed
         // n is the second step pressed
@@ -867,22 +1099,15 @@ void InputModule::altButtonHandler(){
       if ( midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
         changeState(positive_modulo(stepMode + knobChange, STATE_LFOSPEED+1));
       } else {
-        if (multiSelectSwitch){
-          for(int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
-            if(multiSelection[i]){ // if step is selected in multi select
-              setStepData(selectedChannel, i, knobChange); //set the value
-            }
-          }
-        } else {
-          setStepData(selectedChannel, selectedStep, knobChange);
-        }
+        changeStepData(selectedChannel, selectedStep, knobChange);
+
       }
     }
 
 
 };
 
-void InputModule::setStepData(uint8_t channel, uint8_t stepNum, int change){
+void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
     //knobPrev = knobRead;
     uint8_t chrd;
 
@@ -927,6 +1152,7 @@ void InputModule::setStepData(uint8_t channel, uint8_t stepNum, int change){
         break;
 
         case STATE_GATELENGTH:
+
     // change the gate type
             if ((sequenceArray[channel].stepData[stepNum].gateLength == 0) && (change < 0)  ) {
               sequenceArray[channel].stepData[stepNum].gateType = GATETYPE_REST;
@@ -940,7 +1166,6 @@ void InputModule::setStepData(uint8_t channel, uint8_t stepNum, int change){
             //  Serial.println("Setting Gatelength: " + String(sequenceArray[channel].stepData[stepNum].gateLength) + " change: " + String(change));
 
             }
-
         break;
 
 
@@ -958,24 +1183,24 @@ void InputModule::setStepData(uint8_t channel, uint8_t stepNum, int change){
         break;
 
         case STATE_ARPSPEEDNUM:
-        sequenceArray[channel].stepData[stepNum].arpSpdNum = min_max(sequenceArray[channel].stepData[stepNum].arpSpdNum + change, 1, 16) ;
+          sequenceArray[channel].stepData[stepNum].arpSpdNum = min_max(sequenceArray[channel].stepData[stepNum].arpSpdNum + change, 1, 16) ;
         break;
         case STATE_ARPSPEEDDEN:
-        sequenceArray[channel].stepData[stepNum].arpSpdDen = min_max(sequenceArray[channel].stepData[stepNum].arpSpdDen + change, 1, 64);
+          sequenceArray[channel].stepData[stepNum].arpSpdDen = min_max(sequenceArray[channel].stepData[stepNum].arpSpdDen + change, 1, 64);
         break;
 
         case STATE_ARPOCTAVE:
-        sequenceArray[channel].stepData[stepNum].arpOctave=  min_max(sequenceArray[channel].stepData[stepNum].arpOctave + change, 1, 5);
+          sequenceArray[channel].stepData[stepNum].arpOctave=  min_max(sequenceArray[channel].stepData[stepNum].arpOctave + change, 1, 5);
         break;
 
         case STATE_VELOCITY:
-        sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(sequenceArray[channel].stepData[stepNum].velocity + change, 127);
+          sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(sequenceArray[channel].stepData[stepNum].velocity + change, 127);
         break;
         case STATE_VELOCITYTYPE:
-        sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 4);
+          sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 4);
         break;
         case STATE_LFOSPEED:
-        sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(sequenceArray[channel].stepData[stepNum].lfoSpeed + change, 1, 255);
+          sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(sequenceArray[channel].stepData[stepNum].lfoSpeed + change, 1, 255);
         break;
       }
 }

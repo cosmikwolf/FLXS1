@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include "Sequencer.h"
 #include "global.h"
+#include "globalVariable.h"
 #include "MasterClock.h"
 
 #include <SSD_13XX.h>
@@ -82,7 +83,7 @@ class DisplayModule
     SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
-    void initialize(Sequencer *sequenceArray, MasterClock* clockMaster);
+    void initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj);
     void displayLoop(uint16_t frequency);
 
     void clearDisplay();
@@ -93,6 +94,8 @@ class DisplayModule
 
     void channelSequenceDisplay(char *buf);
     void stateDisplay_pitch(char*buf);
+    void stateDisplay_pitchMulti(char*buf);
+    void stateDisplay_pitchRender();
     void stateDisplay_arp(char *buf);
     void stateDisplay_velocity(char *buf);
 
@@ -113,7 +116,7 @@ class DisplayModule
 
     void channelTunerDisplay(char *buf);
     void channelInputDisplay(char *buf);
-    
+
     void multiSelectMenu(char *buf);
 
     void modalPopup();
@@ -158,7 +161,7 @@ private:
     uint8_t chSelector;
     Sequencer *sequenceArray;
     MasterClock* clockMaster;
-
+    GlobalVariable* globalObj;
   /*  struct element {
       uint8_t index;
       uint8_t highlight;

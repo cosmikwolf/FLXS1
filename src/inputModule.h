@@ -9,6 +9,7 @@
 #include "Sequencer.h"
 #include "MasterClock.h"
 #include "FlashMemory.h"
+#include "globalVariable.h"
 #include "global.h"
 
 #define DOUBLECLICKMS  250
@@ -34,7 +35,7 @@ public:
   OutputController* outputControl;
   MasterClock* clockMaster;
 
-  void initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster, DisplayModule* display);
+  void initialize(OutputController* outputControl, Zetaohm_MAX7301* midplaneGPIO, Zetaohm_MAX7301* backplaneGPIO, FlashMemory* saveFile, Sequencer *sequenceArray, MasterClock* clockMaster, DisplayModule* display, GlobalVariable* globalObj);
 
   void loop(uint16_t frequency);
 
@@ -61,7 +62,8 @@ public:
   void inputMenuHandler();
   void globalMenuHandler();
   void tempoMenuHandler();
-  void setStepData(uint8_t channel, uint8_t stepNum, int change);
+  void changeStepData(uint8_t channel, uint8_t stepNum, int change);
+  void setStepAbsolute(uint8_t channel, uint8_t stepNum, int value);
 
   void modMenu1_InputHandler();
   void modMenu2_InputHandler();
@@ -89,6 +91,7 @@ public:
   int8_t instBuffer;
   int16_t stepModeBuffer;
 
+
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;
   unsigned long encoderButtonTime;
@@ -99,7 +102,9 @@ private:
   Sequencer *sequenceArray;
   FlashMemory *saveFile;
   DisplayModule *display;
+  GlobalVariable* globalObj;
   elapsedMicros inputTimer;
+
 };
 
 #endif

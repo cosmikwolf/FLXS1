@@ -50,17 +50,16 @@ uint16_t  adcCalibrationNeg[4] = {65300, 65300, 65300, 65300};
 uint16_t  adcCalibrationOffset[4] = {33237,33237,33237,33237};
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
-bool multiSelection[64] = {0};
-bool multiSelectSwitch = false;
 
 uint16_t  cvInputRaw[12];
 int8_t    cvInputMapped[5];
 int16_t   cvInputMapped1024[4];
 uint8_t		gateInputRaw[9];
 uint8_t   gateInputRose[9];
+
+//multi select variables;
+
 //midi
-elapsedMicros blipTimer;
-elapsedMicros testTimer;
 
 uint16_t masterDebugCounter = 0;
 
@@ -68,7 +67,7 @@ uint8_t selectedText = 0;
 uint8_t prevSelectedText = 255 ;
 
 //save file
-uint8_t saveDestination[4];
+uint8_t saveDestination[4] = {0,0,0,0};
 
 uint8_t chordArray[27][3] = {
 {255,255,255},
@@ -176,20 +175,3 @@ int intFloatHundreds(int value){
 int intFloatTensOnes(int value){
 	return abs(value - (value/100*100));
 };
-
-
-uint32_t FreeRam2(){ // for Teensy 3.0
-//	uint32_t stackTop;
-//	uint32_t heapTop;
-
-//    // current position of the stack.
-//	stackTop = (uint32_t) &stackTop;
-
-//    // current position of heap.
-//	void* hTop = malloc(1);
-//	heapTop = (uint32_t) hTop;
-//	free(hTop);
-
-//    // The difference is the free, available ram.
-//	return stackTop - heapTop;
-}

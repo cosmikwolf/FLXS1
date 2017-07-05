@@ -340,9 +340,6 @@
 #define ARPTYPE_UPDN2 4
 #define ARPTYPE_RNDM	5
 
-
-
-
 extern uint32_t tempoX100;
 extern uint8_t stepMode;
 extern uint8_t notePage;
@@ -357,26 +354,26 @@ extern uint8_t selectedStep;
 extern uint8_t patternChannelSelector;
 extern uint8_t prevPtrnChannelSelector;
 extern uint8_t selectedCalibrationChannel;
-extern boolean extClock;
 extern uint8_t clockMode;
-extern boolean debugBoolean;
 // FlashMemory
 extern uint8_t currentPattern;
 extern uint8_t queuePattern;
-extern boolean playing;
 extern uint8_t chordArray[27][3];
 extern uint16_t colundiArrayX100[56];
 extern uint8_t stepModeOrder[1][MAX_STATE_COUNT];
+extern boolean extClock;
+extern boolean debugBoolean;
+extern boolean playing;
 
 // MasterClock
-extern uint8_t masterPulseCount;
-extern boolean wasPlaying;
 extern unsigned long beatLength;
 extern unsigned long lastTimer;
 extern elapsedMicros masterTempoTimer;
 extern elapsedMicros internalClockTimer;
 extern elapsedMicros startTime;
+extern uint8_t masterPulseCount;
 extern uint16_t masterDebugCounter;
+extern boolean wasPlaying;
 
 extern uint32_t lfoClockCounter;
 
@@ -384,11 +381,9 @@ extern uint32_t lfoClockCounter;
 extern uint8_t saveDestination[4];
 
 //midi
-extern elapsedMicros testTimer;
+extern elapsedMillis modalTimer;
 extern boolean firstRun;
 extern boolean eraseAllFlag;
-
-extern elapsedMillis modalTimer;
 
 extern uint16_t calibrationBuffer;
 extern uint16_t  dacCalibrationNeg[8];
@@ -403,10 +398,11 @@ extern uint8_t	gateInputRose[9];
 extern uint8_t	gateInputRaw[9];
 
 extern uint8_t dacMap[8];
-extern bool multiSelection[64];
-extern bool multiSelectSwitch;
 extern uint8_t selectedText;
 extern uint8_t prevSelectedText;
+
+// multi selectedChannel
+
 
 //void//Serial.println(String text);
 
@@ -420,7 +416,6 @@ int intFloatHundreds(int value);
 int intFloatTensOnes(int value);
 
 uint8_t getNote(uint8_t index);
-uint32_t FreeRam2();
 
 
 extern elapsedMicros debugTimer2;

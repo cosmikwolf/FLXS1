@@ -12,6 +12,7 @@
 #include "FlashMemory.h"
 #include "MasterClock.h"
 #include "OutputController.h"
+#include "globalVariable.h"
 #include "Sequencer.h"
 #include "global.h"
 
@@ -29,6 +30,7 @@ class TimeController {
     void cacheWriteHandler();
 
   private:
+    GlobalVariable     globalObj;
     MasterClock clockMaster;
     OutputController outputControl;
     InputModule buttonIo;

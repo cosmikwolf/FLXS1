@@ -65,7 +65,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 		this->stepData[n].velocity		 =  67;
 		this->stepData[n].velocityType =   0;
 		this->stepData[n].lfoSpeed		 =  16;
-		this->stepData[n].offset       =   0;
+		//this->stepData[n].offset       =   0;
 		this->stepData[n].noteStatus   =  AWAITING_TRIGGER;
 		this->stepData[n].arpStatus   =   0;
 		this->stepData[n].notePlaying  =   0;

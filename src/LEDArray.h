@@ -6,6 +6,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #include "global.h"
+#include "globalVariable.h"
 #include "Sequencer.h"
 
 #define NUM_LEDS 23
@@ -16,7 +17,7 @@ class LEDArray
 {
   public:
     LEDArray();
-    void initialize(Sequencer *sequenceArray);
+    void initialize(Sequencer *sequenceArray, GlobalVariable* globalObj);
     void loop(uint16_t frequency);
     void fadeall();
     void rainbowCycle(uint8_t wait);
@@ -31,6 +32,7 @@ class LEDArray
 
   private:
     Sequencer *sequenceArray;
+    GlobalVariable* globalObj;
     elapsedMicros pixelTimer;
     elapsedMillis blinkTimer;
     Adafruit_NeoPixel leds = Adafruit_NeoPixel(NUM_LEDS, DATA_PIN, NEO_GRBW + NEO_KHZ800);

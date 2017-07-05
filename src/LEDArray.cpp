@@ -3,9 +3,10 @@
 
 LEDArray::LEDArray(){};
 
-void LEDArray::initialize(Sequencer *sequenceArray){
+void LEDArray::initialize(Sequencer *sequenceArray, GlobalVariable* globalObj){
   Serial.println("Initializing LED Array");
   this->sequenceArray = sequenceArray;
+  this->globalObj = globalObj;
 
   pinMode(LED_PIN, OUTPUT);
 
@@ -79,21 +80,21 @@ void LEDArray::loop(uint16_t interval){
       break;
       case PITCH_GATE_MENU:
       case ARPEGGIO_MENU:
-        if(multiSelectSwitch){
+        if(globalObj->multiSelectSwitch){
           multiSelectLEDHandler();
         } else {
           channelPitchModeLEDHandler();
         }
       break;
       case VELOCITY_MENU:
-        if(multiSelectSwitch){
+        if(globalObj->multiSelectSwitch){
           multiSelectLEDHandler();
         } else {
           channelGateModeLEDHandler();
         }
       break;
       case CHANNEL_STEP_MODE:
-        if(multiSelectSwitch){
+        if(globalObj->multiSelectSwitch){
           multiSelectLEDHandler();
         } else {
           channelStepModeLEDHandler();
@@ -165,7 +166,7 @@ void LEDArray::channelSequenceModeLEDHandler(){
 
 void LEDArray::multiSelectLEDHandler(){
   for (int i=0; i < 16; i++){
-    if (multiSelection[getNote(i)]){
+    if (globalObj->multiSelection[getNote(i)]){
       leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
     } else {
       leds.setPixelColor(ledMainMatrix[i], 64,0,0,0);

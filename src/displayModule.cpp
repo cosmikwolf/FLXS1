@@ -4,11 +4,12 @@
 DisplayModule::DisplayModule(){
 };
 
-void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaster){
+void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj){
 
   Serial.println("Initializing Display");
   this->clockMaster = clockMaster;
   this->sequenceArray = sequenceArray;
+  this->globalObj = globalObj;
   currentMenu = 255;
   oled.begin();
   delay(100);
@@ -125,7 +126,12 @@ void DisplayModule::displayLoop(uint16_t frequency) {
       }
       switch(currentMenu) {
         case PITCH_GATE_MENU:
-          stateDisplay_pitch(buf);
+          if(globalObj->multiSelectSwitch){
+            stateDisplay_pitchMulti(buf);
+          } else {
+            stateDisplay_pitch(buf);
+          }
+
         break;
 
         case ARPEGGIO_MENU:
@@ -506,51 +512,85 @@ void DisplayModule::multiSelectMenu(char* buf){
 
 };
 
+void DisplayModule::stateDisplay_pitchMulti(char*buf){
+
+    sprintf(buf, "ch%d multiselect", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    displayElement[0] = strdup(buf);
+
+    if(globalObj->multi_pitch_switch){
+      switch(sequenceArray[selectedChannel].quantizeScale){
+        case COLUNDI:
+          displayElement[1] = strdup(colundiNotes[min_max(globalObj->multi_pitch, 0, COLUNDINOTECOUNT)] );
+        break;
+
+        case SEMITONE:
+          displayElement[1] = strdup(midiNotes[min_max(globalObj->multi_pitch, 0, 127)]);
+        break;
+
+        default:
+        displayElement[1] = strdup(String(globalObj->multi_pitch).c_str());
+
+      }
+    } else {
+      displayElement[1] = strdup("--");
+    }
+
+    sprintf(buf, "gate%d", selectedChannel+1);
+    displayElement[4] = strdup(buf);
+
+    if(globalObj->multi_gateLength_switch){
+      if ( globalObj->multi_gateLength == 0 ){
+        displayElement[5] = strdup("rest");
+      } else {
+        sprintf(buf, "%d.%02d", (globalObj->multi_gateLength+1)/4, (globalObj->multi_gateLength+1)%4*100/4  );
+        displayElement[5] = strdup(buf);
+      }
+    } else {
+      displayElement[5] = strdup("--");
+    }
+    displayElement[6] = strdup("glide:");
+
+
+    displayElement[8] = strdup("type:");
+    String gateTypeArray[] = { "off", "on", "tie","1hit" };
+
+    if( globalObj->multi_gateType_switch){
+      displayElement[7] = strdup(gateTypeArray[globalObj->multi_gateType].c_str() );
+    //  displayElement[7] = strdup(String(globalObj->multi_gateType).c_str() );
+    } else {
+      displayElement[7] = strdup("--");
+    }
+
+    if (globalObj->multi_glide_switch){
+      if (globalObj->multi_glide == 0) {
+        sprintf(buf, "off");
+      } else {
+        sprintf(buf, "%d", globalObj->multi_glide);
+      }
+      displayElement[9] = strdup(buf);
+
+    } else {
+      displayElement[9] = strdup("--");
+    }
+
+    //digitalWriteFast(PIN_EXT_RX, HIGH);
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, contrastColor , background); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(1,  STATE_PITCH0, 0, 15 , 128, 29, false, BOLD4X , background, foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
+
+    renderStringBox(4,  DISPLAY_LABEL, 0,  47,64,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(8,  DISPLAY_LABEL, 0,  63,64,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+    renderStringBox(6,  DISPLAY_LABEL, 0,  79,64,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+
+    renderStringBox(5,  STATE_GATELENGTH,60, 47,68,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+    renderStringBox(7,  STATE_GATETYPE,  60, 63,68,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(9,  STATE_GLIDE,     60, 79,68,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+
+};
+
 
 void DisplayModule::stateDisplay_pitch(char*buf){
 
-  if(multiSelectSwitch){
-    sprintf(buf, "cv%d.pitch MULTI", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-    displayElement[0] = strdup(buf);
-
-    switch(sequenceArray[selectedChannel].quantizeScale){
-      case COLUNDI:
-        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
-      break;
-
-      case SEMITONE:
-        displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
-      break;
-
-      default:
-      displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]).c_str());
-
-    }
-
-    sprintf(buf, "gate%d", selectedChannel+1);
-
-    displayElement[4] = strdup(buf);
-
-    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-      displayElement[5] = strdup("rest");
-    } else {
-      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
-      displayElement[5] = strdup(buf);
-    }
-    displayElement[6] = strdup("glide");
-    if (sequenceArray[selectedChannel].stepData[selectedStep].glide == 0) {
-      sprintf(buf, "off");
-    } else {
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].glide);
-    }
-    displayElement[9] = strdup(buf);
-
-    displayElement[8] = strdup("type:");
-    String gateTypeArray[] = { "off", "on", "tie","1hit" };
-    displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
-
-  } else {
-    sprintf(buf, "cv%d.pitch ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    sprintf(buf, "cv%d.ptch p%d %d-%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1, notePage*16+1, (notePage+1)*16 );
 
     displayElement[0] = strdup(buf);
 
@@ -589,10 +629,15 @@ void DisplayModule::stateDisplay_pitch(char*buf){
     displayElement[8] = strdup("type:");
     String gateTypeArray[] = { "off", "on", "tie","1hit" };
     displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
-  }
 
+    stateDisplay_pitchRender();
+
+};
+
+
+void DisplayModule::stateDisplay_pitchRender(){
   //digitalWriteFast(PIN_EXT_RX, HIGH);
-  if(multiSelectSwitch){
+  if(globalObj->multiSelectSwitch){
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, contrastColor , background); //  digitalWriteFast(PIN_EXT_RX, LOW);
   } else {
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , contrastColor); //  digitalWriteFast(PIN_EXT_RX, LOW);
@@ -607,8 +652,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   renderStringBox(7,  STATE_GATETYPE,  60, 63,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
   renderStringBox(9,  STATE_GLIDE,     60, 79,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
   //digitalWriteFast(PIN_EXT_RX, LOW);
-};
-
+}
 
 
 void DisplayModule::stateDisplay_arp(char *buf){

@@ -34,7 +34,7 @@ void Sequencer::clockReset(bool activeStepReset){
     stepData[stepNum].arpStatus = 0;
   }
 
-  calculateStepTimers();
+  //calculateStepTimers();
   //lastStepOffset = 0;
   //firstPulse = 1;
   if(channel ==0 ){
@@ -234,7 +234,7 @@ uint32_t Sequencer::calculateStepTimers(){
 	//beatOffset
 	//stepLength = beatLength/stepDivider*stepCount;
 	for (int stepNum = activeStep; stepNum < firstStep + stepCount + activeStep-1; stepNum++){
-    stepData[stepNum % (firstStep + stepCount)].offset = accumulatedOffset;
+  //  stepData[stepNum % (firstStep + stepCount)].offset = accumulatedOffset;
     accumulatedOffset += getStepLength();
 	}
 	return accumulatedOffset;
