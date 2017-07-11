@@ -32,7 +32,8 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.println("FASISM");      delay(50);
   oled.fillScreen(BLUE, GREEN);      delay(100);
   oled.fillScreen(PURPLE, NAVY);       delay(100);
-  oled.fillScreen(LIGHTPINK,LIGHTGREEN);
+  oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(100);
+  oled.fillScreen(RED);
   oled.setCursor(CENTER,8);
   oled.setTextColor(BLACK);
   oled.setFont(&LadyRadical_16);//this will load the font
@@ -50,7 +51,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(DARK_GREY);
-  oled.println("firmware v013");
+  oled.println("v014");
 
     delay(1000);
   Serial.println("Display Initialization Complete");
@@ -135,11 +136,21 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         break;
 
         case ARPEGGIO_MENU:
-          stateDisplay_arp(buf);
+          if(globalObj->multiSelectSwitch){
+            stateDisplay_arp_multi(buf);
+          } else {
+            stateDisplay_arp(buf);
+          }
+
         break;
 
         case VELOCITY_MENU:
-          stateDisplay_velocity(buf);
+          if(globalObj->multiSelectSwitch){
+            stateDisplay_velocity_multi(buf);
+          } else {
+            stateDisplay_velocity(buf);
+          }
+
         break;
 
         case SEQUENCE_MENU:
@@ -417,14 +428,13 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
         oled.setTextScale(2);
         break;
       case BOLD4X:
-        oled.setCursor(CENTER,y+1);
+        oled.setCursor(CENTER,y);
         oled.setFont(&a04b03);
         oled.setTextScale(4);
         break;
       case STYLE1X:
-        oled.setCursor(x+1,y+1);
+        oled.setCursor(x+2,y+2);
         oled.setFont(&flxs1_menu);
-
         oled.setTextScale(1);
         break;
 
@@ -512,10 +522,79 @@ void DisplayModule::multiSelectMenu(char* buf){
 
 };
 
+
+void DisplayModule::stateDisplay_pitch(char*buf){
+
+    sprintf(buf, "stepdata");
+      displayElement[0] = strdup(buf);
+    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+      displayElement[2] = strdup(buf);
+    sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+      displayElement[3] = strdup(buf);
+
+    switch(sequenceArray[selectedChannel].quantizeScale){
+      case COLUNDI:
+        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
+      break;
+
+      case SEMITONE:
+        displayElement[1] = strdup(midiNotes[ globalObj->quantizeSemitonePitch(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], sequenceArray[selectedChannel].quantizeMode, sequenceArray[selectedChannel].quantizeKey, 0)]);
+
+      break;
+
+      default:
+      displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]).c_str());
+
+    }
+
+    sprintf(buf, "gate%d", selectedChannel+1);
+
+    displayElement[4] = strdup(buf);
+
+    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
+      displayElement[5] = strdup("rest");
+    } else {
+      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
+      displayElement[5] = strdup(buf);
+    }
+    displayElement[6] = strdup("glide");
+    if (sequenceArray[selectedChannel].stepData[selectedStep].glide == 0) {
+      sprintf(buf, "off");
+    } else {
+      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].glide);
+    }
+    displayElement[9] = strdup(buf);
+
+    displayElement[8] = strdup("type:");
+    String gateTypeArray[] = { "off", "on", "tie","1hit" };
+    displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
+
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(2,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
+    renderStringBox(3,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
+
+
+
+    renderStringBox(1,  STATE_PITCH0, 0, 17 , 128, 27, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
+
+    renderStringBox(4,  DISPLAY_LABEL, 0,  47,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(8,  DISPLAY_LABEL, 0,  63,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+    renderStringBox(6,  DISPLAY_LABEL, 0,  79,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+
+    renderStringBox(5,  STATE_GATELENGTH,60, 47,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+    renderStringBox(7,  STATE_GATETYPE,  60, 63,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(9,  STATE_GLIDE,     60, 79,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
+
+};
+
 void DisplayModule::stateDisplay_pitchMulti(char*buf){
 
-    sprintf(buf, "ch%d multiselect", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-    displayElement[0] = strdup(buf);
+    sprintf(buf, "Multiselect");
+      displayElement[0] = strdup(buf);
+    sprintf(buf, "ch%d pt%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+      displayElement[2] = strdup(buf);
+    sprintf(buf, "%02d-%02d",  notePage*16+1, (notePage+1)*16 );
+      displayElement[3] = strdup(buf);
 
     if(globalObj->multi_pitch_switch){
       switch(sequenceArray[selectedChannel].quantizeScale){
@@ -574,7 +653,10 @@ void DisplayModule::stateDisplay_pitchMulti(char*buf){
     }
 
     //digitalWriteFast(PIN_EXT_RX, HIGH);
-    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, contrastColor , background); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(2,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
+    renderStringBox(3,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
+
     renderStringBox(1,  STATE_PITCH0, 0, 15 , 128, 29, false, BOLD4X , background, foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
 
     renderStringBox(4,  DISPLAY_LABEL, 0,  47,64,16, false, STYLE1X , background, foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
@@ -588,77 +670,19 @@ void DisplayModule::stateDisplay_pitchMulti(char*buf){
 };
 
 
-void DisplayModule::stateDisplay_pitch(char*buf){
-
-    sprintf(buf, "cv%d.ptch p%d %d-%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1, notePage*16+1, (notePage+1)*16 );
-
-    displayElement[0] = strdup(buf);
-
-    switch(sequenceArray[selectedChannel].quantizeScale){
-      case COLUNDI:
-        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
-      break;
-
-      case SEMITONE:
-        displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
-      break;
-
-      default:
-      displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]).c_str());
-
-    }
-
-    sprintf(buf, "gate%d", selectedChannel+1);
-
-    displayElement[4] = strdup(buf);
-
-    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
-      displayElement[5] = strdup("rest");
-    } else {
-      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
-      displayElement[5] = strdup(buf);
-    }
-    displayElement[6] = strdup("glide");
-    if (sequenceArray[selectedChannel].stepData[selectedStep].glide == 0) {
-      sprintf(buf, "off");
-    } else {
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].glide);
-    }
-    displayElement[9] = strdup(buf);
-
-    displayElement[8] = strdup("type:");
-    String gateTypeArray[] = { "off", "on", "tie","1hit" };
-    displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
-
-    stateDisplay_pitchRender();
-
-};
-
-
-void DisplayModule::stateDisplay_pitchRender(){
-  //digitalWriteFast(PIN_EXT_RX, HIGH);
-  if(globalObj->multiSelectSwitch){
-    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, contrastColor , background); //  digitalWriteFast(PIN_EXT_RX, LOW);
-  } else {
-    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 128, 15, false, STYLE1X, background , contrastColor); //  digitalWriteFast(PIN_EXT_RX, LOW);
-  }
-  renderStringBox(1,  STATE_PITCH0, 0, 15 , 128, 29, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
-
-  renderStringBox(4,  DISPLAY_LABEL, 0,  47,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
-  renderStringBox(8,  DISPLAY_LABEL, 0,  63,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
-  renderStringBox(6,  DISPLAY_LABEL, 0,  79,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
-
-  renderStringBox(5,  STATE_GATELENGTH,60, 47,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
-  renderStringBox(7,  STATE_GATETYPE,  60, 63,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
-  renderStringBox(9,  STATE_GLIDE,     60, 79,68,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
-  //digitalWriteFast(PIN_EXT_RX, LOW);
-}
-
 
 void DisplayModule::stateDisplay_arp(char *buf){
 
-  sprintf(buf, "cv%dA.arp ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-  displayElement[0] = strdup(buf);
+
+  sprintf(buf, "arpeggio");
+    displayElement[0] = strdup(buf);
+    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+      displayElement[7] = strdup(buf);
+    sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+      displayElement[12] = strdup(buf);
+
+
+
   displayElement[1]  = strdup("algo");
   const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
   displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
@@ -679,7 +703,9 @@ void DisplayModule::stateDisplay_arp(char *buf){
       //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
 
-   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
+   renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+   renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
+   renderStringBox(12,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
 
    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_ARPTYPE,     60, 20,68,17, false, STYLE1X, background , foreground);
@@ -694,11 +720,68 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
  };
 
+ void DisplayModule::stateDisplay_arp_multi(char *buf){
+
+   sprintf(buf, "arpeggio");
+     displayElement[0] = strdup(buf);
+     sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+     displayElement[7] = strdup(buf);
+     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+     displayElement[12] = strdup(buf);
+
+
+
+   displayElement[1]  = strdup("algo");
+   const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
+   displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
+
+   displayElement[4] = strdup("speed");
+   sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
+   displayElement[5] = strdup(buf);
+   sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
+   displayElement[6] = strdup(buf);
+
+   displayElement[8] = strdup("octve");
+   sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
+   displayElement[9] = strdup(buf);
+   displayElement[10] = strdup("intvl");
+
+     const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
+
+       //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
+    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+
+
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+    renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
+    renderStringBox(12,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
+
+    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(2,  STATE_ARPTYPE,     60, 20,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(4,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(5,  STATE_ARPSPEEDNUM, 60, 37,34,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_ARPSPEEDDEN, 94, 37,34,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(8,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(9,  STATE_ARPOCTAVE, 60, 54,68,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
+  };
+
+
+
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
 
-   sprintf(buf, "cv%dB LFO  ptn%d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-   displayElement[0] = strdup(buf);
+    sprintf(buf, "LFO & ENV");
+     displayElement[0] = strdup(buf);
+     sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+     displayElement[7] = strdup(buf);
+     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+     displayElement[8] = strdup(buf);
+
+
    displayElement[1] = strdup("level:");
 
    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
@@ -712,7 +795,47 @@ void DisplayModule::stateDisplay_arp(char *buf){
    displayElement[6] = strdup(buf);
 
 
-   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+
+   renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
+
+}
+
+
+ void DisplayModule::stateDisplay_velocity_multi(char *buf) {
+
+   sprintf(buf, "LFO & ENV");
+    displayElement[0] = strdup(buf);
+    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    displayElement[7] = strdup(buf);
+    sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+    displayElement[8] = strdup(buf);
+
+   displayElement[1] = strdup("level:");
+
+   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
+   displayElement[2] = strdup(buf);
+   displayElement[3] = strdup("type:");
+   char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
+   displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
+   displayElement[5] = strdup("LFO spd:");
+
+   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+   displayElement[6] = strdup(buf);
+
+
+   renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+   renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
+   renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
 
    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
    renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);

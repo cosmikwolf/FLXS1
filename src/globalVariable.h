@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "global.h"
 
 #ifndef _globalVariable_h_
 #define _globalVariable_h_
@@ -34,6 +35,8 @@ class GlobalVariable {
     uint8_t    multi_velocity;
     uint8_t    multi_velocityType;
     uint8_t    multi_lfoSpeed;
+
+    uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
 
     void initialize(){
       this->multi_pitch_switch = 0;

@@ -97,7 +97,9 @@ class DisplayModule
     void stateDisplay_pitchMulti(char*buf);
     void stateDisplay_pitchRender();
     void stateDisplay_arp(char *buf);
+    void stateDisplay_arp_multi(char *buf);
     void stateDisplay_velocity(char *buf);
+    void stateDisplay_velocity_multi(char *buf);
 
     void stepMode_gateLength(char *buf);
     void stepMode_chord(char *buf);

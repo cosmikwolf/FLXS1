@@ -10,6 +10,7 @@
 #include "Zetaohm_MCP4352/Zetaohm_MCP4352.h"
 #include "FlashMemory.h"
 #include "midiModule.h"
+#include "globalVariable.h"
 #include "global.h"
 
 #define PROGRAM_CHANGE      1
@@ -26,33 +27,10 @@
 #define SLEWSWITCHCV        7
 #define SLEWSWITCHCC        8
 
-#define SEMITONE_BIN        0b111111111111
-#define MAJOR_BIN           0b101011010101
-#define MINOR_BIN           0b101101010101
-#define MAJORMINOR_BIN      0b101111010101
-#define BLUESMAJOR_BIN      0b100110010110
-#define BLUESMINOR_BIN      0b100101110010
-#define PENT_MAJOR_BIN      0b101001010100
-#define PENT_MINOR_BIN      0b100101010010
-#define FOLK_BIN            0b110111011010
-#define IONIAN_BIN          0b101011010101
-#define AEOLIAN_BIN         0b101101011010
-#define DORIAN_BIN          0b101101010110
-#define MIXOLYDIAN_BIN      0b101011010110
-#define PHRYGIAN_BIN        0b110101011010
-#define LYDIAN_BIN          0b101010110101
-#define LOCRIAN_BIN         0b110101101010
-#define GAMELAN_BIN         0b110100011000
-#define JAPANESE_BIN        0b110001011000
-#define GYPSY_BIN           0b101100111001
-#define ARABIAN_BIN         0b110011011001
-#define FLAMENCO_BIN        0b110011011010
-#define WHOLETONE_BIN       0b101010101010
 
 class OutputController {
 public:
-  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc);
-  uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
+  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj);
   void noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   uint16_t getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey);
@@ -93,6 +71,7 @@ private:
   Zetaohm_MCP4352 mcp4352_2;
   ADC *adc;
   Zetaohm_MAX7301* backplaneGPIO;
+  GlobalVariable* globalObj;
   midi::MidiInterface<HardwareSerial>* serialMidi;
 
   uint8_t gateMap[4]  = {0,1,2,3};
