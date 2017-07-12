@@ -173,7 +173,7 @@ uint32_t Sequencer::getCurrentFrame(){
     if ( activeStep != lastActiveStep ){
       swingCount += 1;
       //swingSwitch = !swingSwitch;
-      if(channel == 0) Serial.println(String(millis()) + "\tSwing: "+ String(swingSwitch) + " activeStep "  + String( activeStep ) + "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tframesSinceLastStep:" + String(framesSinceLastStep) + "\tfirstStep: " + String(firstStep) + "\tstepCount: " + String(stepCount));
+    //  if(channel == 0) Serial.println(String(millis()) + "\tSwing: "+ String(swingSwitch) + " activeStep "  + String( activeStep ) + "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tframesSinceLastStep:" + String(framesSinceLastStep) + "\tfirstStep: " + String(firstStep) + "\tstepCount: " + String(stepCount));
 
     }
   if (currentFrame > framesPerSequence() ){
