@@ -17,7 +17,7 @@ void Sequencer::clockReset(bool activeStepReset){
   ppqPulseIndex = 0;
 
   if (activeStepReset){
-    swingSwitch = 0;
+    swingSwitch = false;
     firstPulse = true;
 
 //    ppqPulseIndex = -1;
@@ -87,7 +87,9 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     avgClocksPerPulse = clockSinceLastPulse ;// ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
     ppqPulseIndex++;
   }  else {
-    ppqPulseIndex++; // this may need to be commented to get midi to work
+    if(clockMode != EXTERNAL_MIDI_CLOCK){
+      ppqPulseIndex++; // this may need to be commented to get midi to work
+    }
 
   }
 
@@ -119,10 +121,7 @@ uint32_t Sequencer::getCurrentFrame(){
   lastActiveStep = activeStep;
 
 
-  if (currentFrame > framesPerSequence() ){
-    this->clockReset(false);
-   //if (channel == 1){ Serial.println("CLOCK RESET!"); };
-  }
+
 
   //  activeStep = isFrameSwinging(currentFrame);
   uint32_t framesSinceLastStep = 0;
@@ -162,13 +161,13 @@ uint32_t Sequencer::getCurrentFrame(){
         swinging = false;
       }
     }
-    //activeStep = min_max(activeStep, firstStep, firstStep+stepCount-1);
 
+    activeStep = min_max_cycle(activeStep, firstStep, firstStep+stepCount-1);
   };
 
 
     if (channel == 1 && millis() % 20 == 0){
-  //   Serial.println(String(millis()) + "\tSwing: "+ String(swingSwitch) + " activeStep "  + String( activeStep ) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tswingOffset: " + String(swingOffset) + "\tframesSinceLastStep:" + String(framesSinceLastStep) + "\tLastStepFrame: " + String(lastStepFrame));
+    // Serial.println(String(millis()) + "\tSwing: "+ String(swingSwitch) + " activeStep "  + String( activeStep ) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tframesSinceLastStep:" + String(framesSinceLastStep) );
     }
 
     if ( activeStep != lastActiveStep ){
@@ -177,6 +176,10 @@ uint32_t Sequencer::getCurrentFrame(){
       if(channel == 0) Serial.println(String(millis()) + "\tSwing: "+ String(swingSwitch) + " activeStep "  + String( activeStep ) + "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tframesSinceLastStep:" + String(framesSinceLastStep) + "\tfirstStep: " + String(firstStep) + "\tstepCount: " + String(stepCount));
 
     }
+  if (currentFrame > framesPerSequence() ){
+    this->clockReset(false);
+   //if (channel == 1){ Serial.println("CLOCK RESET!"); };
+  }
 
   return currentFrame;
 

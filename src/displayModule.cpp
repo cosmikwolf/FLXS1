@@ -682,10 +682,9 @@ void DisplayModule::stateDisplay_arp(char *buf){
       displayElement[12] = strdup(buf);
 
 
-
   displayElement[1]  = strdup("algo");
   const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
-  displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
+    displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
   displayElement[4] = strdup("speed");
   sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
@@ -733,23 +732,48 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
    displayElement[1]  = strdup("algo");
    const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
-   displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
+   if(globalObj->multi_arpType_switch){
+     displayElement[2] = strdup(arpTypeArray[globalObj->multi_arpType]);
+   }  else {
+     displayElement[2]  = strdup("--");
+   }
 
    displayElement[4] = strdup("speed");
-   sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
-   displayElement[5] = strdup(buf);
-   sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
-   displayElement[6] = strdup(buf);
+   if(globalObj->multi_arpSpdNum_switch){
+     sprintf(buf, "%d/", globalObj->multi_arpSpdNum);
+     displayElement[5] = strdup(buf);
+   } else {
+     displayElement[5]  = strdup("-");
+   }
+
+   if(globalObj->multi_arpSpdDen_switch){
+     sprintf(buf, "%d",  globalObj->multi_arpSpdDen);
+     displayElement[6] = strdup(buf);
+   } else {
+     displayElement[6]  = strdup("-");
+   }
 
    displayElement[8] = strdup("octve");
-   sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
-   displayElement[9] = strdup(buf);
+
+   if(globalObj->multi_arpOctave_switch){
+     sprintf(buf, "%doct", globalObj->multi_arpOctave);
+     displayElement[9] = strdup(buf);
+   } else {
+     displayElement[9]  = strdup("--");
+   }
+
+
    displayElement[10] = strdup("intvl");
 
      const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
 
        //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
-    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+
+     if(globalObj->multi_chord_switch){
+       displayElement[11] = strdup(chordSelectionArray[globalObj->multi_chord]);
+     } else {
+       displayElement[11]  = strdup("--");
+     }
 
 
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
@@ -774,63 +798,79 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
 
+
     sprintf(buf, "LFO & ENV");
-     displayElement[0] = strdup(buf);
-     sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-     displayElement[7] = strdup(buf);
-     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
-     displayElement[8] = strdup(buf);
-
-
-   displayElement[1] = strdup("level:");
-
-   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
-   displayElement[2] = strdup(buf);
-   displayElement[3] = strdup("type:");
-   char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
-   displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
-   displayElement[5] = strdup("LFO spd:");
-
-   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
-   displayElement[6] = strdup(buf);
-
-
-   renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
-
-   renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
-
-   renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
-
-   renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
-
-}
-
-
- void DisplayModule::stateDisplay_velocity_multi(char *buf) {
-
-   sprintf(buf, "LFO & ENV");
     displayElement[0] = strdup(buf);
     sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
     displayElement[7] = strdup(buf);
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[8] = strdup(buf);
 
-   displayElement[1] = strdup("level:");
+    displayElement[1] = strdup("level:");
 
-   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
-   displayElement[2] = strdup(buf);
-   displayElement[3] = strdup("type:");
-   char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
-   displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
-   displayElement[5] = strdup("LFO spd:");
+    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
+    displayElement[2] = strdup(buf);
+    displayElement[3] = strdup("type:");
+    char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
+    displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
+    displayElement[5] = strdup("LFO spd:");
 
-   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
-   displayElement[6] = strdup(buf);
+    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+    displayElement[6] = strdup(buf);
+
+
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+
+    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
+
+}
+
+
+ void DisplayModule::stateDisplay_velocity_multi(char *buf) {
+
+       sprintf(buf, "LFO & ENV");
+        displayElement[0] = strdup(buf);
+        sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+        displayElement[7] = strdup(buf);
+        sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+        displayElement[8] = strdup(buf);
+
+
+      displayElement[1] = strdup("level:");
+
+      if(globalObj->multi_velocity_switch){
+        sprintf(buf, "%d", globalObj->multi_velocity);
+        displayElement[2] = strdup(buf);
+      } else {
+        displayElement[2]  = strdup("--");
+      }
+
+      displayElement[3] = strdup("type:");
+      char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
+
+
+       if(globalObj->multi_velocityType_switch){
+         displayElement[4] = strdup(velTypeArray[globalObj->multi_velocityType]);
+       } else {
+         displayElement[4]  = strdup("--");
+       }
+
+      displayElement[5] = strdup("LFO spd:");
+      if(globalObj->multi_lfoSpeed_switch){
+        sprintf(buf, "%d", globalObj->multi_lfoSpeed);
+        displayElement[6] = strdup(buf);
+      } else {
+        displayElement[6]  = strdup("--");
+      }
 
 
    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);

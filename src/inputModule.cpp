@@ -95,7 +95,8 @@ void InputModule::multiSelectInputHandler(){
           break;
         case STATE_CHORD:
           globalObj->multi_chord_switch = true;
-          globalObj->multi_chord += knobChange;
+          globalObj->multi_chord = min_max(globalObj->multi_chord + knobChange, 0, 26 );
+
           break;
         case STATE_GATETYPE:
           globalObj->multi_gateType_switch = true;
@@ -108,23 +109,24 @@ void InputModule::multiSelectInputHandler(){
           break;
         case STATE_ARPTYPE:
           globalObj->multi_arpType_switch = true;
-          globalObj->multi_arpType += knobChange;
+          globalObj->multi_arpType = min_max(globalObj->multi_arpType + knobChange, 0, 5);
           break;
         case STATE_ARPOCTAVE:
           globalObj->multi_arpOctave_switch = true;
-          globalObj->multi_arpOctave += knobChange;
+          globalObj->multi_arpOctave = min_max(globalObj->multi_arpOctave + knobChange, 0, 5);
           break;
         case STATE_ARPSPEEDNUM:
           globalObj->multi_arpSpdNum_switch = true;
-          globalObj->multi_arpSpdNum += knobChange;
+          globalObj->multi_arpSpdNum  =min_max(globalObj->multi_arpSpdNum + knobChange,0,16);
           break;
         case STATE_ARPSPEEDDEN:
           globalObj->multi_arpSpdDen_switch = true;
-          globalObj->multi_arpSpdDen += knobChange;
+          globalObj->multi_arpSpdDen = min_max(globalObj->multi_arpSpdDen + knobChange,0,64);
           break;
         case STATE_GLIDE:
           globalObj->multi_glide_switch = true;
-          globalObj->multi_glide += knobChange;
+          globalObj->multi_glide = min_max(globalObj->multi_glide + knobChange,0,255);
+
           break;
         case STATE_BEATCOUNT:
           globalObj->multi_beatDiv_switch = true;
@@ -136,7 +138,8 @@ void InputModule::multiSelectInputHandler(){
           break;
         case STATE_VELOCITYTYPE:
           globalObj->multi_velocityType_switch = true;
-          globalObj->multi_velocityType += knobChange;
+          globalObj->multi_velocityType = min_max(globalObj->multi_velocityType+ knobChange, 0 , 4);
+
           break;
         case STATE_LFOSPEED:
           globalObj->multi_lfoSpeed_switch = true;

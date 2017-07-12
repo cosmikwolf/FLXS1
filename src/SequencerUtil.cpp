@@ -372,35 +372,41 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
     stepData[stepNum].framesRemaining += (2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod) )*   FRAMES_PER_BEAT * clockDivisionNum() / (8*clockDivisionDen());
 
-
     if (swingX100 != 50 ){
-      if (swinging){
-      //  stepData[stepNum].framesRemaining -= (((stepData[stepNum].framesRemaining)%getStepLength())*(2*swingX100-100)/100)+1;
+      if ((stepNum + swingSwitch) % 2){
+				stepData[stepNum].framesRemaining /= 2*swingX100;
+				stepData[stepNum].framesRemaining *= 100;
       } else {
-      //  stepData[stepNum].framesRemaining += (((stepData[stepNum].framesRemaining)%getStepLength())*(2*swingX100-100)/100)+1;
+				stepData[stepNum].framesRemaining *= 2*swingX100;
+				stepData[stepNum].framesRemaining /= 100;
       }
     }
     //stepData[stepNum].arpLastFrame =  stepData[stepNum].framesRemaining / 4;
   //  stepData[stepNum].arpLastFrame =  getStepLength()/;
+
     if( stepData[stepNum].framesRemaining < getStepLength()){
-      stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining /8;
+//      stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining /8;
     } else {
-      stepData[stepNum].arpLastFrame = getStepLength()/8;
+  //    stepData[stepNum].arpLastFrame = getStepLength()/8;
     }
 
-//		stepData[stepNum].arpLastFrame =
-  /*  Serial.println(
-    "stepNum: " + String(stepNum) +
-    "\tgateLength: " + String(stepData[stepNum].gateLength) +
-    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-    "\tswing: "  + String(swingX100) +
-    "\tswinging: " + String(swinging) +
-    "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-    "\tgetStepLength: " + String(getStepLength()) +
-    "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
-    "\t(2*swingX100-100): " + String((2*swingX100-100))
-  );*/
+		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/5 ;
 
+		if (stepData[stepNum].arpLastFrame < getStepLength() / 64){
+			stepData[stepNum].arpLastFrame = getStepLength() / 64;
+		}
+	//		stepData[stepNum].arpLastFrame =
+  //   Serial.println(
+  //   "stepNum: " + String(stepNum) +
+  //   "\tgateLength: " + String(stepData[stepNum].gateLength) +
+  //   "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+  //   "\tswing: "  + String(swingX100) +
+  //   "\tswinging: " + String(swingCount % 2) +
+  //   "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+  //   "\tgetStepLength: " + String(getStepLength()) +
+  //   "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
+  //   "\t(2*swingX100-100): " + String((2*swingX100-100))
+  // );
 
 	} else {
 
@@ -412,15 +418,31 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		//stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/3;
     //stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen()); // stop notes 1/8 early.
 
-    if (swinging){
-      stepData[stepNum].framesRemaining *= 200 - 2*swingX100;
-      stepData[stepNum].framesRemaining /= 100;
-    } else {
-      stepData[stepNum].framesRemaining *= 2*swingX100;
-      stepData[stepNum].framesRemaining /= 100;
+    // if (swinging){
+    //   stepData[stepNum].framesRemaining *= 200 - 2*swingX100;
+    //   stepData[stepNum].framesRemaining /= 100;
+    // } else {
+    //   stepData[stepNum].framesRemaining *= 2*swingX100;
+    //   stepData[stepNum].framesRemaining /= 100;
+    // }
+
+
+
+		if (swingX100 != 50 ){
+			if ((stepNum + swingSwitch + (stepData[stepNum].arpStatus * getArpSpeedNumerator(stepNum)) / getArpSpeedDenominator(stepNum)
+) % 2){
+				stepData[stepNum].framesRemaining /= 4*swingX100;
+				stepData[stepNum].framesRemaining *= 200;
+      } else {
+				stepData[stepNum].framesRemaining *= 4*swingX100;
+				stepData[stepNum].framesRemaining /= 200;
+      }
     }
 
     stepData[stepNum].arpLastFrame =  stepData[stepNum].framesRemaining / 4;
+		if (stepData[stepNum].arpLastFrame < getStepLength() / 64){
+			stepData[stepNum].arpLastFrame = getStepLength() / 64;
+		}
 
 		//Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
 
