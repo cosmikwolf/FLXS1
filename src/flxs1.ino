@@ -14,6 +14,7 @@
 #include "midiModule.h"
 #include "global.h"
 #include "DisplayModule.h"
+#include "globalVariable.h"
 
 
 
@@ -23,6 +24,7 @@
 //int drawingMemory[NUMLEDS*8];
 
 //OctoSK6812 octoLeds(NUMLEDS, displayMemory, drawingMemory, SK6812_GRBW);
+Sequencer sequence[SEQUENCECOUNT];
 
 TimeController timeControl;
 
@@ -33,12 +35,13 @@ IntervalTimer SequencerTimer;
 //IntervalTimer PeripheralLoopTimer;
 
 MidiModule midiControl;
-Sequencer sequence[SEQUENCECOUNT];
 
 AudioInputAnalog              audio_adc(A14);
 AudioAnalyzeNoteFrequency     notefreq;
 AudioConnection               patchCord0(audio_adc, 0 , notefreq, 0);
 elapsedMillis noteFreqTimer;
+
+GlobalVariable globalObj;
 
 ADC *adc = new ADC(); // adc object
 
@@ -50,8 +53,8 @@ void setup() {
   //waiting for serial to begin
 //  while (!Serial) ; // wait for serial monitor window to open
   //AudioMemory(25);
-  //notefreq.begin(.15);
-  //delay(1500);
+//  notefreq.begin(.15);
+  delay(500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
   Serial.println("Sizeof Sequencer object: " + String(sizeof(sequence[0])));
@@ -60,16 +63,24 @@ void setup() {
 	SPI.setMOSI(kMosiPin);
 	SPI.setSCK(kSpiClockPin);
 
+  pinMode(7, INPUT);  //MIDI SERIAL PIN CONFIG
+  pinMode(8, OUTPUT); //MIDI SERIAL PIN CONFIG
+
+  Serial3.setTX(8);
+  Serial3.setRX(7);
+
   serialMidi.begin(MIDI_CHANNEL_OMNI);
 
-  midiControl.midiSetup(sequence);
+  globalObj.initialize();
+
+  midiControl.midiSetup(sequence, &globalObj);
 
 	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
   serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
   serialMidi.setHandleNoteOff( midiNoteOffHandlerWrapper );
   serialMidi.setHandleStart( midiStartContinueHandlerWrapper );
   serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
-  serialMidi.setHandleStop(midiStopHandlerWrapper);
+  serialMidi.setHandleStop( midiStopHandlerWrapper );
 
   usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
   usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
@@ -84,7 +95,7 @@ void setup() {
   //usbMIDI.setHandlePitchChange(OnPitchChange)
   //usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
 
-  timeControl.initialize(&serialMidi, &midiControl, sequence, adc);
+  timeControl.initialize(&serialMidi, &midiControl, sequence, adc, &globalObj);
 
   //PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
   //PeripheralLoopTimer.priority(64);
@@ -121,7 +132,6 @@ void setup() {
   pinMode(24,OUTPUT);
   digitalWrite(3, LOW);
   digitalWrite(24, LOW);
-
   pinMode(1,OUTPUT);
   digitalWrite(1, LOW);
 
@@ -204,7 +214,7 @@ void usbNoteOff(){
 }
 
 void usbNoteOn(byte channel, byte note, byte velocity){
-  Serial3.println("note on!:\t" + String(note));
+  //Serial3.println("note on!:\t" + String(note));
   playing = !playing;
 }
 

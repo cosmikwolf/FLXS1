@@ -46,7 +46,7 @@ void Sequencer::clockReset(bool activeStepReset){
   }
 }
 
-void Sequencer::clockStart(elapsedMicros startTime){
+void Sequencer::clockStart(){
 	pulseTimer = 0;
   swingSwitch = 0;
 };
@@ -70,6 +70,7 @@ void Sequencer::masterClockPulse(){
 }
 
 void Sequencer::runSequence(){
+
 	if(playing){
     sequenceModeStandardStep();
   }
@@ -87,7 +88,7 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     avgClocksPerPulse = clockSinceLastPulse ;// ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
     ppqPulseIndex++;
   }  else {
-    if(clockMode != EXTERNAL_MIDI_CLOCK){
+    if(globalObj->clockMode != EXTERNAL_MIDI_CLOCK){
       ppqPulseIndex++; // this may need to be commented to get midi to work
     }
 
@@ -231,17 +232,17 @@ int Sequencer::getActivePage(){
   return activeStep/16;
 }
 
-uint32_t Sequencer::calculateStepTimers(){
-	//stepLength = beatLength*beatCount/stepCount;
-	uint32_t accumulatedOffset = 0;
-	//beatOffset
-	//stepLength = beatLength/stepDivider*stepCount;
-	for (int stepNum = activeStep; stepNum < firstStep + stepCount + activeStep-1; stepNum++){
-  //  stepData[stepNum % (firstStep + stepCount)].offset = accumulatedOffset;
-    accumulatedOffset += getStepLength();
-	}
-	return accumulatedOffset;
-}
+// uint32_t Sequencer::calculateStepTimers(){
+// 	//stepLength = beatLength*beatCount/stepCount;
+// 	uint32_t accumulatedOffset = 0;
+// 	//beatOffset
+// 	//stepLength = beatLength/stepDivider*stepCount;
+// 	for (int stepNum = activeStep; stepNum < firstStep + stepCount + activeStep-1; stepNum++){
+//   //  stepData[stepNum % (firstStep + stepCount)].offset = accumulatedOffset;
+//     accumulatedOffset += getStepLength();
+// 	}
+// 	return accumulatedOffset;
+// }
 
 
 void Sequencer::sequenceModeStandardStep(){
@@ -250,7 +251,6 @@ void Sequencer::sequenceModeStandardStep(){
   if (mute || !playing){
     return;
   }
-
   currentFrameVar = getCurrentFrame();
 
   if (stepData[activeStep].noteStatus == AWAITING_TRIGGER){

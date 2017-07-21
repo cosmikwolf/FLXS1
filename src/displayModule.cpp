@@ -1086,7 +1086,7 @@ void DisplayModule::inputMenuDisplay(){
  //   displayElement[7] = strdup("NONE");
  // }
 
-   switch(clockMode){
+   switch(globalObj->clockMode){
      case INTERNAL_CLOCK:
        sprintf(buf, "%dbpm", int(tempoX100/100) );
        displayElement[1] = strdup(buf);

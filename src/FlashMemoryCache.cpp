@@ -15,11 +15,14 @@ int  FlashMemory::getCacheStatus(uint8_t index){
 };
 
 void FlashMemory::initializeCache(){
+  Serial.println("initializing save file cache... ");
   char* fileName = (char *) malloc(sizeof(char) * 12);
   fileName =strdup("seqData");
   if (!spiFlash->exists(fileName)) {
     Serial.println("Creating Data File: " + String(fileName) + "\tsize: " + String(FLASHFILESIZE));
     spiFlash->createErasable(fileName, FLASHFILESIZE);
+  } else {
+    Serial.println("seqdata file exists... ");
   }
   free(fileName);
   fileName = NULL;
@@ -29,6 +32,7 @@ void FlashMemory::initializeCache(){
     Serial.println("Creating Cache File: " + String(fileName) );
     spiFlash->createErasable(fileName, FLASHFILESIZE);
   } else {
+    Serial.println("Cache File exists... erasing..");
     file = spiFlash->open(fileName);   //open cache file
     if(file){
       file.seek(0);
@@ -39,14 +43,17 @@ void FlashMemory::initializeCache(){
   free(fileName);
   fileName = NULL;
   while(!spiFlash->ready()){
-
+    Serial.println("waiting for cache..");
+    delay(1000);
   }
   //Randomize a cache offset so that EEPROM is used evenly across all bytes
   //EEPROM will begin to degrade after 100000 writes, so this will increase longevity of the device.
   //Identify previous cache offset value:
   cacheNum = 0;
   spiFlashBusy = false;
-  listFiles();
+  //listFiles();
+  Serial.println("initializing save file cache complete. ");
+
 };
 
 int FlashMemory::cacheWriteLoop(){

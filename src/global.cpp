@@ -21,7 +21,7 @@ float   frequency;
 boolean eraseAllFlag = false;
 boolean extClock = false;
 
-uint8_t clockMode = INTERNAL_CLOCK;
+//uint8_t clockMode = INTERNAL_CLOCK;
 //uint8_t clockMode = EXTERNAL_MIDI_CLOCK;
 //uint8_t clockMode = EXTERNAL_CLOCK_GATE_0;
 
@@ -34,20 +34,9 @@ boolean playing = false;
 boolean wasPlaying = false;
 uint8_t masterPulseCount = 24;
 unsigned long beatLength = 60000000/(tempoX100/100);
-elapsedMicros masterTempoTimer;
-elapsedMicros internalClockTimer;
-elapsedMicros startTime;
-elapsedMicros debugTimer2;
 
 uint32_t lfoClockCounter;
 elapsedMillis modalTimer;
-uint8_t selectedCalibrationChannel = 0;
-uint16_t calibrationBuffer = 0;
-uint16_t  dacCalibrationNeg[8] = {1650, 1650, 1650, 1650, 1650, 1650, 1650, 1650};
-uint16_t  dacCalibrationPos[8] = {64350, 64350, 64350, 64350, 64350, 64350, 64350, 64350};
-uint16_t  adcCalibrationPos[4] = {850,850,850,850};
-uint16_t  adcCalibrationNeg[4] = {65300, 65300, 65300, 65300};
-uint16_t  adcCalibrationOffset[4] = {33237,33237,33237,33237};
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
 
@@ -61,7 +50,6 @@ uint8_t   gateInputRose[9];
 
 //midi
 
-uint16_t masterDebugCounter = 0;
 
 uint8_t selectedText = 0;
 uint8_t prevSelectedText = 255 ;

@@ -125,14 +125,6 @@
 #define POSITIVE 1
 #define NEGATIVE 0
 
-#define INTERNAL_CLOCK 0
-#define EXTERNAL_MIDI_CLOCK 1
-#define EXTERNAL_CLOCK_GATE_0 2
-#define EXTERNAL_CLOCK_GATE_1 3
-#define EXTERNAL_CLOCK_GATE_2 4
-#define EXTERNAL_CLOCK_GATE_3 5
-#define EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT 6
-#define GATE_CLOCK_TIMEOUT 5000000
 
 //INPUT MAPPINGS
 #define SW_00    0
@@ -200,15 +192,12 @@ extern uint8_t notePage;
 extern uint8_t currentMenu;       // Display module + LED module
 extern uint8_t previousState;      // Display module + LED moduleextern
 
-extern float   probability;
-extern float   frequency;
 
 extern uint8_t selectedChannel;
 extern uint8_t selectedStep;
 extern uint8_t patternChannelSelector;
 extern uint8_t prevPtrnChannelSelector;
-extern uint8_t selectedCalibrationChannel;
-extern uint8_t clockMode;
+//extern uint8_t clockMode;
 // FlashMemory
 extern uint8_t currentPattern;
 extern uint8_t queuePattern;
@@ -221,12 +210,7 @@ extern boolean playing;
 
 // MasterClock
 extern unsigned long beatLength;
-extern unsigned long lastTimer;
-extern elapsedMicros masterTempoTimer;
-extern elapsedMicros internalClockTimer;
-extern elapsedMicros startTime;
 extern uint8_t masterPulseCount;
-extern uint16_t masterDebugCounter;
 extern boolean wasPlaying;
 
 extern uint32_t lfoClockCounter;
@@ -239,17 +223,6 @@ extern elapsedMillis modalTimer;
 extern boolean firstRun;
 extern boolean eraseAllFlag;
 
-extern uint16_t calibrationBuffer;
-extern uint16_t  dacCalibrationNeg[8];
-extern uint16_t  dacCalibrationPos[8];
-extern uint16_t  adcCalibrationPos[4];
-extern uint16_t  adcCalibrationNeg[4];
-extern uint16_t  adcCalibrationOffset[4];
-extern uint16_t cvInputRaw[12];
-extern int8_t cvInputMapped[5];
-extern int16_t cvInputMapped1024[4];
-extern uint8_t	gateInputRose[9];
-extern uint8_t	gateInputRaw[9];
 
 extern uint8_t dacMap[8];
 extern uint8_t selectedText;
@@ -272,6 +245,5 @@ int intFloatTensOnes(int value);
 uint8_t getNote(uint8_t index);
 
 
-extern elapsedMicros debugTimer2;
 
 #endif

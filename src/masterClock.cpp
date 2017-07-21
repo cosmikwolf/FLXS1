@@ -1,12 +1,14 @@
 #include <Arduino.h>
 #include "MasterClock.h"
 
-void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl){
+void MasterClock::initialize(OutputController * outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, GlobalVariable* globalObj){
 	Serial.println("Initializing Master Clock");
 	this->sequenceArray = sequenceArray;
 	this->outputControl = outputControl;
 	this->serialMidi = serialMidi;
 	this->midiControl = midiControl;
+	this->globalObj = globalObj;
+
 	gatePrevState[0] = false;
 	gatePrevState[1] = false;
 	gatePrevState[2] = false;
@@ -20,9 +22,6 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
-  for (int i = 0; i < SEQUENCECOUNT; i++ ){
-    sequenceArray[i].setTempo(tempoX100);
-  }
 }
 
 void MasterClock::clockRunCheck(){
@@ -42,7 +41,7 @@ void MasterClock::masterClockFunc(){
   }
 
 	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
-	if (clockMode == INTERNAL_CLOCK){
+	if (globalObj->clockMode == INTERNAL_CLOCK){
 		if ((int)masterLoopTimer > kMasterClockInterval + 100){
 			uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
 			clockCounter = clockCounter + countToAdd;
@@ -78,7 +77,7 @@ void MasterClock::masterClockFunc(){
 			clockCounter = 0;
 			pulseTrigger = 1;
 		}
-	} else if(clockMode == EXTERNAL_MIDI_CLOCK){
+	} else if(globalObj->clockMode == EXTERNAL_MIDI_CLOCK){
     if ((int)masterLoopTimer > kMasterClockInterval + 100){
       uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
       lfoClockCounter += countToAdd;
@@ -103,7 +102,7 @@ void MasterClock::masterClockFunc(){
 void MasterClock::sequencerFunc(void){
 //	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
-	outputControl->inputRead();
+	//outputControl->inputRead();
 
 	if(currentMenu == CALIBRATION_MENU){
 		playing = 0;
@@ -130,7 +129,7 @@ void MasterClock::sequencerFunc(void){
 	//	midiControl->midiClockSyncFunc(serialMidi);
 
 
-	switch(clockMode){
+	switch(globalObj->clockMode){
     case INTERNAL_CLOCK:
 			internalClockTick();
     	break;
@@ -153,16 +152,13 @@ void MasterClock::sequencerFunc(void){
 			externalClockTick(4);
 			break;
   }
-
 	if(lfoTimer > 2){
 		for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->lfoUpdate(i);
 		}
 		lfoTimer = 0;
 	}
-
   wasPlaying = playing;
-
 //	digitalWriteFast(PIN_EXT_AD_2, LOW);
 
 }
@@ -188,7 +184,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 		if (!wasPlaying){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->allNotesOff(i);
-				sequenceArray[i].clockStart(startTime);
+				sequenceArray[i].clockStart();
 				//Serial.println("Starting sequence: " + String(i));
 			}
 		}
@@ -219,11 +215,10 @@ void MasterClock::internalClockTick(){
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
     masterPulseCount = 0;
-    startTime = 0;
 
     for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->allNotesOff(i);
-    	sequenceArray[i].clockStart(startTime);
+    	sequenceArray[i].clockStart();
     }
 
   //  Serial.println("Starting sequence - internal clock: ");

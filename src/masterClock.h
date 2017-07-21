@@ -2,6 +2,7 @@
 #include "OutputController.h"
 #include "Sequencer.h"
 #include "midiModule.h"
+#include "globalVariable.h"
 
 #include "global.h"
 #define INTERNAL_PPQ_COUNT 96
@@ -14,7 +15,7 @@
 class MasterClock {
 
 public:
-  void initialize(OutputController* outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl);
+  void initialize(OutputController* outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, GlobalVariable* globalObj);
   void changeTempo(uint32_t newTempoX100);
   void masterClockFunc();
   void sequencerFunc();
@@ -51,6 +52,8 @@ public:
 
 private:
   OutputController* outputControl;
+  GlobalVariable* globalObj;
+
   Sequencer *sequenceArray;
   midi::MidiInterface<HardwareSerial>* serialMidi;
   MidiModule *midiControl;

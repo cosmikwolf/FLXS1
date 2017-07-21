@@ -19,7 +19,7 @@
 class TimeController {
   public:
     TimeController();
-    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, Sequencer* sequencerArray, ADC *adc);
+    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, Sequencer* sequencerArray, ADC *adc,  GlobalVariable *globalObj);
 
     void runLoopHandler();
     void masterClockHandler();
@@ -30,7 +30,7 @@ class TimeController {
     void cacheWriteHandler();
 
   private:
-    GlobalVariable     globalObj;
+    GlobalVariable *globalObj;
     MasterClock clockMaster;
     OutputController outputControl;
     InputModule buttonIo;

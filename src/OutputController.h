@@ -65,6 +65,7 @@ public:
   bool    clockValue;
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
+
 private:
   Zetaohm_AD5676 ad5676;
   Zetaohm_MCP4352 mcp4352_1;

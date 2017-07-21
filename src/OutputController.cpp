@@ -178,6 +178,8 @@ void OutputController::dacTestLoop(){
       for (int i=0; i<8; i++){
         ad5676.setVoltage(dacMap[i], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
         ad5676.setVoltage(dacMap[i], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+        // ad5676.setVoltage(dacMap[i], map(16384, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+        // ad5676.setVoltage(dacMap[i], map(16384, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
       }
     break;
     case STATE_CALIB_INPUT1_HIGH:
@@ -186,7 +188,7 @@ void OutputController::dacTestLoop(){
     case STATE_CALIB_INPUT3_HIGH:
       for (int i=0; i<8; i++){
         ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
-        ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
+        ad5676.setVoltage(dacMap[i], map(-8912, -16384, 16384, dacCalibrationNeg[dacMap[i]], dacCalibrationPos[dacMap[i]] ) );
       }
     break;
 
@@ -195,10 +197,12 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[0], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
       ad5676.setVoltage(dacMap[0], map(-8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
     break;
+
     case STATE_CALIB_OUTPUT0_HIGH:
       ad5676.setVoltage(dacMap[0], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
       ad5676.setVoltage(dacMap[0], map(8192, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
     break;
+
     case STATE_CALIB_OUTPUT0_TEST:
   //    ad5676.setVoltage(dacMap[0], map(sinVal, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );
   //    ad5676.setVoltage(dacMap[0], map(sinVal, -16384, 16384, dacCalibrationNeg[dacMap[0]], dacCalibrationPos[dacMap[0]] ) );

@@ -311,7 +311,7 @@ void DisplayModule::channelEnvelopeMenuDisplay(char *buf) {
 void DisplayModule::channelTunerDisplay(char *buf){
   uint8_t previousHighlight = highlight;
   highlight = 4;
-  int freq1 = frequency;
+/*  int freq1 = frequency;
   int freq2 = trunc(frequency*100)-trunc(freq1*100);
   int prob1 = probability;
   int prob2 = trunc(probability*100)-trunc(prob1*100);
@@ -323,7 +323,7 @@ void DisplayModule::channelTunerDisplay(char *buf){
   displayElement[2] = strdup(buf);
   sprintf(buf, "PROB: %d.%02d", prob1, prob2);
   displayElement[3] = strdup(buf);
-
+*/
   renderOnce_StringBox(0, highlight, previousHighlight,  0,  0, 128, 16, false, 1,  background, foreground);
   renderOnce_StringBox(1, highlight, previousHighlight,  0,  16, 128, 16, false, 2,  background, foreground);
   renderOnce_StringBox(2, highlight, previousHighlight,  0,  32, 128, 16, false, 2,  background, foreground);
@@ -332,8 +332,10 @@ void DisplayModule::channelTunerDisplay(char *buf){
 }
 
 void DisplayModule::channelInputDisplay(char *buf){
+
   uint8_t previousHighlight = highlight;
   highlight = 4;
+  /*
   int freq1 = frequency;
   int freq2 = trunc(frequency*100)-trunc(freq1*100);
   int prob1 = probability;
@@ -346,7 +348,7 @@ void DisplayModule::channelInputDisplay(char *buf){
   displayElement[2] = strdup(buf);
   sprintf(buf, "PROB: %d.%02d", prob1, prob2);
   displayElement[3] = strdup(buf);
-
+*/
   renderOnce_StringBox(0, highlight, previousHighlight,  0,  0, 128, 16, false, 1,  background, foreground);
   renderOnce_StringBox(1, highlight, previousHighlight,  0,  16, 128, 16, false, 2,  background, foreground);
   renderOnce_StringBox(2, highlight, previousHighlight,  0,  32, 128, 16, false, 2,  background, foreground);

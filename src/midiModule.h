@@ -2,6 +2,7 @@
 #include <MIDI.h>
 #include "Sequencer.h"
 #include "global.h"
+#include "globalVariable.h"
 
 #ifndef _midiModule_h_
 #define _midiModule_h_
@@ -11,7 +12,7 @@
 
 class MidiModule {
 public:
-  void midiSetup(Sequencer *sequenceArray);
+  void midiSetup(Sequencer *sequenceArray, GlobalVariable* globalObj);
   void midiStopHandler();
   void midiNoteOffHandler(byte channel, byte note, byte velocity);
   void midiNoteOnHandler(byte channel, byte note, byte velocity);
@@ -25,5 +26,6 @@ private:
   elapsedMicros pulseTimer;
   boolean firstRun;
   Sequencer *sequenceArray;
+  GlobalVariable *globalObj;
 };
 #endif

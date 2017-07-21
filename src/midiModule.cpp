@@ -3,8 +3,9 @@
 #include "midiModule.h"
 
 
-void MidiModule::midiSetup( Sequencer *sequenceArray){ // backplane is for debug purposes only
+void MidiModule::midiSetup( Sequencer *sequenceArray, GlobalVariable* globalObj){ // backplane is for debug purposes only
   this->sequenceArray = sequenceArray;
+  this->globalObj = globalObj;
 //  this->noteData = noteData;
   beatPulseIndex = 0;
   firstRun = false;
@@ -12,13 +13,16 @@ void MidiModule::midiSetup( Sequencer *sequenceArray){ // backplane is for debug
 }
 
 void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi){
-  noInterrupts();
-  serialMidi->read();
-  interrupts();
+  //noInterrupts();
+  if( serialMidi->read() ){
+  //  Serial.println("1: " + String(serialMidi->getData1()));
+  //  Serial.println("2: " + String(serialMidi->getData2()));
+  }
+  //interrupts();
 }
 
 void MidiModule::midiStopHandler(){
-  if (clockMode == EXTERNAL_MIDI_CLOCK) {
+  if (globalObj->clockMode == EXTERNAL_MIDI_CLOCK) {
     Serial.println("Midi Stop");
     if (playing == 0){
       for (int i=0; i< SEQUENCECOUNT; i++){
@@ -42,14 +46,14 @@ void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
 }
 
 void MidiModule::midiStartContinueHandler(){
-  if (clockMode == EXTERNAL_MIDI_CLOCK) {
+  if (globalObj->clockMode == EXTERNAL_MIDI_CLOCK) {
     Serial.println("Midi Start / Continue");
     playing = 1;
   }
 }
 
 void MidiModule::midiClockPulseHandler(){
-  if (clockMode != EXTERNAL_MIDI_CLOCK) {
+  if (globalObj->clockMode != EXTERNAL_MIDI_CLOCK) {
     return; // no need to run clock pulse handler if using internal clock.
   }
 
@@ -59,5 +63,5 @@ void MidiModule::midiClockPulseHandler(){
     }
   }
 
-Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\ttempotimer: " + String(masterTempoTimer) + "\tbeatLength: " + String(beatLength) + "\tbeatPulseIndex: " + String(beatPulseIndex));
+  Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\tbeatLength: " + String(beatLength) + "\tbeatPulseIndex: " + String(beatPulseIndex));
 }

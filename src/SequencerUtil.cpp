@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "Sequencer.h"
 
-void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl){
+void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount,  OutputController* outputControl, GlobalVariable *globalObj){
 	// initialization routine that runs during setup
 	Serial.println("Initializing Sequencer Object");
 	this->channel = ch;
@@ -10,11 +10,10 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uin
 	this->beatCount = beatCount;
   this->clockDivision = 4;
   this->swingX100 = 50;
-	this->tempoX100 = tempoX100;
 	//this->beatLength = 60000000/(tempoX100/100);
-	this->calculateStepTimers();
 	this->monophonic = true;
 	this->outputControl = outputControl;
+	this->globalObj = globalObj;
 };
 
 
@@ -91,11 +90,6 @@ bool Sequencer::toggleMute(){
 
 };
 
-void Sequencer::setTempo(uint32_t tempoX100){
-	this->tempoX100 = tempoX100;
-	//beatLength = 60000000	/(tempoX100/100);
-	calculateStepTimers();
-}
 
 void Sequencer::setStepPitch(uint8_t step, uint8_t pitch, uint8_t index){
 	stepData[step].pitch[index] = pitch;
@@ -104,17 +98,12 @@ void Sequencer::setStepPitch(uint8_t step, uint8_t pitch, uint8_t index){
 
 void Sequencer::setGateLength(uint8_t step, uint8_t length){
 	stepData[step].gateLength = length;
-	calculateStepTimers();
 };
 
-void Sequencer::setStepCount(uint8_t stepCountNew){
-	//stepCount = stepCountNew;
-	calculateStepTimers();
-};
+
 
 void Sequencer::setBeatCount(uint16_t beatCountNew){
 	beatCount = beatCountNew;
-	calculateStepTimers();
 };
 
 void Sequencer::setGateType(uint8_t step, uint8_t gate){

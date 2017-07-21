@@ -312,7 +312,8 @@ void InputModule::loop(uint16_t frequency){
   if (inputTimer > frequency){
     inputTimer = 0;
     knobPrevious = knobRead;
-    knobRead = -1 * knob.read()/2  ;
+    knobRead = 1 * knob.read()/4  ;
+    //knobRead = -1 * knob.read()/2  ;
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 
@@ -559,7 +560,7 @@ void InputModule::tempoMenuHandler(){
         break;
 
         case STATE_EXTCLOCK:
-          clockMode = positive_modulo(clockMode + knobChange, 7);
+          globalObj->clockMode = positive_modulo(globalObj->clockMode + knobChange, 7);
         break;
 
         case STATE_RESETINPUT:
@@ -766,7 +767,6 @@ void InputModule::channelButtonShiftHandler(uint8_t channel){
 };
 
 void InputModule::channelButtonShiftMenuHandler(uint8_t channel){
-  selectedCalibrationChannel = channel;
   changeState(STATE_CALIB_INPUT0_OFFSET);
   Serial.println("CALIB MENU " + String(channel) + "\t" + String(CALIBRATION_MENU));
 }

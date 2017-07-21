@@ -2,6 +2,7 @@
 #include "OutputController.h"
 #include "StepDatum.h"
 #include "global.h"
+#include "globalVariable.h"
 
 #ifndef _Sequencer_h_
 #define _Sequencer_h_
@@ -15,7 +16,7 @@ class Sequencer
 		//Sequencer();
 
 	//	void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
-		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100, OutputController* outputControl);
+		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, OutputController* outputControl, GlobalVariable *globalObj);
 		void 		runSequence();
 		// Sequencing Modes
 		void 		sequenceModeStandardStep();
@@ -28,11 +29,10 @@ class Sequencer
 
     int32_t getFramesRemaining(uint8_t stepNum);
 
-		uint32_t 		calculateStepTimers();
 		uint32_t    framesPerSequence();
 		uint32_t   	getCurrentFrame();
 
-		void 		clockStart(elapsedMicros startTime);
+		void 		clockStart();
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
 		bool 		toggleMute();  //returns true if target was muted
@@ -48,14 +48,12 @@ class Sequencer
 
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
-		void 		setTempo(uint32_t tempoX100);
 		void 		setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
 		void 		setGateLength(uint8_t step, uint8_t length);
 		void 		setGateType(uint8_t step, uint8_t gate);
 		void 		setStepVelocity(uint8_t step, uint8_t velocity);
 		void 		setStepGlide(uint8_t step, uint8_t glideTime);
     void    setPlayRange(uint8_t first, uint8_t last);
-		void 		setStepCount(uint8_t stepCountNew);
 		void 		setBeatCount(uint16_t beatCountNew);
 
 		void 		gateInputTrigger(uint8_t inputNum);
@@ -74,7 +72,6 @@ class Sequencer
       } else {
         return clockDivision;
       }
-
     }
 
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
@@ -144,10 +141,11 @@ class Sequencer
 		uint32_t	framesPerPulse;
 		uint32_t	clockSinceLastPulse;
 		uint32_t 	avgClocksPerPulse;
-		uint32_t 	tempoX100;
 
 		elapsedMicros pulseTimer;
 		OutputController* outputControl;
+		GlobalVariable *globalObj;
+
 };
 
 
