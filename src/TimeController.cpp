@@ -29,7 +29,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	clockMaster.initialize(&outputControl, sequencerArray, serialMidi, midiControl, globalObj);
 
-	saveFile.initialize(&outputControl, sequencerArray, &SerialFlash, adc);
+	saveFile.initialize(&outputControl, sequencerArray, &SerialFlash, adc, globalObj);
 
 	if(eraseAllFlag){
     Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
@@ -108,9 +108,9 @@ void TimeController::runLoopHandler() {
  	buttonIo.loop(INPUT_INTERVAL);
 
 	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch){
-		// digitalWriteFast(DEBUG_PIN, HIGH);
+		// digitalWriteFast(PIN_EXT_TX, HIGH);
 		saveFile.cacheWriteLoop();
-		// digitalWriteFast(DEBUG_PIN, LOW);
+		// digitalWriteFast(PIN_EXT_TX, LOW);
 		cacheWriteTimer=0;
 	}
 	// digitalWriteFast(PIN_EXT_RX, LOW);

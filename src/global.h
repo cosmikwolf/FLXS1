@@ -19,7 +19,7 @@
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 115200
-#define kMasterClockInterval 500
+#define kMasterClockInterval 460
 #define kLedClockInterval 30000
 #define kSequenceTimerInterval 600
 #define kPeripheralLoopTimer 15000
@@ -73,9 +73,13 @@
 #define MODAL_ERASEARMED       13
 #define MODAL_ERASED           14
 
-#define DEBUG_PIN				    	 31
+#define PIN_EXT_TX				    	 31
 #define PIN_EXT_AD_1   27
 #define PIN_EXT_AD_2   30
+#define PIN_EXT_AD_3   28
+#define PIN_EXT_AD_4   29
+#define PIN_EXT_AD_5   15
+#define PIN_EXT_AD_6   32
 #define PIN_EXT_RX     26
 #define CLOCK_PIN				    	  23
 

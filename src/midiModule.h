@@ -21,7 +21,6 @@ public:
   void midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi);
 private:
 
-  uint8_t beatPulseIndex; //keeps track of which midi clock pulse the beat comes on.
   int avgPulseTimer;
   elapsedMicros pulseTimer;
   boolean firstRun;

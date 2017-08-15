@@ -40,11 +40,6 @@ elapsedMillis modalTimer;
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
 
-uint16_t  cvInputRaw[12];
-int8_t    cvInputMapped[5];
-int16_t   cvInputMapped1024[4];
-uint8_t		gateInputRaw[9];
-uint8_t   gateInputRose[9];
 
 //multi select variables;
 

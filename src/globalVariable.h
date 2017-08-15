@@ -47,6 +47,8 @@ class GlobalVariable {
     uint8_t    multi_lfoSpeed;
 
     uint8_t   clockMode;
+    int8_t  cvInputMapped[14];
+    int16_t cvInputMapped1024[5];
 
     uint16_t  calibrationBuffer;
     uint16_t  dacCalibrationNeg[8];
@@ -55,57 +57,16 @@ class GlobalVariable {
     uint16_t  adcCalibrationNeg[4];
     uint16_t  adcCalibrationOffset[4];
     uint16_t cvInputRaw[12];
-    int8_t  cvInputMapped[5];
-    int16_t cvInputMapped1024[4];
     uint8_t	gateInputRose[9];
     uint8_t	gateInputRaw[9];
 
+    uint32_t tapTempoClockValues[4];
+    uint8_t tapTempoCount;
+    uint32_t tempoMasterClkCounter;
 
     uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
 
-    void initialize(){
-      this->clockMode = INTERNAL_CLOCK;
-
-      this->multi_pitch_switch = 0;
-      this->multi_chord_switch = 0;
-      this->multi_gateType_switch = 0;
-      this->multi_gateLength_switch = 0;
-      this->multi_arpType_switch = 0;
-      this->multi_arpOctave_switch = 0;
-      this->multi_arpSpdNum_switch = 0;
-      this->multi_arpSpdDen_switch = 0;
-      this->multi_glide_switch = 0;
-      this->multi_beatDiv_switch = 0;
-      this->multi_velocity_switch = 0;
-      this->multi_velocityType_switch = 0;
-      this->multi_lfoSpeed_switch = 0;
-      this->multi_pitch = 0;
-      this->multi_chord = 0;
-      this->multi_gateType = 0;
-      this->multi_gateLength = 0;
-      this->multi_arpType = 0;
-      this->multi_arpOctave = 0;
-      this->multi_arpSpdNum = 0;
-      this->multi_arpSpdDen = 0;
-      this->multi_glide = 0;
-      this->multi_beatDiv = 0;
-      this->multi_velocity = 0;
-      this->multi_velocityType = 0;
-      this->multi_lfoSpeed = 0;
-       for(int i = 0; i < 64; i++){
-           this->multiSelection[i]=false;
-       }
-
-
-       this->calibrationBuffer = 0;
-
-       for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 1650; };
-       for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 64350; };
-       for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 850; };
-       for(int i=0; i<4; i++){ this->adcCalibrationNeg[i]= 65300; };
-       for(int i=0; i<4; i++){ this->adcCalibrationOffset[i]= 33237; };
-
-    }
+    void initialize();
 };
 
 #endif

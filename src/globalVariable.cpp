@@ -1,6 +1,51 @@
 #include <Arduino.h>
 #include "globalVariable.h"
 
+void GlobalVariable::initialize(){
+    this->clockMode = INTERNAL_CLOCK;
+  //    this->clockMode = EXTERNAL_MIDI_CLOCK;
+
+      this->multi_pitch_switch = 0;
+      this->multi_chord_switch = 0;
+      this->multi_gateType_switch = 0;
+      this->multi_gateLength_switch = 0;
+      this->multi_arpType_switch = 0;
+      this->multi_arpOctave_switch = 0;
+      this->multi_arpSpdNum_switch = 0;
+      this->multi_arpSpdDen_switch = 0;
+      this->multi_glide_switch = 0;
+      this->multi_beatDiv_switch = 0;
+      this->multi_velocity_switch = 0;
+      this->multi_velocityType_switch = 0;
+      this->multi_lfoSpeed_switch = 0;
+      this->multi_pitch = 0;
+      this->multi_chord = 0;
+      this->multi_gateType = 0;
+      this->multi_gateLength = 0;
+      this->multi_arpType = 0;
+      this->multi_arpOctave = 0;
+      this->multi_arpSpdNum = 0;
+      this->multi_arpSpdDen = 0;
+      this->multi_glide = 0;
+      this->multi_beatDiv = 0;
+      this->multi_velocity = 0;
+      this->multi_velocityType = 0;
+      this->multi_lfoSpeed = 0;
+       for(int i = 0; i < 64; i++){
+           this->multiSelection[i]=false;
+       }
+
+
+       this->calibrationBuffer = 0;
+
+       for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 1650; };
+       for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 64350; };
+       for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 850; };
+       for(int i=0; i<4; i++){ this->adcCalibrationNeg[i]= 65300; };
+       for(int i=0; i<4; i++){ this->adcCalibrationOffset[i]= 33237; };
+
+    }
+
 uint8_t GlobalVariable::quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction){
 
 	uint8_t count = 0;

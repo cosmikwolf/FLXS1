@@ -10,6 +10,7 @@
 #include <string>
 #include <ADC.h>
 #include <MD5.h>
+#include "globalVariable.h"
 
 #define FILE_EXISTS              0
 #define SAVEFILE_DOES_NOT_EXIST  1
@@ -41,7 +42,7 @@ public:
   void changePattern(uint8_t pattern, uint8_t channelSelector, boolean instant);
   void savePattern(uint8_t channelSelector, uint8_t *destinationArray);
 
-  void initialize(OutputController* outputControl, Sequencer *sequenceArray,  SerialFlashChip *spiFlash, ADC *adc);
+  void initialize(OutputController* outputControl, Sequencer *sequenceArray,  SerialFlashChip *spiFlash, ADC *adc, GlobalVariable *globalObj);
   void eraseSaveFile();
   void formatChip();
 
@@ -96,7 +97,7 @@ private:
 
   elapsedMicros cacheWriteTimer;
   elapsedMicros cacheWriteTotalTimer;
-
+  GlobalVariable *globalObj;
   Sequencer *sequenceArray;
   SerialFlashFile file;
   SerialFlashChip *spiFlash;

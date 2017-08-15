@@ -130,9 +130,11 @@ void LEDArray::loop(uint16_t interval){
         }
       break;
     }
-    digitalWriteFast(PIN_EXT_RX, HIGH);
+    //digitalWriteFast(PIN_EXT_RX, HIGH);
+    digitalWriteFast(PIN_EXT_AD_4, HIGH);
     leds.show();
-    digitalWriteFast(PIN_EXT_RX, LOW);
+    digitalWriteFast(PIN_EXT_AD_4, LOW);
+    //digitalWriteFast(PIN_EXT_RX, LOW);
 
   }
 }

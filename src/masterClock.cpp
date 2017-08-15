@@ -8,13 +8,12 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 	this->serialMidi = serialMidi;
 	this->midiControl = midiControl;
 	this->globalObj = globalObj;
-
+	this->displayRunSwitch = true;
 	gatePrevState[0] = false;
 	gatePrevState[1] = false;
 	gatePrevState[2] = false;
 	gatePrevState[3] = false;
-	clickCounter = 0;
-	firstRun = false;
+	this->totalClockCount = 0;
 	Serial.println("Master Clock Initialized");
 	lfoTimer = 0;
 };
@@ -22,6 +21,9 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
+	clockCounter = 0;
+	totalClockCount = 0;
+
 }
 
 void MasterClock::clockRunCheck(){
@@ -35,6 +37,7 @@ void MasterClock::masterClockFunc(){
 	//	Serial.println(String((int)masterLoopTimer));
 	//  masterLooptimeMin
 	//  masterLooptimeMax
+	digitalWriteFast(PIN_EXT_TX, HIGH);
 
 	for (int i = 0; i < SEQUENCECOUNT; i++ ){
     sequenceArray[i].masterClockPulse();
@@ -42,16 +45,21 @@ void MasterClock::masterClockFunc(){
 
 	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	if (globalObj->clockMode == INTERNAL_CLOCK){
-		if ((int)masterLoopTimer > kMasterClockInterval + 100){
-			uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
+
+		if ((int)masterLoopTimer > 2 * kMasterClockInterval){
+			// a subroutine to add clock counts when the masterLoopTimer was skipped
+			// maybe should be 2xmasterclockINterval instead?
+			digitalWriteFast(PIN_EXT_AD_4, HIGH);
+
+			uint8_t countToAdd = masterLoopTimer / kMasterClockInterval;
 			clockCounter = clockCounter + countToAdd;
+			globalObj->tempoMasterClkCounter += countToAdd;
 			lfoClockCounter += countToAdd;
-			//Serial.println("Adding " + String((int)masterLoopTimer / kMasterClockInterval) + " counts to the clock: " + String((int)masterLoopTimer) );
-		//	for(int i=0;  i< countToAdd; i++){
-		//		digitalWriteFast(PIN_EXT_AD_2, LOW);delayMicroseconds(10);
-		//		digitalWriteFast(PIN_EXT_AD_2, HIGH);delayMicroseconds(10);
-		//	}
+			Serial.println("Adding " + String(countToAdd) + " counts to the clock: " + String(masterLoopTimer) + "\tinterval: " + String(kMasterClockInterval) + "\tclockCounter: " + String(clockCounter));
+			digitalWriteFast(PIN_EXT_AD_4, LOW);
+
 		} else {
+			globalObj->tempoMasterClkCounter++;
 			clockCounter++;
 			lfoClockCounter++;
 		}
@@ -64,19 +72,30 @@ void MasterClock::masterClockFunc(){
       displayRunSwitch = true;
     }
 
-		if (clockCounter * kMasterClockInterval >  clockPeriod){
+		if (clockCounter * kMasterClockInterval - totalClockCount*clockPeriod >  clockPeriod){
+			// THIS IS WHERE THE CLOCK PROBLEM IS
+			// IT REDUCES EACH CLOCK COUNT TO A MULTIPLE OF CLOCK INTERVAL,
+			// SO EACH CLOCK COUNT ADDS AN OFFSET, WHICH ACCUMULATES.
 			extClockCounter++;
 
 			if( extClockCounter >= EXTCLOCKDIV && playing){
 				outputControl->setClockOutput(HIGH);
+				digitalWriteFast(PIN_EXT_AD_3, HIGH);
 				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
-				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval));
+				Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval));
 				masterDebugTimer = 0;
+								digitalWriteFast(PIN_EXT_AD_3, LOW);
 			}
-			clockCounter = 0;
+			//
+			totalClockCount++;
+			if(totalClockCount > kMasterClockInterval){
+				clockCounter = 0;
+				totalClockCount = 0;
+			}
 			pulseTrigger = 1;
 		}
+
 	} else if(globalObj->clockMode == EXTERNAL_MIDI_CLOCK){
     if ((int)masterLoopTimer > kMasterClockInterval + 100){
       uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
@@ -96,13 +115,14 @@ void MasterClock::masterClockFunc(){
 
 	// digitalWriteFast(PIN_EXT_AD_2, LOW);
   // masterLooptimeAvg
+	digitalWriteFast(PIN_EXT_TX, LOW);
 
 };
 
 void MasterClock::sequencerFunc(void){
 //	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
-	//outputControl->inputRead();
+	outputControl->inputRead();
 
 	if(currentMenu == CALIBRATION_MENU){
 		playing = 0;
@@ -112,12 +132,12 @@ void MasterClock::sequencerFunc(void){
 
 	for(int i=0; i < 8; i++){
 		for(int n=0; n<4; n++){
-			if (gateInputRose[i] == true){
+			if (globalObj->gateInputRose[i] == true){
 				sequenceArray[n].gateInputTrigger(i+1); // add one to accomodate for mapping
 			}
 		}
 	}
-	//	outputControl->setClockOutput(gateInputRaw[0]);
+	//	outputControl->setClockOutput(globalObj->gateInputRaw[0]);
 	//  avgInterval =((micros() - lastMicros) + 9* avgInterval) / 10;
 	//  timerAvg = (lastTimer + 9*timerAvg) /10;
 	//  lastMicros = micros();
@@ -168,12 +188,12 @@ bool MasterClock::gateTrigger(uint8_t gateNum){
 
 void MasterClock::checkGateClock(){
 	for (int i =0; i <9; i++){
-		if (gateInputRaw[i] == 1 && gatePrevState[i] == 0 ){
+		if (globalObj->gateInputRaw[i] == 1 && gatePrevState[i] == 0 ){
 			gateTrig[i] = true;
 		} else {
 			gateTrig[i] = false;
 		};
-		gatePrevState[i] = gateInputRaw[i];
+		gatePrevState[i] = globalObj->gateInputRaw[i];
 	}
 }
 
@@ -205,7 +225,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 }
 
 void MasterClock::internalClockTick(){
- //digitalWriteFast(DEBUG_PIN, HIGH);
+ //digitalWriteFast(PIN_EXT_TX, HIGH);
  //Serial.println("begin internal clock tick");
         // int clock
 
@@ -242,7 +262,7 @@ void MasterClock::internalClockTick(){
 
 //Serial.println("end internal clock tick");
 
-  //digitalWriteFast(DEBUG_PIN, LOW);
+  //digitalWriteFast(PIN_EXT_TX, LOW);
 }
 
 void MasterClock::midiClockTick(){

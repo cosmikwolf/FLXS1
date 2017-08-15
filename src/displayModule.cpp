@@ -811,7 +811,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
     displayElement[2] = strdup(buf);
     displayElement[3] = strdup("type:");
-    char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
+    char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square","LFO SawUp","LFO SawDn","LFO S+H" };
     displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
     displayElement[5] = strdup("LFO spd:");
 
@@ -821,10 +821,10 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
 
-    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
+    renderStringBox(3,  DISPLAY_LABEL,        0, 20,40,17, false, STYLE1X, background , foreground);
+    renderStringBox(4,  STATE_VELOCITYTYPE,   40, 20,56,17, false, STYLE1X, background , foreground);
+    renderStringBox(1,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+    renderStringBox(2,  STATE_VELOCITY, 50, 37,78,17, false, STYLE1X, background , foreground);
 
     renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
     renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
@@ -855,7 +855,8 @@ void DisplayModule::stateDisplay_arp(char *buf){
       }
 
       displayElement[3] = strdup("type:");
-      char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
+//    char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
+      char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square","LFO SawUp","LFO SawDn","LFO S+H" };
 
 
        if(globalObj->multi_velocityType_switch){
@@ -877,10 +878,10 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
    renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
 
-   renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_VELOCITY,     60, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(3,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_VELOCITYTYPE, 50, 37,78,17, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_VELOCITYTYPE,     60, 20,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(1,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_VELOCITY, 50, 37,78,17, false, STYLE1X, background , foreground);
 
    renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
    renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
@@ -1419,40 +1420,40 @@ void DisplayModule::modalPopup(){
    displayElement[0] = strdup(buf);
 
 
-   sprintf(buf, "CV IN 1: %d %d.%02dv %d", cvInputMapped[0],    intFloatHundreds(cvInputMapped1024[0]*500/1024),    intFloatTensOnes(cvInputMapped1024[0]*500/1024), cvInputMapped1024[0] );
+   sprintf(buf, "CV IN 1: %d %d.%02dv %d", globalObj->cvInputMapped[0],    intFloatHundreds(globalObj->cvInputMapped1024[0]*500/1024),    intFloatTensOnes(globalObj->cvInputMapped1024[0]*500/1024), globalObj->cvInputMapped1024[0] );
    displayElement[1] = strdup(buf);
-   sprintf(buf, "O:%d", adcCalibrationOffset[0]);
+   sprintf(buf, "O:%d", globalObj->adcCalibrationOffset[0]);
    displayElement[2] = strdup(buf);
-   sprintf(buf, "L:%d", adcCalibrationPos[0]);
+   sprintf(buf, "L:%d", globalObj->adcCalibrationPos[0]);
    displayElement[3] = strdup(buf);
-   sprintf(buf, "H:%d", adcCalibrationNeg[0]);
+   sprintf(buf, "H:%d", globalObj->adcCalibrationNeg[0]);
    displayElement[4] = strdup(buf);
 
-   sprintf(buf, "CV IN 2: %d %d.%02dv %d", cvInputMapped[1],    intFloatHundreds(cvInputMapped1024[1]*500/1024),    intFloatTensOnes(cvInputMapped1024[1]*500/1024), cvInputMapped1024[1] );
+   sprintf(buf, "CV IN 2: %d %d.%02dv %d", globalObj->cvInputMapped[1],    intFloatHundreds(globalObj->cvInputMapped1024[1]*500/1024),    intFloatTensOnes(globalObj->cvInputMapped1024[1]*500/1024), globalObj->cvInputMapped1024[1] );
    displayElement[5] = strdup(buf);
-   sprintf(buf, "O:%d", adcCalibrationOffset[1]);
+   sprintf(buf, "O:%d", globalObj->adcCalibrationOffset[1]);
    displayElement[6] = strdup(buf);
-   sprintf(buf, "L: %d", adcCalibrationPos[1]);
+   sprintf(buf, "L: %d", globalObj->adcCalibrationPos[1]);
    displayElement[7] = strdup(buf);
-   sprintf(buf, "H: %d", adcCalibrationNeg[1]);
+   sprintf(buf, "H: %d", globalObj->adcCalibrationNeg[1]);
    displayElement[8] = strdup(buf);
 
-   sprintf(buf, "CV IN 3: %d %d.%02dv %d", cvInputMapped[2],    intFloatHundreds(cvInputMapped1024[2]*500/1024),    intFloatTensOnes(cvInputMapped1024[2]*500/1024), cvInputMapped1024[2] );
+   sprintf(buf, "CV IN 3: %d %d.%02dv %d", globalObj->cvInputMapped[2],    intFloatHundreds(globalObj->cvInputMapped1024[2]*500/1024),    intFloatTensOnes(globalObj->cvInputMapped1024[2]*500/1024), globalObj->cvInputMapped1024[2] );
    displayElement[9] = strdup(buf);
-   sprintf(buf, "O:%d", adcCalibrationOffset[2]);
+   sprintf(buf, "O:%d", globalObj->adcCalibrationOffset[2]);
    displayElement[10] = strdup(buf);
-   sprintf(buf, "L: %d", adcCalibrationPos[2]);
+   sprintf(buf, "L: %d", globalObj->adcCalibrationPos[2]);
    displayElement[11] = strdup(buf);
-   sprintf(buf, "H: %d", adcCalibrationNeg[2]);
+   sprintf(buf, "H: %d", globalObj->adcCalibrationNeg[2]);
    displayElement[12] = strdup(buf);
 
-   sprintf(buf, "CV IN 4: %d %d.%02dv %d", cvInputMapped[3],    intFloatHundreds(cvInputMapped1024[3]*500/1024),    intFloatTensOnes(cvInputMapped1024[3]*500/1024), cvInputMapped1024[3] );
+   sprintf(buf, "CV IN 4: %d %d.%02dv %d", globalObj->cvInputMapped[3],    intFloatHundreds(globalObj->cvInputMapped1024[3]*500/1024),    intFloatTensOnes(globalObj->cvInputMapped1024[3]*500/1024), globalObj->cvInputMapped1024[3] );
    displayElement[13] = strdup(buf);
-   sprintf(buf, "O:%d", adcCalibrationOffset[3]);
+   sprintf(buf, "O:%d", globalObj->adcCalibrationOffset[3]);
    displayElement[14] = strdup(buf);
-   sprintf(buf, "L: %d", adcCalibrationPos[3]);
+   sprintf(buf, "L: %d", globalObj->adcCalibrationPos[3]);
    displayElement[15] = strdup(buf);
-   sprintf(buf, "H: %d", adcCalibrationNeg[3]);
+   sprintf(buf, "H: %d", globalObj->adcCalibrationNeg[3]);
    displayElement[16] = strdup(buf);
 
 
@@ -1492,58 +1493,58 @@ void DisplayModule::modalPopup(){
    displayElement[0] = strdup(buf);
 
 
-   sprintf(buf, "CV1A -5v:%d", dacCalibrationNeg[dacMap[0]]);
+   sprintf(buf, "CV1A -5v:%d", globalObj->dacCalibrationNeg[dacMap[0]]);
    displayElement[1] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[0]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[0]]);
    displayElement[2] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[3] = strdup(buf);
 
-   sprintf(buf, "CV1B -5v:%d", dacCalibrationNeg[dacMap[1]]);
+   sprintf(buf, "CV1B -5v:%d", globalObj->dacCalibrationNeg[dacMap[1]]);
    displayElement[4] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[1]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[1]]);
    displayElement[5] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[6] = strdup(buf);
 
-   sprintf(buf, "CV2A -5v:%d", dacCalibrationNeg[dacMap[2]]);
+   sprintf(buf, "CV2A -5v:%d", globalObj->dacCalibrationNeg[dacMap[2]]);
    displayElement[7] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[2]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[2]]);
    displayElement[8] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[9] = strdup(buf);
 
-   sprintf(buf, "CV2B -5v:%d", dacCalibrationNeg[dacMap[3]]);
+   sprintf(buf, "CV2B -5v:%d", globalObj->dacCalibrationNeg[dacMap[3]]);
    displayElement[10] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[3]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[3]]);
    displayElement[11] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[12] = strdup(buf);
 
-   sprintf(buf, "CV3A -5v:%d", dacCalibrationNeg[dacMap[4]]);
+   sprintf(buf, "CV3A -5v:%d", globalObj->dacCalibrationNeg[dacMap[4]]);
    displayElement[13] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[4]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[4]]);
    displayElement[14] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[15] = strdup(buf);
 
-   sprintf(buf, "CV3B -5v:%d", dacCalibrationNeg[dacMap[5]]);
+   sprintf(buf, "CV3B -5v:%d", globalObj->dacCalibrationNeg[dacMap[5]]);
    displayElement[16] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[5]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[5]]);
    displayElement[17] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[18] = strdup(buf);
 
-   sprintf(buf, "CV4A -5v:%d", dacCalibrationNeg[dacMap[6]]);
+   sprintf(buf, "CV4A -5v:%d", globalObj->dacCalibrationNeg[dacMap[6]]);
    displayElement[19] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[6]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[6]]);
    displayElement[20] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[21] = strdup(buf);
 
-   sprintf(buf, "CV4B -5v:%d", dacCalibrationNeg[dacMap[7]]);
+   sprintf(buf, "CV4B -5v:%d", globalObj->dacCalibrationNeg[dacMap[7]]);
    displayElement[22] = strdup(buf);
-   sprintf(buf, "+5v :%d", dacCalibrationPos[dacMap[7]]);
+   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[7]]);
    displayElement[23] = strdup(buf);
    sprintf(buf, "0v");
    displayElement[24] = strdup(buf);

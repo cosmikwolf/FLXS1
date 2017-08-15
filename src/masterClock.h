@@ -32,19 +32,18 @@ public:
   bool gateTrig[9];
   bool gatePrevState[9];
   elapsedMicros pulseTimer;
+  uint32_t totalClockCount;
   uint32_t clockCounter;
   uint32_t extClockCounter;
 
-  uint32_t masterLooptimeMin;
+  uint32_t masterFrameCount;
+
   uint32_t masterLooptimeMax;
   uint32_t masterLooptimeAvg;
   elapsedMicros masterLoopTimer;
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
   boolean displayRunSwitch;
-  uint8_t beatPulseIndex;
-  uint8_t clickCounter;
-  boolean firstRun;
 
   uint8_t gateMap[4];
   uint8_t dacCvMap[4];

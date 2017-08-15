@@ -317,6 +317,41 @@ void InputModule::loop(uint16_t frequency){
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 
+    if (midplaneGPIO->fell(SW_SHIFT)){
+      //tap tempo
+      if (globalObj->tapTempoCount == 0){
+        globalObj->tempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
+        for(int i = 0; i<4; i++){
+          globalObj->tapTempoClockValues[i] = 0;
+        }
+      } else {
+        globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tempoMasterClkCounter;
+        globalObj->tempoMasterClkCounter = 0;
+      };
+      globalObj->tapTempoCount++;
+
+      if(globalObj->tapTempoCount > 4){
+        uint32_t tempTempo = 0;
+        for(int i = 0; i<4; i++){
+          tempTempo += globalObj->tapTempoClockValues[i] * kMasterClockInterval;
+        }
+
+        tempoX100 = 6000000000/(tempTempo/4);
+        clockMaster->changeTempo(tempoX100);
+        Serial.println("Setting tap tempo to: " + String(tempoX100) + "\ttempTempo: " + String(tempTempo));
+      }
+    } else {
+      if(globalObj->tapTempoCount){
+        if (globalObj->tempoMasterClkCounter > 1000000/kMasterClockInterval){
+          Serial.println("Resetting tap tempo : prev count: " + String(globalObj->tapTempoCount));
+          globalObj->tapTempoCount = 0;
+        }
+      }
+    }
+
+
+
+
     if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) ){
       changeState(STATE_CALIBRATION);
     }
@@ -1313,89 +1348,89 @@ void InputModule::calibrationMenuHandler(){
     } else {
       switch (stepMode){
         case STATE_CALIB_INPUT0_LOW:
-          adcCalibrationPos[0] += knobChange;
+          globalObj->adcCalibrationPos[0] += knobChange;
         break;
         case STATE_CALIB_INPUT0_HIGH:
-          adcCalibrationNeg[0] += knobChange;
+          globalObj->adcCalibrationNeg[0] += knobChange;
         break;
 
         case STATE_CALIB_INPUT0_OFFSET:
-          adcCalibrationOffset[0] += knobChange;
+          globalObj->adcCalibrationOffset[0] += knobChange;
         break;
         case STATE_CALIB_INPUT1_OFFSET:
-          adcCalibrationOffset[1] += knobChange;
+          globalObj->adcCalibrationOffset[1] += knobChange;
         break;
         case STATE_CALIB_INPUT2_OFFSET:
-          adcCalibrationOffset[2] += knobChange;
+          globalObj->adcCalibrationOffset[2] += knobChange;
         break;
         case STATE_CALIB_INPUT3_OFFSET:
-          adcCalibrationOffset[3] += knobChange;
+          globalObj->adcCalibrationOffset[3] += knobChange;
         break;
         case STATE_CALIB_INPUT1_LOW:
-          adcCalibrationPos[1] += knobChange;
+          globalObj->adcCalibrationPos[1] += knobChange;
         break;
         case STATE_CALIB_INPUT1_HIGH:
-          adcCalibrationNeg[1] += knobChange;
+          globalObj->adcCalibrationNeg[1] += knobChange;
         break;
         case STATE_CALIB_INPUT2_LOW:
-          adcCalibrationPos[2] += knobChange;
+          globalObj->adcCalibrationPos[2] += knobChange;
         break;
         case STATE_CALIB_INPUT2_HIGH:
-          adcCalibrationNeg[2] += knobChange;
+          globalObj->adcCalibrationNeg[2] += knobChange;
         break;
         case STATE_CALIB_INPUT3_LOW:
-          adcCalibrationPos[3] += knobChange;
+          globalObj->adcCalibrationPos[3] += knobChange;
         break;
         case STATE_CALIB_INPUT3_HIGH:
-          adcCalibrationNeg[3] += knobChange;
+          globalObj->adcCalibrationNeg[3] += knobChange;
         break;
         case STATE_CALIB_OUTPUT0_LOW:
-          dacCalibrationNeg[dacMap[0]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[0]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT0_HIGH:
-          dacCalibrationPos[dacMap[0]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[0]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT1_LOW:
-          dacCalibrationNeg[dacMap[1]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[1]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT1_HIGH:
-          dacCalibrationPos[dacMap[1]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[1]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT2_LOW:
-          dacCalibrationNeg[dacMap[2]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[2]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT2_HIGH:
-          dacCalibrationPos[dacMap[2]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[2]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT3_LOW:
-          dacCalibrationNeg[dacMap[3]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[3]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT3_HIGH:
-          dacCalibrationPos[dacMap[3]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[3]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT4_LOW:
-          dacCalibrationNeg[dacMap[4]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[4]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT4_HIGH:
-          dacCalibrationPos[dacMap[4]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[4]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT5_LOW:
-          dacCalibrationNeg[dacMap[5]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[5]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT5_HIGH:
-          dacCalibrationPos[dacMap[5]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[5]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT6_LOW:
-          dacCalibrationNeg[dacMap[6]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[6]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT6_HIGH:
-          dacCalibrationPos[dacMap[6]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[6]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT7_LOW:
-          dacCalibrationNeg[dacMap[7]] += knobChange;
+          globalObj->dacCalibrationNeg[dacMap[7]] += knobChange;
         break;
         case STATE_CALIB_OUTPUT7_HIGH:
-          dacCalibrationPos[dacMap[7]] += knobChange;
+          globalObj->dacCalibrationPos[dacMap[7]] += knobChange;
         break;
       }
     }

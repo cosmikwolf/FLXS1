@@ -36,14 +36,18 @@ IntervalTimer SequencerTimer;
 
 MidiModule midiControl;
 
-AudioInputAnalog              audio_adc(A14);
-AudioAnalyzeNoteFrequency     notefreq;
-AudioConnection               patchCord0(audio_adc, 0 , notefreq, 0);
+ADC *adc = new ADC(); // adc object
+
+AudioInputAnalog              adc0(A14);
+AudioAnalyzeNoteFrequency notefreq;
+
+////      fft1024;        //xy=467,147
+AudioConnection               patchCord1(adc0 , notefreq);
+
 elapsedMillis noteFreqTimer;
 
 GlobalVariable globalObj;
 
-ADC *adc = new ADC(); // adc object
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
@@ -52,8 +56,10 @@ void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
 //  while (!Serial) ; // wait for serial monitor window to open
-  //AudioMemory(25);
-//  notefreq.begin(.15);
+  AudioMemory(24);
+  notefreq.begin(.15);
+
+
   delay(500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
@@ -65,10 +71,11 @@ void setup() {
 
   pinMode(7, INPUT);  //MIDI SERIAL PIN CONFIG
   pinMode(8, OUTPUT); //MIDI SERIAL PIN CONFIG
-
+  Serial3.begin(31250);
+  Serial3.clear();
   Serial3.setTX(8);
   Serial3.setRX(7);
-
+  delay(500);
   serialMidi.begin(MIDI_CHANNEL_OMNI);
 
   globalObj.initialize();
@@ -102,7 +109,7 @@ void setup() {
 
 
   LEDClockTimer.begin(LEDLoop,kLedClockInterval);
-  LEDClockTimer.priority(1);
+  LEDClockTimer.priority(2);
 
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
   MasterClockTimer.priority(0);
@@ -111,7 +118,7 @@ void setup() {
 //  DisplayLoopTimer.priority(3);
 
   SequencerTimer.begin(sequencerLoop,kSequenceTimerInterval);
-  SequencerTimer.priority(2);
+  SequencerTimer.priority(4);
 
   //SPI.usingInterrupt(PeripheralLoopTimer);
   SPI.usingInterrupt(SequencerTimer);
@@ -127,23 +134,35 @@ void setup() {
   //CacheTimer.priority(2);
 
 
-  pinMode(31, OUTPUT); // debug pin - EXT_TX - exp pin 5
+
+
+  pinMode(PIN_EXT_TX, OUTPUT); // debug pin - EXT_TX - exp pin 5
+  pinMode(PIN_EXT_AD_1, OUTPUT);
+  pinMode(PIN_EXT_AD_2, OUTPUT);
+  pinMode(PIN_EXT_AD_3, OUTPUT);
+  pinMode(PIN_EXT_AD_4, OUTPUT);
+  pinMode(PIN_EXT_AD_5, OUTPUT);
+  pinMode(PIN_EXT_AD_6, OUTPUT);
+  pinMode(PIN_EXT_RX, OUTPUT);
+
   pinMode(3, OUTPUT);
   pinMode(24,OUTPUT);
-  digitalWrite(3, LOW);
-  digitalWrite(24, LOW);
-  pinMode(1,OUTPUT);
-  digitalWrite(1, LOW);
+  //digitalWrite(3, HIGH);  //INPUT 1 for HIHG HIGH
+  //digitalWrite(24, HIGH);
+  //pinMode(1,OUTPUT);
+  //digitalWrite(1, LOW);
 
-  adc->enableInterrupts(ADC_0);
+  //adc->enableInterrupts(ADC_1);
   adc->setAveraging(8, ADC_1); // set number of averages
   adc->setResolution(16, ADC_1); // set bits of resolution
+  //adc->setAveraging(8, ADC_0); // set number of averages
+  //adc->setResolution(16, ADC_0); // set bits of resolution
 
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   // see the documentation for more information
-  adc->setConversionSpeed(ADC_HIGH_SPEED); // change the conversion speed
+  //adc->setConversionSpeed(ADC_VERY_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-  adc->setSamplingSpeed(ADC_VERY_LOW_SPEED); // change the sampling speed
+  adc->setSamplingSpeed(ADC_VERY_HIGH_SPEED); // change the sampling speed
   // CLOCK PIN SETUP
   pinMode(CLOCK_PIN, OUTPUT);
   digitalWrite(CLOCK_PIN, LOW);
@@ -151,10 +170,8 @@ void setup() {
   pinMode(A3, INPUT);
   pinMode(A12, INPUT);
   pinMode(A13, INPUT);
+  pinMode(A14, INPUT);
   pinMode(A10, INPUT);
-  pinMode(PIN_EXT_AD_1, OUTPUT);
-  pinMode(PIN_EXT_AD_2, OUTPUT);
-  pinMode(PIN_EXT_RX, OUTPUT);
 /* OctoSK6812 testing stuff
   pinMode(2, OUTPUT);  // strip #1
   pinMode(14, OUTPUT);  // strip #2
@@ -174,6 +191,21 @@ void setup() {
 //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
+  //
+  // for(int i =0; i<20; i++){
+  //   serialMidi.sendNoteOn(64+i, 127, 0);                                   // send midi note out
+  //   delay(200);
+  //   serialMidi.sendNoteOff(64+i,127, 0);
+  //   delay(100);
+  // }
+  // for(int i =0; i<20; i++){
+  //   serialMidi.sendNoteOn(64+i, 127, 1);                                   // send midi note out
+  //   delay(200);
+  //   serialMidi.sendNoteOff(64+i,127, 1);
+  //   delay(100);
+  // }
+
+
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
 //  Serial.println("TEST EQUATIONS");
@@ -207,6 +239,13 @@ void loop() {
 void loop() {
   timeControl.runLoopHandler();
 
+  //  if (notefreq.available() && millis()%100) {
+  //   int note = notefreq.read()*100;
+  //   int prob = notefreq.probability()*100;
+  //   Serial.printf("Note: %d | Probability: %d", note, prob);
+  //   Serial.println("");
+  // }
+
 };
 
 void usbNoteOff(){
@@ -228,6 +267,15 @@ void sequencerLoop(){
   usbMIDI.read();
   timeControl.midiClockHandler();
   timeControl.sequencerHandler();
+  // if (Serial3.available() > 0) {
+	// 	int incomingByte = Serial3.read();
+	// 	Serial.print("UART received: ");
+	// 	Serial.println(incomingByte, DEC);
+  //    incomingByte = Serial3.read();
+  //   Serial.println(incomingByte, DEC);
+  //
+	// }
+
 }
 
 void masterLoop(){

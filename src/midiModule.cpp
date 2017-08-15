@@ -7,17 +7,17 @@ void MidiModule::midiSetup( Sequencer *sequenceArray, GlobalVariable* globalObj)
   this->sequenceArray = sequenceArray;
   this->globalObj = globalObj;
 //  this->noteData = noteData;
-  beatPulseIndex = 0;
   firstRun = false;
   pulseTimer = 0;
 }
 
 void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi){
   //noInterrupts();
-  if( serialMidi->read() ){
+  // if(  ){
   //  Serial.println("1: " + String(serialMidi->getData1()));
   //  Serial.println("2: " + String(serialMidi->getData2()));
-  }
+  // }
+  serialMidi->read();
   //interrupts();
 }
 
@@ -63,5 +63,5 @@ void MidiModule::midiClockPulseHandler(){
     }
   }
 
-  Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\tbeatLength: " + String(beatLength) + "\tbeatPulseIndex: " + String(beatPulseIndex));
+  Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\tbeatLength: " + String(beatLength) );
 }

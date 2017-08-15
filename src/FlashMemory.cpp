@@ -13,12 +13,13 @@ FlashMemory::FlashMemory(){
   //SerialFlashPrint serialFlashPrint(&file);
 };
 
-void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequenceArray, SerialFlashChip *spiFlash, ADC *adc){
+void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequenceArray, SerialFlashChip *spiFlash, ADC *adc, GlobalVariable *globalObj){
   Serial.println("<</~*^*~\>>Initializing Flash Memory<</~*^*~\>>");
   this->outputControl = outputControl;
   this->sequenceArray = sequenceArray;
   this->spiFlash = spiFlash;
   this->adc = adc;
+  this->globalObj = globalObj;
 
   if(!spiFlash->begin(WINBOND_CS_PIN)){
     Serial.println("SPI FLASH CHIP INITIALIZATION FAILED!");
@@ -47,23 +48,23 @@ void FlashMemory::saveCalibrationEEPROM(){
   address += 2;
 
   for (int i = 0; i<4; i++){
-    EEPROMWrite16(address, adcCalibrationPos[i]);
+    EEPROMWrite16(address, globalObj->adcCalibrationPos[i]);
     address += 2;
   }
   for (int i = 0; i<4; i++){
-    EEPROMWrite16(address, adcCalibrationNeg[i]);
+    EEPROMWrite16(address, globalObj->adcCalibrationNeg[i]);
     address += 2;
   }
   for (int i = 0; i<4; i++){
-    EEPROMWrite16(address, adcCalibrationOffset[i]);
+    EEPROMWrite16(address, globalObj->adcCalibrationOffset[i]);
     address += 2;
   }
   for (int i = 0; i<8; i++){
-    EEPROMWrite16(address, dacCalibrationNeg[i]);
+    EEPROMWrite16(address, globalObj->dacCalibrationNeg[i]);
     address += 2;
   }
   for (int i = 0; i<8; i++){
-    EEPROMWrite16(address, dacCalibrationPos[i]);
+    EEPROMWrite16(address, globalObj->dacCalibrationPos[i]);
     address += 2;
   }
   Serial.println(" -- CALIBRATION EEPROM WRITE COMPLETE -- ");
@@ -87,23 +88,23 @@ void FlashMemory::readCalibrationEEPROM(){
 
 
   for (int i = 0; i<4; i++){
-    adcCalibrationPos[i] = EEPROMRead16(address);
+    globalObj->adcCalibrationPos[i] = EEPROMRead16(address);
     address += 2;
   }
   for (int i = 0; i<4; i++){
-    adcCalibrationNeg[i] = EEPROMRead16(address);
+    globalObj->adcCalibrationNeg[i] = EEPROMRead16(address);
     address += 2;
   }
   for (int i = 0; i<4; i++){
-    adcCalibrationOffset[i] = EEPROMRead16(address);
+    globalObj->adcCalibrationOffset[i] = EEPROMRead16(address);
     address += 2;
   }
   for (int i = 0; i<8; i++){
-    dacCalibrationNeg[i] = EEPROMRead16(address);
+    globalObj->dacCalibrationNeg[i] = EEPROMRead16(address);
     address += 2;
   }
   for (int i = 0; i<8; i++){
-    dacCalibrationPos[i] = EEPROMRead16(address);
+    globalObj->dacCalibrationPos[i] = EEPROMRead16(address);
     address += 2;
   }
 
