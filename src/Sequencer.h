@@ -40,7 +40,7 @@ class Sequencer
 		void 		skipStep(uint8_t count);
     void    jumpToStep(uint8_t stepNum);
 
-		void    masterClockPulse();
+		void    masterClockPulse(uint8_t pulses);
 
     bool    isFrameSwinging(uint32_t frame);
 

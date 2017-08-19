@@ -21,9 +21,11 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 60000000/(tempoX100/100);
-	clockCounter = 0;
-	totalClockCount = 0;
 
+	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+
+	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
+	totalClockCount = 0;
 }
 
 void MasterClock::clockRunCheck(){
@@ -39,11 +41,9 @@ void MasterClock::masterClockFunc(){
 	//  masterLooptimeMax
 	digitalWriteFast(PIN_EXT_TX, HIGH);
 
-	for (int i = 0; i < SEQUENCECOUNT; i++ ){
-    sequenceArray[i].masterClockPulse();
-  }
+	//uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 
-	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	if (globalObj->clockMode == INTERNAL_CLOCK){
 
 		if ((int)masterLoopTimer > 2 * kMasterClockInterval){
@@ -55,10 +55,17 @@ void MasterClock::masterClockFunc(){
 			clockCounter = clockCounter + countToAdd;
 			globalObj->tempoMasterClkCounter += countToAdd;
 			lfoClockCounter += countToAdd;
-			Serial.println("Adding " + String(countToAdd) + " counts to the clock: " + String(masterLoopTimer) + "\tinterval: " + String(kMasterClockInterval) + "\tclockCounter: " + String(clockCounter));
+			//xSerial.println("Adding " + String(countToAdd) + " counts to the clock: " + String(masterLoopTimer) + "\tinterval: " + String(kMasterClockInterval) + "\tclockCounter: " + String(clockCounter));
+
+			for (int i = 0; i < SEQUENCECOUNT; i++ ){
+				sequenceArray[i].masterClockPulse(countToAdd);
+			}
 			digitalWriteFast(PIN_EXT_AD_4, LOW);
 
 		} else {
+			for (int i = 0; i < SEQUENCECOUNT; i++ ){
+				sequenceArray[i].masterClockPulse(1);
+			}
 			globalObj->tempoMasterClkCounter++;
 			clockCounter++;
 			lfoClockCounter++;
@@ -67,7 +74,7 @@ void MasterClock::masterClockFunc(){
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
 		if (extClockCounter > EXTCLOCKDIV - 1  && clockCounter * kMasterClockInterval>  clockPeriod - 3000){
 			digitalWriteFast(PIN_EXT_AD_2, LOW);
-			displayRunSwitch = false;
+			//displayRunSwitch = false;
 		} else {
       displayRunSwitch = true;
     }
@@ -83,14 +90,14 @@ void MasterClock::masterClockFunc(){
 				digitalWriteFast(PIN_EXT_AD_3, HIGH);
 				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
-				Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval));
+				Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
 				masterDebugTimer = 0;
 								digitalWriteFast(PIN_EXT_AD_3, LOW);
 			}
 			//
 			totalClockCount++;
-			if(totalClockCount > kMasterClockInterval){
-				clockCounter = 0;
+			if(totalClockCount > INTERNAL_PPQ_COUNT){
+				clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
 				totalClockCount = 0;
 			}
 			pulseTrigger = 1;
@@ -103,6 +110,10 @@ void MasterClock::masterClockFunc(){
     } else {
       lfoClockCounter++;
     }
+		for (int i = 0; i < SEQUENCECOUNT; i++ ){
+			sequenceArray[i].masterClockPulse(1);
+		}
+
 
   }
 	masterLoopTimer = 0;

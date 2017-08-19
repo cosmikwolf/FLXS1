@@ -72,13 +72,13 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 //	saveFile.deleteSaveFile();
 	//saveFile.wipeEEPROM();
 	//saveFile.deleteTest();
-	Serial.println("1"); delay(100);
 	saveFile.initializeCache();
 	//saveFile.loadPattern(0, 0b1111);
   currentPattern = 0;
   for(int i=0; i<SEQUENCECOUNT; i++){
     sequencerArray[i].initNewSequence(currentPattern, i);
   }
+	
 	saveFile.readCalibrationEEPROM();
 
 	buttonIo.changeState(STATE_PITCH0);

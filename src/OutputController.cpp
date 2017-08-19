@@ -330,7 +330,7 @@ void OutputController::inputRead(){
   backplaneGPIO->update();
 
   for(int i=0; i<28; i++){
-    if(backplaneGPIO->fell(i)) Serial.println("Backplane " + String(i));
+  //  if(backplaneGPIO->fell(i)) Serial.println("Backplane " + String(i));
   }
   globalObj->cvInputRaw[0] = adc->analogRead(A3, ADC_1);
   globalObj->cvInputRaw[1] = adc->analogRead(A12, ADC_1);
@@ -690,7 +690,7 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType){
 
 
 void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
-//  Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note) + "\timer: " + String(debugTimer1) );
+  //Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note));
 
   if (gateOff){
     backplaneGPIO->digitalWrite(channel, LOW);

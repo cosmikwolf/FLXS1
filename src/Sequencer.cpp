@@ -51,7 +51,7 @@ void Sequencer::clockStart(){
   swingSwitch = 0;
 };
 
-void Sequencer::masterClockPulse(){
+void Sequencer::masterClockPulse(uint8_t pulses){
   if (!playing){
     //return;
   }
@@ -262,7 +262,7 @@ void Sequencer::sequenceModeStandardStep(){
       arpSpeedModulation[activeStep] = outputControl->cvInputCheck(cv_arpspdmod)/15;
       noteTrigger(activeStep, stepData[activeStep].gateTrig(), arpTypeModulated[activeStep], arpOctaveModulated[activeStep] );
       stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
-      //Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));
+    //  Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));
       //stepData[activeStep].offset = currentFrameVar;
     }
   }

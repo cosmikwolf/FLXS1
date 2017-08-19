@@ -16,22 +16,22 @@ void LEDArray::initialize(Sequencer *sequenceArray, GlobalVariable* globalObj){
   leds.begin();
   leds.show(); // Initialize all pixels to 'off'
 
-  static uint8_t hue = 0;
-  for (int j=0; j < 256; j++){
-    for (int i=0; i < 16; i++){
-      leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
-    }
-    leds.show();
-    delayMicroseconds(100);
-  }
-  for (int j=255; j > 0 ; j--){
-    for (int i=0; i < 16; i++){
-      leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
-    }
-    leds.show();
-    delayMicroseconds(100);
-  }
-  rainbowCycle(100);
+  // static uint8_t hue = 0;
+  // for (int j=0; j < 256; j++){
+  //   for (int i=0; i < 16; i++){
+  //     leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
+  //   }
+  //   leds.show();
+  //   delayMicroseconds(100);
+  // }
+  // for (int j=255; j > 0 ; j--){
+  //   for (int i=0; i < 16; i++){
+  //     leds.setPixelColor(ledMainMatrix[i], j,j,j,j);
+  //   }
+  //   leds.show();
+  //   delayMicroseconds(100);
+  // }
+  // rainbowCycle(100);
 /*
 
   for(int m=0; m<10; m++ ) {

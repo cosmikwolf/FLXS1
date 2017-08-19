@@ -30,16 +30,16 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.println("RESIST");               delay(50);
   oled.fillScreen(GREEN, ORANGE);
   oled.println("FASISM");      delay(50);
-  oled.fillScreen(BLUE, GREEN);      delay(100);
-  oled.fillScreen(PURPLE, NAVY);       delay(100);
-  oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(100);
+  oled.fillScreen(BLUE, GREEN);      delay(50);
+  oled.fillScreen(PURPLE, NAVY);       delay(50);
+  oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
   oled.fillScreen(RED);
   oled.setCursor(CENTER,8);
   oled.setTextColor(BLACK);
   oled.setFont(&LadyRadical_16);//this will load the font
   oled.setTextScale(2);
   oled.println("Zetaohm");
-  delay(100);
+  delay(50);
   oled.setFont(&NeueHaasXBlack_28);//this will load the font
 
   oled.setCursor(CENTER,35);
@@ -53,7 +53,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextColor(DARK_GREY);
   oled.println("v014");
 
-    delay(1000);
+  //  delay(1000);
   Serial.println("Display Initialization Complete");
 }
 
