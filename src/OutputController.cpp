@@ -23,6 +23,14 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   this->lfoRheoSet[1] = 1;
   this->lfoRheoSet[2] = 1;
   this->lfoRheoSet[3] = 1;
+  this->lfoStartPhase[0] = 0;
+  this->lfoStartPhase[1] = 0;
+  this->lfoStartPhase[2] = 0;
+  this->lfoStartPhase[3] = 0;
+  this->sampleAndHoldSwitch[0] = 1;
+  this->sampleAndHoldSwitch[1] = 1;
+  this->sampleAndHoldSwitch[2] = 1;
+  this->sampleAndHoldSwitch[3] = 1;
 
   Serial.println("initializing gate outputs");
   this->backplaneGPIO = backplaneGPIO;
@@ -470,10 +478,11 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
     //  Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
   } else {
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
-
-    lfoType[channel] = velocityType;
-    lfoAmplitude[channel] = velocity;
-    lfoSpeed[channel] = lfoSpeedSetting;
+    if (velocityType != 0 ){
+      lfoType[channel] = velocityType;
+      lfoAmplitude[channel] = velocity;
+      lfoSpeed[channel] = lfoSpeedSetting;
+    }
 
     if(velocityType == 1){
       //  Serial.println("velocitytype == 1 on channel " + String(channel));
@@ -488,6 +497,7 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
     } else if (velocityType > 1){
     //  Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
       lfoRheoSet[channel] = 1;
+      lfoStartPhase[channel] = lfoClockCounter;
     }
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
@@ -561,9 +571,11 @@ uint16_t OutputController::calibHigh(uint8_t channel, uint8_t mapAddress, uint8_
 }
 
 void OutputController::lfoUpdate(uint8_t channel){
-  uint8_t rheoStatLevel;
+  uint8_t slewLevel;
   int16_t voltageLevel;
-
+  bool   slewOn = false;
+  bool skipUpdate = false;
+  uint32_t lfoTime = (lfoClockCounter-lfoStartPhase[channel]) * lfoSpeed[channel];
   //Serial.println("beginning lfoUpdate for channel " + String(channel));
   if (lfoType[channel] < 1){
     return;
@@ -571,33 +583,82 @@ void OutputController::lfoUpdate(uint8_t channel){
 
   switch(lfoType[channel]){
     case LFO_OFF:
-      rheoStatLevel = 0;
+      slewLevel = 0;
       voltageLevel = 0;
     break;
     case LFO_TRIGGER:
 
     case LFO_ENV_DECAY:
+
+    break;
+
     case LFO_ENV_ATTACK:
+
+    break;
+
     case LFO_ENV_AR:
+
+    break;
+
     case LFO_ENV_ASR:
+
+    break;
+
     case LFO_TRIANGLE:
+      voltageLevel =abs( lfoAmplitude[channel] -  lfoTime % (lfoAmplitude[channel]*2) ) * 128;
+      slewOn = true;
+      slewLevel = 0;
+
+    break;
+
     case LFO_SAWUP:
+      slewLevel = 0;
+      voltageLevel = abs( -lfoAmplitude[channel]*128 + lfoTime % (2*lfoAmplitude[channel]*128) );
+      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
+    break;
+
     case LFO_SAWDN:
+    slewLevel = 0;
+
+      voltageLevel = abs( lfoAmplitude[channel]*128 - lfoTime % (2*lfoAmplitude[channel]*128) );
+      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
+    break;
+
     case LFO_SAMPLEHOLD:
+      slewLevel = 0;
+      slewOn = false;
+
+
+      if(sampleAndHoldSwitch[channel]){
+        skipUpdate = false;
+      } else {
+        skipUpdate = true;
+      }
+
+      if (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.14159*100)/(beatLength*64)) > 0){
+        if(sampleAndHoldSwitch[channel]) voltageLevel = random(-lfoAmplitude[channel]*128, lfoAmplitude[channel]*128);
+        sampleAndHoldSwitch[channel] = false;
+      } else {
+        sampleAndHoldSwitch[channel] = true;
+        skipUpdate = true;
+      }
+
+    break;
+
 
     case LFO_VOLTAGE:
-      rheoStatLevel = 0;
+      slewLevel = 0;
       voltageLevel = lfoAmplitude[channel]*128;
     break;
 
     case LFO_SINE:
-      rheoStatLevel = 2;
-      voltageLevel = (sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)))*lfoAmplitude[channel]*128;
-      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW);
+      slewLevel = 1;
+      voltageLevel =  (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.14159*100)/(beatLength*16)))*lfoAmplitude[channel]*128;
+      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
     break;
 
     case LFO_SQUARE: // SQUARE WAVE
-      rheoStatLevel = 0;
+      slewLevel = 0;
       if ( sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)) > 0){
         voltageLevel = lfoAmplitude[channel]*128;
       } else {
@@ -607,7 +668,7 @@ void OutputController::lfoUpdate(uint8_t channel){
     break;
 
     case LFO_RNDSQUARE: //rounded square wave
-      rheoStatLevel = 40;
+      slewLevel = 40;
       if ( sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)) > 0){
         voltageLevel = lfoAmplitude[channel]*128;
       } else {
@@ -622,24 +683,29 @@ void OutputController::lfoUpdate(uint8_t channel){
     break;
   }
 
+  if(slewOn){
+    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
+  } else {
+    backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), HIGH); // disable slew
+  }
   //lfoAmplitude[channel]
   //lfoRheoSet[channel]
   // update modulation destinations
-  globalObj->cvInputRaw[4+2*channel+1] = voltageLevel;
+  if( !skipUpdate){
 
-  //if (lfoRheoSet[channel] == 1){
+    globalObj->cvInputRaw[4+2*channel+1] = voltageLevel;
+
     if (outputMap(channel, RHEOCHANNELCC) == 0){
-      mcp4352_1.setResistance(outputMap(channel, CCRHEO), rheoStatLevel);        // set digipot to 0
+      mcp4352_1.setResistance(outputMap(channel, CCRHEO), slewLevel);        // set digipot to 0
     } else {
-      mcp4352_2.setResistance(outputMap(channel, CCRHEO), rheoStatLevel);        // set digipot to 0
+      mcp4352_2.setResistance(outputMap(channel, CCRHEO), slewLevel);        // set digipot to 0
     }
-    //Serial.println("setting rheo");
     lfoRheoSet[channel] = 0;
-  //}
     ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
     ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+  }
 
-//  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(rheoStatLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
+//  Serial.println("Setting velocity-ch:" + String(channel) + "\tVL: " + String(voltageLevel) + "\trheo: " + String(slewLevel) + "\ttype: " + String(lfoType[channel]) + "\tstartTime: " + String(startTime) + "\tbeatLength:" + String(beatLength) + "\tamp: " + String(lfoAmplitude[channel]) + "\tsinResult:" + String(sin((startTime*3.14159)/(beatLength) )) + "\tdivide: " + String(startTime/beatLength) +"\tendVolt: " + String(map(voltageLevel, -127,127,0, 65535 )));
 
 }
 

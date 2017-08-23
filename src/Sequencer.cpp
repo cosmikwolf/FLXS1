@@ -38,7 +38,7 @@ void Sequencer::clockReset(bool activeStepReset){
   //lastStepOffset = 0;
   //firstPulse = 1;
   if(channel ==0 ){
-   Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(getCurrentFrame()));
+  // Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(getCurrentFrame()));
   }
 
   if((stepCount) %2 ){

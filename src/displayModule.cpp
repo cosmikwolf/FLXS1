@@ -728,8 +728,6 @@ void DisplayModule::stateDisplay_arp(char *buf){
      sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
      displayElement[12] = strdup(buf);
 
-
-
    displayElement[1]  = strdup("algo");
    const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
    if(globalObj->multi_arpType_switch){
@@ -811,7 +809,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
     displayElement[2] = strdup(buf);
     displayElement[3] = strdup("type:");
-    char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square","LFO SawUp","LFO SawDn","LFO S+H" };
+    char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
     displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
     displayElement[5] = strdup("LFO spd:");
 
@@ -822,7 +820,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
 
     renderStringBox(3,  DISPLAY_LABEL,        0, 20,40,17, false, STYLE1X, background , foreground);
-    renderStringBox(4,  STATE_VELOCITYTYPE,   40, 20,56,17, false, STYLE1X, background , foreground);
+    renderStringBox(4,  STATE_VELOCITYTYPE,   40, 20,88,17, false, STYLE1X, background , foreground);
     renderStringBox(1,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
     renderStringBox(2,  STATE_VELOCITY, 50, 37,78,17, false, STYLE1X, background , foreground);
 

@@ -60,8 +60,11 @@ public:
   uint8_t lfoType[4];
   uint8_t lfoSpeed[4];
   uint8_t lfoAmplitude[4];
+  uint32_t lfoStartPhase[4];
+  bool   sampleAndHoldSwitch[4];
   bool    lfoRheoSet[4];
   bool    clockValue;
+
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
 

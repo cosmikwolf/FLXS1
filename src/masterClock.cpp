@@ -20,9 +20,9 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 
 void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
-	beatLength = 60000000/(tempoX100/100);
+	beatLength = 58962000/(tempoX100/100);
 
-	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 
 	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
 	totalClockCount = 0;
@@ -90,7 +90,7 @@ void MasterClock::masterClockFunc(){
 				digitalWriteFast(PIN_EXT_AD_3, HIGH);
 				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
-				Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
+				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
 				masterDebugTimer = 0;
 								digitalWriteFast(PIN_EXT_AD_3, LOW);
 			}

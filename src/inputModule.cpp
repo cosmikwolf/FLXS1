@@ -201,7 +201,7 @@ void InputModule::multiSelectInputHandler(){
 
               break;
             case STATE_VELOCITYTYPE:
-              sequenceArray[selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 4);
+              sequenceArray[selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 13);
 
               break;
             case STATE_LFOSPEED:
@@ -448,7 +448,7 @@ void InputModule::loop(uint16_t frequency){
 }
 
 void InputModule::changeState(uint8_t targetState){
-  Serial.println("change state: " + String(targetState));
+  //Serial.println("change state: " + String(targetState));
   stepMode = targetState;
   switch (stepMode) {
     case STATE_PITCH0:
@@ -1235,7 +1235,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
           sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(sequenceArray[channel].stepData[stepNum].velocity + change, 127);
         break;
         case STATE_VELOCITYTYPE:
-          sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 4);
+          sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 13);
         break;
         case STATE_LFOSPEED:
           sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(sequenceArray[channel].stepData[stepNum].lfoSpeed + change, 1, 255);
