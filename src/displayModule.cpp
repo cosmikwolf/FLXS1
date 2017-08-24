@@ -811,6 +811,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
     displayElement[3] = strdup("type:");
     char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
     displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
+    //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].velocityType).c_str());
     displayElement[5] = strdup("LFO spd:");
 
     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
@@ -853,7 +854,6 @@ void DisplayModule::stateDisplay_arp(char *buf){
       }
 
       displayElement[3] = strdup("type:");
-//    char *velTypeArray[] = { "none", "voltage", "LFO Sine", "LFO Square", "roundSq" };
       char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square","LFO SawUp","LFO SawDn","LFO S+H" };
 
 

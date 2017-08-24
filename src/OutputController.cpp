@@ -570,12 +570,13 @@ uint16_t OutputController::calibHigh(uint8_t channel, uint8_t mapAddress, uint8_
   return globalObj->dacCalibrationPos[dacCvMap[channel]]-voltageOffset(negOffset, dacCvMap[channel]);
 }
 
-void OutputController::lfoUpdate(uint8_t channel){
-  uint8_t slewLevel;
-  int16_t voltageLevel;
+void OutputController::lfoUpdate(uint8_t channel, uint32_t currentFrame, uint32_t totalFrames){
+  uint8_t slewLevel = 0;
+  int16_t voltageLevel = 0;
   bool   slewOn = false;
   bool skipUpdate = false;
-  uint32_t lfoTime = (lfoClockCounter-lfoStartPhase[channel]) * lfoSpeed[channel];
+  int32_t lfoTime = currentFrame * lfoSpeed[channel];
+  totalFrames *= 8;
   //Serial.println("beginning lfoUpdate for channel " + String(channel));
   if (lfoType[channel] < 1){
     return;
@@ -605,7 +606,7 @@ void OutputController::lfoUpdate(uint8_t channel){
     break;
 
     case LFO_TRIANGLE:
-      voltageLevel =abs( lfoAmplitude[channel] -  lfoTime % (lfoAmplitude[channel]*2) ) * 128;
+      voltageLevel = 128*lfoAmplitude[channel]*abs(32768 -  (int)(65535*lfoTime/totalFrames) % (65535) ) - lfoAmplitude[channel]*128;
       slewOn = true;
       slewLevel = 0;
 
@@ -613,15 +614,14 @@ void OutputController::lfoUpdate(uint8_t channel){
 
     case LFO_SAWUP:
       slewLevel = 0;
-      voltageLevel = abs( -lfoAmplitude[channel]*128 + lfoTime % (2*lfoAmplitude[channel]*128) );
-      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
+      voltageLevel = -lfoAmplitude[channel]*128 +  (int)(lfoTime/(totalFrames/8550)) % (lfoAmplitude[channel]*256);
+      slewOn = true;
     break;
 
     case LFO_SAWDN:
-    slewLevel = 0;
-
-      voltageLevel = abs( lfoAmplitude[channel]*128 - lfoTime % (2*lfoAmplitude[channel]*128) );
-      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
+      slewLevel = 0;
+      voltageLevel = lfoAmplitude[channel]*128 -  (int)(lfoTime/(totalFrames/8550)) % (lfoAmplitude[channel]*256);
+      slewOn = true;
     break;
 
     case LFO_SAMPLEHOLD:
@@ -635,7 +635,7 @@ void OutputController::lfoUpdate(uint8_t channel){
         skipUpdate = true;
       }
 
-      if (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.14159*100)/(beatLength*64)) > 0){
+      if ((sin((lfoTime*3.1415926536)/(totalFrames))) > 0){
         if(sampleAndHoldSwitch[channel]) voltageLevel = random(-lfoAmplitude[channel]*128, lfoAmplitude[channel]*128);
         sampleAndHoldSwitch[channel] = false;
       } else {
@@ -653,13 +653,14 @@ void OutputController::lfoUpdate(uint8_t channel){
 
     case LFO_SINE:
       slewLevel = 1;
-      voltageLevel =  (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.14159*100)/(beatLength*16)))*lfoAmplitude[channel]*128;
-      backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCC), LOW); // enable slew
+      voltageLevel =  (sin((lfoTime*3.1415926536)/(totalFrames)))*lfoAmplitude[channel]*128;
+      //voltageLevel =  (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.1415926536)/(beatLength/100)))*lfoAmplitude[channel]*128;
+      slewOn = false;
     break;
 
     case LFO_SQUARE: // SQUARE WAVE
       slewLevel = 0;
-      if ( sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)) > 0){
+      if ( sin((lfoTime*3.1415926536)/(totalFrames)) > 0){
         voltageLevel = lfoAmplitude[channel]*128;
       } else {
         voltageLevel = -lfoAmplitude[channel]*128;
@@ -669,7 +670,7 @@ void OutputController::lfoUpdate(uint8_t channel){
 
     case LFO_RNDSQUARE: //rounded square wave
       slewLevel = 40;
-      if ( sin((lfoSpeed[channel]*lfoClockCounter*3.14159*100)/(beatLength*16)) > 0){
+      if ( sin((lfoTime*3.1415926536)/(totalFrames)) > 0){
         voltageLevel = lfoAmplitude[channel]*128;
       } else {
         voltageLevel = -lfoAmplitude[channel]*128;
@@ -692,7 +693,6 @@ void OutputController::lfoUpdate(uint8_t channel){
   //lfoRheoSet[channel]
   // update modulation destinations
   if( !skipUpdate){
-
     globalObj->cvInputRaw[4+2*channel+1] = voltageLevel;
 
     if (outputMap(channel, RHEOCHANNELCC) == 0){

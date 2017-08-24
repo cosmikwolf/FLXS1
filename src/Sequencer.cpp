@@ -107,7 +107,6 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
 
 uint32_t Sequencer::getCurrentFrame(){
   int32_t clockCount = 0;
-  uint32_t currentFrame = 0 ;
   uint8_t lastActiveStep;
   // this prevents clocksSinceLastPulse from exceeding avgClocksPerPulse, which results in the currentFrame going backwards
   if(clockSinceLastPulse >= avgClocksPerPulse){
@@ -246,12 +245,12 @@ int Sequencer::getActivePage(){
 
 
 void Sequencer::sequenceModeStandardStep(){
-  uint32_t currentFrameVar = 0;
-  //incrementActiveStep(currentFrameVar);
+  //uint32_t currentFrame = 0;
+  //incrementActiveStep(currentFrame);
   if (mute || !playing){
     return;
   }
-  currentFrameVar = getCurrentFrame();
+  currentFrame = getCurrentFrame();
 
   if (stepData[activeStep].noteStatus == AWAITING_TRIGGER){
     if (stepData[activeStep].gateType != GATETYPE_REST){
@@ -263,7 +262,7 @@ void Sequencer::sequenceModeStandardStep(){
       noteTrigger(activeStep, stepData[activeStep].gateTrig(), arpTypeModulated[activeStep], arpOctaveModulated[activeStep] );
       stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
     //  Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));
-      //stepData[activeStep].offset = currentFrameVar;
+      //stepData[activeStep].offset = currentFrame;
     }
   }
 
@@ -277,7 +276,7 @@ void Sequencer::sequenceModeStandardStep(){
 
     switch (stepData[stepNum].noteStatus){
       case NOTE_HAS_BEEN_PLAYED_THIS_ITERATION:
-        if(stepNum != activeStep || ( stepCount == 1 && currentFrameVar < getStepLength()/4 ) ){
+        if(stepNum != activeStep || ( stepCount == 1 && currentFrame < getStepLength()/4 ) ){
           //Serial.println("Resetting step: " + String(stepNum) + "\tactiveStep: " + String(activeStep)) ;
           stepData[stepNum].noteStatus = AWAITING_TRIGGER;
           stepData[stepNum].arpStatus = 0;
@@ -297,7 +296,7 @@ void Sequencer::sequenceModeStandardStep(){
 
       case BETWEEN_APEGGIATIONS:
         // Arpeggio retrigger
-        if(currentFrameVar > getArpStartFrame(stepNum, stepData[stepNum].arpStatus) ){
+        if(currentFrame > getArpStartFrame(stepNum, stepData[stepNum].arpStatus) ){
         //if ( getFramesRemaining(stepNum) <= 0 ) {
           // Serial.println("arpRetrigger: "  + String(stepNum));
            noteTrigger(stepNum, stepData[stepNum].gateTrig(), arpTypeModulated[stepNum], arpOctaveModulated[stepNum] );

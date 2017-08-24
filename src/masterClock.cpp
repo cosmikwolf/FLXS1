@@ -46,7 +46,8 @@ void MasterClock::masterClockFunc(){
 
 	if (globalObj->clockMode == INTERNAL_CLOCK){
 
-		if ((int)masterLoopTimer > 2 * kMasterClockInterval){
+		if ((int)masterLoopTimer > 3 * kMasterClockInterval /2){
+//			if ((int)masterLoopTimer > 2 * kMasterClockInterval-100){
 			// a subroutine to add clock counts when the masterLoopTimer was skipped
 			// maybe should be 2xmasterclockINterval instead?
 			digitalWriteFast(PIN_EXT_AD_4, HIGH);
@@ -113,9 +114,17 @@ void MasterClock::masterClockFunc(){
 		for (int i = 0; i < SEQUENCECOUNT; i++ ){
 			sequenceArray[i].masterClockPulse(1);
 		}
-
-
-  }
+  }else if(globalObj->clockMode == EXTERNAL_CLOCK_GATE_0){
+    if ((int)masterLoopTimer > kMasterClockInterval + 100){
+      uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
+      lfoClockCounter += countToAdd;
+    } else {
+      lfoClockCounter++;
+    }
+		for (int i = 0; i < SEQUENCECOUNT; i++ ){
+			sequenceArray[i].masterClockPulse(1);
+		}
+	}
 	masterLoopTimer = 0;
 
 	if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
@@ -185,7 +194,7 @@ void MasterClock::sequencerFunc(void){
   }
 	if(lfoTimer > 2){
 		for (int i=0; i< SEQUENCECOUNT; i++){
-			outputControl->lfoUpdate(i);
+			outputControl->lfoUpdate(i, sequenceArray[i].currentFrame, sequenceArray[i].getStepLength() );
 		}
 		lfoTimer = 0;
 	}
