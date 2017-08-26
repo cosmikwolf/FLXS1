@@ -44,7 +44,7 @@ void FlashMemory::initializeCache(){
   fileName = NULL;
   while(!spiFlash->ready()){
     Serial.println("waiting for cache..");
-    delay(1000);
+    delay(100);
   }
   //Randomize a cache offset so that EEPROM is used evenly across all bytes
   //EEPROM will begin to degrade after 100000 writes, so this will increase longevity of the device.

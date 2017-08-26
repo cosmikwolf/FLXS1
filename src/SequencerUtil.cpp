@@ -70,6 +70,8 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 		this->stepData[n].notePlaying  =   0;
 		this->stepData[n].framesRemaining = 0;
 	}
+
+	outputControl->clearVelocityOutput(ch);
 };
 
 bool Sequencer::toggleMute(){

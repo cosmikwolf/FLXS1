@@ -93,6 +93,7 @@ void InputModule::multiSelectInputHandler(){
           globalObj->multi_pitch_switch = true;
           globalObj->multi_pitch += knobChange;
           break;
+
         case STATE_CHORD:
           globalObj->multi_chord_switch = true;
           globalObj->multi_chord = min_max(globalObj->multi_chord + knobChange, 0, 26 );
@@ -348,9 +349,6 @@ void InputModule::loop(uint16_t frequency){
         }
       }
     }
-
-
-
 
     if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) ){
       changeState(STATE_CALIBRATION);
@@ -711,14 +709,9 @@ void InputModule::sequenceMenuHandler(){
           sequenceArray[selectedChannel].swingX100 = min_max(sequenceArray[selectedChannel].swingX100 + knobChange, 1,99);
         break;
 
-
-
-
       }
     }
-
   }
-
 }
 
 void InputModule::inputMenuHandler(){

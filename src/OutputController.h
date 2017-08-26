@@ -39,6 +39,8 @@ public:
   void setClockOutput(bool value);
   void setGateOutputDebug(uint8_t index, bool value);
   bool gpioCheck(int8_t mapValue);
+
+  void clearVelocityOutput(uint8_t channel);
   uint16_t cvInputCheck(uint8_t mapValue);
   uint8_t analogInputTranspose(uint8_t note);
 

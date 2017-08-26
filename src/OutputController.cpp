@@ -158,6 +158,7 @@ for (int i=0; i<4; i++){
   }
 }
 
+
 void OutputController::dacTestLoop(){
   int voltage; // = 65535*(sin(millis()/10.0)+1)/2;
   int32_t sinVal = sin(millis()/10.0)*16384.0;
@@ -544,11 +545,7 @@ uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t qu
       case COLUNDI:
         return map( colundiArrayX100[note], 0,1012,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
       break;
-
     }
-
-
-
 }
 
 
@@ -569,6 +566,23 @@ uint16_t OutputController::calibLow(uint8_t channel, uint8_t mapAddress, uint8_t
 uint16_t OutputController::calibHigh(uint8_t channel, uint8_t mapAddress, uint8_t negOffset){
   return globalObj->dacCalibrationPos[dacCvMap[channel]]-voltageOffset(negOffset, dacCvMap[channel]);
 }
+
+void OutputController::clearVelocityOutput(uint8_t channel){
+  int16_t voltageLevel = 0;
+
+  for(int i=0; i<SEQUENCECOUNT; i++){
+    this->lfoType[i] = 0;
+    this->lfoSpeed[i] = 1;
+    this->lfoAmplitude[i] = 0;
+    this->lfoRheoSet[i] = 1;
+    this->lfoStartPhase[i] = 0;
+    this->sampleAndHoldSwitch[i] = 1;
+  }
+
+  ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+  ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+
+};
 
 void OutputController::lfoUpdate(uint8_t channel, uint32_t currentFrame, uint32_t totalFrames){
   uint8_t slewLevel = 0;
@@ -609,12 +623,11 @@ void OutputController::lfoUpdate(uint8_t channel, uint32_t currentFrame, uint32_
       voltageLevel = 128*lfoAmplitude[channel]*abs(32768 -  (int)(65535*lfoTime/totalFrames) % (65535) ) - lfoAmplitude[channel]*128;
       slewOn = true;
       slewLevel = 0;
-
     break;
 
     case LFO_SAWUP:
       slewLevel = 0;
-      voltageLevel = -lfoAmplitude[channel]*128 +  (int)(lfoTime/(totalFrames/8550)) % (lfoAmplitude[channel]*256);
+      voltageLevel = lfoAmplitude[channel]*(- 128 +  (int)(lfoTime/(totalFrames/128)) % (256));
       slewOn = true;
     break;
 
@@ -627,7 +640,6 @@ void OutputController::lfoUpdate(uint8_t channel, uint32_t currentFrame, uint32_
     case LFO_SAMPLEHOLD:
       slewLevel = 0;
       slewOn = false;
-
 
       if(sampleAndHoldSwitch[channel]){
         skipUpdate = false;
@@ -655,7 +667,7 @@ void OutputController::lfoUpdate(uint8_t channel, uint32_t currentFrame, uint32_
       slewLevel = 1;
       voltageLevel =  (sin((lfoTime*3.1415926536)/(totalFrames)))*lfoAmplitude[channel]*128;
       //voltageLevel =  (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.1415926536)/(beatLength/100)))*lfoAmplitude[channel]*128;
-      slewOn = false;
+      slewOn = true;
     break;
 
     case LFO_SQUARE: // SQUARE WAVE
