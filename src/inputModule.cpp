@@ -370,76 +370,77 @@ void InputModule::loop(uint16_t frequency){
       }
     }
     //we always want the alt (non matrix) buttons to behave the same way
-    altButtonHandler();
 
     // now to handle the rest of the buttons.
-    switch (currentMenu) {
-      case PITCH_GATE_MENU:
-      case ARPEGGIO_MENU:
-      case VELOCITY_MENU:
-        if(globalObj->multiSelectSwitch){
-          multiSelectInputHandler();
-        } else{
-          channelPitchModeInputHandler();
-        }
-      break;
-      case SEQUENCE_MENU:
-      case MOD_MENU_1:
-      case MOD_MENU_2:
-      case QUANTIZE_MENU:
-        sequenceMenuHandler();
-      break;
-      case INPUT_MENU:
-        inputMenuHandler();
-      break;
-      case GLOBAL_MENU:
-        globalMenuHandler();
-      break;
+    if (altButtonHandler() == 0){
+      switch (currentMenu) {
+        case PITCH_GATE_MENU:
+        case ARPEGGIO_MENU:
+        case VELOCITY_MENU:
+          if(globalObj->multiSelectSwitch){
+            multiSelectInputHandler();
+          } else{
+            channelPitchModeInputHandler();
+          }
+        break;
+        case SEQUENCE_MENU:
+        case MOD_MENU_1:
+        case MOD_MENU_2:
+        case QUANTIZE_MENU:
+          sequenceMenuHandler();
+        break;
+        case INPUT_MENU:
+          inputMenuHandler();
+        break;
+        case GLOBAL_MENU:
+          globalMenuHandler();
+        break;
 
-      case CHANNEL_INPUT_MODE:
-        channelInputInputHandler();
-      break;
+        case CHANNEL_INPUT_MODE:
+          channelInputInputHandler();
+        break;
 
-      case CHANNEL_STEP_MODE:
-        channelStepModeInputHandler();
-      break;
+        case CHANNEL_STEP_MODE:
+          channelStepModeInputHandler();
+        break;
 
-      case INPUT_DEBUG_MENU:
-        if (knobChange){
-          selectedText = positive_modulo(selectedText+knobChange, 5);
-        }
-      break;
+        case INPUT_DEBUG_MENU:
+          if (knobChange){
+            selectedText = positive_modulo(selectedText+knobChange, 5);
+          }
+        break;
 
-      case PATTERN_SELECT:
-        patternSelectHandler();
-      break;
+        case PATTERN_SELECT:
+          patternSelectHandler();
+        break;
 
-      case TEMPO_MENU:
-        tempoMenuHandler();
-      break;
+        case TEMPO_MENU:
+          tempoMenuHandler();
+        break;
 
-      case TIMING_MENU:
-        timingMenuInputHandler();
-      break;
+        case TIMING_MENU:
+          timingMenuInputHandler();
+        break;
 
-      case DEBUG_SCREEN:
-        debugScreenInputHandler();
-      break;
+        case DEBUG_SCREEN:
+          debugScreenInputHandler();
+        break;
 
-      case CALIBRATION_MENU:
-        calibrationMenuHandler();
-      break;
+        case CALIBRATION_MENU:
+          calibrationMenuHandler();
+        break;
 
-      case MENU_MODAL:
-        if (modalTimer > 1000){
-          changeState(STATE_PITCH0);
-        }
-      break;
+        case MENU_MODAL:
+          if (modalTimer > 1000){
+            changeState(STATE_PITCH0);
+          }
+        break;
 
-      case SAVE_MENU:
-        saveMenuInputHandler();
-      break;
+        case SAVE_MENU:
+          saveMenuInputHandler();
+        break;
 
+      }
     }
   }
 
@@ -829,10 +830,108 @@ void InputModule::channelButtonHandler(uint8_t channel){
 }
 
 
-void InputModule::altButtonHandler(){
+bool InputModule::altButtonHandler(){
 
   uint8_t channelButton;
-  //chPressedSelector = 0;
+  chPressedSelector = 0;
+  if (midplaneGPIO->pressed(SW_CH0)){
+      chPressedSelector = chPressedSelector | 0b0001;
+  } else {chPressedSelector = chPressedSelector & ~0b0001;}
+  if (midplaneGPIO->pressed(SW_CH1)){
+      chPressedSelector = chPressedSelector | 0b0010;
+  } else {chPressedSelector = chPressedSelector & ~0b0010;}
+  if (midplaneGPIO->pressed(SW_CH2)){
+      chPressedSelector = chPressedSelector | 0b0100;
+  } else {chPressedSelector = chPressedSelector & ~0b0100;}
+  if (midplaneGPIO->pressed(SW_CH3)){
+      chPressedSelector = chPressedSelector | 0b1000;
+  } else {chPressedSelector = chPressedSelector & ~0b1000;}
+
+// shortcut button loop
+  for (int i=0; i <16; i++){
+    if (midplaneGPIO->fell(i) ){
+      switch (i){
+        case SW_00:
+                  if(midplaneGPIO->pressed(SW_CH0)){
+                    if( sequenceArray[0].toggleMute() ){
+                      display->displayModal(750, MODAL_MUTE_CH1);
+                    } else {
+                      display->displayModal(750, MODAL_UNMUTE_CH1);
+                    }
+                  }
+                  if(midplaneGPIO->pressed(SW_CH1)){
+                     if( sequenceArray[1].toggleMute() ){
+                       display->displayModal(750, MODAL_MUTE_CH2);
+                     } else {
+                       display->displayModal(750, MODAL_UNMUTE_CH2);
+                     }
+                   }
+                  if(midplaneGPIO->pressed(SW_CH2)){
+                     if( sequenceArray[2].toggleMute() ){
+                       display->displayModal(750, MODAL_MUTE_CH3);
+                     } else {
+                       display->displayModal(750, MODAL_UNMUTE_CH3);
+                     }
+                   }
+                  if(midplaneGPIO->pressed(SW_CH3)){
+                     if( sequenceArray[3].toggleMute() ){
+                       display->displayModal(750, MODAL_MUTE_CH4);
+                     } else {
+                       display->displayModal(750, MODAL_UNMUTE_CH4);
+                     }
+                   }
+        break;
+        case SW_01:
+
+        break;
+        case SW_02:
+
+        break;
+        case SW_03:
+
+        break;
+        case SW_04:
+
+        break;
+        case SW_05:
+
+        break;
+        case SW_06:
+
+        break;
+        case SW_07:
+
+        break;
+        case SW_08:
+
+        break;
+        case SW_09:
+
+        break;
+        case SW_10:
+
+        break;
+        case SW_11:
+
+        break;
+        case SW_12:
+
+        break;
+        case SW_13:
+
+        break;
+        case SW_14:
+
+        break;
+        case SW_15:
+
+        break;
+        }
+      return 1;
+    }
+  }
+
+// non matrix button loop
   for (int i=16; i <28; i++){
     if (midplaneGPIO->fell(i) ){
       switch (i){
@@ -926,34 +1025,6 @@ void InputModule::altButtonHandler(){
           }
 
 
-          if(midplaneGPIO->pressed(SW_CH0)){
-            if( sequenceArray[0].toggleMute() ){
-              display->displayModal(750, MODAL_MUTE_CH1);
-            } else {
-              display->displayModal(750, MODAL_UNMUTE_CH1);
-            }
-          }
-          if(midplaneGPIO->pressed(SW_CH1)){
-             if( sequenceArray[1].toggleMute() ){
-               display->displayModal(750, MODAL_MUTE_CH2);
-             } else {
-               display->displayModal(750, MODAL_UNMUTE_CH2);
-             }
-           }
-          if(midplaneGPIO->pressed(SW_CH2)){
-             if( sequenceArray[2].toggleMute() ){
-               display->displayModal(750, MODAL_MUTE_CH3);
-             } else {
-               display->displayModal(750, MODAL_UNMUTE_CH3);
-             }
-           }
-          if(midplaneGPIO->pressed(SW_CH3)){
-             if( sequenceArray[3].toggleMute() ){
-               display->displayModal(750, MODAL_MUTE_CH4);
-             } else {
-               display->displayModal(750, MODAL_UNMUTE_CH4);
-             }
-           }
 
           if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
@@ -1017,19 +1088,7 @@ void InputModule::altButtonHandler(){
         break;
 
         case SW_STOP:
-          chPressedSelector = 0;
-          if (midplaneGPIO->pressed(SW_CH0)){
-              chPressedSelector = chPressedSelector | 0b0001;
-          } else {chPressedSelector = chPressedSelector & ~0b0001;}
-          if (midplaneGPIO->pressed(SW_CH1)){
-              chPressedSelector = chPressedSelector | 0b0010;
-          } else {chPressedSelector = chPressedSelector & ~0b0010;}
-          if (midplaneGPIO->pressed(SW_CH2)){
-              chPressedSelector = chPressedSelector | 0b0100;
-          } else {chPressedSelector = chPressedSelector & ~0b0100;}
-          if (midplaneGPIO->pressed(SW_CH3)){
-              chPressedSelector = chPressedSelector | 0b1000;
-          } else {chPressedSelector = chPressedSelector & ~0b1000;}
+
 
 
           if (chPressedSelector && chRecEraseTimer > 750){
@@ -1067,6 +1126,7 @@ void InputModule::altButtonHandler(){
         }
       }
     }
+    return 0;
   }
 
 

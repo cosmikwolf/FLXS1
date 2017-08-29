@@ -42,11 +42,12 @@ public:
   void patternSelectHandler();
   //void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
+  void channelButtonShortcutHandler(uint8_t channel);
   void channelButtonChannelSelectorHandler(uint8_t channel);
   void channelButtonShiftHandler(uint8_t channel);
   void channelButtonShiftMenuHandler(uint8_t channel);
 
-  void altButtonHandler();
+  bool altButtonHandler();
   void stepModeMatrixHandler();
 
   void channelPitchModeInputHandler();
