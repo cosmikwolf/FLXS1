@@ -442,7 +442,7 @@ bool OutputController::gpioCheck(int8_t mapValue){
 
 };
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -514,13 +514,15 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   //offset = globalObj->cvInputMapped[channel];
   //delayMicroseconds(5);
 //  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel],0)) );    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
-//delayMicroseconds(5);
-  //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
-  ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
-//  delayMicroseconds(5);
-  //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(globalObj->cvInputRaw[channel]));
-  serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
+  if(!cvMute){
+    ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
+  //delayMicroseconds(5);
+    //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
+    ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
+  //  delayMicroseconds(5);
+    //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(globalObj->cvInputRaw[channel]));
+    serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
+  }
 
   if (gate){
     backplaneGPIO->digitalWrite(channel, HIGH);                                 // open gate voltage
@@ -584,14 +586,17 @@ void OutputController::clearVelocityOutput(uint8_t channel){
 
 };
 
-void OutputController::lfoUpdate(uint8_t channel, uint32_t currentFrame, uint32_t totalFrames){
+void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_t totalFrames, bool mute){
+  if (mute){
+    return;
+  }
   uint8_t slewLevel = 0;
   int16_t voltageLevel = 0;
   bool   slewOn = false;
   bool skipUpdate = false;
   int32_t lfoTime = currentFrame * lfoSpeed[channel];
   totalFrames *= 8;
-  //Serial.println("beginning lfoUpdate for channel " + String(channel));
+  //Serial.println("beginning cv2update for channel " + String(channel));
   if (lfoType[channel] < 1){
     return;
   }

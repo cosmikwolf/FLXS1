@@ -235,13 +235,13 @@ void LEDArray::channelPitchModeLEDHandler(){
 void LEDArray::channelLEDHandler(){
   for (int i=0; i < 4; i++){
     if (selectedChannel == i) {
-      if(sequenceArray[i].mute == true){
+      if(sequenceArray[i].muteGate == true){
         leds.setPixelColor(ledChannelButtons[i], 127, 0,0,32);
       } else {
         leds.setPixelColor(ledChannelButtons[i], 0, 0,127,64);
       }
     } else {
-      if(sequenceArray[i].mute == true){
+      if(sequenceArray[i].muteGate == true){
         leds.setPixelColor(ledChannelButtons[i], 127, 0,0,0);
       } else {
         leds.setPixelColor(ledChannelButtons[i], 0, 127,0,0);

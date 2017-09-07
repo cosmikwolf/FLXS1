@@ -372,7 +372,8 @@ void InputModule::loop(uint16_t frequency){
     //we always want the alt (non matrix) buttons to behave the same way
 
     // now to handle the rest of the buttons.
-    if (altButtonHandler() == 0){
+    bool didAltButtonsFire = altButtonHandler();
+    if (didAltButtonsFire == false){
       switch (currentMenu) {
         case PITCH_GATE_MENU:
         case ARPEGGIO_MENU:
@@ -441,6 +442,8 @@ void InputModule::loop(uint16_t frequency){
         break;
 
       }
+    } else {
+      Serial.println("AltButton: " + String(didAltButtonsFire));
     }
   }
 
@@ -848,86 +851,90 @@ bool InputModule::altButtonHandler(){
   } else {chPressedSelector = chPressedSelector & ~0b1000;}
 
 // shortcut button loop
-  for (int i=0; i <16; i++){
-    if (midplaneGPIO->fell(i) ){
-      switch (i){
-        case SW_00:
-                  if(midplaneGPIO->pressed(SW_CH0)){
-                    if( sequenceArray[0].toggleMute() ){
-                      display->displayModal(750, MODAL_MUTE_CH1);
-                    } else {
-                      display->displayModal(750, MODAL_UNMUTE_CH1);
-                    }
-                  }
-                  if(midplaneGPIO->pressed(SW_CH1)){
-                     if( sequenceArray[1].toggleMute() ){
-                       display->displayModal(750, MODAL_MUTE_CH2);
-                     } else {
-                       display->displayModal(750, MODAL_UNMUTE_CH2);
-                     }
-                   }
-                  if(midplaneGPIO->pressed(SW_CH2)){
-                     if( sequenceArray[2].toggleMute() ){
-                       display->displayModal(750, MODAL_MUTE_CH3);
-                     } else {
-                       display->displayModal(750, MODAL_UNMUTE_CH3);
-                     }
-                   }
-                  if(midplaneGPIO->pressed(SW_CH3)){
-                     if( sequenceArray[3].toggleMute() ){
-                       display->displayModal(750, MODAL_MUTE_CH4);
-                     } else {
-                       display->displayModal(750, MODAL_UNMUTE_CH4);
-                     }
-                   }
+uint8_t chanSwIndex;
+  for(int chan=0; chan<4; chan++){
+    switch(chan){
+      case 0:
+        chanSwIndex = SW_CH0;
         break;
-        case SW_01:
+      case 1:
+        chanSwIndex = SW_CH1;
+        break;
+      case 2:
+        chanSwIndex = SW_CH2;
+        break;
+      case 3:
+        chanSwIndex = SW_CH3;
+        break;
+    }
+    if(midplaneGPIO->pressed(chanSwIndex)){
+      for (int i=0; i <16; i++){
+        if (midplaneGPIO->fell(i) ){
+          switch (i){
+            case SW_00:
+                if( sequenceArray[chan].toggleMute(0) ){
+                  display->displayModal(750, MODAL_MUTE_CH1);
+                } else {
+                  display->displayModal(750, MODAL_UNMUTE_CH1);
+                }
+            break;
+            case SW_01:
+                if( sequenceArray[chan].toggleMute(1) ){
+                  display->displayModal(750, MODAL_MUTE_CH1);
+                } else {
+                  display->displayModal(750, MODAL_UNMUTE_CH1);
+                }
+           break;
+           case SW_02:
+                if( sequenceArray[chan].toggleMute(2) ){
+                  display->displayModal(750, MODAL_MUTE_CH1);
+                } else {
+                  display->displayModal(750, MODAL_UNMUTE_CH1);
+                }
+            break;
+            case SW_03:
 
-        break;
-        case SW_02:
+            break;
+            case SW_04:
 
-        break;
-        case SW_03:
+            break;
+            case SW_05:
 
-        break;
-        case SW_04:
+            break;
+            case SW_06:
 
-        break;
-        case SW_05:
+            break;
+            case SW_07:
 
-        break;
-        case SW_06:
+            break;
+            case SW_08:
 
-        break;
-        case SW_07:
+            break;
+            case SW_09:
 
-        break;
-        case SW_08:
+            break;
+            case SW_10:
 
-        break;
-        case SW_09:
+            break;
+            case SW_11:
 
-        break;
-        case SW_10:
+            break;
+            case SW_12:
 
-        break;
-        case SW_11:
+            break;
+            case SW_13:
 
-        break;
-        case SW_12:
+            break;
+            case SW_14:
 
-        break;
-        case SW_13:
+            break;
+            case SW_15:
 
-        break;
-        case SW_14:
-
-        break;
-        case SW_15:
-
-        break;
+            break;
+            }
+            return 1;
         }
-      return 1;
+      }
     }
   }
 
@@ -1088,9 +1095,6 @@ bool InputModule::altButtonHandler(){
         break;
 
         case SW_STOP:
-
-
-
           if (chPressedSelector && chRecEraseTimer > 750){
               chRecEraseTimer = 0;
               display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
@@ -1113,7 +1117,6 @@ bool InputModule::altButtonHandler(){
               sequenceArray[s].clockReset(true);
             }
 
-
           }
 
           break;
@@ -1126,7 +1129,8 @@ bool InputModule::altButtonHandler(){
         }
       }
     }
-    return 0;
+    Serial.println("Return at the end of alt");
+    return false;
   }
 
 
@@ -1390,11 +1394,11 @@ void InputModule::calibrationSaveHandler(){
 }
 
 void InputModule::calibrationMenuHandler(){
-  uint8_t multiplier = 100;
+//  uint8_t multiplier = 100;
   playing = 0;
-  if (midplaneGPIO->pressed(SW_REC)){
-    multiplier = 10;
-  }
+  //if (midplaneGPIO->pressed(SW_REC)){
+  //  multiplier = 10;
+///  }
   if(knobChange){
     if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
       changeState(min_max_cycle(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_CALIB_OUTPUT7_TEST ));

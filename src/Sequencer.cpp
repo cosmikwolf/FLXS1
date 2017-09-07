@@ -247,7 +247,7 @@ int Sequencer::getActivePage(){
 void Sequencer::sequenceModeStandardStep(){
   //uint32_t currentFrame = 0;
   //incrementActiveStep(currentFrame);
-  if (mute || !playing){
+  if (muteGate || !playing){
     return;
   }
   currentFrame = getCurrentFrame();

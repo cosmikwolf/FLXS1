@@ -35,7 +35,7 @@ class Sequencer
 		void 		clockStart();
 		void 		clockReset(bool activeStepReset);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
-		bool 		toggleMute();  //returns true if target was muted
+		bool 		toggleMute(uint8_t index);  //returns true if target was muted
 
 		void 		skipStep(uint8_t count);
     void    jumpToStep(uint8_t stepNum);
@@ -117,7 +117,9 @@ class Sequencer
 		uint8_t		cv_pitchmod;
 		uint8_t		cv_gatemod;
 		uint8_t		cv_glidemod;
-		bool 			mute;
+		bool 			muteGate;
+		bool 			muteCV1;
+		bool 			muteCV2;
 		bool			fill;
     bool      skipNextNoteTrigger;
     bool      channelPlaying;

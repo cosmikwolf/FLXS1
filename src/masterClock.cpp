@@ -194,7 +194,7 @@ void MasterClock::sequencerFunc(void){
   }
 	if(lfoTimer > 2){
 		for (int i=0; i< SEQUENCECOUNT; i++){
-			outputControl->lfoUpdate(i, sequenceArray[i].currentFrame, sequenceArray[i].getStepLength() );
+			outputControl->cv2update(i, sequenceArray[i].currentFrame, sequenceArray[i].getStepLength(), sequenceArray[i].muteCV2 );
 		}
 		lfoTimer = 0;
 	}

@@ -43,7 +43,9 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->cv_pitchmod 			= 0;
 	this->cv_gatemod 				= 0;
 	this->cv_glidemod 			= 0;
-	this->mute 							= 0;
+  this->muteGate 							= 0;
+  this->muteCV1 							= 0;
+  this->muteCV2 							= 0;
   this->fill              = 0;
   this->skipNextNoteTrigger = 0;
   this->tieFlag           =0;
@@ -74,21 +76,33 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	outputControl->clearVelocityOutput(ch);
 };
 
-bool Sequencer::toggleMute(){
-	this->mute = !mute;
+bool Sequencer::toggleMute(uint8_t index){
+  switch(index){
+      case 0:
+        this->muteGate = !muteGate;
 
-	if (mute){
-		for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
-			if(stepNum == activeStep){
-				break;
-			}
-			stepData[stepNum].noteStatus = AWAITING_TRIGGER;
-			stepData[stepNum].arpStatus = 0;
-		}
-		outputControl->allNotesOff(channel);
-	}
+        if (muteGate){
+          for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
+            if(stepNum == activeStep){
+              break;
+            }
+            stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+            stepData[stepNum].arpStatus = 0;
+          }
+          outputControl->allNotesOff(channel);
+        }
 
-  return mute;
+        return muteGate;
+      break;
+      case 1:
+        this->muteCV1 = !muteCV1;
+        return muteCV1;
+      break;
+      case 2:
+        this->muteCV2 = !muteCV2;
+        return muteCV2;
+      break;
+  }
 
 };
 
@@ -234,7 +248,7 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
   //	}
 
 	//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
-    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey);
+    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey, muteCV1);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
   } else {
@@ -442,7 +456,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION
-	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey);
+	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1);
   tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true);
 
 	stepData[stepNum].arpStatus++;
