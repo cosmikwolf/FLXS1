@@ -1129,7 +1129,7 @@ uint8_t chanSwIndex;
         }
       }
     }
-    Serial.println("Return at the end of alt");
+    //Serial.println("Return at the end of alt");
     return false;
   }
 

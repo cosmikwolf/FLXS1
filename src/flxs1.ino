@@ -38,11 +38,11 @@ MidiModule midiControl;
 
 ADC *adc = new ADC(); // adc object
 
-AudioInputAnalog              adc0(A14);
-AudioAnalyzeNoteFrequency notefreq;
+//AudioInputAnalog              adc0(A14);
+//AudioAnalyzeNoteFrequency notefreq;
 
 ////      fft1024;        //xy=467,147
-AudioConnection               patchCord1(adc0 , notefreq);
+//AudioConnection               patchCord1(adc0 , notefreq);
 
 elapsedMillis noteFreqTimer;
 
@@ -56,8 +56,8 @@ void setup() {
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
 //  while (!Serial) ; // wait for serial monitor window to open
-  AudioMemory(24);
-  notefreq.begin(.15);
+  //AudioMemory(24);
+  //notefreq.begin(.15);
 
 
   delay(500);
@@ -157,12 +157,13 @@ void setup() {
   adc->setResolution(16, ADC_1); // set bits of resolution
   //adc->setAveraging(8, ADC_0); // set number of averages
   //adc->setResolution(16, ADC_0); // set bits of resolution
+  //adc->setReference(ADC_REF_3V3, ADC_1);
 
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   // see the documentation for more information
-  //adc->setConversionSpeed(ADC_VERY_LOW_SPEED); // change the conversion speed
+  //adc->setConversionSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-  adc->setSamplingSpeed(ADC_VERY_HIGH_SPEED); // change the sampling speed
+//  adc->setSamplingSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the sampling speed
   // CLOCK PIN SETUP
   pinMode(CLOCK_PIN, OUTPUT);
   digitalWrite(CLOCK_PIN, LOW);

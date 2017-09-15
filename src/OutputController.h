@@ -31,10 +31,10 @@
 class OutputController {
 public:
   void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj);
-  void noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey,  bool cvMute);
+  void noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey,  bool cvMute, uint32_t startFrame);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   uint16_t getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey);
-  void cv2update(uint8_t channel, uint32_t currentFrame, uint32_t totalFrames, bool mute);
+  void cv2update(uint8_t channel, uint32_t currentFrame, uint32_t stepLength, bool mute);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
   void setGateOutputDebug(uint8_t index, bool value);
@@ -62,7 +62,7 @@ public:
   uint8_t lfoType[4];
   uint8_t lfoSpeed[4];
   uint8_t lfoAmplitude[4];
-  uint32_t lfoStartPhase[4];
+  uint32_t lfoStartFrame[4];
   bool   sampleAndHoldSwitch[4];
   bool    lfoRheoSet[4];
   bool    clockValue;

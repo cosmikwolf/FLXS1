@@ -23,10 +23,10 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
   this->lfoRheoSet[1] = 1;
   this->lfoRheoSet[2] = 1;
   this->lfoRheoSet[3] = 1;
-  this->lfoStartPhase[0] = 0;
-  this->lfoStartPhase[1] = 0;
-  this->lfoStartPhase[2] = 0;
-  this->lfoStartPhase[3] = 0;
+  this->lfoStartFrame[0] = 0;
+  this->lfoStartFrame[1] = 0;
+  this->lfoStartFrame[2] = 0;
+  this->lfoStartFrame[3] = 0;
   this->sampleAndHoldSwitch[0] = 1;
   this->sampleAndHoldSwitch[1] = 1;
   this->sampleAndHoldSwitch[2] = 1;
@@ -442,7 +442,7 @@ bool OutputController::gpioCheck(int8_t mapValue){
 
 };
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -485,20 +485,20 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
       lfoSpeed[channel] = lfoSpeedSetting;
     }
 
-    if(velocityType == 1){
-      //  Serial.println("velocitytype == 1 on channel " + String(channel));
-      if (outputMap(channel, RHEOCHANNELCC) == 0){
-        mcp4352_1.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
-      } else {
-        mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
-      }
-    //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
-    //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
-      lfoRheoSet[channel] = 1;
-    } else if (velocityType > 1){
+    if(velocityType > 0){
+    //   //  Serial.println("velocitytype == 1 on channel " + String(channel));
+    //   if (outputMap(channel, RHEOCHANNELCC) == 0){
+    //     mcp4352_1.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
+    //   } else {
+    //     mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
+    //   }
+    // //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+    // //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+    //   lfoRheoSet[channel] = 1;
+    // } else if (velocityType > 1){
     //  Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
       lfoRheoSet[channel] = 1;
-      lfoStartPhase[channel] = lfoClockCounter;
+      lfoStartFrame[channel] = startFrame;
     }
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
@@ -577,7 +577,7 @@ void OutputController::clearVelocityOutput(uint8_t channel){
     this->lfoSpeed[i] = 1;
     this->lfoAmplitude[i] = 0;
     this->lfoRheoSet[i] = 1;
-    this->lfoStartPhase[i] = 0;
+    this->lfoStartFrame[i] = 0;
     this->sampleAndHoldSwitch[i] = 1;
   }
 
@@ -586,16 +586,17 @@ void OutputController::clearVelocityOutput(uint8_t channel){
 
 };
 
-void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_t totalFrames, bool mute){
+void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_t stepLength, bool mute){
   if (mute){
     return;
   }
   uint8_t slewLevel = 0;
   int16_t voltageLevel = 0;
+
   bool   slewOn = false;
   bool skipUpdate = false;
   int32_t lfoTime = currentFrame * lfoSpeed[channel];
-  totalFrames *= 8;
+  stepLength *= 8;
   //Serial.println("beginning cv2update for channel " + String(channel));
   if (lfoType[channel] < 1){
     return;
@@ -607,13 +608,29 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
       voltageLevel = 0;
     break;
     case LFO_TRIGGER:
-
+      if(currentFrame < lfoStartFrame[channel] + stepLength/16){
+        voltageLevel = 16384;
+      } else {
+        voltageLevel = 0;
+      }
+    break;
     case LFO_ENV_DECAY:
+      //voltageLevel = min_max(-16*lfoAmplitude[channel]*log(currentFrame - lfoStartFrame[channel]),-16384, 16384);
+      voltageLevel = lfoAmplitude[channel]*exp(((int)currentFrame - (int)lfoStartFrame[channel])/((int)lfoSpeed[channel]));
 
+      slewOn = false;
+
+      Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\texp: " + String(((int)currentFrame - (int)lfoStartFrame[channel])/((int)lfoSpeed[channel])));
     break;
 
     case LFO_ENV_ATTACK:
-
+      // lfoStartFrame[channel] - first frame of env
+      // currentFrame -
+      //voltageLevel = lfoAmplitude[channel] * 16384 * (currentFrame - lfoStartFrame[channel])/ (stepLength * lfoSpeed[channel]);
+      voltageLevel = lfoAmplitude[channel] * 16384 *  (currentFrame - lfoStartFrame[channel]);
+      //voltageLevel = 8000;
+      slewLevel = 0;
+      slewOn = false;
     break;
 
     case LFO_ENV_AR:
@@ -625,21 +642,23 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     break;
 
     case LFO_TRIANGLE:
-      voltageLevel = 128*lfoAmplitude[channel]*abs(32768 -  (int)(65535*lfoTime/totalFrames) % (65535) ) - lfoAmplitude[channel]*128;
-      slewOn = true;
+    //x = m - abs(i % (2*m) - m)
+//      voltageLevel = stepLength - abs(lfoTime)
+      voltageLevel = 2*abs(lfoAmplitude[channel]*((int)(lfoTime/(stepLength/128)) % (256)- 128 ))  - (lfoAmplitude[channel]*128);
+      slewOn = false;
       slewLevel = 0;
     break;
 
     case LFO_SAWUP:
       slewLevel = 0;
-      voltageLevel = lfoAmplitude[channel]*(- 128 +  (int)(lfoTime/(totalFrames/128)) % (256));
-      slewOn = true;
+      voltageLevel = lfoAmplitude[channel]*((int)(lfoTime/(stepLength/128)) % (256)- 128 );
+      slewOn = false;
     break;
 
     case LFO_SAWDN:
       slewLevel = 0;
-      voltageLevel = lfoAmplitude[channel]*128 -  (int)(lfoTime/(totalFrames/8550)) % (lfoAmplitude[channel]*256);
-      slewOn = true;
+      voltageLevel = lfoAmplitude[channel]*128 -  (int)(lfoTime/(stepLength/8550)) % (lfoAmplitude[channel]*256);
+      slewOn = false;
     break;
 
     case LFO_SAMPLEHOLD:
@@ -652,16 +671,14 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
         skipUpdate = true;
       }
 
-      if ((sin((lfoTime*3.1415926536)/(totalFrames))) > 0){
+      if ((sin((lfoTime*3.1415926536)/(stepLength))) > 0){
         if(sampleAndHoldSwitch[channel]) voltageLevel = random(-lfoAmplitude[channel]*128, lfoAmplitude[channel]*128);
         sampleAndHoldSwitch[channel] = false;
       } else {
         sampleAndHoldSwitch[channel] = true;
         skipUpdate = true;
       }
-
     break;
-
 
     case LFO_VOLTAGE:
       slewLevel = 0;
@@ -670,14 +687,14 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
     case LFO_SINE:
       slewLevel = 1;
-      voltageLevel =  (sin((lfoTime*3.1415926536)/(totalFrames)))*lfoAmplitude[channel]*128;
-      //voltageLevel =  (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartPhase[channel])*3.1415926536)/(beatLength/100)))*lfoAmplitude[channel]*128;
+      voltageLevel =  (sin((lfoTime*3.1415926536)/(stepLength)))*lfoAmplitude[channel]*128;
+      //voltageLevel =  (sin((lfoSpeed[channel]*(lfoClockCounter-lfoStartFrame[channel])*3.1415926536)/(beatLength/100)))*lfoAmplitude[channel]*128;
       slewOn = true;
     break;
 
     case LFO_SQUARE: // SQUARE WAVE
       slewLevel = 0;
-      if ( sin((lfoTime*3.1415926536)/(totalFrames)) > 0){
+      if ( sin((lfoTime*3.1415926536)/(stepLength)) > 0){
         voltageLevel = lfoAmplitude[channel]*128;
       } else {
         voltageLevel = -lfoAmplitude[channel]*128;
@@ -687,7 +704,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
     case LFO_RNDSQUARE: //rounded square wave
       slewLevel = 40;
-      if ( sin((lfoTime*3.1415926536)/(totalFrames)) > 0){
+      if ( sin((lfoTime*3.1415926536)/(stepLength)) > 0){
         voltageLevel = lfoAmplitude[channel]*128;
       } else {
         voltageLevel = -lfoAmplitude[channel]*128;

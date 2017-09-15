@@ -26,10 +26,12 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.fillScreen(PURPLE);      delay(10);
   oled.fillScreen(RED);        delay(10);
   oled.fillScreen(ORANGE, YELLOW);
-  oled.setFont(&NeueHaasXBlack_28);//this will load the font
-  oled.println("RESIST");               delay(50);
+  oled.setFont(&OrbitBold_14);//this will load the font
+  oled.setTextScale(2);
+  oled.setCursor(CENTER,8);
+  oled.println("RESIST");               delay(100);
   oled.fillScreen(GREEN, ORANGE);
-  oled.println("FASISM");      delay(50);
+  oled.println("FASCISM");      delay(100);
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
