@@ -157,6 +157,7 @@ void setup() {
   adc->setResolution(16, ADC_1); // set bits of resolution
   //adc->setAveraging(8, ADC_0); // set number of averages
   //adc->setResolution(16, ADC_0); // set bits of resolution
+  adc->setReference(ADC_REF_3V3, ADC_1);
   //adc->setReference(ADC_REF_3V3, ADC_1);
 
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED

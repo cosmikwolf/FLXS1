@@ -70,6 +70,7 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
     eraseAllFlag = true;
   }
 
+
 }
 void InputModule::multiSelectInputHandler(){
   for (int i=0; i < 16; i++){
@@ -373,6 +374,7 @@ void InputModule::loop(uint16_t frequency){
 
     // now to handle the rest of the buttons.
     bool didAltButtonsFire = altButtonHandler();
+
     if (didAltButtonsFire == false){
       switch (currentMenu) {
         case PITCH_GATE_MENU:
@@ -967,6 +969,8 @@ uint8_t chanSwIndex;
            case CALIBRATION_MENU:
             if (midplaneGPIO->pressed(SW_SHIFT)){
               calibrationSaveHandler();
+            } else {
+              calibrationMenuHandler();
             }
            break;
            default:
@@ -1399,10 +1403,73 @@ void InputModule::calibrationMenuHandler(){
   //if (midplaneGPIO->pressed(SW_REC)){
   //  multiplier = 10;
 ///  }
+switch (stepMode){
+  case STATE_CALIB_INPUT0_LOW:
+  case STATE_CALIB_INPUT0_HIGH:
+  case STATE_CALIB_INPUT0_OFFSET:
+  case STATE_CALIB_INPUT1_LOW:
+  case STATE_CALIB_INPUT1_HIGH:
+  case STATE_CALIB_INPUT1_OFFSET:
+  case STATE_CALIB_INPUT2_LOW:
+  case STATE_CALIB_INPUT2_HIGH:
+  case STATE_CALIB_INPUT2_OFFSET:
+  case STATE_CALIB_INPUT3_LOW:
+  case STATE_CALIB_INPUT3_HIGH:
+  case STATE_CALIB_INPUT3_OFFSET:
+    if(midplaneGPIO->pressed(SW_CH0)){
+      globalObj->adcCalibrationOffset[0] = (globalObj->cvInputRaw[0]  + 9* globalObj->adcCalibrationOffset[0])/10 ;
+    }
+    if(midplaneGPIO->pressed(SW_CH1)){
+      globalObj->adcCalibrationOffset[1] = (globalObj->cvInputRaw[1]  + 9* globalObj->adcCalibrationOffset[1])/10 ;
+    }
+    if(midplaneGPIO->pressed(SW_CH2)){
+      globalObj->adcCalibrationOffset[2] = (globalObj->cvInputRaw[2]  + 9* globalObj->adcCalibrationOffset[2])/10 ;
+    }
+    if(midplaneGPIO->pressed(SW_CH3)){
+      globalObj->adcCalibrationOffset[3] = (globalObj->cvInputRaw[3]  + 9* globalObj->adcCalibrationOffset[3])/10 ;
+    }
+
+    if(midplaneGPIO->pressed(SW_00)){
+      globalObj->adcCalibrationNeg[0] = min_max(globalObj->adcCalibrationOffset[0] + ((globalObj->adcCalibrationOffset[0] - globalObj->cvInputRaw[0])/3)*5, 0,65535 );
+      globalObj->adcCalibrationPos[0] = min_max(globalObj->adcCalibrationOffset[0] - ((globalObj->adcCalibrationOffset[0] - globalObj->cvInputRaw[0])/3)*5, 0,65535 );
+    }
+    if(midplaneGPIO->pressed(SW_04)){
+      globalObj->adcCalibrationNeg[1] = min_max(globalObj->adcCalibrationOffset[1] + ((globalObj->adcCalibrationOffset[1] - globalObj->cvInputRaw[1])/3)*5, 0,65535 );
+      globalObj->adcCalibrationPos[1] = min_max(globalObj->adcCalibrationOffset[1] - ((globalObj->adcCalibrationOffset[1] - globalObj->cvInputRaw[1])/3)*5, 0,65535 );
+    }
+    if(midplaneGPIO->pressed(SW_08)){
+      globalObj->adcCalibrationNeg[2] = min_max(globalObj->adcCalibrationOffset[2] + ((globalObj->adcCalibrationOffset[2] - globalObj->cvInputRaw[2])/3)*5, 0,65535 );
+      globalObj->adcCalibrationPos[2] = min_max(globalObj->adcCalibrationOffset[2] - ((globalObj->adcCalibrationOffset[2] - globalObj->cvInputRaw[2])/3)*5, 0,65535 );
+    }
+    if(midplaneGPIO->pressed(SW_12)){
+      globalObj->adcCalibrationNeg[3] = min_max(globalObj->adcCalibrationOffset[3] + ((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3)*5, 0,65535 );
+      globalObj->adcCalibrationPos[3] = min_max(globalObj->adcCalibrationOffset[3] - ((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3)*5, 0,65535 );
+      Serial.println("RAW: " + String(globalObj->cvInputRaw[3]) + "\t1v: " + String((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3) + "\t5v: " + String(((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[0])/3) *5));
+
+    }
+    /*
+
+    offset = 0v level - 32767 in an ideal situation
+    pos = -5v level - something around 62000
+    neg = 5v level - something around 1024
+
+    calibration occurs at 3v which should be around 15000
+    (around 6000 per volt)
+
+
+    adcCalibrationNeg = offset + (offset - 3vVal)*5/3
+    adcCalibrationPos = offset - (offset - 3vVal)*5/3
+
+    */
+
+  break;
+}
   if(knobChange){
     if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
       changeState(min_max_cycle(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_CALIB_OUTPUT7_TEST ));
     } else {
+
+
       switch (stepMode){
         case STATE_CALIB_INPUT0_LOW:
           globalObj->adcCalibrationPos[0] += knobChange;

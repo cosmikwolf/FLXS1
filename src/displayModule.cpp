@@ -52,8 +52,8 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
 
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
-  oled.setTextColor(DARK_GREY);
-  oled.println("v014");
+  oled.setTextColor(BLACK);
+  oled.println("v015");
 
   //  delay(1000);
   Serial.println("Display Initialization Complete");
