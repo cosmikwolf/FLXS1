@@ -603,7 +603,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
   bool   slewOn = false;
   bool skipUpdate = false;
-  int32_t lfoTime = (currentFrame-lfoStartFrame[channel]) * lfoSpeed[channel];
+  int32_t lfoTime = (currentFrame-lfoStartFrame[channel]) * lfoSpeed[channel]/4;
   ///stepLength *= 8;
   //Serial.println("beginning cv2update for channel " + String(channel));
   if (lfoType[channel] < 1){
@@ -624,8 +624,8 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     break;
 
     case LFO_ENV_AR:
-    offset = stepLength*16/(2*lfoSpeed[channel]);
-    segmentLength = (stepLength*16/(4*lfoSpeed[channel]));
+    offset = stepLength*16*4/(2*lfoSpeed[channel]);
+    segmentLength = (stepLength*16/(lfoSpeed[channel]));
 
       if(currentFrame - lfoStartFrame[channel] < offset){
         voltageLevel = min_max(-1*(lfoAmplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/segmentLength), lfoAmplitude[channel]*-128, lfoAmplitude[channel]*128);
@@ -639,8 +639,8 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
 
     case LFO_ENV_ASR:
-      offset = stepLength*16/(3*lfoSpeed[channel]);
-      segmentLength = (stepLength*16/(6*lfoSpeed[channel]));
+      offset = stepLength*16*4/(3*lfoSpeed[channel]);
+      segmentLength = (stepLength*16*4/(6*lfoSpeed[channel]));
 
       if(currentFrame - lfoStartFrame[channel] < offset){
         voltageLevel = min_max(-1*(lfoAmplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/segmentLength)  , lfoAmplitude[channel]*-128, lfoAmplitude[channel]*128);
@@ -668,7 +668,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
       // lfoStartFrame[channel] - first frame of env
       // currentFrame -
       //voltageLevel = lfoAmplitude[channel] * 16384 * (currentFrame - lfoStartFrame[channel])/ (stepLength * lfoSpeed[channel]);
-      voltageLevel = min_max(-1*(lfoAmplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/(stepLength*16/lfoSpeed[channel]))  , -16384, lfoAmplitude[channel]*128);
+      voltageLevel = min_max(-1*(lfoAmplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/(stepLength*16*4/lfoSpeed[channel]))  , -16384, lfoAmplitude[channel]*128);
       //voltageLevel = 8000;
       slewLevel = 0;
       slewOn = false;

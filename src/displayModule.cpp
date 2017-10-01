@@ -822,18 +822,38 @@ void DisplayModule::stateDisplay_arp(char *buf){
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[8] = strdup(buf);
 
-    displayElement[1] = strdup("level:");
+    displayElement[1] = strdup("ampl:");
 
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocity);
+    sprintf(buf, "%d.%02dv",sequenceArray[selectedChannel].stepData[selectedStep].velocity*10/128, (1000*sequenceArray[selectedChannel].stepData[selectedStep].velocity)/128-100*(sequenceArray[selectedChannel].stepData[selectedStep].velocity*10/128) );
+
     displayElement[2] = strdup(buf);
     displayElement[3] = strdup("type:");
     char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
     displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
     //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].velocityType).c_str());
-    displayElement[5] = strdup("LFO spd:");
 
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
-    displayElement[6] = strdup(buf);
+    /*
+    Speed of 128
+    is 1/2 step wavelength
+    which is 64/128
+    speed of 64 is 1 step wavelength
+    speed of 32 is 2 step wavelenth
+    which is 64/32
+    */
+    if (sequenceArray[selectedChannel].stepData[selectedStep].velocityType > 6){
+        displayElement[5] = strdup("Wavelnt:");
+        sprintf(buf, "%d.%02d stp",
+          sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed%64))/64
+       );
+       displayElement[6] = strdup(buf);
+
+    } else {
+      displayElement[5] = strdup("EnvLng:");
+      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+      displayElement[6] = strdup(buf);
+
+    }
+
 
 
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
@@ -843,8 +863,8 @@ void DisplayModule::stateDisplay_arp(char *buf){
     renderStringBox(1,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
     renderStringBox(2,  STATE_VELOCITY, 50, 37,78,17, false, STYLE1X, background , foreground);
 
-    renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
+    renderStringBox(5,  DISPLAY_LABEL,        0,  54,64,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_LFOSPEED, 64, 54,64,17, false, STYLE1X, background , foreground);
 
     renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
     renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
@@ -900,7 +920,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
    renderStringBox(2,  STATE_VELOCITY, 50, 37,78,17, false, STYLE1X, background , foreground);
 
    renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_LFOSPEED, 80, 54,47,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_LFOSPEED, 90, 54,47,17, false, STYLE1X, background , foreground);
 
    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
