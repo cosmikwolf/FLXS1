@@ -38,11 +38,11 @@ void GlobalVariable::initialize(){
 
        this->calibrationBuffer = 0;
 
-       for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 1650; };
-       for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 64350; };
-       for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 850; };
-       for(int i=0; i<4; i++){ this->adcCalibrationNeg[i]= 65300; };
-       for(int i=0; i<4; i++){ this->adcCalibrationOffset[i]= 33237; };
+       for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
+       for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };
+       for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 0; };
+       for(int i=0; i<4; i++){ this->adcCalibrationNeg[i]= 65535; };
+       for(int i=0; i<4; i++){ this->adcCalibrationOffset[i]= 32767; };
 
     }
 

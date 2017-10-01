@@ -71,7 +71,7 @@ void FlashMemory::saveCalibrationEEPROM(){
 
 };
 
-void FlashMemory::readCalibrationEEPROM(){
+bool FlashMemory::readCalibrationEEPROM(){
   uint16_t address = 0;
   uint16_t checkVal;
 
@@ -82,7 +82,7 @@ void FlashMemory::readCalibrationEEPROM(){
     Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
     Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
     Serial.println(" -- CALIBRATION HAS NOT BEEN PERFORMED -- ");
-    return;
+    return 1;
   }
   address += 2;
 
@@ -109,7 +109,7 @@ void FlashMemory::readCalibrationEEPROM(){
   }
 
 
-
+  return 0;
 };
 
 uint8_t FlashMemory::getSaveSector(uint8_t channel, uint8_t pattern){

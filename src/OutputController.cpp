@@ -158,6 +158,10 @@ for (int i=0; i<4; i++){
   }
 }
 
+void OutputController::setDacVoltage( uint8_t dac, uint16_t output ){
+  ad5676.setVoltage(dac, output);
+  ad5676.setVoltage(dac, output);
+};
 
 void OutputController::dacTestLoop(){
   int voltage; // = 65535*(sin(millis()/10.0)+1)/2;
@@ -200,7 +204,7 @@ void OutputController::dacTestLoop(){
         ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[i]], globalObj->dacCalibrationPos[dacMap[i]] ) );
       }
     break;
-
+/*
 
     case STATE_CALIB_OUTPUT0_LOW:
       ad5676.setVoltage(dacMap[0], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
@@ -212,13 +216,6 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[0], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
     break;
 
-    case STATE_CALIB_OUTPUT0_TEST:
-  //    ad5676.setVoltage(dacMap[0], map(sinVal, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
-  //    ad5676.setVoltage(dacMap[0], map(sinVal, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
-      ad5676.setVoltage(dacMap[0], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
-      ad5676.setVoltage(dacMap[0], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
-
-    break;
     case STATE_CALIB_OUTPUT1_LOW:
       ad5676.setVoltage(dacMap[1], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[1]], globalObj->dacCalibrationPos[dacMap[1]] ) );
       ad5676.setVoltage(dacMap[1], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[1]], globalObj->dacCalibrationPos[dacMap[1]] ) );
@@ -227,10 +224,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[1], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[1]], globalObj->dacCalibrationPos[dacMap[1]] ) );
       ad5676.setVoltage(dacMap[1], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[1]], globalObj->dacCalibrationPos[dacMap[1]] ) );
     break;
-    case STATE_CALIB_OUTPUT1_TEST:
-      ad5676.setVoltage(dacMap[1], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[1]], globalObj->dacCalibrationPos[dacMap[1]] ) );
-      ad5676.setVoltage(dacMap[1], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[1]], globalObj->dacCalibrationPos[dacMap[1]] ) );
-    break;
+
     case STATE_CALIB_OUTPUT2_LOW:
       ad5676.setVoltage(dacMap[2], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[2]], globalObj->dacCalibrationPos[dacMap[2]] ) );
       ad5676.setVoltage(dacMap[2], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[2]], globalObj->dacCalibrationPos[dacMap[2]] ) );
@@ -239,10 +233,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[2], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[2]], globalObj->dacCalibrationPos[dacMap[2]] ) );
       ad5676.setVoltage(dacMap[2], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[2]], globalObj->dacCalibrationPos[dacMap[2]] ) );
     break;
-    case STATE_CALIB_OUTPUT2_TEST:
-      ad5676.setVoltage(dacMap[2], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[2]], globalObj->dacCalibrationPos[dacMap[2]] ) );
-      ad5676.setVoltage(dacMap[2], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[2]], globalObj->dacCalibrationPos[dacMap[2]] ) );
-    break;
+
     case STATE_CALIB_OUTPUT3_LOW:
       ad5676.setVoltage(dacMap[3], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[3]], globalObj->dacCalibrationPos[dacMap[3]] ) );
       ad5676.setVoltage(dacMap[3], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[3]], globalObj->dacCalibrationPos[dacMap[3]] ) );
@@ -251,10 +242,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[3], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[3]], globalObj->dacCalibrationPos[dacMap[3]] ) );
       ad5676.setVoltage(dacMap[3], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[3]], globalObj->dacCalibrationPos[dacMap[3]] ) );
     break;
-    case STATE_CALIB_OUTPUT3_TEST:
-      ad5676.setVoltage(dacMap[3], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[3]], globalObj->dacCalibrationPos[dacMap[3]] ) );
-      ad5676.setVoltage(dacMap[3], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[3]], globalObj->dacCalibrationPos[dacMap[3]] ) );
-    break;
+
     case STATE_CALIB_OUTPUT4_LOW:
       ad5676.setVoltage(dacMap[4], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[4]], globalObj->dacCalibrationPos[dacMap[4]] ) );
       ad5676.setVoltage(dacMap[4], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[4]], globalObj->dacCalibrationPos[dacMap[4]] ) );
@@ -263,10 +251,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[4], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[4]], globalObj->dacCalibrationPos[dacMap[4]] ) );
       ad5676.setVoltage(dacMap[4], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[4]], globalObj->dacCalibrationPos[dacMap[4]] ) );
     break;
-    case STATE_CALIB_OUTPUT4_TEST:
-      ad5676.setVoltage(dacMap[4], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[4]], globalObj->dacCalibrationPos[dacMap[4]] ) );
-      ad5676.setVoltage(dacMap[4], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[4]], globalObj->dacCalibrationPos[dacMap[4]] ) );
-    break;
+
     case STATE_CALIB_OUTPUT5_LOW:
       ad5676.setVoltage(dacMap[5], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[5]], globalObj->dacCalibrationPos[dacMap[5]] ) );
       ad5676.setVoltage(dacMap[5], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[5]], globalObj->dacCalibrationPos[dacMap[5]] ) );
@@ -275,10 +260,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[5], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[5]], globalObj->dacCalibrationPos[dacMap[5]] ) );
       ad5676.setVoltage(dacMap[5], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[5]], globalObj->dacCalibrationPos[dacMap[5]] ) );
     break;
-    case STATE_CALIB_OUTPUT5_TEST:
-      ad5676.setVoltage(dacMap[5], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[5]], globalObj->dacCalibrationPos[dacMap[5]] ) );
-      ad5676.setVoltage(dacMap[5], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[5]], globalObj->dacCalibrationPos[dacMap[5]] ) );
-    break;
+
     case STATE_CALIB_OUTPUT6_LOW:
       ad5676.setVoltage(dacMap[6], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[6]], globalObj->dacCalibrationPos[dacMap[6]] ) );
       ad5676.setVoltage(dacMap[6], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[6]], globalObj->dacCalibrationPos[dacMap[6]] ) );
@@ -287,10 +269,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[6], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[6]], globalObj->dacCalibrationPos[dacMap[6]] ) );
       ad5676.setVoltage(dacMap[6], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[6]], globalObj->dacCalibrationPos[dacMap[6]] ) );
     break;
-    case STATE_CALIB_OUTPUT6_TEST:
-      ad5676.setVoltage(dacMap[6], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[6]], globalObj->dacCalibrationPos[dacMap[6]] ) );
-      ad5676.setVoltage(dacMap[6], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[6]], globalObj->dacCalibrationPos[dacMap[6]] ) );
-    break;
+
     case STATE_CALIB_OUTPUT7_LOW:
       ad5676.setVoltage(dacMap[7], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[7]], globalObj->dacCalibrationPos[dacMap[7]] ) );
       ad5676.setVoltage(dacMap[7], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[7]], globalObj->dacCalibrationPos[dacMap[7]] ) );
@@ -299,10 +278,7 @@ void OutputController::dacTestLoop(){
       ad5676.setVoltage(dacMap[7], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[7]], globalObj->dacCalibrationPos[dacMap[7]] ) );
       ad5676.setVoltage(dacMap[7], map(8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[7]], globalObj->dacCalibrationPos[dacMap[7]] ) );
     break;
-    case STATE_CALIB_OUTPUT7_TEST:
-      ad5676.setVoltage(dacMap[7], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[7]], globalObj->dacCalibrationPos[dacMap[7]] ) );
-      ad5676.setVoltage(dacMap[7], map(0, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[7]], globalObj->dacCalibrationPos[dacMap[7]] ) );
-    break;
+    */
   }
   //Serial.println("setting voltage all dacs to: " + String(voltage) + " -- starttime:" + String(startTime));
 

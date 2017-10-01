@@ -54,7 +54,7 @@ public:
   void deleteTest();
 
   void saveCalibrationEEPROM();
-  void readCalibrationEEPROM();
+  bool readCalibrationEEPROM();
 
   void setCacheStatus(uint8_t index, uint8_t status);
   int  getCacheStatus(uint8_t index);

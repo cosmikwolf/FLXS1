@@ -1400,73 +1400,188 @@ void InputModule::calibrationSaveHandler(){
 void InputModule::calibrationMenuHandler(){
 //  uint8_t multiplier = 100;
   playing = 0;
+
+  uint32_t calibHigh;
+  uint32_t calibLow;
+  elapsedMillis timeoutTimer;
   //if (midplaneGPIO->pressed(SW_REC)){
   //  multiplier = 10;
 ///  }
-switch (stepMode){
-  case STATE_CALIB_INPUT0_LOW:
-  case STATE_CALIB_INPUT0_HIGH:
-  case STATE_CALIB_INPUT0_OFFSET:
-  case STATE_CALIB_INPUT1_LOW:
-  case STATE_CALIB_INPUT1_HIGH:
-  case STATE_CALIB_INPUT1_OFFSET:
-  case STATE_CALIB_INPUT2_LOW:
-  case STATE_CALIB_INPUT2_HIGH:
-  case STATE_CALIB_INPUT2_OFFSET:
-  case STATE_CALIB_INPUT3_LOW:
-  case STATE_CALIB_INPUT3_HIGH:
-  case STATE_CALIB_INPUT3_OFFSET:
-    if(midplaneGPIO->pressed(SW_CH0)){
-      globalObj->adcCalibrationOffset[0] = (globalObj->cvInputRaw[0]  + 9* globalObj->adcCalibrationOffset[0])/10 ;
-    }
-    if(midplaneGPIO->pressed(SW_CH1)){
-      globalObj->adcCalibrationOffset[1] = (globalObj->cvInputRaw[1]  + 9* globalObj->adcCalibrationOffset[1])/10 ;
-    }
-    if(midplaneGPIO->pressed(SW_CH2)){
-      globalObj->adcCalibrationOffset[2] = (globalObj->cvInputRaw[2]  + 9* globalObj->adcCalibrationOffset[2])/10 ;
-    }
-    if(midplaneGPIO->pressed(SW_CH3)){
-      globalObj->adcCalibrationOffset[3] = (globalObj->cvInputRaw[3]  + 9* globalObj->adcCalibrationOffset[3])/10 ;
-    }
+  switch (stepMode){
+    case STATE_CALIB_INPUT0_LOW:
+    case STATE_CALIB_INPUT0_HIGH:
+    case STATE_CALIB_INPUT0_OFFSET:
+    case STATE_CALIB_INPUT1_LOW:
+    case STATE_CALIB_INPUT1_HIGH:
+    case STATE_CALIB_INPUT1_OFFSET:
+    case STATE_CALIB_INPUT2_LOW:
+    case STATE_CALIB_INPUT2_HIGH:
+    case STATE_CALIB_INPUT2_OFFSET:
+    case STATE_CALIB_INPUT3_LOW:
+    case STATE_CALIB_INPUT3_HIGH:
+    case STATE_CALIB_INPUT3_OFFSET:
+      if(midplaneGPIO->pressed(SW_CH0)){
+        globalObj->adcCalibrationOffset[0] = (globalObj->cvInputRaw[0]  + 9* globalObj->adcCalibrationOffset[0])/10 ;
+      }
+      if(midplaneGPIO->pressed(SW_CH1)){
+        globalObj->adcCalibrationOffset[1] = (globalObj->cvInputRaw[1] + 9* globalObj->adcCalibrationOffset[1])/10 ;
+      }
+      if(midplaneGPIO->pressed(SW_CH2)){
+        globalObj->adcCalibrationOffset[2] = (globalObj->cvInputRaw[2] + 9* globalObj->adcCalibrationOffset[2])/10 ;
+      }
+      if(midplaneGPIO->pressed(SW_CH3)){
+        globalObj->adcCalibrationOffset[3] = (globalObj->cvInputRaw[3] + 9* globalObj->adcCalibrationOffset[3])/10 ;
+      }
 
-    if(midplaneGPIO->pressed(SW_00)){
-      globalObj->adcCalibrationNeg[0] = min_max(globalObj->adcCalibrationOffset[0] + ((globalObj->adcCalibrationOffset[0] - globalObj->cvInputRaw[0])/3)*5, 0,65535 );
-      globalObj->adcCalibrationPos[0] = min_max(globalObj->adcCalibrationOffset[0] - ((globalObj->adcCalibrationOffset[0] - globalObj->cvInputRaw[0])/3)*5, 0,65535 );
-    }
-    if(midplaneGPIO->pressed(SW_04)){
-      globalObj->adcCalibrationNeg[1] = min_max(globalObj->adcCalibrationOffset[1] + ((globalObj->adcCalibrationOffset[1] - globalObj->cvInputRaw[1])/3)*5, 0,65535 );
-      globalObj->adcCalibrationPos[1] = min_max(globalObj->adcCalibrationOffset[1] - ((globalObj->adcCalibrationOffset[1] - globalObj->cvInputRaw[1])/3)*5, 0,65535 );
-    }
-    if(midplaneGPIO->pressed(SW_08)){
-      globalObj->adcCalibrationNeg[2] = min_max(globalObj->adcCalibrationOffset[2] + ((globalObj->adcCalibrationOffset[2] - globalObj->cvInputRaw[2])/3)*5, 0,65535 );
-      globalObj->adcCalibrationPos[2] = min_max(globalObj->adcCalibrationOffset[2] - ((globalObj->adcCalibrationOffset[2] - globalObj->cvInputRaw[2])/3)*5, 0,65535 );
-    }
-    if(midplaneGPIO->pressed(SW_12)){
-      globalObj->adcCalibrationNeg[3] = min_max(globalObj->adcCalibrationOffset[3] + ((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3)*5, 0,65535 );
-      globalObj->adcCalibrationPos[3] = min_max(globalObj->adcCalibrationOffset[3] - ((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3)*5, 0,65535 );
-      Serial.println("RAW: " + String(globalObj->cvInputRaw[3]) + "\t1v: " + String((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3) + "\t5v: " + String(((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[0])/3) *5));
+      if(midplaneGPIO->pressed(SW_00)){
+        globalObj->adcCalibrationNeg[0] = min_max(globalObj->adcCalibrationOffset[0] + ((globalObj->adcCalibrationOffset[0]  - globalObj->cvInputRaw[0])/3)*5, 0,65535 );
+        globalObj->adcCalibrationPos[0] = min_max(globalObj->adcCalibrationOffset[0] - ((globalObj->adcCalibrationOffset[0]  - globalObj->cvInputRaw[0])/3)*5, 0,65535 );
+      }
+      if(midplaneGPIO->pressed(SW_04)){
+        globalObj->adcCalibrationNeg[1] = min_max(globalObj->adcCalibrationOffset[1] + ((globalObj->adcCalibrationOffset[1]  - globalObj->cvInputRaw[1])/3)*5, 0,65535 );
+        globalObj->adcCalibrationPos[1] = min_max(globalObj->adcCalibrationOffset[1] - ((globalObj->adcCalibrationOffset[1]  - globalObj->cvInputRaw[1])/3)*5, 0,65535 );
+      }
+      if(midplaneGPIO->pressed(SW_08)){
+        globalObj->adcCalibrationNeg[2] = min_max(globalObj->adcCalibrationOffset[2] + ((globalObj->adcCalibrationOffset[2]  - globalObj->cvInputRaw[2])/3)*5, 0,65535 );
+        globalObj->adcCalibrationPos[2] = min_max(globalObj->adcCalibrationOffset[2] - ((globalObj->adcCalibrationOffset[2]  - globalObj->cvInputRaw[2])/3)*5, 0,65535 );
+      }
+      if(midplaneGPIO->pressed(SW_12)){
+        globalObj->adcCalibrationNeg[3] = min_max(globalObj->adcCalibrationOffset[3] + ((globalObj->adcCalibrationOffset[3]  - globalObj->cvInputRaw[3])/3)*5, 0,65535 );
+        globalObj->adcCalibrationPos[3] = min_max(globalObj->adcCalibrationOffset[3] - ((globalObj->adcCalibrationOffset[3]  - globalObj->cvInputRaw[3])/3)*5, 0,65535 );
+        Serial.println("RAW: " + String(globalObj->cvInputRaw[3]) + "\t1v: " + String((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[3])/3) + "\t5v: " + String(((globalObj->adcCalibrationOffset[3] - globalObj->cvInputRaw[0])/3) *5));
 
-    }
-    /*
+      }
+      /*
 
-    offset = 0v level - 32767 in an ideal situation
-    pos = -5v level - something around 62000
-    neg = 5v level - something around 1024
+      offset = 0v level - 32767 in an ideal situation
+      pos = -5v level - something around 62000
+      neg = 5v level - something around 1024
 
-    calibration occurs at 3v which should be around 15000
-    (around 6000 per volt)
+      calibration occurs at 3v which should be around 15000
+      (around 6000 per volt)
 
 
-    adcCalibrationNeg = offset + (offset - 3vVal)*5/3
-    adcCalibrationPos = offset - (offset - 3vVal)*5/3
+      adcCalibrationNeg = offset + (offset - 3vVal)*5/3
+      adcCalibrationPos = offset - (offset - 3vVal)*5/3
 
-    */
+      */
+    break;
+    case STATE_CALIB_OUTPUT0_LOW:
+    case STATE_CALIB_OUTPUT0_HIGH:
+    case STATE_CALIB_OUTPUT1_LOW:
+    case STATE_CALIB_OUTPUT1_HIGH:
+    case STATE_CALIB_OUTPUT2_LOW:
+    case STATE_CALIB_OUTPUT2_HIGH:
+    case STATE_CALIB_OUTPUT3_LOW:
+    case STATE_CALIB_OUTPUT3_HIGH:
+    case STATE_CALIB_OUTPUT4_LOW:
+    case STATE_CALIB_OUTPUT4_HIGH:
+    case STATE_CALIB_OUTPUT5_LOW:
+    case STATE_CALIB_OUTPUT5_HIGH:
+    case STATE_CALIB_OUTPUT6_LOW:
+    case STATE_CALIB_OUTPUT6_HIGH:
+    case STATE_CALIB_OUTPUT7_LOW:
+    case STATE_CALIB_OUTPUT7_HIGH:
+      if(midplaneGPIO->pressed(SW_15)){
+        for(int i =0; i<8; i++){
+          globalObj->dacCalibrationPos[dacMap[i]] = 65535;
+          globalObj->dacCalibrationNeg[dacMap[i]] = 0;
+        }
+      }
+      if(midplaneGPIO->pressed(SW_CH0)){
+        Serial.println("Calibrating DAC");
+        for(int n = 0; n <8; n++){
+          for(int i = 0; i<8; i++){
+            // set all DACs low
+            outputControl->setDacVoltage(dacMap[i], 0);
+          }
+          delay(10);
+          outputControl->setDacVoltage(dacMap[n], 65535);
+          delay(100);
+          outputControl->inputRead();
+          delay(10);
+          Serial.print("dac ch " + String(n) + " dacMap: " + String(dacMap[n]));
+          for(int adc = 0; adc < 4; adc++){
+            Serial.print("  adc" + String(adc) + "\t: " + String(globalObj->cvInputMapped1024[adc] ) + "\t");
+            if(globalObj->cvInputMapped1024[adc] > 512){
 
-  break;
-}
+              Serial.println("DAC " + String(n) + " is connected to ADC " + String(adc) + "\t with val: " + String(globalObj->cvInputMapped1024[adc]) + "\tcalibrating....");
+              // coarse tuning
+              calibHigh = 65535;
+              timeoutTimer = 0;
+              while( globalObj->cvInputMapped1024[adc] > 512 ){
+                calibHigh = calibHigh -100;
+                outputControl->setDacVoltage(dacMap[n], calibHigh);
+                delay(1); outputControl->inputRead(); delay(1);
+                if(timeoutTimer > 30000){Serial.println("timeout, ending calibration routine"); break;};
+              };
+              //fine adjustment
+              calibHigh += 150;
+              outputControl->setDacVoltage(dacMap[n], calibHigh);
+              delay(1); outputControl->inputRead(); delay(1);
+              timeoutTimer = 0;
+              while( globalObj->cvInputMapped1024[adc] > 512 ){
+                calibHigh = calibHigh - 1;
+                outputControl->setDacVoltage(dacMap[n], calibHigh);
+                delay(1); outputControl->inputRead(); delay(1);
+                if(timeoutTimer > 30000){Serial.println("timeout, ending calibration routine"); break;};
+              };
+              Serial.println("Calibration +2.5v found: " + String(calibHigh) + "\t adc value:  " + String(globalObj->cvInputMapped1024[adc]));
+              // coarse tuning
+
+              calibLow = 0;
+              outputControl->setDacVoltage(dacMap[n], calibLow);
+              delay(1); outputControl->inputRead(); delay(1);
+              timeoutTimer = 0;
+
+              while( globalObj->cvInputMapped1024[adc] < -512 ){
+                calibLow = calibLow + 100;
+                outputControl->setDacVoltage(dacMap[n], calibLow);
+                delay(1); outputControl->inputRead(); delay(1);
+                if(timeoutTimer > 30000){Serial.println("timeout, ending calibration routine"); break;};
+              };
+              // fine adjustment
+              calibLow -= 150;
+              outputControl->setDacVoltage(dacMap[n], calibLow);
+              delay(1); outputControl->inputRead(); delay(1);
+
+              while( globalObj->cvInputMapped1024[adc] < -512 ){
+                calibLow = calibLow + 1;
+                outputControl->setDacVoltage(dacMap[n], calibLow);
+                delay(1); outputControl->inputRead(); delay(1);
+                if(timeoutTimer > 30000){Serial.println("timeout, ending calibration routine"); break;};
+              };
+
+              Serial.println("Calibration -2.5v found: " + String(calibLow) + "\t adc value:  " + String(globalObj->cvInputMapped1024[adc]));
+              globalObj->dacCalibrationPos[dacMap[n]] = (5*calibHigh - 3*calibLow)/2;
+              globalObj->dacCalibrationNeg[dacMap[n]] = (5*calibLow - 3*calibHigh)/2;
+              Serial.println("Calibration Results - pos: " + String(globalObj->dacCalibrationPos[dacMap[n]]) + "\tneg: " + String(globalObj->dacCalibrationNeg[dacMap[n]]));
+
+            };
+          }
+          Serial.println("");
+
+          delay(100);
+        }
+        Serial.println("Calibration Complete");
+
+      }
+
+      /*
+        calibration routine:
+          1. set all DAC outputs to max neg
+          2. set one to max high
+          3. read ADC inputs to see if any of them have went HIGH
+          4. continue through ADC inputs til all have been checked
+          5. if more than one is high, error out
+          6. else, ADC and DAC are now connected.
+
+      */
+    break;
+  }
   if(knobChange){
     if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
-      changeState(min_max_cycle(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_CALIB_OUTPUT7_TEST ));
+      changeState(min_max(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_CALIB_OUTPUT7_HIGH ));
     } else {
 
 

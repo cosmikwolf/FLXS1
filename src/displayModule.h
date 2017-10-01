@@ -85,6 +85,7 @@ class DisplayModule
     elapsedMicros displayTimer;
     void initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj);
     void displayLoop(uint16_t frequency);
+    void calibrationWarning();
 
     void clearDisplay();
     void freeDisplayCache();

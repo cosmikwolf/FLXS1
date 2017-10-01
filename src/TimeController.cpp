@@ -78,8 +78,10 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   for(int i=0; i<SEQUENCECOUNT; i++){
     sequencerArray[i].initNewSequence(currentPattern, i);
   }
-	
-	saveFile.readCalibrationEEPROM();
+
+	if( saveFile.readCalibrationEEPROM() == true ){
+		display.calibrationWarning();
+	};
 
 	buttonIo.changeState(STATE_PITCH0);
 

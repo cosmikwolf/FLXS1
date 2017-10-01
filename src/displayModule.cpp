@@ -59,6 +59,22 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   Serial.println("Display Initialization Complete");
 }
 
+void DisplayModule::calibrationWarning(){
+  oled.fillScreen(RED); delay(250);
+  oled.fillScreen(WHITE); delay(250);
+  oled.fillScreen(RED); delay(250);
+  oled.fillScreen(WHITE); delay(250);
+  oled.fillScreen(RED); delay(250);
+  oled.fillScreen(WHITE); delay(250);
+  oled.fillScreen(BLACK);
+
+  oled.setCursor(CENTER,35);
+  oled.setTextColor(WHITE);
+  oled.setTextScale(1);
+  oled.println("CALIBRATION");
+  oled.println("NOT FOUND");
+  delay(500);
+}
 
 void DisplayModule::clearDisplay(){
   oled.clearScreen();
@@ -1416,7 +1432,7 @@ void DisplayModule::modalPopup(){
    highlight = currentPattern;
    oled.setTextWrap(true);
 
-   sprintf(buf, "Input Calibration: SHIFT-CH1 to save");
+   sprintf(buf, "Input Calib: SHIFT-CH1 to save");
    displayElement[0] = strdup(buf);
 
 
@@ -1493,95 +1509,79 @@ void DisplayModule::modalPopup(){
    displayElement[0] = strdup(buf);
 
 
-   sprintf(buf, "CV1A -5v:%d", globalObj->dacCalibrationNeg[dacMap[0]]);
+   sprintf(buf, "CV1A %d", globalObj->dacCalibrationNeg[dacMap[0]]);
    displayElement[1] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[0]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[0]]);
    displayElement[2] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[3] = strdup(buf);
 
-   sprintf(buf, "CV1B -5v:%d", globalObj->dacCalibrationNeg[dacMap[1]]);
+
+   sprintf(buf, "CV1B %d", globalObj->dacCalibrationNeg[dacMap[1]]);
    displayElement[4] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[1]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[1]]);
    displayElement[5] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[6] = strdup(buf);
 
-   sprintf(buf, "CV2A -5v:%d", globalObj->dacCalibrationNeg[dacMap[2]]);
+
+   sprintf(buf, "CV2A %d", globalObj->dacCalibrationNeg[dacMap[2]]);
    displayElement[7] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[2]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[2]]);
    displayElement[8] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[9] = strdup(buf);
 
-   sprintf(buf, "CV2B -5v:%d", globalObj->dacCalibrationNeg[dacMap[3]]);
+
+   sprintf(buf, "CV2B %d", globalObj->dacCalibrationNeg[dacMap[3]]);
    displayElement[10] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[3]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[3]]);
    displayElement[11] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[12] = strdup(buf);
 
-   sprintf(buf, "CV3A -5v:%d", globalObj->dacCalibrationNeg[dacMap[4]]);
+
+   sprintf(buf, "CV3A %d", globalObj->dacCalibrationNeg[dacMap[4]]);
    displayElement[13] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[4]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[4]]);
    displayElement[14] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[15] = strdup(buf);
 
-   sprintf(buf, "CV3B -5v:%d", globalObj->dacCalibrationNeg[dacMap[5]]);
+
+   sprintf(buf, "CV3B %d", globalObj->dacCalibrationNeg[dacMap[5]]);
    displayElement[16] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[5]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[5]]);
    displayElement[17] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[18] = strdup(buf);
 
-   sprintf(buf, "CV4A -5v:%d", globalObj->dacCalibrationNeg[dacMap[6]]);
+
+   sprintf(buf, "CV4A %d", globalObj->dacCalibrationNeg[dacMap[6]]);
    displayElement[19] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[6]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[6]]);
    displayElement[20] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[21] = strdup(buf);
 
-   sprintf(buf, "CV4B -5v:%d", globalObj->dacCalibrationNeg[dacMap[7]]);
+
+   sprintf(buf, "CV4B %d", globalObj->dacCalibrationNeg[dacMap[7]]);
    displayElement[22] = strdup(buf);
-   sprintf(buf, "+5v :%d", globalObj->dacCalibrationPos[dacMap[7]]);
+   sprintf(buf, ":%d", globalObj->dacCalibrationPos[dacMap[7]]);
    displayElement[23] = strdup(buf);
-   sprintf(buf, "0v");
-   displayElement[24] = strdup(buf);
+
 
    renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(1, STATE_CALIB_OUTPUT0_LOW,      0, 16, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(2, STATE_CALIB_OUTPUT0_HIGH,    63, 16, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(3, STATE_CALIB_OUTPUT0_TEST,    108, 16, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(2, STATE_CALIB_OUTPUT0_HIGH,    63, 16, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(4, STATE_CALIB_OUTPUT1_LOW,      0, 24, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(5, STATE_CALIB_OUTPUT1_HIGH,    63, 24, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(6, STATE_CALIB_OUTPUT1_TEST,    108, 24, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(5, STATE_CALIB_OUTPUT1_HIGH,    63, 24, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(7, STATE_CALIB_OUTPUT2_LOW,      0, 32, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(8, STATE_CALIB_OUTPUT2_HIGH,    63, 32, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(9, STATE_CALIB_OUTPUT2_TEST,    108, 32, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(8, STATE_CALIB_OUTPUT2_HIGH,    63, 32, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(10, STATE_CALIB_OUTPUT3_LOW,      0, 40, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(11, STATE_CALIB_OUTPUT3_HIGH,    63, 40, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(12, STATE_CALIB_OUTPUT3_TEST,    108, 40, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(11, STATE_CALIB_OUTPUT3_HIGH,    63, 40, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(13, STATE_CALIB_OUTPUT4_LOW,      0, 48, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(14, STATE_CALIB_OUTPUT4_HIGH,    63, 48, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(15, STATE_CALIB_OUTPUT4_TEST,    108, 48, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(14, STATE_CALIB_OUTPUT4_HIGH,    63, 48, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(16, STATE_CALIB_OUTPUT5_LOW,      0, 56, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(17, STATE_CALIB_OUTPUT5_HIGH,    63, 56, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(18, STATE_CALIB_OUTPUT5_TEST,    108, 56, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(17, STATE_CALIB_OUTPUT5_HIGH,    63, 56, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(19, STATE_CALIB_OUTPUT6_LOW,      0, 64, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(20, STATE_CALIB_OUTPUT6_HIGH,    63, 64, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(21, STATE_CALIB_OUTPUT6_TEST,    108, 64, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(20, STATE_CALIB_OUTPUT6_HIGH,    63, 64, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 
    renderStringBox(22, STATE_CALIB_OUTPUT7_LOW,      0, 72, 64 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(23, STATE_CALIB_OUTPUT7_HIGH,    63, 72, 45 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(24, STATE_CALIB_OUTPUT7_TEST,    108, 72, 20 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(23, STATE_CALIB_OUTPUT7_HIGH,    63, 72, 64 , 8, false, REGULAR1X, BLACK, WHITE);
 /*
 CV1A   - OUT7
 CV1B   - OUT1

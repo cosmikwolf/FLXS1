@@ -26,13 +26,13 @@ void setup() {
 void loop() {
   // Some example procedures showing how to display to the pixels:
   colorWipe(strip.Color(255, 0, 0), 5); // Red
-delay(1);
+delay(250);
   colorWipe(strip.Color(0, 255, 0), 5); // Green
-delay(1);
+delay(250);
   colorWipe(strip.Color(0, 0, 255), 5); // Blue
-delay(1);
+delay(250);
   colorWipe(strip.Color(0, 0, 0, 255), 5); // White
-  delay(1);
+  delay(250);
 
 }
 

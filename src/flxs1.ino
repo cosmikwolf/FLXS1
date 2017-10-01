@@ -153,7 +153,7 @@ void setup() {
   //digitalWrite(1, LOW);
 
   //adc->enableInterrupts(ADC_1);
-  adc->setAveraging(8, ADC_1); // set number of averages
+  adc->setAveraging(4, ADC_1); // set number of averages
   adc->setResolution(16, ADC_1); // set bits of resolution
   //adc->setAveraging(8, ADC_0); // set number of averages
   //adc->setResolution(16, ADC_0); // set bits of resolution
@@ -162,9 +162,9 @@ void setup() {
 
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   // see the documentation for more information
-  //adc->setConversionSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the conversion speed
+  adc->setConversionSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-//  adc->setSamplingSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the sampling speed
+  adc->setSamplingSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the sampling speed
   // CLOCK PIN SETUP
   pinMode(CLOCK_PIN, OUTPUT);
   digitalWrite(CLOCK_PIN, LOW);
