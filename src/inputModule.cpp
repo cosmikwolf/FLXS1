@@ -1553,8 +1553,17 @@ void InputModule::calibrationMenuHandler(){
               };
 
               Serial.println("Calibration -2.5v found: " + String(calibLow) + "\t adc value:  " + String(globalObj->cvInputMapped1024[adc]));
+              //calibHigh = calibHigh * 100 / 102; //offset for impedance mismatch
+              //calibLow = calibLow * 102 / 100; //offset for impedance mismatch
               globalObj->dacCalibrationPos[dacMap[n]] = (5*calibHigh - 3*calibLow)/2;
               globalObj->dacCalibrationNeg[dacMap[n]] = (5*calibLow - 3*calibHigh)/2;
+
+
+              int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/110;
+
+              globalObj->dacCalibrationPos[dacMap[n]] = globalObj->dacCalibrationPos[dacMap[n]] - compensation;
+              globalObj->dacCalibrationNeg[dacMap[n]] = globalObj->dacCalibrationNeg[dacMap[n]] + compensation;
+
               Serial.println("Calibration Results - pos: " + String(globalObj->dacCalibrationPos[dacMap[n]]) + "\tneg: " + String(globalObj->dacCalibrationNeg[dacMap[n]]));
 
             };
