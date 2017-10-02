@@ -4,7 +4,7 @@
 DisplayModule::DisplayModule(){
 };
 
-void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj){
+void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj, MidiModule *midiControl){
 
   Serial.println("Initializing Display");
   this->clockMaster = clockMaster;
@@ -54,7 +54,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
   oled.println("v015");
-
+  this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
 }
@@ -210,8 +210,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         case CALIBRATION_MENU:
           if (stepMode < STATE_CALIB_OUTPUT0_LOW) {
             inputCalibrationMenuDisplay();
-          } else {
+          } else if (stepMode < STATE_TEST_MIDI){
             outputCalibrationMenuDisplay();
+          } else {
+            midiTestDisplay();
           }
         break;
 
@@ -1623,6 +1625,18 @@ CV4B   - OUT4
   //  STATE_CALIB_OUTPUT3_HIGH
  }
 
+void DisplayModule::midiTestDisplay(){
+  displayElement[0] = strdup("MIDI TEST");
+
+  sprintf(buf, "%d %d %d %d %d %d %d %d %d %d" , midiControl->midiTestArray[0], midiControl->midiTestArray[1], midiControl->midiTestArray[2], midiControl->midiTestArray[3], midiControl->midiTestArray[4], midiControl->midiTestArray[5], midiControl->midiTestArray[6], midiControl->midiTestArray[7], midiControl->midiTestArray[8], midiControl->midiTestArray[9]);
+  displayElement[1] = strdup(buf);
+
+  renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(1, DISPLAY_LABEL,  0, 8, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 80, false, REGULAR1X, BLACK, WHITE);
+
+
+}
 
  void DisplayModule::inputDebugMenuDisplay(){
 

@@ -83,7 +83,7 @@ class DisplayModule
     SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;
-    void initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj);
+    void initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj, MidiModule *midiControl);
     void displayLoop(uint16_t frequency);
     void calibrationWarning();
 
@@ -145,6 +145,7 @@ class DisplayModule
     void timingMenuDisplay();
     void inputCalibrationMenuDisplay();
     void outputCalibrationMenuDisplay();
+    void midiTestDisplay();
     void inputDebugMenuDisplay();
 
     uint16_t foreground, background, contrastColor;
@@ -156,7 +157,7 @@ class DisplayModule
 
     //void renderOnce_StringBox(Element element);
 private:
-
+    MidiModule *midiControl;
     elapsedMillis modaltimer;
     bool modalRefreshSwitch;
     uint16_t modalMaxTime;

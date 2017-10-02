@@ -9,6 +9,9 @@ void MidiModule::midiSetup( Sequencer *sequenceArray, GlobalVariable* globalObj)
 //  this->noteData = noteData;
   firstRun = false;
   pulseTimer = 0;
+  for(int i=0; i<10; i++){
+    midiTestArray[i] = false;
+  }
 }
 
 void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi){
@@ -38,10 +41,17 @@ void MidiModule::midiNoteOffHandler(byte channel, byte note, byte velocity){
 }
 
 void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
+  if(stepMode == STATE_TEST_MIDI){
+    Serial.println("Recieved test note " + String(note));
+    if(note < 10){
+      midiTestArray[note] = true;
+    }
+  }
+
   if (velocity > 0) {
-    //Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
+    Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
   } else {
-  //  Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
+    Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
   }
 }
 

@@ -81,8 +81,8 @@ void MasterClock::masterClockFunc(){
     }
 
 		if (clockCounter * kMasterClockInterval - totalClockCount*clockPeriod >  clockPeriod){
-			// THIS IS WHERE THE CLOCK PROBLEM IS
-			// IT REDUCES EACH CLOCK COUNT TO A MULTIPLE OF CLOCK INTERVAL,
+			// THIS IS WHERE THE CLOCK PROBLEM IS  --- was? think i fixed it.
+ 			// IT REDUCES EACH CLOCK COUNT TO A MULTIPLE OF CLOCK INTERVAL,
 			// SO EACH CLOCK COUNT ADDS AN OFFSET, WHICH ACCUMULATES.
 			extClockCounter++;
 
@@ -93,7 +93,7 @@ void MasterClock::masterClockFunc(){
 				extClockCounter = 0;
 				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
 				masterDebugTimer = 0;
-								digitalWriteFast(PIN_EXT_AD_3, LOW);
+			  digitalWriteFast(PIN_EXT_AD_3, LOW);
 			}
 			//
 			totalClockCount++;

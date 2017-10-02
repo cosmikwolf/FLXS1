@@ -114,8 +114,8 @@ void setup() {
   MasterClockTimer.begin(masterLoop,kMasterClockInterval);
   MasterClockTimer.priority(0);
 
-//DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
-//DisplayLoopTimer.priority(3);
+//  DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
+//  DisplayLoopTimer.priority(3);
 
   SequencerTimer.begin(sequencerLoop,kSequenceTimerInterval);
   SequencerTimer.priority(4);

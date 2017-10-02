@@ -205,6 +205,20 @@ void OutputController::dacTestLoop(){
       }
     break;
 
+    case STATE_TEST_MIDI:
+
+  //    Serial.println("Sending Midi Test Notes");
+  //    delay(1000);
+    //  for(int i=1; i<10; i++){
+        //serialMidi->sendNoteOn(i, 127, 1);
+    //    serialMidi->sendNoteOff(i, 0,  1);
+        //delay(10);
+      //}
+//      serialMidi->sendNoteOn(4, 64, 3);
+//      serialMidi->sendNoteOff(4, 0, 3);
+    //  serialMidi->read();
+
+    break;
 /*
     case STATE_CALIB_OUTPUT0_LOW:
       ad5676.setVoltage(dacMap[0], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
@@ -781,9 +795,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 }
 
 uint8_t OutputController::analogInputTranspose(uint8_t note){
-
   uint16_t input = analogRead(22);
-
   return (note + map(input, 0, 1023, 0, 127) );
 }
 

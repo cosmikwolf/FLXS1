@@ -542,6 +542,7 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_CALIB_OUTPUT2_HIGH:
     case STATE_CALIB_OUTPUT3_LOW:
     case STATE_CALIB_OUTPUT3_HIGH:
+    case STATE_TEST_MIDI:
       currentMenu = CALIBRATION_MENU;
       break;
     case STATE_CALIBRATION_SAVE_MODAL:
@@ -1590,7 +1591,7 @@ void InputModule::calibrationMenuHandler(){
   }
   if(knobChange){
     if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
-      changeState(min_max(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_CALIB_OUTPUT7_HIGH ));
+      changeState(min_max(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_TEST_MIDI ));
     } else {
 
 

@@ -21,7 +21,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   sequencerArray[2].initialize(2, 16, 4, &outputControl, globalObj);
   sequencerArray[3].initialize(3, 16, 4, &outputControl, globalObj);
 
-	display.initialize(sequencerArray, &clockMaster, globalObj);
+	display.initialize(sequencerArray, &clockMaster, globalObj, midiControl);
 
 	buttonIo.initialize(&outputControl, &midplaneGPIO, &backplaneGPIO, &saveFile, sequencerArray, &clockMaster, &display, globalObj);
 
@@ -121,6 +121,37 @@ void TimeController::runLoopHandler() {
     display.displayLoop(DISPLAY_INTERVAL);
     //clockMaster.displayRunSwitch = false;
   }
+
+  if(stepMode == STATE_TEST_MIDI){
+    bool exitLoop = true;
+    for(int i=0; i<10; i++){
+        if(midiControl->midiTestArray[i] == false){
+          exitLoop = false;
+        }
+    }
+    if (exitLoop) {
+      return;
+    }
+      for(int i=0; i<10; i++){
+        Serial.println("SENDING MIDI TEST NOTES " + String(i));
+
+        serialMidi->sendNoteOn(i, 127, 1);
+        serialMidi->sendNoteOff(i, 0,  1);
+        display.displayLoop(DISPLAY_INTERVAL);
+        delay(250);
+      }
+  }
+
+//    Serial.println("Sending Midi Test Notes");
+//    delay(1000);
+  //  for(int i=1; i<10; i++){
+      //serialMidi->sendNoteOn(i, 127, 1);
+  //    serialMidi->sendNoteOff(i, 0,  1);
+      //delay(10);
+    //}
+//
+//
+  //  serialMidi->read();
 }
 
 void TimeController::ledClockHandler(){

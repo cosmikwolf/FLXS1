@@ -19,6 +19,8 @@ public:
   void midiStartContinueHandler();
   void midiClockPulseHandler();
   void midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi);
+
+  bool midiTestArray[10];
 private:
 
   int avgPulseTimer;
