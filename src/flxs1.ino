@@ -47,7 +47,7 @@ ADC *adc = new ADC(); // adc object
 elapsedMillis noteFreqTimer;
 
 GlobalVariable globalObj;
-
+uint8_t cycleIntervalCount;
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
@@ -58,7 +58,10 @@ void setup() {
 //  while (!Serial) ; // wait for serial monitor window to open
   //AudioMemory(24);
   //notefreq.begin(.15);
-
+  // begin cycle counter
+  ARM_DEMCR |= ARM_DEMCR_TRCENA;
+  ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
+  cycleIntervalCount = 0;
 
   delay(500);
 
@@ -282,6 +285,18 @@ void sequencerLoop(){
 
 void masterLoop(){
   timeControl.masterClockHandler();
+
+
+  // unsigned long    cycles = ARM_DWT_CYCCNT;
+  // if(cycles > cycleIntervalCount * 10000 ){
+  //   cycleIntervalCount++;
+  //   if(cycleIntervalCount%2){
+  //     digitalWriteFast(CLOCK_PIN, HIGH);
+  //   } else {
+  //     digitalWriteFast(CLOCK_PIN, LOW);
+  //   }
+  // }
+
 }
 
 void LEDLoop(){

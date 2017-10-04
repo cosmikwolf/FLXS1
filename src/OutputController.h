@@ -30,7 +30,7 @@
 
 class OutputController {
 public:
-  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj);
+  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj );
   void noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey,  bool cvMute, uint32_t startFrame);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   uint16_t getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey);
@@ -46,6 +46,7 @@ public:
   uint8_t analogInputTranspose(uint8_t note);
 
   void dacTestLoop();
+  void midiTestLoop();
   void calibrationRoutine();
   void inputLoopTest();
   void inputRead();

@@ -20,7 +20,7 @@ public:
   void midiClockPulseHandler();
   void midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi);
 
-  bool midiTestArray[10];
+  bool midiTestArray[128];
 private:
 
   int avgPulseTimer;

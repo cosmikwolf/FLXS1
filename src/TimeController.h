@@ -29,6 +29,8 @@ class TimeController {
     void midiClockHandler();
     void cacheWriteHandler();
 
+    uint8_t midiTestValue;
+
   private:
     GlobalVariable *globalObj;
     MasterClock clockMaster;

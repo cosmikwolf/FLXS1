@@ -31,9 +31,13 @@ void GlobalVariable::initialize(){
       this->multi_velocity = 0;
       this->multi_velocityType = 0;
       this->multi_lfoSpeed = 0;
-       for(int i = 0; i < 64; i++){
-           this->multiSelection[i]=false;
-       }
+      for(int i = 0; i < 64; i++){
+          this->multiSelection[i]=false;
+      }
+      for(int i = 0; i < 4; i++){
+        this->gateTestArray[i]=255;
+      }
+      gateTestComplete = false;
 
 
        this->calibrationBuffer = 0;

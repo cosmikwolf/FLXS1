@@ -41,7 +41,7 @@
 //#define FRAMES_PER_BEAT  16777216
 #define FRAMES_PER_BEAT  4194304
 
-#define DISPLAY_INTERVAL 30000
+#define DISPLAY_INTERVAL 40000
 #define INPUT_INTERVAL 10000
 #define LED_INTERVAL 50000
 
@@ -226,7 +226,7 @@ extern uint8_t saveDestination[4];
 extern elapsedMillis modalTimer;
 extern boolean firstRun;
 extern boolean eraseAllFlag;
-
+extern boolean midiTestActive;
 
 extern uint8_t dacMap[8];
 extern uint8_t selectedText;

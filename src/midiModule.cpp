@@ -41,18 +41,35 @@ void MidiModule::midiNoteOffHandler(byte channel, byte note, byte velocity){
 }
 
 void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
+  bool exitTestLoop;
   if(stepMode == STATE_TEST_MIDI){
+    if(midiTestActive == false){
+      for(int i=0; i<128; i++){
+        midiTestArray[i] = false;
+      }
+    }
     Serial.println("Recieved test note " + String(note));
-    if(note < 10){
+    if(note < 128){
       midiTestArray[note] = true;
+    }
+    exitTestLoop = true;
+    for(int n=0; n <128; n++){
+      if (midiTestArray[n] == false){
+        exitTestLoop = false;
+      }
+    }
+    if(exitTestLoop){
+      midiTestActive = false;
+      Serial.println("midi Test loop complete");
+    }
+  } else {
+    if (velocity > 0) {
+      Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
+    } else {
+      Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
     }
   }
 
-  if (velocity > 0) {
-    Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
-  } else {
-    Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
-  }
 }
 
 void MidiModule::midiStartContinueHandler(){

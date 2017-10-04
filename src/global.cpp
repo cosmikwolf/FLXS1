@@ -20,6 +20,7 @@ float   frequency;
 
 boolean eraseAllFlag = false;
 boolean extClock = false;
+boolean midiTestActive;
 
 //uint8_t clockMode = INTERNAL_CLOCK;
 //uint8_t clockMode = EXTERNAL_MIDI_CLOCK;
@@ -39,12 +40,8 @@ uint32_t lfoClockCounter;
 elapsedMillis modalTimer;
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 
-
-
 //multi select variables;
-
 //midi
-
 
 uint8_t selectedText = 0;
 uint8_t prevSelectedText = 255 ;

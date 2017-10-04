@@ -217,7 +217,43 @@ void OutputController::dacTestLoop(){
 //      serialMidi->sendNoteOn(4, 64, 3);
 //      serialMidi->sendNoteOff(4, 0, 3);
     //  serialMidi->read();
+    break;
 
+    case STATE_TEST_GATES:
+      //Serial.println("lets do this!");
+
+    //  delay(500);
+    // move this to a loop and make it not all at once. needs time to work.
+      for(int i=0; i<4; i++){
+        for(int n=0; n<4; n++){
+          if(i==n){
+            backplaneGPIO->digitalWrite(i, HIGH);
+          } else {
+            backplaneGPIO->digitalWrite(n, LOW);
+          }
+//          this->inputRead();
+          delay(100);
+          if(globalObj->gateInputRaw[i] == 1){
+            if(globalObj->gateTestArray[i] == 255 || globalObj->gateTestArray[i] == n ){
+              globalObj->gateTestArray[i] = n;
+            } else {
+              globalObj->gateTestArray[i] = 254;
+            }
+          }
+        }
+      }
+
+    break;
+
+    case STATE_TEST_RHEOSTAT:
+      // uint16_t value = 0;
+      // if(sin(millis()/1000) > 0){
+      //   value = 1;
+      // }
+      // for (int i=0; i<8; i++){
+      //   ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
+      //   ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
+      // }
     break;
 /*
     case STATE_CALIB_OUTPUT0_LOW:
@@ -361,10 +397,10 @@ void OutputController::inputRead(){
   for(int i=0; i<28; i++){
   //  if(backplaneGPIO->fell(i)) Serial.println("Backplane " + String(i));
   }
-  globalObj->cvInputRaw[0] = adc->analogRead(A3, ADC_1);
-  globalObj->cvInputRaw[1] = adc->analogRead(A12, ADC_1);
-  globalObj->cvInputRaw[2] = adc->analogRead(A13, ADC_1);
-  globalObj->cvInputRaw[3] = adc->analogRead(A10, ADC_1);
+  globalObj->cvInputRaw[0] = adc->analogRead(A3, ADC_1)/2;
+  globalObj->cvInputRaw[1] = adc->analogRead(A12, ADC_1)/2;
+  globalObj->cvInputRaw[2] = adc->analogRead(A13, ADC_1)/2;
+  globalObj->cvInputRaw[3] = adc->analogRead(A10, ADC_1)/2;
 
   for(int ch=0; ch < 4; ch++){
     //globalObj->cvInputMapped[ch] = map(globalObj->cvInputRaw[ch], globalObj->adcCalibrationNeg[ch], globalObj->adcCalibrationPos[ch], -60, 60) +1;

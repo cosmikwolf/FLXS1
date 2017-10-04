@@ -86,7 +86,7 @@ class DisplayModule
     void initialize(Sequencer *sequenceArray, MasterClock* clockMaster, GlobalVariable* globalObj, MidiModule *midiControl);
     void displayLoop(uint16_t frequency);
     void calibrationWarning();
-
+    void saveFileWarning();
     void clearDisplay();
     void freeDisplayCache();
 
@@ -146,6 +146,8 @@ class DisplayModule
     void inputCalibrationMenuDisplay();
     void outputCalibrationMenuDisplay();
     void midiTestDisplay();
+    void gateTestDisplay();
+    void rheostatTestDisplay();
     void inputDebugMenuDisplay();
 
     uint16_t foreground, background, contrastColor;

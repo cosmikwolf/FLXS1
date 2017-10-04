@@ -45,7 +45,8 @@ public:
   void initialize(OutputController* outputControl, Sequencer *sequenceArray,  SerialFlashChip *spiFlash, ADC *adc, GlobalVariable *globalObj);
   void eraseSaveFile();
   void formatChip();
-
+  void initializeSaveFile();
+  void formatAndInitialize();
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
   void printPattern();
@@ -55,7 +56,7 @@ public:
 
   void saveCalibrationEEPROM();
   bool readCalibrationEEPROM();
-
+  bool doesSeqDataExist();
   void setCacheStatus(uint8_t index, uint8_t status);
   int  getCacheStatus(uint8_t index);
   int  getCacheIndex(uint8_t channel,uint8_t pattern);

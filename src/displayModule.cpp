@@ -53,7 +53,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("v015");
+  oled.println("v016a");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -68,7 +68,7 @@ void DisplayModule::calibrationWarning(){
   oled.fillScreen(WHITE); delay(250);
   oled.fillScreen(BLACK);
 
-  oled.setCursor(CENTER,35);
+  oled.setCursor(0,35);
   oled.setTextColor(WHITE);
   oled.setTextScale(1);
   oled.println("CALIBRATION");
@@ -76,6 +76,22 @@ void DisplayModule::calibrationWarning(){
   delay(500);
 }
 
+void DisplayModule::saveFileWarning(){
+  oled.fillScreen(YELLOW); delay(250);
+  oled.fillScreen(WHITE); delay(250);
+  oled.fillScreen(YELLOW); delay(250);
+  oled.fillScreen(WHITE); delay(250);
+  oled.fillScreen(YELLOW); delay(250);
+  oled.fillScreen(WHITE); delay(250);
+  oled.fillScreen(BLACK);
+
+  oled.setCursor(0,35);
+  oled.setTextColor(WHITE);
+  oled.setTextScale(1);
+  oled.println("SAVE FILE");
+  oled.println("NOT FOUND");
+  delay(500);
+}
 void DisplayModule::clearDisplay(){
   oled.clearScreen();
 //  oled.fillScreen(BLUE);
@@ -210,10 +226,14 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         case CALIBRATION_MENU:
           if (stepMode < STATE_CALIB_OUTPUT0_LOW) {
             inputCalibrationMenuDisplay();
-          } else if (stepMode < STATE_TEST_MIDI){
-            outputCalibrationMenuDisplay();
-          } else {
+          } else if (stepMode == STATE_TEST_MIDI){
             midiTestDisplay();
+          } else if (stepMode == STATE_TEST_GATES){
+            gateTestDisplay();
+          } else if (stepMode == STATE_TEST_RHEOSTAT){
+            rheostatTestDisplay();
+          } else {
+            outputCalibrationMenuDisplay();
           }
         break;
 
@@ -844,7 +864,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
     */
     if (sequenceArray[selectedChannel].stepData[selectedStep].velocityType > 6){
         displayElement[5] = strdup("Wavelnt:");
-        sprintf(buf, "%d.%02d stp",
+        sprintf(buf, "%d.%02d x",
           sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed%64))/64
        );
        displayElement[6] = strdup(buf);
@@ -1624,16 +1644,56 @@ CV4B   - OUT4
   //  STATE_CALIB_OUTPUT3_LOW
   //  STATE_CALIB_OUTPUT3_HIGH
  }
+ void DisplayModule::gateTestDisplay(){
+   displayElement[0] = strdup("GATE TEST ");
+
+   for(int i=0; i<4; i++){
+     if(globalObj->gateTestArray[i] != 255){
+       sprintf(buf, "Gate %d is connected to %d" , i+1, globalObj->gateTestArray[i] +1 );
+       displayElement[i+1] = strdup(buf);
+     } else {
+       sprintf(buf, "No Gate Sensed on inputi %d" , i+1);
+       displayElement[i+1] = strdup(buf);
+     }
+   }
+
+
+   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(1, DISPLAY_LABEL,  0, 8, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(3, DISPLAY_LABEL,  0, 24, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(4, DISPLAY_LABEL,  0, 32, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(9, DISPLAY_LABEL,  0, 72, 128 , 24, false, REGULAR1X, BLACK, WHITE);
+
+ }
+ void DisplayModule::rheostatTestDisplay(){
+   displayElement[0] = strdup("RHEO TEST  ");
+   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+
+ }
 
 void DisplayModule::midiTestDisplay(){
-  displayElement[0] = strdup("MIDI TEST");
+  if(midiTestActive){
+    displayElement[0] = strdup("MIDI TEST  -- TESTING");
+  } else {
+    displayElement[0] = strdup("MIDI TEST  -- COMPLETE!");
+  }
 
-  sprintf(buf, "%d %d %d %d %d %d %d %d %d %d" , midiControl->midiTestArray[0], midiControl->midiTestArray[1], midiControl->midiTestArray[2], midiControl->midiTestArray[3], midiControl->midiTestArray[4], midiControl->midiTestArray[5], midiControl->midiTestArray[6], midiControl->midiTestArray[7], midiControl->midiTestArray[8], midiControl->midiTestArray[9]);
-  displayElement[1] = strdup(buf);
+  for (size_t i = 0; i < 8; i++) {
+    sprintf(buf, "%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d" , midiControl->midiTestArray[16*i+0], midiControl->midiTestArray[16*i+1], midiControl->midiTestArray[16*i+2], midiControl->midiTestArray[16*i+3], midiControl->midiTestArray[16*i+4], midiControl->midiTestArray[16*i+5], midiControl->midiTestArray[16*i+6], midiControl->midiTestArray[16*i+7], midiControl->midiTestArray[16*i+8], midiControl->midiTestArray[16*i+9], midiControl->midiTestArray[16*i+10], midiControl->midiTestArray[16*i+11], midiControl->midiTestArray[16*i+12], midiControl->midiTestArray[16*i+13], midiControl->midiTestArray[16*i+14], midiControl->midiTestArray[16*i+15]);
+    displayElement[i+1] = strdup(buf);
+  }
 
   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
   renderStringBox(1, DISPLAY_LABEL,  0, 8, 128 , 8, false, REGULAR1X, BLACK, WHITE);
-  renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 80, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(3, DISPLAY_LABEL,  0, 24, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(4, DISPLAY_LABEL,  0, 32, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(5, DISPLAY_LABEL,  0, 40, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(6, DISPLAY_LABEL,  0, 48, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(7, DISPLAY_LABEL,  0, 56, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(8, DISPLAY_LABEL,  0, 64, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+  renderStringBox(9, DISPLAY_LABEL,  0, 72, 128 , 24, false, REGULAR1X, BLACK, WHITE);
 
 
 }

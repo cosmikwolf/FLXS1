@@ -14,18 +14,23 @@ int  FlashMemory::getCacheStatus(uint8_t index){
   return cacheStatus[index];
 };
 
+bool FlashMemory::doesSeqDataExist(){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName =strdup("seqData");
+  if (spiFlash->exists(fileName)) {
+    return 1;
+  } else {
+    return 0;
+  }
+
+}
+
+
+
 void FlashMemory::initializeCache(){
   Serial.println("initializing save file cache... ");
   char* fileName = (char *) malloc(sizeof(char) * 12);
-  fileName =strdup("seqData");
-  if (!spiFlash->exists(fileName)) {
-    Serial.println("Creating Data File: " + String(fileName) + "\tsize: " + String(FLASHFILESIZE));
-    spiFlash->createErasable(fileName, FLASHFILESIZE);
-  } else {
-    Serial.println("seqdata file exists... ");
-  }
-  free(fileName);
-  fileName = NULL;
+
 
   fileName = strdup( "seqCache");
   if (!spiFlash->exists(fileName)) {

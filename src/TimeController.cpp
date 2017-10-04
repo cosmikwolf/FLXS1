@@ -34,37 +34,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	if(eraseAllFlag){
     Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
 		saveFile.wipeEEPROM();
-		saveFile.formatChip();
-    saveFile.initializeCache();
-
-    for(int pattern=0; pattern < 16; pattern++){
-      Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
-
-      for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        sequencerArray[channel].initNewSequence(pattern, channel);
-      }
-      Serial.println("Patterns initialized");
-      for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        saveFile.saveSequenceJSON(channel, pattern);
-      }
-      Serial.println("json sequence saved");
-      while(saveFile.cacheWriteSwitch){
-        saveFile.cacheWriteLoop();
-      //  Serial.print(".");
-      //  delay(10);
-      };
-      //  Serial.println(" ");
-      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
-      delay(500);
-    }
-
-    while(saveFile.cacheWriteSwitch){
-      saveFile.cacheWriteLoop();
-    }
-    delay(100);
-//    saveFile.loadPattern(0, 0b1111);
-    saveFile.listFiles();
-  //  changeState(STATE_PITCH0);
+		saveFile.formatAndInitialize();
+		Serial.println("*&*&*&&**&&&*&*&*& erasing complete!... *&*&*&*&*&*&*&&*");
 
   }
 
@@ -81,10 +52,20 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	if( saveFile.readCalibrationEEPROM() == true ){
 		display.calibrationWarning();
+	} else {
+		Serial.println("Calibration Data Found");
 	};
+
+	if (!saveFile.doesSeqDataExist()){
+		display.saveFileWarning();
+		Serial.println("WARNING! SAVE FILE NOT FOUND");
+	} else {
+		Serial.println("SAVE FILE FOUND");
+	}
 
 	buttonIo.changeState(STATE_PITCH0);
 
+	midiTestValue = 0;
 
 //
 
@@ -122,24 +103,17 @@ void TimeController::runLoopHandler() {
     //clockMaster.displayRunSwitch = false;
   }
 
-  if(stepMode == STATE_TEST_MIDI){
-    bool exitLoop = true;
-    for(int i=0; i<10; i++){
-        if(midiControl->midiTestArray[i] == false){
-          exitLoop = false;
-        }
-    }
-    if (exitLoop) {
-      return;
-    }
-      for(int i=0; i<10; i++){
-        Serial.println("SENDING MIDI TEST NOTES " + String(i));
-
-        serialMidi->sendNoteOn(i, 127, 1);
-        serialMidi->sendNoteOff(i, 0,  1);
-        display.displayLoop(DISPLAY_INTERVAL);
-        delay(250);
-      }
+  if(midiTestActive && stepMode == STATE_TEST_MIDI){
+//for(int i=0; i<128; i++){
+        Serial.println("SENDING MIDI TEST NOTES " + String(midiTestValue));
+        serialMidi->sendNoteOn(midiTestValue, 127, 1);
+//        delay(100);
+				serialMidi->sendNoteOff(midiTestValue, 0,  1);
+	//			delay(100);
+				serialMidi->read();
+				//display.displayLoop(DISPLAY_INTERVAL);
+				midiTestValue = (midiTestValue+1)%128;
+      //}
   }
 
 //    Serial.println("Sending Midi Test Notes");

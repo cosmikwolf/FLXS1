@@ -30,9 +30,60 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   for(int n = 0; n < CACHE_COUNT; n++){
     cacheStatus[n] = 0;
   }
+  this->initializeSaveFile();
   Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
 }
 
+void FlashMemory::formatAndInitialize(){
+
+    char* fileName = (char *) malloc(sizeof(char) * 12);
+    fileName =strdup("seqData");
+
+    this->formatChip();
+    this->initializeCache();
+
+    Serial.println("Creating Data File: " + String(fileName) + "\tsize: " + String(FLASHFILESIZE));
+    spiFlash->createErasable(fileName, FLASHFILESIZE);
+
+    for(int pattern=0; pattern < 16; pattern++){
+      Serial.println("***----###$$$###---*** *^~^* INITIALIZING PATTERN " + String(pattern) + " *^~^* ***----###$$$###---***");
+
+      for (int channel=0; channel < SEQUENCECOUNT; channel++){
+        sequenceArray[channel].initNewSequence(pattern, channel);
+      }
+      Serial.println("Patterns initialized");
+      for (int channel=0; channel < SEQUENCECOUNT; channel++){
+        this->saveSequenceJSON(channel, pattern);
+      }
+      Serial.println("json sequence saved");
+      while(this->cacheWriteSwitch){
+        this->cacheWriteLoop();
+      };
+      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " *^~^* ***----###$$$###---***");
+      delay(500);
+    }
+    while(this->cacheWriteSwitch){
+      this->cacheWriteLoop();
+    }
+    delay(100);
+    free(fileName);
+
+    Serial.println("Save File Initialization complete.");
+}
+
+
+void FlashMemory::initializeSaveFile(){
+  Serial.println("Initializing Save File");
+
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName =strdup("seqData");
+  if (!spiFlash->exists(fileName)) {
+    Serial.println("seqdata file does not exist... ");
+    this->formatAndInitialize();
+  }
+  free(fileName);
+
+}
 // BRAIN DUMP:
 // always use dedicated cache for each file save.
 // CACHE STATUSES
