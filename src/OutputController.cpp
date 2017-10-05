@@ -166,7 +166,7 @@ void OutputController::setDacVoltage( uint8_t dac, uint16_t output ){
 void OutputController::dacTestLoop(){
   int voltage; // = 65535*(sin(millis()/10.0)+1)/2;
   int32_t sinVal = sin(millis()/10.0)*16384.0;
-
+  bool connected = 0;
   if (sin(millis()) > 0 ){
     voltage = 65535;
   } else {
@@ -222,34 +222,96 @@ void OutputController::dacTestLoop(){
     case STATE_TEST_GATES:
       //Serial.println("lets do this!");
 
-    //  delay(500);
-    // move this to a loop and make it not all at once. needs time to work.
-      for(int i=0; i<4; i++){
-        for(int n=0; n<4; n++){
-          if(i==n){
-            backplaneGPIO->digitalWrite(i, HIGH);
-          } else {
-            backplaneGPIO->digitalWrite(n, LOW);
-          }
-//          this->inputRead();
-          delay(100);
-          if(globalObj->gateInputRaw[i] == 1){
-            if(globalObj->gateTestArray[i] == 255 || globalObj->gateTestArray[i] == n ){
-              globalObj->gateTestArray[i] = n;
-            } else {
-              globalObj->gateTestArray[i] = 254;
-            }
+
+      //activate the one gate that is active for this loop
+
+
+
+      this->inputRead();
+
+      if(globalObj->testTimer > 100){
+        connected = false;
+        for(int i=0; i<4; i++){
+          if(globalObj->gateInputRaw[i] == true){
+            globalObj->gateTestArray[i] = globalObj->activeGate;
+            Serial.println("Setting Gate out " + String(globalObj->activeGate) +" to " + String(i));
+            connected = true;
           }
         }
+        if(!connected){
+          globalObj->gateTestArray[globalObj->activeGate] = 255;
+          Serial.println("Setting Gate out " + String(globalObj->activeGate) + " to " + String(255));
+        }
+
+        globalObj->activeGate = (globalObj->activeGate+1)%4;
+        globalObj->testTimer = 0;
       }
 
+            for(int n=0; n<4; n++){
+              if(n == globalObj->activeGate){
+                backplaneGPIO->digitalWrite(n, HIGH);
+              } else {
+                backplaneGPIO->digitalWrite(n, LOW);
+              }
+            }
     break;
 
     case STATE_TEST_RHEOSTAT:
-      // uint16_t value = 0;
-      // if(sin(millis()/1000) > 0){
-      //   value = 1;
-      // }
+
+      if(globalObj->testTimer > 150 && globalObj->activeGate != 1){
+        globalObj->activeGate = 1;
+        for(int n=0; n<4; n++){
+          backplaneGPIO->digitalWrite(outputMap(n, SLEWSWITCHCC), LOW); // enable slew
+          backplaneGPIO->digitalWrite(outputMap(n, SLEWSWITCHCV), LOW);                     // turn on switch with cap to ground, enable slew
+
+          if (outputMap(n, RHEOCHANNELCV) == 0){
+            mcp4352_1.setResistance(outputMap(n, CVRHEO), globalObj->rheoTestLevel);        // set digipot to 0
+          } else {
+            mcp4352_2.setResistance(outputMap(n, CVRHEO), globalObj->rheoTestLevel);        // set digipot to 0
+          }
+          if (outputMap(n, RHEOCHANNELCC) == 0){
+            mcp4352_1.setResistance(outputMap(n, CCRHEO), globalObj->rheoTestLevel);        // set digipot to 0
+          } else {
+            mcp4352_2.setResistance(outputMap(n, CCRHEO), globalObj->rheoTestLevel);        // set digipot to 0
+          }
+
+        }
+
+        for (int i=0; i<8; i++){
+          ad5676.setVoltage(dacMap[i], globalObj->dacCalibrationPos[dacMap[i]] );
+          ad5676.setVoltage(dacMap[i], globalObj->dacCalibrationPos[dacMap[i]] );
+        }
+
+
+      } else if(globalObj->testTimer > 300){
+        globalObj->testTimer = 0;
+        globalObj->activeGate = 0;
+        globalObj->rheoTestLevel = (globalObj->rheoTestLevel+16)%128;
+        for(int n=0; n<4; n++){
+          backplaneGPIO->digitalWrite(outputMap(n, SLEWSWITCHCC), HIGH); // disable slew
+          backplaneGPIO->digitalWrite(outputMap(n, SLEWSWITCHCV), HIGH);                     // turn on switch with cap to ground, enable slew
+
+          if (outputMap(n, RHEOCHANNELCV) == 0){
+            mcp4352_1.setResistance(outputMap(n, CVRHEO), 0);        // set digipot to 0
+          } else {
+            mcp4352_2.setResistance(outputMap(n, CVRHEO), 0);        // set digipot to 0
+          }
+          if (outputMap(n, RHEOCHANNELCC) == 0){
+            mcp4352_1.setResistance(outputMap(n, CCRHEO), 0);        // set digipot to 0
+          } else {
+            mcp4352_2.setResistance(outputMap(n, CCRHEO), 0);        // set digipot to 0
+          }
+
+        }
+
+        for (int i=0; i<8; i++){
+          ad5676.setVoltage(dacMap[i], globalObj->dacCalibrationNeg[dacMap[i]] );
+          ad5676.setVoltage(dacMap[i], globalObj->dacCalibrationNeg[dacMap[i]] );
+        }
+
+      }
+
+
       // for (int i=0; i<8; i++){
       //   ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );
       //   ad5676.setVoltage(dacMap[i], map(-8192, -16384, 16384, globalObj->dacCalibrationNeg[dacMap[0]], globalObj->dacCalibrationPos[dacMap[0]] ) );

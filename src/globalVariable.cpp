@@ -37,6 +37,8 @@ void GlobalVariable::initialize(){
       for(int i = 0; i < 4; i++){
         this->gateTestArray[i]=255;
       }
+      activeGate = 0;
+      rheoTestLevel = 0;
       gateTestComplete = false;
 
 

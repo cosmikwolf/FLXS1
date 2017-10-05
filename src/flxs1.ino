@@ -44,8 +44,8 @@ ADC *adc = new ADC(); // adc object
 ////      fft1024;        //xy=467,147
 //AudioConnection               patchCord1(adc0 , notefreq);
 
-elapsedMillis noteFreqTimer;
-
+// unsigned long    cyclesLast;
+// elapsedMicros   cyclesTimer;
 GlobalVariable globalObj;
 uint8_t cycleIntervalCount;
 
@@ -287,16 +287,19 @@ void masterLoop(){
   timeControl.masterClockHandler();
 
 
-  // unsigned long    cycles = ARM_DWT_CYCCNT;
-  // if(cycles > cycleIntervalCount * 10000 ){
-  //   cycleIntervalCount++;
-  //   if(cycleIntervalCount%2){
-  //     digitalWriteFast(CLOCK_PIN, HIGH);
-  //   } else {
-  //     digitalWriteFast(CLOCK_PIN, LOW);
-  //   }
-  // }
-
+  //  unsigned long    cycles = ARM_DWT_CYCCNT;
+  //  if(cycles > cycleIntervalCount * 10000 ){
+  //    cycleIntervalCount++;
+  //    if(cycleIntervalCount%2){
+  //      digitalWriteFast(CLOCK_PIN, HIGH);
+  //    } else {
+  //      digitalWriteFast(CLOCK_PIN, LOW);
+  //    }
+  //  }
+   //
+  //  Serial.println("cycles: " + String(cycles/65535) + "\tsinceLast: " + String(cycles-cyclesLast) + "\tcyclesPerMicros: " + String((cycles-cyclesLast)/cyclesTimer) + "\ttimer: " + String(cyclesTimer));
+  //  cyclesTimer = 0;
+  //  cyclesLast = cycles;
 }
 
 void LEDLoop(){

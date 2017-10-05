@@ -27,11 +27,22 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.fillScreen(RED);        delay(10);
   oled.fillScreen(ORANGE, YELLOW);
   oled.setFont(&OrbitBold_14);//this will load the font
-  oled.setTextScale(2);
-  oled.setCursor(CENTER,8);
+  oled.setTextScale(1);
+  oled.setCursor(0,0);
+  oled.println("RESIST");delay(10);
+  oled.println("RESIST");delay(10);
+  oled.println("RESIST");delay(10);
+  oled.println("RESIST");delay(10);
+  oled.println("RESIST");delay(10);
   oled.println("RESIST");               delay(100);
   oled.fillScreen(GREEN, ORANGE);
-  oled.println("FASCISM");      delay(100);
+  oled.setCursor(0,0);
+  oled.println("FASCISM"); delay(10);
+  oled.println("FASCISM"); delay(10);
+  oled.println("FASCISM"); delay(10);
+  oled.println("FASCISM"); delay(10);
+  oled.println("FASCISM"); delay(10);
+  oled.println("FASCISM"); delay(10);      delay(100);
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
@@ -53,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("v016a");
+  oled.println("v0.16b");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -1649,10 +1660,10 @@ CV4B   - OUT4
 
    for(int i=0; i<4; i++){
      if(globalObj->gateTestArray[i] != 255){
-       sprintf(buf, "Gate %d is connected to %d" , i+1, globalObj->gateTestArray[i] +1 );
+       sprintf(buf, "Output %d <--> Input %d" , i+1, globalObj->gateTestArray[i]+1  );
        displayElement[i+1] = strdup(buf);
      } else {
-       sprintf(buf, "No Gate Sensed on inputi %d" , i+1);
+       sprintf(buf, "Output %d disconnected" , i +1);
        displayElement[i+1] = strdup(buf);
      }
    }
@@ -1663,12 +1674,14 @@ CV4B   - OUT4
    renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 8, false, REGULAR1X, BLACK, WHITE);
    renderStringBox(3, DISPLAY_LABEL,  0, 24, 128 , 8, false, REGULAR1X, BLACK, WHITE);
    renderStringBox(4, DISPLAY_LABEL,  0, 32, 128 , 8, false, REGULAR1X, BLACK, WHITE);
-   renderStringBox(9, DISPLAY_LABEL,  0, 72, 128 , 24, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(9, DISPLAY_LABEL,  0, 40, 128 , 56, false, REGULAR1X, BLACK, WHITE);
 
  }
  void DisplayModule::rheostatTestDisplay(){
    displayElement[0] = strdup("RHEO TEST  ");
+   displayElement[1] = strdup("View CV outs with scope ");
    renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
+   renderStringBox(1, DISPLAY_LABEL,  0, 8, 128 , 88, false, REGULAR1X, BLACK, WHITE);
 
  }
 

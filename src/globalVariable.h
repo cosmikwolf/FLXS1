@@ -65,7 +65,10 @@ class GlobalVariable {
     uint32_t tempoMasterClkCounter;
 
     uint8_t gateTestArray[4];
+    uint8_t activeGate;
+    uint8_t rheoTestLevel;
     bool    gateTestComplete;
+    elapsedMillis testTimer;
 
     uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
 
