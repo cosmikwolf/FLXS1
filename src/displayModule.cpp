@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("v0.16b");
+  oled.println("v0.16c");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -873,20 +873,22 @@ void DisplayModule::stateDisplay_arp(char *buf){
     speed of 32 is 2 step wavelenth
     which is 64/32
     */
-    if (sequenceArray[selectedChannel].stepData[selectedStep].velocityType > 6){
-        displayElement[5] = strdup("Wavelnt:");
-        sprintf(buf, "%d.%02d x",
-          sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed%64))/64
-       );
-       displayElement[6] = strdup(buf);
-
-    } else {
-      displayElement[5] = strdup("EnvLng:");
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
-      displayElement[6] = strdup(buf);
-
-    }
-
+    // if (sequenceArray[selectedChannel].stepData[selectedStep].velocityType > 6){
+    //     displayElement[5] = strdup("Wavelnt:");
+    //     sprintf(buf, "%d.%02d x",
+    //       sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed%64))/64
+    //    );
+    //    displayElement[6] = strdup(buf);
+    //
+    // } else {
+    //   displayElement[5] = strdup("EnvLng:");
+    //   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+    //   displayElement[6] = strdup(buf);
+    //
+    // }
+    displayElement[5] = strdup("Speed:");
+    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+    displayElement[6] = strdup(buf);
 
 
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
