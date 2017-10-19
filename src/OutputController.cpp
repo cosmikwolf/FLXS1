@@ -560,7 +560,7 @@ bool OutputController::gpioCheck(int8_t mapValue){
 
 };
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -615,8 +615,10 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
     //   lfoRheoSet[channel] = 1;
     // } else if (velocityType > 1){
     //  Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
-      lfoRheoSet[channel] = 1;
-      lfoStartFrame[channel] = startFrame;
+      if (notFirstArp == 0){
+        lfoRheoSet[channel] = 1;
+        lfoStartFrame[channel] = startFrame;
+      }
     }
 
     if (outputMap(channel, RHEOCHANNELCV) == 0){
@@ -745,7 +747,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
         voltageLevel = min_max((lfoAmplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel]-offset)/segmentLength), lfoAmplitude[channel]*-128, lfoAmplitude[channel]*128);
       }
       slewOn = false;
-      Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tstepLength: " + String(stepLength) +  "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength));
+      //Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tstepLength: " + String(stepLength) +  "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength));
 
     break;
 
@@ -772,7 +774,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
       slewOn = false;
 
-      Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength));
+      //Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength));
     break;
 
     case LFO_ENV_ATTACK:
