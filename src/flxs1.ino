@@ -16,6 +16,10 @@
 #include "DisplayModule.h"
 #include "globalVariable.h"
 
+#define CPU_RESET_CYCLECOUNTER    do { ARM_DEMCR |= ARM_DEMCR_TRCENA;          \
+                                       ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA; \
+                                       ARM_DWT_CYCCNT = 0; } while(0)
+
 
 
 //#define NUMLEDS  23
@@ -45,7 +49,8 @@ ADC *adc = new ADC(); // adc object
 //AudioConnection               patchCord1(adc0 , notefreq);
 
 // unsigned long    cyclesLast;
-// elapsedMicros   cyclesTimer;
+ elapsedMicros   cyclesTimer;
+ unsigned long clockCycles;
 GlobalVariable globalObj;
 uint8_t cycleIntervalCount;
 
@@ -59,10 +64,9 @@ void setup() {
   //AudioMemory(24);
   //notefreq.begin(.15);
   // begin cycle counter
-  ARM_DEMCR |= ARM_DEMCR_TRCENA;
-  ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
+  CPU_RESET_CYCLECOUNTER;
   cycleIntervalCount = 0;
-
+  cyclesTimer = 0;
   delay(500);
 
   Serial.println("<<<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>> Setup <<<<----===---==--=-|*+~^~+*|-=--==---===---->>>>>");
@@ -243,7 +247,13 @@ void loop() {
 
 void loop() {
   timeControl.runLoopHandler();
-
+/*  if(cyclesTimer > 20000000){
+    CPU_RESET_CYCLECOUNTER;
+    cyclesTimer = 0;
+  }
+  clockCycles = ARM_DWT_CYCCNT;
+  Serial.println("micros: " + String(cyclesTimer) + "\t\tclockCycles: " + String(clockCycles)  + "\tclock/millis: " + String(clockCycles/120)  + "\t diff: " + String((int)cyclesTimer-(int)clockCycles/120 ));
+  */
   //  if (notefreq.available() && millis()%100) {
   //   int note = notefreq.read()*100;
   //   int prob = notefreq.probability()*100;

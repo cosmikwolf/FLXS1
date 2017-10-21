@@ -83,14 +83,14 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     return;
   }
 
-
   if (firstPulse == false){
     avgClocksPerPulse = clockSinceLastPulse ;// ( clockSinceLastPulse + 2 * avgClocksPerPulse ) / 3;
     ppqPulseIndex++;
+
   }  else {
-    if(globalObj->clockMode != EXTERNAL_MIDI_CLOCK){
-      ppqPulseIndex++; // this may need to be commented to get midi to work
-    }
+  //  if(globalObj->clockMode != EXTERNAL_MIDI_CLOCK){
+  //  //  ppqPulseIndex++; // this may need to be commented to get midi to work
+  //  }
 
   }
 

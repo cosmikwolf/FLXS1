@@ -33,7 +33,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	if(eraseAllFlag){
     Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
-		saveFile.wipeEEPROM();
+		//saveFile.wipeEEPROM();
 		saveFile.formatAndInitialize();
 		Serial.println("*&*&*&&**&&&*&*&*& erasing complete!... *&*&*&*&*&*&*&&*");
 
@@ -64,7 +64,6 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	}
 
 	buttonIo.changeState(STATE_PITCH0);
-
 	midiTestValue = 0;
 
 //

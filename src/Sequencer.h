@@ -129,7 +129,7 @@ class Sequencer
 		int8_t    arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];
 
 		int8_t 	  clockDivision;
-		uint32_t currentFrame;
+		uint32_t  currentFrame;
 
 	private:
 

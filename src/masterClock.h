@@ -36,10 +36,9 @@ public:
   uint32_t clockCounter;
   uint32_t extClockCounter;
 
-  uint32_t masterFrameCount;
+  unsigned long masterClockCycleCount;
+  unsigned long startingClockCount;
 
-  uint32_t masterLooptimeMax;
-  uint32_t masterLooptimeAvg;
   elapsedMicros masterLoopTimer;
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;

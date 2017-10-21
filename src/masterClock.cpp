@@ -35,7 +35,6 @@ void MasterClock::clockRunCheck(){
 }
 
 void MasterClock::masterClockFunc(){
-
 	//	Serial.println(String((int)masterLoopTimer));
 	//  masterLooptimeMin
 	//  masterLooptimeMax
@@ -43,9 +42,44 @@ void MasterClock::masterClockFunc(){
 
 	//uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	unsigned long clockCycles = ARM_DWT_CYCCNT;
 
 	if (globalObj->clockMode == INTERNAL_CLOCK){
+/*
+		clockCycles
+		masterClockCycleCount
+		startingClockCount
+		kMasterClockInterval
 
+		when clock is started,
+			startingClockCount is set to clockCycles
+			Time since Clock start: clockCycles-startingClockCount
+			if (timeSinceClockStart / kMasterClockInterval > masterClockCycleCount ){
+				run internal clock loop
+				masterClockCycleCount++
+			}
+
+
+		*/
+
+ /*
+		if (clockCycles-startingClockCount > masterClockCycleCount * kMasterClockInterval*120 ){
+			for (int i = 0; i < SEQUENCECOUNT; i++ ){
+				sequenceArray[i].masterClockPulse(1);
+			}
+			globalObj->tempoMasterClkCounter++;
+			clockCounter++;
+			lfoClockCounter++;
+			masterClockCycleCount++;
+		}
+
+		if(masterDebugTimer > 100000 ){
+			Serial.println("Pulse! start: " + String(startingClockCount) + "\tdiff: " + String((unsigned long)clockCycles-(unsigned long)startingClockCount) + "\tcmpval: " +String((unsigned long)masterClockCycleCount * kMasterClockInterval*120) + "\tclockcycles: " + String(clockCycles) + "\tmasterClockCycleCount: " + String(masterClockCycleCount) );
+		}
+
+ */
+
+//	/*
 		if ((int)masterLoopTimer > 3 * kMasterClockInterval /2){
 //			if ((int)masterLoopTimer > 2 * kMasterClockInterval-100){
 			// a subroutine to add clock counts when the masterLoopTimer was skipped
@@ -71,6 +105,7 @@ void MasterClock::masterClockFunc(){
 			clockCounter++;
 			lfoClockCounter++;
 		}
+	//	*/
 
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
 		if (extClockCounter > EXTCLOCKDIV - 1  && clockCounter * kMasterClockInterval>  clockPeriod - 3000){
@@ -92,7 +127,7 @@ void MasterClock::masterClockFunc(){
 				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
 				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
-				masterDebugTimer = 0;
+				//masterDebugTimer = 0;
 			  digitalWriteFast(PIN_EXT_AD_3, LOW);
 			}
 			//
@@ -248,6 +283,7 @@ void MasterClock::internalClockTick(){
  //digitalWriteFast(PIN_EXT_TX, HIGH);
  //Serial.println("begin internal clock tick");
         // int clock
+	unsigned long clockCycles = ARM_DWT_CYCCNT;
 
   if (playing && !wasPlaying){
 		serialMidi->sendRealTime(midi::Start);
@@ -259,6 +295,8 @@ void MasterClock::internalClockTick(){
     for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->allNotesOff(i);
     	sequenceArray[i].clockStart();
+			startingClockCount = clockCycles;
+			masterClockCycleCount = 0;
     }
 
   //  Serial.println("Starting sequence - internal clock: ");
