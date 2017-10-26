@@ -22,7 +22,8 @@ void MasterClock::changeTempo(uint32_t newTempoX100){
 	tempoX100 = newTempoX100;
 	beatLength = 58962000/(tempoX100/100);
 
-	uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	//uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 
 	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
 	totalClockCount = 0;
@@ -40,9 +41,9 @@ void MasterClock::masterClockFunc(){
 	//  masterLooptimeMax
 	digitalWriteFast(PIN_EXT_TX, HIGH);
 
-	//uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
-	uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
-	unsigned long clockCycles = ARM_DWT_CYCCNT;
+	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	//uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	uint32_t clockCycles = ARM_DWT_CYCCNT;
 
 	if (globalObj->clockMode == INTERNAL_CLOCK){
 /*
@@ -61,25 +62,41 @@ void MasterClock::masterClockFunc(){
 
 
 		*/
-
- /*
-		if (clockCycles-startingClockCount > masterClockCycleCount * kMasterClockInterval*120 ){
+  /*
+		uint8_t clocksToAdd = ((clockCycles-startingClockCount) / (kMasterClockInterval*120))-masterClockCycleCount ;
+		if (clockCycles-startingClockCount > masterClockCycleCount*kMasterClockInterval*120 ){
 			for (int i = 0; i < SEQUENCECOUNT; i++ ){
-				sequenceArray[i].masterClockPulse(1);
+				sequenceArray[i].masterClockPulse(clocksToAdd);
 			}
-			globalObj->tempoMasterClkCounter++;
-			clockCounter++;
-			lfoClockCounter++;
-			masterClockCycleCount++;
+			globalObj->tempoMasterClkCounter += clocksToAdd;
+			clockCounter += clocksToAdd;
+			lfoClockCounter += clocksToAdd;
+			masterClockCycleCount += clocksToAdd;
 		}
 
-		if(masterDebugTimer > 100000 ){
-			Serial.println("Pulse! start: " + String(startingClockCount) + "\tdiff: " + String((unsigned long)clockCycles-(unsigned long)startingClockCount) + "\tcmpval: " +String((unsigned long)masterClockCycleCount * kMasterClockInterval*120) + "\tclockcycles: " + String(clockCycles) + "\tmasterClockCycleCount: " + String(masterClockCycleCount) );
-		}
+		// if(clockCycles > lastClockValue + (120000000)/(96*4)){
+		// 	lastClockValue = clockCycles;
+		// 	pulseTrigger = 1;
+		// }
 
- */
+		// if(masterDebugTimer > 100000 ){
+			// masterDebugTimer = 0;
+			// Serial.println("Pulse! start: " + String(lastClockValue) + "\tdiff: " + String((unsigned long)clockCycles-(unsigned long)lastClockValue) + "\tcmpval: " +String((unsigned long)masterClockCycleCount * kMasterClockInterval*120) + "\tclockcycles: " + String(clockCycles) + "\tmasterClockCycleCount: " + String(masterClockCycleCount) + "\tclocksToAdd: " + String(clocksToAdd) );
+		// }
 
-//	/*
+	//	if(clocksToAdd > 2){
+			//Serial.println("additional Clocks!: " + String(startingClockCount) + "\tdiff: " + String((unsigned long)clockCycles-(unsigned long)startingClockCount) + "\tcmpval: " +String((unsigned long)masterClockCycleCount * kMasterClockInterval*120) + "\tclockcycles: " + String(clockCycles) + "\tmasterClockCycleCount: " + String(masterClockCycleCount) + "\tclocksToAdd: " + String(clocksToAdd) );
+	//	}
+
+	//if( clockCycles > 4294967295/10 ){
+	//	Serial.println("Resetting Cycle Counter");
+	//	CPU_RESET_CYCLECOUNTER_MSTR;
+	//	startingClockCount = 0;
+ 	//};
+
+  */
+
+	///*
 		if ((int)masterLoopTimer > 3 * kMasterClockInterval /2){
 //			if ((int)masterLoopTimer > 2 * kMasterClockInterval-100){
 			// a subroutine to add clock counts when the masterLoopTimer was skipped
@@ -105,7 +122,7 @@ void MasterClock::masterClockFunc(){
 			clockCounter++;
 			lfoClockCounter++;
 		}
-	//	*/
+		//	*/
 
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
 		if (extClockCounter > EXTCLOCKDIV - 1  && clockCounter * kMasterClockInterval>  clockPeriod - 3000){
@@ -295,6 +312,7 @@ void MasterClock::internalClockTick(){
     for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->allNotesOff(i);
     	sequenceArray[i].clockStart();
+			lastClockValue = clockCycles;
 			startingClockCount = clockCycles;
 			masterClockCycleCount = 0;
     }

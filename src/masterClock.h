@@ -5,12 +5,15 @@
 #include "globalVariable.h"
 
 #include "global.h"
-#define INTERNAL_PPQ_COUNT 96
-#define EXTCLOCKDIV  24
+#define INTERNAL_PPQ_COUNT 24
+#define EXTCLOCKDIV  6
 // DAC Mapping for each channel:
 #ifndef _MasterClock_h_
 #define _MasterClock_h_
 
+#define CPU_RESET_CYCLECOUNTER_MSTR    do { ARM_DEMCR |= ARM_DEMCR_TRCENA;          \
+                                       ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA; \
+                                       ARM_DWT_CYCCNT = 0; } while(0)
 
 class MasterClock {
 
@@ -36,8 +39,9 @@ public:
   uint32_t clockCounter;
   uint32_t extClockCounter;
 
-  unsigned long masterClockCycleCount;
-  unsigned long startingClockCount;
+  uint32_t masterClockCycleCount;
+  uint32_t lastClockValue;
+  uint32_t startingClockCount;
 
   elapsedMicros masterLoopTimer;
   elapsedMicros masterDebugTimer;

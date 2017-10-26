@@ -714,6 +714,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   int16_t voltageLevel = 0;
   uint32_t offset = 0;
   uint32_t segmentLength = 0;
+  uint32_t clockCycles = ARM_DWT_CYCCNT;
 
   bool   slewOn = false;
   bool skipUpdate = false;
@@ -834,6 +835,9 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
       GOTOVOLTAGE:
       slewLevel = 0;
       voltageLevel = lfoAmplitude[channel]*128;
+      //voltageLevel = clockCycles/4096;
+      slewOn = false;
+
     break;
 
     case LFO_SINE:
