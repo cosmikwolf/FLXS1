@@ -597,39 +597,41 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
     //  Serial.println("glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
   } else {
     backplaneGPIO->digitalWrite(outputMap(channel, SLEWSWITCHCV), HIGH);        // shut off swich with cap to ground, disable slew
-    if (velocityType != 0 ){
-      lfoType[channel] = velocityType;
-      lfoAmplitude[channel] = velocity;
-      lfoSpeed[channel] = lfoSpeedSetting;
-    }
-
-    if(velocityType > 0){
-    //   //  Serial.println("velocitytype == 1 on channel " + String(channel));
-    //   if (outputMap(channel, RHEOCHANNELCC) == 0){
-    //     mcp4352_1.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
-    //   } else {
-    //     mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
-    //   }
-    // //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
-    // //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
-    //   lfoRheoSet[channel] = 1;
-    // } else if (velocityType > 1){
-    //  Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
-      if (notFirstArp == 0){
-        lfoRheoSet[channel] = 1;
-        lfoStartFrame[channel] = startFrame;
-      }
-    }
-
     if (outputMap(channel, RHEOCHANNELCV) == 0){
       mcp4352_1.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to 0
     } else {
       mcp4352_2.setResistance(outputMap(channel, CVRHEO), 0);        // set digipot to 0
     }
 
+  }
+  if (velocityType != 0 ){
+    lfoType[channel] = velocityType;
+    lfoAmplitude[channel] = velocity;
+    lfoSpeed[channel] = lfoSpeedSetting;
+  }
+
+  if(velocityType > 0){
+  //   //  Serial.println("velocitytype == 1 on channel " + String(channel));
+  //   if (outputMap(channel, RHEOCHANNELCC) == 0){
+  //     mcp4352_1.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
+  //   } else {
+  //     mcp4352_2.setResistance(outputMap(channel, CCRHEO), 0);        // set digipot to 0
+  //   }
+  // //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+  // //  ad5676.setVoltage(dacCcMap[channel],  map(velocity, 0,127,globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+  //   lfoRheoSet[channel] = 1;
+  // } else if (velocityType > 1){
+  //  Serial.println("velocitytype > 1 on channel " + String(channel) + "type: " + String(velocityType));
+    if (notFirstArp == 0){
+      lfoRheoSet[channel] = 1;
+      lfoStartFrame[channel] = startFrame;
+    }
+  }
+
+
     //Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
 
-  }
+
   int offset = 0;
   //offset = globalObj->cvInputMapped[channel];
   //delayMicroseconds(5);
