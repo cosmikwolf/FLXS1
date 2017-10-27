@@ -71,7 +71,56 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 		this->stepData[n].arpStatus   =   0;
 		this->stepData[n].notePlaying  =   0;
 		this->stepData[n].framesRemaining = 0;
-	}
+    this->stepData[n].test1 = 254;
+    this->stepData[n].test2 = 254;
+    this->stepData[n].test3 = 254;
+    this->stepData[n].test4 = 254;
+    this->stepData[n].test5 = 254;
+    this->stepData[n].test6 = 254;
+    this->stepData[n].test7 = 254;
+    this->stepData[n].test8 = 254;
+    this->stepData[n].test9 = 254;
+    this->stepData[n].test10 = 254;
+    this->stepData[n].test11 = 254;
+    this->stepData[n].test12 = 254;
+    this->stepData[n].test13 = 254;
+    this->stepData[n].test14 = 254;
+    this->stepData[n].test15 = 254;
+    this->stepData[n].test16 = 254;
+    this->stepData[n].test17 = 254;
+    this->stepData[n].test18 = 254;
+    this->stepData[n].test19 = 254;
+    this->stepData[n].test20 = 254;
+    this->stepData[n].test21 = 254;
+    this->stepData[n].test22 = 254;
+    this->stepData[n].test23 = 254;
+    this->stepData[n].test24 = 254;
+    this->stepData[n].test2_1 = 254;
+    this->stepData[n].test2_2 = 254;
+    this->stepData[n].test2_3 = 254;
+    this->stepData[n].test2_4 = 254;
+    this->stepData[n].test2_5 = 254;
+    this->stepData[n].test2_6 = 254;
+    this->stepData[n].test2_7 = 254;
+    this->stepData[n].test2_8 = 254;
+    this->stepData[n].test2_9 = 254;
+    this->stepData[n].test2_10 = 254;
+    this->stepData[n].test2_11 = 254;
+    this->stepData[n].test2_12 = 254;
+    this->stepData[n].test2_13 = 254;
+    this->stepData[n].test2_14 = 254;
+    this->stepData[n].test2_15 = 254;
+    this->stepData[n].test2_16 = 254;
+    this->stepData[n].test2_17 = 254;
+    this->stepData[n].test2_18 = 254;
+    this->stepData[n].test2_19 = 254;
+    this->stepData[n].test2_20 = 254;
+    this->stepData[n].test2_21 = 254;
+    this->stepData[n].test2_22 = 254;
+    this->stepData[n].test2_23 = 254;
+    this->stepData[n].test2_24 = 254;
+
+}
 
 	outputControl->clearVelocityOutput(ch);
 };
