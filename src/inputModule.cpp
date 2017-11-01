@@ -576,7 +576,7 @@ void InputModule::changeState(uint8_t targetState){
 void InputModule::patternSelectHandler(){
 
   for (int i=0; i < 16; i++){
-    if (midplaneGPIO->rose(i)){
+    if (midplaneGPIO->fell(i)){
       saveFile->changePattern(i, patternChannelSelector, true);
 
       //delay(10);
@@ -1189,7 +1189,7 @@ uint8_t chanSwIndex;
           sequenceArray[selectedChannel].stoppedTrig(getNote(i), false, false);
         }
 
-        if(buttonMode == BUTTON_MODE_XOX){ // tap to turn a step on, double tap to turn step off
+        if(buttonMode == BUTTON_MODE_XOX){
           selectedStep = getNote(i);
           if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
             sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
