@@ -92,7 +92,6 @@ public:
   int8_t instBuffer;
   int16_t stepModeBuffer;
 
-
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;
   unsigned long encoderButtonTime;

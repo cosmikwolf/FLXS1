@@ -46,6 +46,7 @@ public:
   void eraseSaveFile();
   void formatChip();
   void initializeSaveFile();
+  void initializeGlobalFile();
   void formatAndInitialize();
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
@@ -69,17 +70,14 @@ public:
   int cacheWriteLoop();
 
   void listFiles();
-  uint8_t getSaveSector(uint8_t channel, uint8_t pattern);
 
   void saveSequenceJSON(uint8_t channel, uint8_t pattern);
   int  readSequenceJSON(uint8_t channel, uint8_t pattern);
   int getSaveAddress(uint8_t index);
-  void serializeHash(char* fileBuffer, uint8_t channel, uint8_t pattern);
-  void serialize(char* fileBuffer, uint8_t channel, uint8_t pattern);
-  void serializeTest(unsigned char * fileBuffer, uint8_t channel, uint8_t pattern);
-  void serializeTest2(char* fileBuffer, uint8_t channel, uint8_t pattern);
-  bool deserializeHash(uint8_t channel, char* json);
-  bool deserialize(uint8_t channel, char* json);
+  void serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern);
+  void serializePatternTest(unsigned char * fileBuffer, uint8_t channel, uint8_t pattern);
+  void serializePatternTest2(char* fileBuffer, uint8_t channel, uint8_t pattern);
+  bool deserializePatternPattern(uint8_t channel, char* json);
 
   bool validateJson(char* fileBuffer);
 

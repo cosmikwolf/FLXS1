@@ -41,8 +41,9 @@ void GlobalVariable::initialize(){
       rheoTestLevel = 0;
       gateTestComplete = false;
 
+      this->parameterSelect = false;
       this->midiSetClockOut = false;
-       this->calibrationBuffer = 0;
+      this->calibrationBuffer = 0;
 
        for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
        for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };

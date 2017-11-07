@@ -295,7 +295,7 @@ void DisplayModule::channelEnvelopeMenuDisplay(char *buf) {
   displayElement[0] = strdup("ENVELOPE SET");
 
   switch (stepMode) {
-    case STATE_VELOCITY:
+    case STATE_CV2_LEVEL:
       highlight = 1;    break;
   }
 

@@ -70,7 +70,6 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
     eraseAllFlag = true;
   }
 
-
 }
 void InputModule::multiSelectInputHandler(){
   for (int i=0; i < 16; i++){
@@ -85,9 +84,8 @@ void InputModule::multiSelectInputHandler(){
   };
 
   if (knobChange){
-    backplaneGPIO->update();
-    if ( midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
-      changeState(min_max(stepMode + knobChange,STATE_PITCH0, STATE_LFOSPEED));
+    if ( globalObj->parameterSelect ) {// Encoder Switch
+      changeState(min_max(stepMode + knobChange,STATE_PITCH0, STATE_CV2_OFFSET));
     } else {
       switch(stepMode){
         case STATE_PITCH0:
@@ -134,16 +132,16 @@ void InputModule::multiSelectInputHandler(){
           globalObj->multi_beatDiv_switch = true;
           globalObj->multi_beatDiv += knobChange;
           break;
-        case STATE_VELOCITY:
+        case STATE_CV2_LEVEL:
           globalObj->multi_velocity_switch = true;
           globalObj->multi_velocity += knobChange;
           break;
-        case STATE_VELOCITYTYPE:
+        case STATE_CV2_TYPE:
           globalObj->multi_velocityType_switch = true;
           globalObj->multi_velocityType = min_max(globalObj->multi_velocityType+ knobChange, 0 , 4);
 
           break;
-        case STATE_LFOSPEED:
+        case STATE_CV2_SPEED:
           globalObj->multi_lfoSpeed_switch = true;
           globalObj->multi_lfoSpeed += knobChange;
           break;
@@ -198,15 +196,15 @@ void InputModule::multiSelectInputHandler(){
             case STATE_GLIDE:
               sequenceArray[selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 128);
               break;
-            case STATE_VELOCITY:
+            case STATE_CV2_LEVEL:
               sequenceArray[selectedChannel].stepData[i].velocity =  positive_modulo(globalObj->multi_velocity, 127);
 
               break;
-            case STATE_VELOCITYTYPE:
+            case STATE_CV2_TYPE:
               sequenceArray[selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 13);
 
               break;
-            case STATE_LFOSPEED:
+            case STATE_CV2_SPEED:
               sequenceArray[selectedChannel].stepData[i].lfoSpeed = min_max(globalObj->multi_lfoSpeed, 1, 255);
 
               break;
@@ -297,13 +295,13 @@ void InputModule::setStepAbsolute(uint8_t channel, uint8_t stepNum, int value){
           sequenceArray[channel].stepData[stepNum].arpOctave=  min_max(value, 1, 5);
         break;
 
-        case STATE_VELOCITY:
+        case STATE_CV2_LEVEL:
           sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(value, 127);
         break;
-        case STATE_VELOCITYTYPE:
+        case STATE_CV2_TYPE:
           sequenceArray[channel].stepData[stepNum].velocityType = min_max(value, 0, 4);
         break;
-        case STATE_LFOSPEED:
+        case STATE_CV2_SPEED:
           sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(value, 1, 255);
         break;
       }
@@ -318,6 +316,16 @@ void InputModule::loop(uint16_t frequency){
     //knobRead = -1 * knob.read()/2  ;
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
+
+    if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
+      globalObj->parameterSelect = !globalObj->parameterSelect;
+    }
+
+    // if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT) ){ //encoder knob
+    //   globalObj->parameterSelect = true;
+    // } else {
+    //   globalObj->parameterSelect = false;
+    // }
 
     if (midplaneGPIO->fell(SW_SHIFT)){
       //tap tempo
@@ -364,7 +372,7 @@ void InputModule::loop(uint16_t frequency){
         case MOD_MENU_1:
         case MOD_MENU_2:
         case QUANTIZE_MENU:
-          if(backplaneGPIO->pressed(22)){
+          if(globalObj->parameterSelect){
             changeState(min_max_cycle(stepMode+knobChange, STATE_FIRSTSTEP , STATE_ARPINTMOD ));
           }
           break;
@@ -480,9 +488,10 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_ARPOCTAVE:
       currentMenu = ARPEGGIO_MENU;
       break;
-    case STATE_VELOCITY:
-    case STATE_VELOCITYTYPE:
-    case STATE_LFOSPEED:
+    case STATE_CV2_LEVEL:
+    case STATE_CV2_TYPE:
+    case STATE_CV2_SPEED:
+    case STATE_CV2_OFFSET:
       currentMenu = VELOCITY_MENU;
       break;
     case STATE_FIRSTSTEP:
@@ -605,7 +614,7 @@ void InputModule::tempoMenuHandler(){
   }
 
   if(knobChange){
-    if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
+    if(globalObj->parameterSelect){
       changeState(min_max_cycle(stepMode+knobChange, STATE_TEMPO , STATE_RESETINPUT ));
     } else {
       switch (stepMode){
@@ -644,7 +653,7 @@ void InputModule::sequenceMenuHandler(){
     }
   }
   if(knobChange){
-    if ( backplaneGPIO->pressed(22) ) {// Encoder Switch
+    if ( globalObj->parameterSelect ) {// Encoder Switch
     //  changeState(min_max_cycle(stepMode + knobChange,  STATE_STEPCOUNT,  STATE_QUANTIZEMODE));
     } else {
       switch(stepMode){
@@ -745,7 +754,7 @@ void InputModule::sequenceMenuHandler(){
 void InputModule::inputMenuHandler(){
 
   if(knobChange){
-    if ( backplaneGPIO->pressed(22) ) {// Encoder Switch
+    if ( globalObj->parameterSelect ) {
       changeState(min_max_cycle(stepMode+knobChange, STATE_STEPCOUNT , STATE_SKIPSTEP));
     } else {
 
@@ -757,56 +766,18 @@ void InputModule::inputMenuHandler(){
 }
 
 void InputModule::globalMenuHandler(){
-  /*if (midplaneGPIO->fell(0)){
-    Serial.println("Initializing sequence");
-    sequenceArray[selectedChannel].initNewSequence(currentPattern, selectedChannel);
-      changeState(STATE_PITCH0);
-
-  } else if (midplaneGPIO->fell(4)){
-    Serial.println("Initializing pattern");
-    for (int i=0; i < SEQUENCECOUNT; i++){
-      sequenceArray[i].initNewSequence(currentPattern, i);
-    }
-    changeState(STATE_PITCH0);
-
-  } else if (midplaneGPIO->fell(8)){
-    Serial.println("DELETING ALL SAVE FILES");
-  //  saveFile->listFiles();
-    delay(1000);
-  //  saveFile->wipeEEPROM();
-    saveFile->initializeCache();
-    saveFile->eraseSaveFile();
-
-    for(int pattern=0; pattern < 16; pattern++){
-      Serial.println("***----###$$$###---*** *^~^* SAVING PATTERN " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
-
-      for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        sequenceArray[channel].initNewSequence(pattern, channel);
+  if(knobChange){
+    if ( globalObj->parameterSelect ) {// Encoder Switch
+      changeState(min_max_cycle(stepMode + knobChange,  STATE_PG_BTN_SWITCH,  STATE_CH4_VOLT_RANGE));
+    } else {
+      switch(stepMode){
+        case STATE_PG_BTN_SWITCH:
+          //sequenceArray[selectedChannel].firstStep = min_max(sequenceArray[selectedChannel].firstStep + knobChange, 0, 63);
+          //sequenceArray[selectedChannel].firstStepChanged == TRUE;
+          break;
+        }
       }
-      Serial.println("Patterns initialized");
-      for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        saveFile->saveSequenceJSON(channel, pattern);
-      }
-      Serial.println("json sequence saved");
-      while(saveFile->cacheWriteSwitch){
-        saveFile->cacheWriteLoop();
-
-      }
-      Serial.println("***----###$$$###---*** *^~^* PATTERN SAVED " + String(pattern) + " TO CACHE *^~^* ***----###$$$###---***");
-      delay(500);
     }
-
-    while(saveFile->cacheWriteSwitch){
-      saveFile->cacheWriteLoop();
-    }
-    delay(500);
-    saveFile->loadPattern(0, 0b1111);
-    saveFile->listFiles();
-    changeState(STATE_PITCH0);
-
-  }
-  */
-  //changeState(STATE_PITCH0);
 }
 
 
@@ -852,7 +823,7 @@ void InputModule::channelButtonHandler(uint8_t channel){
     selectedChannel = channel;
     return;
   }
-  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_LFOSPEED));
+  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_CV2_OFFSET));
 
 }
 
@@ -1218,12 +1189,10 @@ uint8_t chanSwIndex;
       }
     }
     if (knobChange){
-      backplaneGPIO->update();
-      if ( midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3) || backplaneGPIO->pressed(22) ) {// Encoder Switch
-        changeState(positive_modulo(stepMode + knobChange, STATE_LFOSPEED+1));
+      if ( globalObj->parameterSelect ) {// Encoder Switch
+        changeState(min_max_cycle(stepMode + knobChange,  STATE_PITCH0,  STATE_CV2_OFFSET));
       } else {
         changeStepData(selectedChannel, selectedStep, knobChange);
-
       }
     }
 
@@ -1316,13 +1285,13 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
           sequenceArray[channel].stepData[stepNum].arpOctave=  min_max(sequenceArray[channel].stepData[stepNum].arpOctave + change, 1, 5);
         break;
 
-        case STATE_VELOCITY:
+        case STATE_CV2_LEVEL:
           sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(sequenceArray[channel].stepData[stepNum].velocity + change, 127);
         break;
-        case STATE_VELOCITYTYPE:
+        case STATE_CV2_TYPE:
           sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 13);
         break;
-        case STATE_LFOSPEED:
+        case STATE_CV2_SPEED:
           sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(sequenceArray[channel].stepData[stepNum].lfoSpeed + change, 1, 255);
         break;
       }
@@ -1613,7 +1582,7 @@ void InputModule::calibrationMenuHandler(){
     break;
   }
   if(knobChange){
-    if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE)){
+    if(globalObj->parameterSelect){
       changeState(min_max(stepMode+knobChange, STATE_CALIB_INPUT0_OFFSET , STATE_TEST_RHEOSTAT ));
     } else {
       switch (stepMode){

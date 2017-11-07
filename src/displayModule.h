@@ -80,6 +80,7 @@ class DisplayModule
     uint8_t previousMenu;
     uint8_t previouslySelectedChannel;
     uint8_t previousStepMode;
+    bool previousParameterSelect;
     SSD_13XX oled = SSD_13XX(LCD_CS, LCD_DC, LCD_RST);
 
     elapsedMicros displayTimer;

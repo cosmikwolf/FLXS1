@@ -71,6 +71,19 @@ void FlashMemory::formatAndInitialize(){
     Serial.println("Save File Initialization complete.");
 }
 
+void FlashMemory::initializeGlobalFile()(){
+  Serial.println("Initializing Global Settings File");
+
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName =strdup("globSet");
+  if (!spiFlash->exists(fileName)) {
+    Serial.println("globSet file does not exist...  creating save file");
+    spiFlash->createErasable(fileName, FLASHFILESIZE);
+
+  }
+  free(fileName);
+
+}
 
 void FlashMemory::initializeSaveFile(){
   Serial.println("Initializing Save File");
@@ -163,10 +176,6 @@ bool FlashMemory::readCalibrationEEPROM(){
   return 0;
 };
 
-uint8_t FlashMemory::getSaveSector(uint8_t channel, uint8_t pattern){
-  return (pattern * 4 + channel) * SECTORSIZE;
-};
-
 void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
 
@@ -183,7 +192,7 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
   cacheFileName = strdup("seqCache");
   char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
 
-  serialize(fileBuffer, channel, pattern);
+  serializePattern(fileBuffer, channel, pattern);
 
   while( !(spiFlash->ready()) ){
     //delay(1);
@@ -208,7 +217,7 @@ void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
 }
 
 
-void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
+void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
@@ -238,6 +247,7 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
   seqSettingsArray.add(sequenceArray[channel].skipStepCount);       // array index: 21
   seqSettingsArray.add(sequenceArray[channel].randomLow);           // array index: 22
   seqSettingsArray.add(sequenceArray[channel].randomHigh);          // array index: 23
+  seqSettingsArray.add(sequenceArray[channel].quantizeScale);       // array index: 24
 
   JsonArray& stepDataArray = root.createNestedArray("data");
 
@@ -265,7 +275,7 @@ void FlashMemory::serialize(char* fileBuffer, uint8_t channel, uint8_t pattern){
   root.printTo(fileBuffer,4096);
 }
 
-bool FlashMemory::deserialize(uint8_t channel, char* json){
+bool FlashMemory::deserializePattern(uint8_t channel, char* json){
   StaticJsonBuffer<16384> jsonBuffer;
 
   //Serial.println("jsonBuffer allocated");
@@ -297,6 +307,7 @@ bool FlashMemory::deserialize(uint8_t channel, char* json){
    sequenceArray[channel].skipStepCount    = jsonReader["settings"][21];
    sequenceArray[channel].randomLow        = jsonReader["settings"][22];
    sequenceArray[channel].randomHigh       = jsonReader["settings"][23];
+   sequenceArray[channel].quantizeScale    = jsonReader["settings"][24];
     //.as<uint8_t>();
    //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
    JsonArray& stepDataArray = jsonReader["data"];
@@ -406,7 +417,7 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
           //Serial.println("file read");
         //  fileBuffer[SECTORSIZE] = '\0';               // Add the terminating null char.
           //Serial.println(fileBuffer);                // Print the file to the //Serial monitor.
-          if(this->deserialize(channel, fileBuffer) == false ){
+          if(this->deserializePattern(channel, fileBuffer) == false ){
 
             file.close();
             free(fileBuffer);
@@ -414,7 +425,7 @@ int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
             Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. attempting to read cache...");
             file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
             file.read(fileBuffer, SECTORSIZE);
-            if(this->deserialize(channel, fileBuffer) == false ){
+            if(this->deserializePattern(channel, fileBuffer) == false ){
               Serial.println(fileBuffer);
               Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt");
             };
