@@ -155,8 +155,22 @@ void MasterClock::masterClockFunc(){
 			}
 			pulseTrigger = 1;
 		}
+		if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
+				outputControl->setClockOutput(LOW);
+				displayRunSwitch = true;
+				digitalWriteFast(PIN_EXT_AD_2, HIGH);
+		}
 
 	} else if(globalObj->clockMode == EXTERNAL_MIDI_CLOCK){
+		if (globalObj->midiSetClockOut && !outputControl->clockValue){
+			outputControl->setClockOutput(HIGH);
+		}
+		if (outputControl->clockValue && !globalObj->midiSetClockOut) {
+			outputControl->setClockOutput(LOW);
+			displayRunSwitch = true;
+			digitalWriteFast(PIN_EXT_AD_2, HIGH);
+		}
+
     if ((int)masterLoopTimer > kMasterClockInterval + 100){
       uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
       lfoClockCounter += countToAdd;
@@ -166,7 +180,7 @@ void MasterClock::masterClockFunc(){
 		for (int i = 0; i < SEQUENCECOUNT; i++ ){
 			sequenceArray[i].masterClockPulse(1);
 		}
-  }else if(globalObj->clockMode == EXTERNAL_CLOCK_GATE_0){
+  } else if(globalObj->clockMode == EXTERNAL_CLOCK_GATE_0){
     if ((int)masterLoopTimer > kMasterClockInterval + 100){
       uint32_t countToAdd = (int)masterLoopTimer / kMasterClockInterval;
       lfoClockCounter += countToAdd;
@@ -179,11 +193,6 @@ void MasterClock::masterClockFunc(){
 	}
 	masterLoopTimer = 0;
 
-	if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
-			outputControl->setClockOutput(LOW);
-			displayRunSwitch = true;
-			digitalWriteFast(PIN_EXT_AD_2, HIGH);
-	}
 
 	// digitalWriteFast(PIN_EXT_AD_2, LOW);
   // masterLooptimeAvg
@@ -343,6 +352,7 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::midiClockTick(){
   // ext clock sync
+
 	  for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].runSequence();
 	  }

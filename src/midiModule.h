@@ -21,6 +21,7 @@ public:
   void midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi);
 
   bool midiTestArray[128];
+  uint8_t midiClockCount;
 private:
 
   int avgPulseTimer;

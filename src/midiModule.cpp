@@ -28,6 +28,8 @@ void MidiModule::midiStopHandler(){
   if (globalObj->clockMode == EXTERNAL_MIDI_CLOCK) {
     Serial.println("Midi Stop");
     if (playing == 0){
+      midiClockCount = 0;
+      globalObj->midiSetClockOut = false;
       for (int i=0; i< SEQUENCECOUNT; i++){
         sequenceArray[i].clockReset(true);
       }
@@ -85,6 +87,13 @@ void MidiModule::midiClockPulseHandler(){
   }
 
   if(playing){
+    if (midiClockCount < 4 ){
+      globalObj->midiSetClockOut = true;
+    } else {
+      globalObj->midiSetClockOut = false;
+    }
+    midiClockCount = (midiClockCount +1) % MIDI_PULSE_COUNT;
+
     for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].ppqPulse(MIDI_PULSE_COUNT);
     }

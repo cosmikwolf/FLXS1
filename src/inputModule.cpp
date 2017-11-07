@@ -395,7 +395,9 @@ void InputModule::loop(uint16_t frequency){
         case INPUT_MENU:
           inputMenuHandler();
         break;
-        case GLOBAL_MENU:
+
+        case GLOBAL_MENU_1:
+        case GLOBAL_MENU_2:
           globalMenuHandler();
         break;
 
@@ -529,8 +531,15 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_INPUTDEBUG:
       currentMenu = INPUT_DEBUG_MENU;
       break;
-    case STATE_GLOBAL:
-      currentMenu = GLOBAL_MENU;
+    case STATE_PG_BTN_SWITCH:
+    case STATE_DATA_KNOB_SWITCH:
+      currentMenu = GLOBAL_MENU_1;
+      break;
+    case STATE_CH1_VOLT_RANGE:
+    case STATE_CH2_VOLT_RANGE:
+    case STATE_CH3_VOLT_RANGE:
+    case STATE_CH4_VOLT_RANGE:
+      currentMenu = GLOBAL_MENU_2;
       break;
     case STATE_CALIB_INPUT0_OFFSET:
     case STATE_CALIB_INPUT0_LOW:
@@ -797,7 +806,7 @@ void InputModule::globalMenuHandler(){
 
   }
   */
-  changeState(STATE_PITCH0);
+  //changeState(STATE_PITCH0);
 }
 
 
@@ -1048,8 +1057,6 @@ uint8_t chanSwIndex;
             break;
           }
 
-
-
           if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) break;
 
           switch(currentMenu){
@@ -1070,7 +1077,11 @@ uint8_t chanSwIndex;
 
         case SW_MENU: //switch M3 toggles the sequence menu
          if (midplaneGPIO->pressed(SW_SHIFT)){
-           changeState(STATE_GLOBAL);
+           if(currentMenu == GLOBAL_MENU_1){
+             changeState(STATE_CH1_VOLT_RANGE);
+           } else {
+             changeState(STATE_PG_BTN_SWITCH);
+           }
          } else {
           //  if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
           //    changeState(min_max_cycle(stepMode+1, STATE_STEPCOUNT , STATE_SKIPSTEP));
@@ -1104,7 +1115,7 @@ uint8_t chanSwIndex;
 
         case SW_PGUP:
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            //changeState(GLOBAL_MENU);
+            //changeState(GLOBAL_MENU_1);
           } else {
             notePage = positive_modulo(notePage + 1, 4);
           }

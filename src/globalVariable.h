@@ -67,6 +67,8 @@ class GlobalVariable {
     uint8_t gateTestArray[4];
     uint8_t activeGate;
     uint8_t rheoTestLevel;
+
+    bool midiSetClockOut;
     bool    gateTestComplete;
     elapsedMillis testTimer;
 

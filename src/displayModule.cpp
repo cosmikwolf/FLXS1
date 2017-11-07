@@ -168,7 +168,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           modalRefreshSwitch = false;
          freeDisplayCache();
          oled.fillScreen(background);
-         //Serial.println("Changing Menu: " + String(currentMenu));
+         Serial.println("Changing Menu: " + String(currentMenu));
       }
       switch(currentMenu) {
         case PITCH_GATE_MENU:
@@ -226,8 +226,12 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           channelInputDisplay(buf);
         break;
 
-        case GLOBAL_MENU:
+        case GLOBAL_MENU_1:
           globalMenuDisplay();
+        break;
+
+        case GLOBAL_MENU_2:
+          globalMenuDisplay2();
         break;
 
         case TEMPO_MENU:
@@ -1777,22 +1781,59 @@ prevSelectedText = selectedText;
 
 
  void DisplayModule::globalMenuDisplay(){
-/*
-   displayElement[0] = strdup("GLOBAL MENU");
-   displayElement[1] = strdup("INIT CH");
-   displayElement[2] = strdup("INIT PAT");
-   displayElement[3] = strdup("DELETE SAVE FILE");
-   displayElement[4] = strdup("TOGGLE GAME OF LIFE");
-   displayElement[5] = strdup("");
 
-   renderStringBox(0, DISPLAY_LABEL, 0 , 0  , 128 , 16, false, STYLE1X,  WHITE, RED);
-   renderStringBox(1, DISPLAY_LABEL, 0 , 16 , 64 , 16, false, STYLE1X, WHITE, GREEN);
-   renderStringBox(2, DISPLAY_LABEL, 0 , 32 , 64 , 16, false, STYLE1X, WHITE, BLUE);
-   renderStringBox(3, DISPLAY_LABEL ,0, 48 , 128 , 16, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(4, DISPLAY_LABEL ,0, 64 , 128 , 16, false, STYLE1X, WHITE, BLACK);
-   renderStringBox(5, DISPLAY_LABEL, 64 , 16 , 64 , 16, false, STYLE1X, WHITE, GREEN);
-   renderStringBox(6, DISPLAY_LABEL, 64 , 32 , 64 , 16, false, STYLE1X, WHITE, BLUE);
+   displayElement[0] = strdup("GLOBAL MENU 1/2");
 
-   sprintf(buf, "step: %d", selectedStep);
-*/
+   displayElement[1] = strdup("pg up/dn: ");
+   displayElement[2] = strdup("stndrd");
+
+   displayElement[3] = strdup("data knb:");
+   displayElement[4] = strdup("moment");
+
+
+
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
+
+   renderStringBox(1,  DISPLAY_LABEL,    0, 15, 95,17, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_PG_BTN_SWITCH,   70, 15, 38,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(3,  DISPLAY_LABEL,    0, 31, 95,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_DATA_KNOB_SWITCH,   70, 31, 38,17, false, STYLE1X, background , foreground);
+
+
  }
+
+ void DisplayModule::globalMenuDisplay2(){
+   displayElement[0] = strdup("GLOBAL MENU 2/2");
+
+   displayElement[5] = strdup("CV output range");
+
+   displayElement[6] = strdup("ch1");
+   displayElement[7] = strdup("-2v:8v");
+
+   displayElement[8] = strdup("ch2");
+   displayElement[9] = strdup("-5v:5v");
+
+   displayElement[10] = strdup("CH3");
+   displayElement[11] = strdup("-5v:5v");
+
+   displayElement[12] = strdup("ch4");
+   displayElement[13] = strdup("-5v:5v");
+
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
+
+   renderStringBox(5,  DISPLAY_LABEL,    0, 16, 90,17, false, STYLE1X, background , contrastColor);
+
+   renderStringBox(6,  DISPLAY_LABEL,            0, 32, 32,17, false, STYLE1X, background , foreground);
+   renderStringBox(7,  STATE_CH1_VOLT_RANGE,    48, 32, 80,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(8,  DISPLAY_LABEL,           0, 48, 32,17, false, STYLE1X, background , foreground);
+   renderStringBox(9,  STATE_CH2_VOLT_RANGE,    48, 48, 80,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(10,  DISPLAY_LABEL,           0, 64, 32,17, false, STYLE1X, background , foreground);
+   renderStringBox(11,  STATE_CH3_VOLT_RANGE,   48, 64, 80,17, false, STYLE1X, background , foreground);
+
+   renderStringBox(12,  DISPLAY_LABEL,          0, 80, 32,17, false, STYLE1X, background , foreground);
+   renderStringBox(13,  STATE_CH4_VOLT_RANGE,   48, 80, 80,17, false, STYLE1X, background , foreground);
+
+}

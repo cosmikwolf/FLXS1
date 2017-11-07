@@ -135,6 +135,7 @@ class DisplayModule
     void scaleMenuDisplay();
     void inputMenuDisplay();
     void globalMenuDisplay();
+    void globalMenuDisplay2();
     void tempoMenuDisplay();
     void modMenu1_DisplayHandler();
     void modMenu2_DisplayHandler();
