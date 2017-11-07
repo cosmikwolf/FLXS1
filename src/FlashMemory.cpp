@@ -71,7 +71,7 @@ void FlashMemory::formatAndInitialize(){
     Serial.println("Save File Initialization complete.");
 }
 
-void FlashMemory::initializeGlobalFile()(){
+void FlashMemory::initializeGlobalFile(){
   Serial.println("Initializing Global Settings File");
 
   char* fileName = (char *) malloc(sizeof(char) * 12);

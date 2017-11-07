@@ -75,9 +75,7 @@ public:
   int  readSequenceJSON(uint8_t channel, uint8_t pattern);
   int getSaveAddress(uint8_t index);
   void serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern);
-  void serializePatternTest(unsigned char * fileBuffer, uint8_t channel, uint8_t pattern);
-  void serializePatternTest2(char* fileBuffer, uint8_t channel, uint8_t pattern);
-  bool deserializePatternPattern(uint8_t channel, char* json);
+  bool deserializePattern(uint8_t channel, char* json);
 
   bool validateJson(char* fileBuffer);
 
