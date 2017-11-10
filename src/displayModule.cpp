@@ -453,7 +453,6 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
   if (previousStepMode == highlight && highlight != stepMode)  { refresh = 1;};
   if (previousParameterSelect != globalObj->parameterSelect )  {
     refresh = 1;
-    Serial.println("ParameterSelect has changed");
   };
 
   if ( refresh ) {
@@ -901,7 +900,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
     displayElement[6] = strdup(buf);
 
     displayElement[10] = strdup("offset:");
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].velocityOffset);
+    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2offset);
     displayElement[11] = strdup(buf);
 
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
@@ -1795,55 +1794,86 @@ prevSelectedText = selectedText;
    displayElement[0] = strdup("GLOBAL settings");
 
    displayElement[1] = strdup("pg up/dn: ");
-   displayElement[2] = strdup("stndrd");
+   if(globalObj->pageButtonStyle){
+     displayElement[2] = strdup("forward");
+   } else {
+     displayElement[2] = strdup("reverse");
+   }
 
    displayElement[3] = strdup("data knb:");
-   displayElement[4] = strdup("moment");
+   if(globalObj->dataInputStyle){
+     displayElement[4] = strdup("toggle");
+   } else {
+     displayElement[4] = strdup("moment");
+   }
 
-
+//   displayElement[4] = strdup("moment");
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
 
-   renderStringBox(1,  DISPLAY_LABEL,         0, 15, 95,17, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_PG_BTN_SWITCH,   70, 15, 58,17, false, STYLE1X, background , foreground);
+   renderStringBox(1,  DISPLAY_LABEL,         0, 15, 95,16, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_PG_BTN_SWITCH,   70, 15, 57,16, false, STYLE1X, background , foreground);
 
-   renderStringBox(3,  DISPLAY_LABEL,              0, 31, 95,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_DATA_KNOB_SWITCH,   70, 31, 58,17, false, STYLE1X, background , foreground);
+   renderStringBox(3,  DISPLAY_LABEL,              0, 31, 95,16, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_DATA_KNOB_SWITCH,   70, 31, 57,16, false, STYLE1X, background , foreground);
+
 
 
  }
 
+void DisplayModule::cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeValue){
+  switch(outputRangeValue){
+    case 5:
+      displayElement[dispElement] = strdup("-5v to 5v");
+      break;
+    case 4:
+      displayElement[dispElement] = strdup("-4v to 6v");
+      break;
+    case 3:
+      displayElement[dispElement] = strdup("-3v to 7v");
+      break;
+    case 2:
+      displayElement[dispElement] = strdup("-2v to 8v");
+      break;
+    case 1:
+      displayElement[dispElement] = strdup("-1v to 9v");
+      break;
+    case 0:
+      displayElement[dispElement] = strdup("0v to 10v");
+      break;
+  }
+}
  void DisplayModule::globalMenuDisplay2(){
    displayElement[0] = strdup("GLOBAL settings");
 
-   displayElement[5] = strdup("CV output range");
+   displayElement[5] = strdup("pitch CV range");
 
-   displayElement[6] = strdup("ch1");
-   displayElement[7] = strdup("-2v:8v");
+   displayElement[6] = strdup("cv1a:");
+   this->cvOuputRangeText(7, globalObj->outputNegOffset[0]);
 
-   displayElement[8] = strdup("ch2");
-   displayElement[9] = strdup("-5v:5v");
+   displayElement[8] = strdup("cv2a:");
+   this->cvOuputRangeText(9, globalObj->outputNegOffset[1]);
 
-   displayElement[10] = strdup("CH3");
-   displayElement[11] = strdup("-5v:5v");
+   displayElement[10] = strdup("cv3a:");
+   this->cvOuputRangeText(11, globalObj->outputNegOffset[2]);
 
-   displayElement[12] = strdup("ch4");
-   displayElement[13] = strdup("-5v:5v");
+   displayElement[12] = strdup("cv4a:");
+   this->cvOuputRangeText(13, globalObj->outputNegOffset[3]);
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
 
-   renderStringBox(5,  DISPLAY_LABEL,    0, 16, 90,17, false, STYLE1X, background , contrastColor);
+   renderStringBox(5,  DISPLAY_LABEL,    0, 15, 90,17, false, STYLE1X, background , contrastColor);
 
-   renderStringBox(6,  DISPLAY_LABEL,            0, 32, 32,17, false, STYLE1X, background , foreground);
-   renderStringBox(7,  STATE_CH1_VOLT_RANGE,    48, 32, 80,17, false, STYLE1X, background , foreground);
+   renderStringBox(6,  DISPLAY_LABEL,            0, 31, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(7,  STATE_CH1_VOLT_RANGE,    48, 31, 79,16, false, STYLE1X, background , foreground);
 
-   renderStringBox(8,  DISPLAY_LABEL,           0, 48, 32,17, false, STYLE1X, background , foreground);
-   renderStringBox(9,  STATE_CH2_VOLT_RANGE,    48, 48, 80,17, false, STYLE1X, background , foreground);
+   renderStringBox(8,  DISPLAY_LABEL,           0, 47, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(9,  STATE_CH2_VOLT_RANGE,    48, 47, 79,16, false, STYLE1X, background , foreground);
 
-   renderStringBox(10,  DISPLAY_LABEL,           0, 64, 32,17, false, STYLE1X, background , foreground);
-   renderStringBox(11,  STATE_CH3_VOLT_RANGE,   48, 64, 80,17, false, STYLE1X, background , foreground);
+   renderStringBox(10,  DISPLAY_LABEL,           0, 63, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(11,  STATE_CH3_VOLT_RANGE,   48, 63, 79,16, false, STYLE1X, background , foreground);
 
-   renderStringBox(12,  DISPLAY_LABEL,          0, 80, 32,17, false, STYLE1X, background , foreground);
-   renderStringBox(13,  STATE_CH4_VOLT_RANGE,   48, 80, 80,17, false, STYLE1X, background , foreground);
+   renderStringBox(12,  DISPLAY_LABEL,          0, 79, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(13,  STATE_CH4_VOLT_RANGE,   48, 79, 79,16, false, STYLE1X, background , foreground);
 
 }

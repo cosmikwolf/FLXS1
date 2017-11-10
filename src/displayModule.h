@@ -137,6 +137,7 @@ class DisplayModule
     void inputMenuDisplay();
     void globalMenuDisplay();
     void globalMenuDisplay2();
+    void cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeValue);
     void tempoMenuDisplay();
     void modMenu1_DisplayHandler();
     void modMenu2_DisplayHandler();

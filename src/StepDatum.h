@@ -17,7 +17,7 @@ typedef	struct StepDatum {
 	int8_t			beatDiv;
 	uint8_t			velocity;	    // note velocity
 	uint8_t			velocityType;
-	uint8_t			velocityOffset;
+	uint8_t			cv2offset;
 	uint8_t			lfoSpeed;
 	// utility variables - dont need to be saved.
 	uint8_t			noteStatus;		// if note is playing or not

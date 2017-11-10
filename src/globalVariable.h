@@ -18,7 +18,9 @@ class GlobalVariable {
   public:
     bool       multiSelection[64];
     bool       multiSelectSwitch;
-
+    uint8_t    dataInputStyle;
+    uint8_t    pageButtonStyle;
+    uint8_t    outputNegOffset[4];
     bool       multi_pitch_switch;
     bool       multi_chord_switch;
     bool       multi_gateType_switch;
@@ -77,6 +79,7 @@ class GlobalVariable {
     uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
 
     void initialize();
+    void initGlobals();
 };
 
 #endif

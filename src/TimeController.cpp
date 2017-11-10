@@ -61,6 +61,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 		Serial.println("WARNING! SAVE FILE NOT FOUND");
 	} else {
 		Serial.println("SAVE FILE FOUND");
+		delay(5);
 	}
 
 	buttonIo.changeState(STATE_PITCH0);
@@ -76,9 +77,9 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 //	saveFile.deleteSaveFile();
 /*
-	saveFile.saveSequenceJSON(sequence[0], 0, 0 );
+	saveFile.saveSequenceData(sequence[0], 0, 0 );
 	delay(200);
-	saveFile.readSequenceJSON(sequence[0], 0, 0);
+	saveFile.readSequenceData(sequence[0], 0, 0);
 	File root = SD.open("/");
   saveFile.printDirectory(root, 2);
 	*/

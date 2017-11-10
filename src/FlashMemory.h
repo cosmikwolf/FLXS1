@@ -18,6 +18,7 @@
 #define WINBOND_CS_PIN           22
 #define USE_SPI_FLASH            1
 #define FLASHFILESIZE            262144
+#define GLOBALFILESIZE           65536
 #define SECTORSIZE               4096
 #define CACHE_WRITE_DELAY        50000
 #define AWAITING_FILE_ERASURE    0
@@ -71,11 +72,20 @@ public:
 
   void listFiles();
 
-  void saveSequenceJSON(uint8_t channel, uint8_t pattern);
-  int  readSequenceJSON(uint8_t channel, uint8_t pattern);
+
+
   int getSaveAddress(uint8_t index);
   void serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern);
   bool deserializePattern(uint8_t channel, char* json);
+
+  void serializeGlobalSettings(char* fileBuffer);
+  bool deserializeGlobalSettings(char* json);
+
+  void saveGlobalData();
+  int readGlobalData();
+
+  void saveSequenceData(uint8_t channel, uint8_t pattern);
+  int  readSequenceData(uint8_t channel, uint8_t pattern);
 
   bool validateJson(char* fileBuffer);
 

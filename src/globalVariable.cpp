@@ -2,9 +2,7 @@
 #include "globalVariable.h"
 
 void GlobalVariable::initialize(){
-    this->clockMode = INTERNAL_CLOCK;
-  //    this->clockMode = EXTERNAL_MIDI_CLOCK;
-
+      this->clockMode = INTERNAL_CLOCK;
       this->multi_pitch_switch = 0;
       this->multi_chord_switch = 0;
       this->multi_gateType_switch = 0;
@@ -51,7 +49,17 @@ void GlobalVariable::initialize(){
        for(int i=0; i<4; i++){ this->adcCalibrationNeg[i]= 65535; };
        for(int i=0; i<4; i++){ this->adcCalibrationOffset[i]= 32767; };
 
+       this->initGlobals();
     }
+
+void GlobalVariable::initGlobals(){
+  this->dataInputStyle = 0;
+  this->pageButtonStyle = 0;
+  this->outputNegOffset[0] = 2;
+  this->outputNegOffset[1] = 2;
+  this->outputNegOffset[2] = 2;
+  this->outputNegOffset[3] = 2;
+}
 
 uint8_t GlobalVariable::quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction){
 

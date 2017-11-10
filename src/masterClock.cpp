@@ -313,7 +313,7 @@ void MasterClock::internalClockTick(){
 
   if (playing && !wasPlaying){
 		serialMidi->sendRealTime(midi::Start);
-
+		
         // if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
     masterPulseCount = 0;

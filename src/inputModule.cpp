@@ -317,8 +317,16 @@ void InputModule::loop(uint16_t frequency){
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 
-    if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
-      globalObj->parameterSelect = !globalObj->parameterSelect;
+    if(globalObj->dataInputStyle){
+      if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
+        globalObj->parameterSelect = !globalObj->parameterSelect;
+      }
+    } else {
+      if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT)){
+        globalObj->parameterSelect = true;
+      } else {
+        globalObj->parameterSelect = false;
+      }
     }
 
     // if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT) ){ //encoder knob
@@ -458,7 +466,6 @@ void InputModule::loop(uint16_t frequency){
       Serial.println("AltButton: " + String(didAltButtonsFire));
     }
   }
-
 }
 
 void InputModule::changeState(uint8_t targetState){
@@ -586,7 +593,12 @@ void InputModule::changeState(uint8_t targetState){
     break;
   }
 
-  //this->resetKnobValues();
+  if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && (previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2) ){
+    saveFile->saveGlobalData();
+    Serial.println("Saved GlobalData");
+  }
+
+  previousMenu = currentMenu;
 }
 
 // STATE VARIABLE INPUT HANDLERS
@@ -752,14 +764,11 @@ void InputModule::sequenceMenuHandler(){
 }
 
 void InputModule::inputMenuHandler(){
-
   if(knobChange){
     if ( globalObj->parameterSelect ) {
       changeState(min_max_cycle(stepMode+knobChange, STATE_STEPCOUNT , STATE_SKIPSTEP));
     } else {
-
       switch(stepMode){
-
       }
     }
   }
@@ -771,10 +780,31 @@ void InputModule::globalMenuHandler(){
       changeState(min_max_cycle(stepMode + knobChange,  STATE_PG_BTN_SWITCH,  STATE_CH4_VOLT_RANGE));
     } else {
       switch(stepMode){
+
         case STATE_PG_BTN_SWITCH:
-          //sequenceArray[selectedChannel].firstStep = min_max(sequenceArray[selectedChannel].firstStep + knobChange, 0, 63);
-          //sequenceArray[selectedChannel].firstStepChanged == TRUE;
-          break;
+        globalObj->pageButtonStyle = min_max( globalObj->pageButtonStyle + knobChange, 0, 1);
+
+            break;
+        case STATE_DATA_KNOB_SWITCH:
+        globalObj->dataInputStyle = min_max( globalObj->dataInputStyle + knobChange, 0, 1);
+
+            break;
+        case STATE_CH1_VOLT_RANGE:
+        globalObj->outputNegOffset[0] = min_max( globalObj->outputNegOffset[0] + knobChange, 0, 5);
+
+            break;
+        case STATE_CH2_VOLT_RANGE:
+        globalObj->outputNegOffset[1] = min_max( globalObj->outputNegOffset[1] + knobChange, 0, 5);
+
+            break;
+        case STATE_CH3_VOLT_RANGE:
+        globalObj->outputNegOffset[2] = min_max( globalObj->outputNegOffset[2] + knobChange, 0, 5);
+
+            break;
+        case STATE_CH4_VOLT_RANGE:
+        globalObj->outputNegOffset[3] = min_max( globalObj->outputNegOffset[3] + knobChange, 0, 5);
+
+            break;
         }
       }
     }
@@ -1050,6 +1080,8 @@ uint8_t chanSwIndex;
          if (midplaneGPIO->pressed(SW_SHIFT)){
            if(currentMenu == GLOBAL_MENU_1){
              changeState(STATE_CH1_VOLT_RANGE);
+           } else if(currentMenu == GLOBAL_MENU_2)  {
+             changeState(STATE_PITCH0);
            } else {
              changeState(STATE_PG_BTN_SWITCH);
            }
@@ -1076,10 +1108,19 @@ uint8_t chanSwIndex;
         case SW_PGDN:
 
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            globalObj->multiSelectSwitch = true;
-            changeState(STATE_PITCH0);
+            if(globalObj->multiSelectSwitch){
+              globalObj->multiSelectSwitch = false;
+              changeState(STATE_PITCH0);
+            } else {
+              globalObj->multiSelectSwitch = true;
+              changeState(STATE_PITCH0);
+            }
           } else {
-            notePage = positive_modulo(notePage - 1, 4);
+            if(!globalObj->pageButtonStyle){
+              notePage = positive_modulo(notePage + 1, 4);
+            } else {
+              notePage = positive_modulo(notePage - 1, 4);
+            }
           }
 
         break;
@@ -1088,7 +1129,11 @@ uint8_t chanSwIndex;
           if (midplaneGPIO->pressed(SW_SHIFT)){
             //changeState(GLOBAL_MENU_1);
           } else {
-            notePage = positive_modulo(notePage + 1, 4);
+            if(globalObj->pageButtonStyle){
+              notePage = positive_modulo(notePage + 1, 4);
+            } else {
+              notePage = positive_modulo(notePage - 1, 4);
+            }
           }
 
         break;

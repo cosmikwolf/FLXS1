@@ -91,6 +91,7 @@ public:
   int8_t menuSelector;
   int8_t instBuffer;
   int16_t stepModeBuffer;
+  uint8_t previousMenu;
 
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;

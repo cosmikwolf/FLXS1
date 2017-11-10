@@ -30,7 +30,17 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   for(int n = 0; n < CACHE_COUNT; n++){
     cacheStatus[n] = 0;
   }
+  noInterrupts();
   this->initializeSaveFile();
+  this->initializeGlobalFile();
+  interrupts();
+  int readJsonReturn = this->readGlobalData();
+  if(readJsonReturn){
+    Serial.println("ERROR READING GLOBAL DATA -- CODE: " + String(readJsonReturn) );
+  } else {
+    Serial.println("Global Data Loaded" );
+  }
+
   Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
 }
 
@@ -53,7 +63,7 @@ void FlashMemory::formatAndInitialize(){
       }
       Serial.println("Patterns initialized");
       for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        this->saveSequenceJSON(channel, pattern);
+        this->saveSequenceData(channel, pattern);
       }
       Serial.println("json sequence saved");
       while(this->cacheWriteSwitch){
@@ -75,11 +85,26 @@ void FlashMemory::initializeGlobalFile(){
   Serial.println("Initializing Global Settings File");
 
   char* fileName = (char *) malloc(sizeof(char) * 12);
-  fileName =strdup("globSet");
+  fileName =strdup("globData");
   if (!spiFlash->exists(fileName)) {
-    Serial.println("globSet file does not exist...  creating save file");
-    spiFlash->createErasable(fileName, FLASHFILESIZE);
+    Serial.println("globData file does not exist...  creating save file");
+    spiFlash->createErasable(fileName, GLOBALFILESIZE);
+    globalObj->initGlobals();
+    this->saveGlobalData();
+  } else {
+    Serial.println("Global Settings File found" );
 
+    while(!spiFlash->ready()){
+
+    }
+    file = spiFlash->open(fileName);   //open cache file
+    if(file){
+      Serial.println("Global Settings File Size: " + String(file.size()));
+      delay(10);
+    } else {
+      Serial.println("Could not open global settings file to determine size");
+    }
+    file.close();
   }
   free(fileName);
 
@@ -93,18 +118,34 @@ void FlashMemory::initializeSaveFile(){
   if (!spiFlash->exists(fileName)) {
     Serial.println("seqdata file does not exist... ");
     this->formatAndInitialize();
+  } else {
+    while(!spiFlash->ready()){
+    }
+    file = spiFlash->open(fileName);   //open cache file
+    if(file){
+      Serial.println("Sequence Data File Size: " + String(file.size()));
+      delay(10);
+    } else {
+      Serial.println("Could not open Sequence Data file to determine size");
+      delay(10);
+    }
+    file.close();
   }
   free(fileName);
-
 }
-// BRAIN DUMP:
-// always use dedicated cache for each file save.
-// CACHE STATUSES
-// SAVING TO CACHESECTOR
-// ERASING SAVESECTOR
-// COPYING CACHESECTOR TO SAVESECTOR
-// ERASING CACHESECTOR
-//
+
+
+bool FlashMemory::validateJson(char* fileBuffer){
+  StaticJsonBuffer<16384> jsonBuffer;
+  JsonObject& root = jsonBuffer.parse(fileBuffer);
+  return root.success();
+}
+
+int FlashMemory::getSaveAddress(uint8_t index){
+  return index*SECTORSIZE;
+};
+
+
 void FlashMemory::saveCalibrationEEPROM(){
   uint16_t address = 0;
   //setting calibration written flag.
@@ -176,47 +217,52 @@ bool FlashMemory::readCalibrationEEPROM(){
   return 0;
 };
 
-void FlashMemory::saveSequenceJSON(uint8_t channel, uint8_t pattern){
-  //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
 
-  uint8_t cacheIndex = getCacheIndex(channel, pattern);
-  //Serial.println("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
-  while (cacheStatus[cacheIndex] != 0){
-    int tempint = cacheWriteLoop();
-    //Serial.println("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
-  }
-  saveSequenceBusy = 1;
-  cacheWriteTotalTimer = 0;
+void FlashMemory::serializeGlobalSettings(char* fileBuffer){
+  StaticJsonBuffer<16384> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
 
-  char* cacheFileName = (char *) malloc(sizeof(char) * 12);
-  cacheFileName = strdup("seqCache");
-  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+  JsonArray& globSettingsArray = root.createNestedArray("settings");
 
-  serializePattern(fileBuffer, channel, pattern);
+  globSettingsArray.add(17);      // version number           // array index: 0
+  globSettingsArray.add(globalObj->dataInputStyle);           // array index: 1
+  globSettingsArray.add(globalObj->pageButtonStyle);          // array index: 2
+  globSettingsArray.add(globalObj->outputNegOffset[0]);           // array index: 3
+  globSettingsArray.add(globalObj->outputNegOffset[1]);           // array index: 4
+  globSettingsArray.add(globalObj->outputNegOffset[2]);           // array index: 5
+  globSettingsArray.add(globalObj->outputNegOffset[3]);           // array index: 6
 
-  while( !(spiFlash->ready()) ){
-    //delay(1);
-  }
-  file = spiFlash->open(cacheFileName);
-  if (file){
-    file.seek(getSaveAddress(cacheIndex));
-    file.write(fileBuffer,SECTORSIZE);
-    file.close();
-    setCacheStatus(cacheIndex, SAVING_TO_CACHE_SECTOR);
-  } else {
-      Serial.println("##############");
-      Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(cacheFileName));
-      Serial.println("##############");
-  }
-  free(fileBuffer);
-  fileBuffer = NULL;
+  Serial.println("Saving Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
 
-  free(cacheFileName);
-  saveSequenceBusy = 0;
-  cacheWriteSwitch = 1;
+  root.printTo(fileBuffer,4096);
 }
 
+bool FlashMemory::deserializeGlobalSettings(char* json){
+  StaticJsonBuffer<16384> jsonBuffer;
+  JsonObject& jsonReader = jsonBuffer.parseObject(json);
+  if(!jsonReader.success()){
+    delay(5);
+    Serial.println("Deserializing Global Settings Failed, exiting");
+    return 0;
+  }
 
+  if( jsonReader["settings"][0] != 17) {
+    // if global settings are not saved properly, or if it is an older version, initialize globals, re-save and exit.
+    globalObj->initGlobals();
+    this->saveGlobalData();
+    return 1;
+  }  // global data version is stored here.
+
+  globalObj->dataInputStyle    = jsonReader["settings"][1];
+  globalObj->pageButtonStyle   = jsonReader["settings"][2];
+  globalObj->outputNegOffset[0]    = jsonReader["settings"][3];
+  globalObj->outputNegOffset[1]    = jsonReader["settings"][4];
+  globalObj->outputNegOffset[2]    = jsonReader["settings"][5];
+  globalObj->outputNegOffset[3]    = jsonReader["settings"][6];
+
+  Serial.println("Reading In Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
+  return 1;
+}
 void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
@@ -343,111 +389,184 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
      sequenceArray[channel].stepData[index] = stepDataBuf;
   }
 
-/*  for(int n = sequenceArray[channel].stepCount; n< MAX_STEPS_PER_SEQUENCE; n++){
-    // fill up the remaining steps with zeroed data so if stepCount is increased, it will work
-    StepDatum stepDataBuf;
-
-    stepDataBuf.pitch[0]   = 24;
-    for (int i=1; i<4; i++){
-      stepDataBuf.pitch[i] = 0;
-    }
-    stepDataBuf.chord	   		 =	 0;
-    stepDataBuf.gateType		 =	 0;
-    stepDataBuf.gateLength	 =	 1;
-    stepDataBuf.arpType			 =	 0;
-    stepDataBuf.arpOctave		 =   1;
-    stepDataBuf.arpSpdNum		 =   1;
-    stepDataBuf.arpSpdDen		 =   4;
-    stepDataBuf.glide				 =   0;
-    stepDataBuf.beatDiv			 =   4;
-    stepDataBuf.velocity		 =  67;
-    stepDataBuf.velocityType =   0;
-    stepDataBuf.lfoSpeed		 =  16;
-    stepDataBuf.offset       =   0;
-    stepDataBuf.noteStatus   =  AWAITING_TRIGGER;
-    stepDataBuf.notePlaying  =   0;
-    sequenceArray[channel].stepData[n] = stepDataBuf;
-
-  }*/
-
   return jsonReader.success();
 }
 
+void FlashMemory::saveGlobalData(){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName = strdup("globData");
+  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
 
-bool FlashMemory::validateJson(char* fileBuffer){
-  StaticJsonBuffer<16384> jsonBuffer;
-  JsonObject& root = jsonBuffer.parse(fileBuffer);
-  return root.success();
+  serializeGlobalSettings(fileBuffer);
+
+  while( !(spiFlash->ready()) ){
+    //delay(1);
+  }
+  Serial.println("Filebuffer: " + String(fileBuffer));
+  file = spiFlash->open(fileName);
+  if (file){
+    file.seek(0);
+    file.erase4k();
+    file.seek(0);
+    file.write(fileBuffer,SECTORSIZE);
+    file.close();
+  } else {
+      Serial.println("##############");
+      Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(fileName));
+      Serial.println("##############");
+  }
+  free(fileBuffer);
+  fileBuffer = NULL;
 }
 
-int FlashMemory::getSaveAddress(uint8_t index){
-  return index*SECTORSIZE;
-};
+int FlashMemory::readGlobalData(){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName = strdup("globData");
 
-int FlashMemory::readSequenceJSON(uint8_t channel, uint8_t pattern){
-    /*char* fileNameChar = (char *) malloc(sizeof(char) * 12);
-    strcpy(fileNameChar, "P");
-    strcat(fileNameChar, String(pattern).c_str());
-  //  strcat(fileNameChar, "CH");
-  //  strcat(fileNameChar, String(channel).c_str());
-    strcat(fileNameChar,".TXT");
-*/
-    char* fileName = (char *) malloc(sizeof(char) * 12);
-      //strcpy(fileName, String("p" + String(pattern) + ".txt").c_str());
-      fileName = strdup("seqData");
-      //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE " + String(fileName) + " LOAD START *&*&*&*&*&*&*&*&*&");
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY");
+  } ; // wait
 
-      while (!spiFlash->ready()){
-        Serial.println("SPIFLASH NOT READY");
-      } ; // wait
+  if (spiFlash->exists(fileName)){
+    //Serial.println("Save file exists... attempting load");
+    file = spiFlash->open(fileName);
+    if (file){
+      char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
+      file.seek(0);
+      file.read(fileBuffer, SECTORSIZE);
 
-      if (spiFlash->exists(fileName)){
-        //Serial.println("Save file exists... attempting load");
+      if(this->deserializeGlobalSettings(fileBuffer) == false ){
+        file.close();
+        free(fileBuffer);
         file = spiFlash->open(fileName);
-        if (file){
-          //Serial.println("File opened...");
-          //unsigned int fileSize = file.size();  // Get the file size.
-          char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
-          //Serial.println(String(SECTORSIZE) + " bytes allocated");
-          //Serial.println("SaveAddress: " + String(getSaveAddress(getCacheIndex(channel, pattern))));
-          //Serial.println("cacheIndex: " + String(getCacheIndex(channel, pattern)));
-
-          file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
-          file.read(fileBuffer, SECTORSIZE);
-          //Serial.println("file read");
-        //  fileBuffer[SECTORSIZE] = '\0';               // Add the terminating null char.
-          //Serial.println(fileBuffer);                // Print the file to the //Serial monitor.
-          if(this->deserializePattern(channel, fileBuffer) == false ){
-
-            file.close();
-            free(fileBuffer);
-            file = spiFlash->open(fileName);
-            Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. attempting to read cache...");
-            file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
-            file.read(fileBuffer, SECTORSIZE);
-            if(this->deserializePattern(channel, fileBuffer) == false ){
-              Serial.println(fileBuffer);
-              Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt");
-            };
-
-          };
-          file.close();
-          free(fileBuffer);
-        } else {
-          Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
-          free(fileName);
-          return READ_JSON_ERROR;
+        Serial.println("?*?* GLOBAL DATA LOADED BUT DATA CANNOT BE READ. attempting to re-read...");
+        file.seek(0);
+        file.read(fileBuffer, SECTORSIZE);
+        if(this->deserializeGlobalSettings(fileBuffer) == false ){
+          Serial.println(fileBuffer);
+          Serial.println("?*?* GLOBAL DATA LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt, re-saving default data");
+          globalObj->initGlobals();
+          this->saveGlobalData();
         };
 
-        free(fileName);
-        //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
-        return FILE_EXISTS;
-      } else {
-        free(fileName);
-        //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
-        return SAVEFILE_DOES_NOT_EXIST;
-      }
+      };
+      file.close();
+      Serial.println("read Filebuffer: " + String(fileBuffer));
+      delay(10);
+      free(fileBuffer);
+    } else {
+      Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
       free(fileName);
+      return READ_JSON_ERROR;
+    };
+    free(fileName);
+    //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
+    return FILE_EXISTS;
+  } else {
+    free(fileName);
+    //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
+    return SAVEFILE_DOES_NOT_EXIST;
+  }
+  free(fileName);
+}
+
+void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
+  //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
+
+  uint8_t cacheIndex = getCacheIndex(channel, pattern);
+  //Serial.println("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
+  while (cacheStatus[cacheIndex] != 0){
+    int tempint = cacheWriteLoop();
+    //Serial.println("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
+  }
+  saveSequenceBusy = 1;
+  cacheWriteTotalTimer = 0;
+
+  char* cacheFileName = (char *) malloc(sizeof(char) * 12);
+  cacheFileName = strdup("seqCache");
+  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+
+  serializePattern(fileBuffer, channel, pattern);
+
+  while( !(spiFlash->ready()) ){
+    //delay(1);
+  }
+  file = spiFlash->open(cacheFileName);
+  if (file){
+    file.seek(getSaveAddress(cacheIndex));
+    file.write(fileBuffer,SECTORSIZE);
+    file.close();
+    setCacheStatus(cacheIndex, SAVING_TO_CACHE_SECTOR);
+  } else {
+      Serial.println("##############");
+      Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(cacheFileName));
+      Serial.println("##############");
+  }
+  free(fileBuffer);
+  fileBuffer = NULL;
+
+  free(cacheFileName);
+  saveSequenceBusy = 0;
+  cacheWriteSwitch = 1;
+}
+
+int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  //strcpy(fileName, String("p" + String(pattern) + ".txt").c_str());
+  fileName = strdup("seqData");
+  //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE " + String(fileName) + " LOAD START *&*&*&*&*&*&*&*&*&");
+
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY");
+  } ; // wait
+
+  if (spiFlash->exists(fileName)){
+    //Serial.println("Save file exists... attempting load");
+    file = spiFlash->open(fileName);
+    if (file){
+      //Serial.println("File opened...");
+      //unsigned int fileSize = file.size();  // Get the file size.
+      char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
+      //Serial.println(String(SECTORSIZE) + " bytes allocated");
+      //Serial.println("SaveAddress: " + String(getSaveAddress(getCacheIndex(channel, pattern))));
+      //Serial.println("cacheIndex: " + String(getCacheIndex(channel, pattern)));
+
+      file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
+      file.read(fileBuffer, SECTORSIZE);
+      //Serial.println("file read");
+    //  fileBuffer[SECTORSIZE] = '\0';               // Add the terminating null char.
+      //Serial.println(fileBuffer);                // Print the file to the //Serial monitor.
+      if(this->deserializePattern(channel, fileBuffer) == false ){
+
+        file.close();
+        free(fileBuffer);
+        file = spiFlash->open(fileName);
+        Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. attempting to read cache...");
+        file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
+        file.read(fileBuffer, SECTORSIZE);
+        if(this->deserializePattern(channel, fileBuffer) == false ){
+          Serial.println(fileBuffer);
+          Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt");
+        };
+
+      };
+      file.close();
+      free(fileBuffer);
+    } else {
+      Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
+      free(fileName);
+      return READ_JSON_ERROR;
+    };
+
+    free(fileName);
+    //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
+    return FILE_EXISTS;
+  } else {
+    free(fileName);
+    //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
+    return SAVEFILE_DOES_NOT_EXIST;
+  }
+  free(fileName);
 
 }
 
@@ -476,13 +595,13 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 
     //Serial.println("About to run readJsonReturn for channel: " + String(i));
 
-    int readJsonReturn = this->readSequenceJSON(i, pattern);
+    int readJsonReturn = this->readSequenceData(i, pattern);
 
     if ( readJsonReturn == SAVEFILE_DOES_NOT_EXIST )  {
       //Serial.println("saveData not available, initializing sequence");
       sequenceArray[i].initNewSequence(pattern, i);
       //Serial.println("sequence initialized, saving sequence to JSON");
-      //saveSequenceJSON(i, pattern);
+      //saveSequenceData(i, pattern);
 
       //Serial.println("Sequence successfully saved to JSON");
 
@@ -504,7 +623,7 @@ void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray)
   for(int i=0; i < SEQUENCECOUNT; i++){
     //need to skip the sequences that are masked out
     if( patternChannelSelector & (1<<i) ){
-      saveSequenceJSON(i, destinationArray[i]);
+      saveSequenceData(i, destinationArray[i]);
     }
   }
 }
@@ -515,8 +634,8 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
 	//if(saveFirst){
 //    for(int i=0; i < SEQUENCECOUNT; i++){
   		//saveChannelPattern(i);
-      //saveSequenceJSON(i, currentPattern);
-      //saveSequenceJSON(i, sequenceArray[i].pattern);
+      //saveSequenceData(i, currentPattern);
+      //saveSequenceData(i, sequenceArray[i].pattern);
   //  }
     //Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	//}

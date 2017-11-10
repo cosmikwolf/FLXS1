@@ -124,20 +124,20 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
 delay(10);
 
 for (int i=0; i<4; i++){
-  Serial.println("Resistance 1: " + String(i) + "- " + String(mcp4352_1.readResistance(i))); delay(1);
-  Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
+  // Serial.println("Resistance 1: " + String(i) + "- " + String(mcp4352_1.readResistance(i))); delay(1);
+  // Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
   delay(1);
   mcp4352_1.setResistance(i, 1); delay(1);
   mcp4352_2.setResistance(i, 1); delay(1);
   delay(1);
-  Serial.println("Resistance 1: " + String(i) + "- " + String(mcp4352_1.readResistance(i))); delay(1);
-  Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
+  // Serial.println("Resistance 1: " + String(i) + "- " + String(mcp4352_1.readResistance(i))); delay(1);
+  // Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
   delay(1);
   mcp4352_1.setResistance(i, 255);  delay(1);
   mcp4352_2.setResistance(i, 255);  delay(1);
   delay(1);
-  Serial.println("Resistance 1: " + String(i) + "- " + String(mcp4352_1.readResistance(i))); delay(1);
-  Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
+  // Serial.println("Resistance 1: " + String(i) + "- " + String(mcp4352_1.readResistance(i))); delay(1);
+  // Serial.println("Resistance 2: " + String(i) + "- " + String(mcp4352_2.readResistance(i))); delay(1);
 }
 
 for (int i=0; i<4; i++){
@@ -153,9 +153,9 @@ for (int i=0; i<4; i++){
   Serial.println("Output Controller Initialization Complete");
 
   backplaneGPIO->update();
-  for (int i=0; i<28; i++){
-    Serial.println("Reading port: " + String(i) + "\t" + String(backplaneGPIO->readAddress(i)));
-  }
+  //for (int i=0; i<28; i++){
+  //  Serial.println("Reading port: " + String(i) + "\t" + String(backplaneGPIO->readAddress(i)));
+  //}
 }
 
 void OutputController::setDacVoltage( uint8_t dac, uint16_t output ){
@@ -560,7 +560,7 @@ bool OutputController::gpioCheck(int8_t mapValue){
 
 };
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t lfoSpeedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -608,6 +608,7 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
     lfoType[channel] = velocityType;
     lfoAmplitude[channel] = velocity;
     lfoSpeed[channel] = lfoSpeedSetting;
+    cv2offset[channel] = cv2offsetSetting;
   }
 
   if(velocityType > 0){
@@ -656,20 +657,23 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
 uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey){
   uint32_t cents = 0;
   uint16_t quantNote = 0;
+
     switch (quantizeScale) {
       case SEMITONE:
         quantNote = globalObj->quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
-        return map( quantNote, 0, 120,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+        quantNote = map( quantNote, 0, 120,calibLow(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]), calibHigh(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]));
       break;
       case PYTHAGOREAN:
         quantNote = globalObj->quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
         cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
-        return map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+        quantNote = map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]), calibHigh(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]));
       break;
       case COLUNDI:
-        return map( colundiArrayX100[note], 0,1012,calibLow(channel, dacCvMap[channel], 2), calibHigh(channel, dacCvMap[channel], 2));
+        quantNote = map( colundiArrayX100[note], 0,1012,calibLow(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]), calibHigh(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]));
       break;
     }
+
+    return quantNote;
 }
 
 
@@ -961,6 +965,7 @@ void OutputController::allNotesOff(uint8_t channel){
     this->lfoType[channel] = 0;
     this->lfoAmplitude[channel] = 0;
     this->lfoRheoSet[channel] = 1;
+    this->clearVelocityOutput(channel);
 }
 
 void OutputController::setClockOutput(bool value){
