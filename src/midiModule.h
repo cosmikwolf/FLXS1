@@ -19,6 +19,8 @@ public:
   void midiStartContinueHandler();
   void midiClockPulseHandler();
   void midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMidi);
+  void midiSongPosition(int songPosition);
+
 
   bool midiTestArray[128];
   uint8_t midiClockCount;

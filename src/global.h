@@ -5,17 +5,24 @@
 #ifndef _global_h_
 #define _global_h_
 
-#ifdef min
-#undef min
+/*#ifdef min(a,b)
+#undef min(a,b)
 #endif
 
-#define min(X, Y)  ((X) < (Y) ? (X) : (Y))
+#define min(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b; })
 
-#ifdef max
-  #undef max
+#ifdef max(a,b)
+  #undef max(a,b)
 #endif
-#define max(X, Y)  ((X) > (Y) ? (X) : (Y))
 
+#define max(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b; })
+*/
 #define SEQUENCECOUNT         4
 
 #define kSerialSpeed 31250
@@ -57,22 +64,24 @@
 #define PITCH_GATE_MENU_ORDER  0
 
 #define MODAL_SELECT_CH1       0
-#define MODAL_SELECT_CH2       1
-#define MODAL_SELECT_CH3       2
-#define MODAL_SELECT_CH4       3
+#define MODAL_SELECT_CH2        MODAL_SELECT_CH1 + 1
+#define MODAL_SELECT_CH3        MODAL_SELECT_CH2 + 1
+#define MODAL_SELECT_CH4        MODAL_SELECT_CH3 + 1
+#define MODAL_MUTE_CH1          MODAL_SELECT_CH4 + 1
+#define MODAL_MUTE_CH2          MODAL_MUTE_CH1 + 1
+#define MODAL_MUTE_CH3          MODAL_MUTE_CH2 + 1
+#define MODAL_MUTE_CH4          MODAL_MUTE_CH3 + 1
+#define MODAL_UNMUTE_CH1        MODAL_MUTE_CH4 + 1
+#define MODAL_UNMUTE_CH2        MODAL_UNMUTE_CH1 + 1
+#define MODAL_UNMUTE_CH3        MODAL_UNMUTE_CH2 + 1
+#define MODAL_UNMUTE_CH4        MODAL_UNMUTE_CH3 + 1
+#define MODAL_SAVE              MODAL_UNMUTE_CH4 + 1
+#define MODAL_COPY_STEP         MODAL_SAVE + 1
+#define MODAL_PASTE_STEP        MODAL_COPY_STEP + 1
+#define MODAL_CLEAR_STEP        MODAL_PASTE_STEP + 1
+#define MODAL_ERASEARMED        MODAL_CLEAR_STEP + 1
+#define MODAL_ERASED            MODAL_ERASEARMED + 1
 
-#define MODAL_MUTE_CH1         4
-#define MODAL_MUTE_CH2         5
-#define MODAL_MUTE_CH3         6
-#define MODAL_MUTE_CH4         7
-
-#define MODAL_UNMUTE_CH1       8
-#define MODAL_UNMUTE_CH2       9
-#define MODAL_UNMUTE_CH3       10
-#define MODAL_UNMUTE_CH4       11
-#define MODAL_SAVE             12
-#define MODAL_ERASEARMED       13
-#define MODAL_ERASED           14
 
 #define PIN_EXT_TX				    	 31
 #define PIN_EXT_AD_1   27

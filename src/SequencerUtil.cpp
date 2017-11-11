@@ -50,81 +50,39 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->fill              = 0;
   this->skipNextNoteTrigger = 0;
   this->tieFlag           =0;
-	for(int n=0; n < MAX_STEPS_PER_SEQUENCE; n++){
-		this->stepData[n].pitch[0]   = 24;
-		for (int i=1; i<4; i++){
-			this->stepData[n].pitch[i] = 0;
-		}
-		this->stepData[n].chord	   		 =	 0;
-		this->stepData[n].gateType		 =	 0;
-		this->stepData[n].gateLength	 =	 3;
-		this->stepData[n].arpType			 =	 0;
-		this->stepData[n].arpOctave		 =   1;
-		this->stepData[n].arpSpdNum		 =   1;
-		this->stepData[n].arpSpdDen		 =   2;
-		this->stepData[n].glide				 =   0;
-		this->stepData[n].beatDiv			 =   4;
-		this->stepData[n].velocity		 =  67;
-		this->stepData[n].velocityType =   0;
-		this->stepData[n].lfoSpeed		 =  64;
-		//this->stepData[n].offset       =   0;
-		this->stepData[n].noteStatus   =  AWAITING_TRIGGER;
-		this->stepData[n].arpStatus   =   0;
-		this->stepData[n].notePlaying  =   0;
-		this->stepData[n].framesRemaining = 0;
-    this->stepData[n].test1 = 254;
-    this->stepData[n].test2 = 254;
-    this->stepData[n].test3 = 254;
-    this->stepData[n].test4 = 254;
-    this->stepData[n].test5 = 254;
-    this->stepData[n].test6 = 254;
-    this->stepData[n].test7 = 254;
-    this->stepData[n].test8 = 254;
-    this->stepData[n].test9 = 254;
-    this->stepData[n].test10 = 254;
-    this->stepData[n].test11 = 254;
-    this->stepData[n].test12 = 254;
-    this->stepData[n].test13 = 254;
-    this->stepData[n].test14 = 254;
-    this->stepData[n].test15 = 254;
-    this->stepData[n].test16 = 254;
-    this->stepData[n].test17 = 254;
-    this->stepData[n].test18 = 254;
-    this->stepData[n].test19 = 254;
-    this->stepData[n].test20 = 254;
-    this->stepData[n].test21 = 254;
-    this->stepData[n].test22 = 254;
-    this->stepData[n].test23 = 254;
-    this->stepData[n].test24 = 254;
-    this->stepData[n].test2_1 = 254;
-    this->stepData[n].test2_2 = 254;
-    this->stepData[n].test2_3 = 254;
-    this->stepData[n].test2_4 = 254;
-    this->stepData[n].test2_5 = 254;
-    this->stepData[n].test2_6 = 254;
-    this->stepData[n].test2_7 = 254;
-    this->stepData[n].test2_8 = 254;
-    this->stepData[n].test2_9 = 254;
-    this->stepData[n].test2_10 = 254;
-    this->stepData[n].test2_11 = 254;
-    this->stepData[n].test2_12 = 254;
-    this->stepData[n].test2_13 = 254;
-    this->stepData[n].test2_14 = 254;
-    this->stepData[n].test2_15 = 254;
-    this->stepData[n].test2_16 = 254;
-    this->stepData[n].test2_17 = 254;
-    this->stepData[n].test2_18 = 254;
-    this->stepData[n].test2_19 = 254;
-    this->stepData[n].test2_20 = 254;
-    this->stepData[n].test2_21 = 254;
-    this->stepData[n].test2_22 = 254;
-    this->stepData[n].test2_23 = 254;
-    this->stepData[n].test2_24 = 254;
-
-}
+	for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+		this->initializeStep(stepNum);
+	}
 
 	outputControl->clearVelocityOutput(ch);
 };
+
+void Sequencer::initializeStep(uint8_t stepNum){
+	if(stepNum > MAX_STEPS_PER_SEQUENCE){
+		return;
+	}
+	this->stepData[stepNum].pitch[0]   = 24;
+	for (int i=1; i<4; i++){
+		this->stepData[stepNum].pitch[i] = 0;
+	}
+	this->stepData[stepNum].chord	   		 =	 0;
+	this->stepData[stepNum].gateType		 =	 0;
+	this->stepData[stepNum].gateLength	 =	 3;
+	this->stepData[stepNum].arpType			 =	 0;
+	this->stepData[stepNum].arpOctave		 =   1;
+	this->stepData[stepNum].arpSpdNum		 =   1;
+	this->stepData[stepNum].arpSpdDen		 =   2;
+	this->stepData[stepNum].glide				 =   0;
+	this->stepData[stepNum].beatDiv			 =   4;
+	this->stepData[stepNum].velocity		 =  67;
+	this->stepData[stepNum].velocityType =   0;
+	this->stepData[stepNum].cv2speed		 =  64;
+	this->stepData[stepNum].cv2offset    =   0;
+	this->stepData[stepNum].noteStatus   =  AWAITING_TRIGGER;
+	this->stepData[stepNum].arpStatus   =   0;
+	this->stepData[stepNum].notePlaying  =   0;
+	this->stepData[stepNum].framesRemaining = 0;
+}
 
 bool Sequencer::toggleMute(uint8_t index){
   switch(index){
@@ -298,7 +256,7 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
   //	}
 
 	//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
-    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].cv2offset, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey, muteCV1, currentFrame, true);
+    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey, muteCV1, currentFrame, true);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
   } else {
@@ -506,7 +464,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION
-	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].lfoSpeed, stepData[stepNum].cv2offset, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1, currentFrame, stepData[stepNum].arpStatus );
+	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1, currentFrame, stepData[stepNum].arpStatus );
   tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true)  ;
 
 	stepData[stepNum].arpStatus++;

@@ -142,8 +142,8 @@ void InputModule::multiSelectInputHandler(){
 
           break;
         case STATE_CV2_SPEED:
-          globalObj->multi_lfoSpeed_switch = true;
-          globalObj->multi_lfoSpeed += knobChange;
+          globalObj->multi_cv2speed_switch = true;
+          globalObj->multi_cv2speed += knobChange;
           break;
       }
 
@@ -205,7 +205,7 @@ void InputModule::multiSelectInputHandler(){
 
               break;
             case STATE_CV2_SPEED:
-              sequenceArray[selectedChannel].stepData[i].lfoSpeed = min_max(globalObj->multi_lfoSpeed, 1, 255);
+              sequenceArray[selectedChannel].stepData[i].cv2speed = min_max(globalObj->multi_cv2speed, 1, 255);
 
               break;
           }
@@ -302,7 +302,7 @@ void InputModule::setStepAbsolute(uint8_t channel, uint8_t stepNum, int value){
           sequenceArray[channel].stepData[stepNum].velocityType = min_max(value, 0, 4);
         break;
         case STATE_CV2_SPEED:
-          sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(value, 1, 255);
+          sequenceArray[channel].stepData[stepNum].cv2speed = min_max(value, 1, 255);
         break;
       }
       */
@@ -1041,10 +1041,61 @@ uint8_t chanSwIndex;
              }
          }
         break;
+        case SW_PLAY:
+          for(int sw=0; sw<16; sw++){
+            if(midplaneGPIO->pressed(sw)){
+              globalObj->stepCopyIndex = getNote(sw);
+              display->displayModal(750, MODAL_COPY_STEP);
+              goto PLAYEND;
+            }
+          }
+          playing = !playing;
+          PLAYEND:
+        break;
 
         case SW_REC:
-
+          for(int sw=0; sw<16; sw++){
+            if(midplaneGPIO->pressed(sw)){
+              display->displayModal(750, MODAL_PASTE_STEP);
+              sequenceArray[selectedChannel].stepData[sw] = sequenceArray[selectedChannel].stepData[getNote(globalObj->stepCopyIndex)];
+            }
+          }
         break;
+
+                case SW_STOP:
+                  for(int sw=0; sw<16; sw++){
+                    if(midplaneGPIO->pressed(sw)){
+                      sequenceArray[selectedChannel].initializeStep(sw);
+                      display->displayModal(750, MODAL_CLEAR_STEP);
+                      goto STOPEND;
+                    }
+                  }
+
+                  if (chPressedSelector && chRecEraseTimer > 750){
+                      chRecEraseTimer = 0;
+                      display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
+                  } else if (chPressedSelector && chRecEraseTimer < 750) {
+                      for(int i=0; i<4; i++){
+                        if ((0b001 << i) & chPressedSelector){
+                          sequenceArray[i].initNewSequence(currentPattern, i);
+                        }
+                      }
+                      display->displayModal(750, MODAL_ERASED, chPressedSelector);
+                  } else {
+                    if (!playing){ //if the sequence is already paused, stop kills all internal sound.
+                      for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
+                        outputControl->allNotesOff(channel);
+                      }
+                    }
+                    playing = false;
+
+                    for(int s = 0; s < SEQUENCECOUNT; s++){
+                      sequenceArray[s].clockReset(true);
+                    }
+
+                  }
+                  STOPEND:
+                  break;
 
         case SW_PATTERN:
           globalObj->multiSelectSwitch = false;
@@ -1138,37 +1189,8 @@ uint8_t chanSwIndex;
 
         break;
 
-        case SW_STOP:
-          if (chPressedSelector && chRecEraseTimer > 750){
-              chRecEraseTimer = 0;
-              display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
-          } else if (chPressedSelector && chRecEraseTimer < 750) {
-              for(int i=0; i<4; i++){
-                if ((0b001 << i) & chPressedSelector){
-                  sequenceArray[i].initNewSequence(currentPattern, i);
-                }
-              }
-              display->displayModal(750, MODAL_ERASED, chPressedSelector);
-          } else {
-            if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-              for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
-                outputControl->allNotesOff(channel);
-              }
-            }
-            playing = false;
-
-            for(int s = 0; s < SEQUENCECOUNT; s++){
-              sequenceArray[s].clockReset(true);
-            }
-
-          }
-
-          break;
-
         // right two, bottom up
-          case SW_PLAY:
-            playing = !playing;
-          break;
+
 
         }
       }
@@ -1216,7 +1238,9 @@ uint8_t chanSwIndex;
           sequenceArray[selectedChannel].stoppedTrig(getNote(i), false, false);
         }
 
-        if(buttonMode == BUTTON_MODE_XOX){ // tap to turn a step on, double tap to turn step off
+        if(buttonMode == BUTTON_MODE_XOX ){
+          // tap to turn a step on, double tap to turn step off
+          // skip turning step on or of it was just copied
           selectedStep = getNote(i);
           if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
             sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
@@ -1331,13 +1355,16 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
         break;
 
         case STATE_CV2_LEVEL:
-          sequenceArray[channel].stepData[stepNum].velocity =  positive_modulo(sequenceArray[channel].stepData[stepNum].velocity + change, 127);
+          sequenceArray[channel].stepData[stepNum].velocity =  min_max(sequenceArray[channel].stepData[stepNum].velocity + change, -127, 127);
         break;
         case STATE_CV2_TYPE:
           sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 13);
         break;
         case STATE_CV2_SPEED:
-          sequenceArray[channel].stepData[stepNum].lfoSpeed = min_max(sequenceArray[channel].stepData[stepNum].lfoSpeed + change, 1, 255);
+          sequenceArray[channel].stepData[stepNum].cv2speed = min_max(sequenceArray[channel].stepData[stepNum].cv2speed + change, 1, 255);
+        break;
+        case STATE_CV2_OFFSET:
+          sequenceArray[channel].stepData[stepNum].cv2offset = min_max(sequenceArray[channel].stepData[stepNum].cv2offset + change, -64, 64);
         break;
       }
 }

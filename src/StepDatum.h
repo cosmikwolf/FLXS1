@@ -15,10 +15,10 @@ typedef	struct StepDatum {
 	uint8_t 		arpSpdDen;	//
 	uint8_t			glide;			// portamento time - to be implemented.
 	int8_t			beatDiv;
-	uint8_t			velocity;	    // note velocity
+	int8_t			velocity;	    // note velocity
 	uint8_t			velocityType;
-	uint8_t			cv2offset;
-	uint8_t			lfoSpeed;
+	int8_t			cv2offset;
+	uint8_t			cv2speed;
 	// utility variables - dont need to be saved.
 	uint8_t			noteStatus;		// if note is playing or not
 	uint8_t			arpStatus;		// if note is playing or not. Value indicates arp number.
@@ -27,55 +27,55 @@ typedef	struct StepDatum {
 	int32_t 	  framesRemaining;  // number of frames to continue playing.
 	int32_t 	  arpLastFrame;  // When to end current arp.
 
-  uint8_t     test1;
-  uint8_t     test2;
-  uint8_t     test3;
-  uint8_t     test4;
-  uint8_t     test5;
-  uint8_t     test6;
-  uint8_t     test7;
-  uint8_t     test8;
-  uint8_t     test9;
-  uint8_t     test10;
-  uint8_t     test11;
-  uint8_t     test12;
-  uint8_t     test13;
-  uint8_t     test14;
-  uint8_t     test15;
-  uint8_t     test16;
-  uint8_t     test17;
-  uint8_t     test18;
-  uint8_t     test19;
-  uint8_t     test20;
-  uint8_t     test21;
-  uint8_t     test22;
-  uint8_t     test23;
-  uint8_t     test24;
-
-  uint8_t     test2_1;
-  uint8_t     test2_2;
-  uint8_t     test2_3;
-  uint8_t     test2_4;
-  uint8_t     test2_5;
-  uint8_t     test2_6;
-  uint8_t     test2_7;
-  uint8_t     test2_8;
-  uint8_t     test2_9;
-  uint8_t     test2_10;
-  uint8_t     test2_11;
-  uint8_t     test2_12;
-  uint8_t     test2_13;
-  uint8_t     test2_14;
-  uint8_t     test2_15;
-  uint8_t     test2_16;
-  uint8_t     test2_17;
-  uint8_t     test2_18;
-  uint8_t     test2_19;
-  uint8_t     test2_20;
-  uint8_t     test2_21;
-  uint8_t     test2_22;
-  uint8_t     test2_23;
-  uint8_t     test2_24;
+  // uint8_t     test1;
+  // uint8_t     test2;
+  // uint8_t     test3;
+  // uint8_t     test4;
+  // uint8_t     test5;
+  // uint8_t     test6;
+  // uint8_t     test7;
+  // uint8_t     test8;
+  // uint8_t     test9;
+  // uint8_t     test10;
+  // uint8_t     test11;
+  // uint8_t     test12;
+  // uint8_t     test13;
+  // uint8_t     test14;
+  // uint8_t     test15;
+  // uint8_t     test16;
+  // uint8_t     test17;
+  // uint8_t     test18;
+  // uint8_t     test19;
+  // uint8_t     test20;
+  // uint8_t     test21;
+  // uint8_t     test22;
+  // uint8_t     test23;
+  // uint8_t     test24;
+	//
+  // uint8_t     test2_1;
+  // uint8_t     test2_2;
+  // uint8_t     test2_3;
+  // uint8_t     test2_4;
+  // uint8_t     test2_5;
+  // uint8_t     test2_6;
+  // uint8_t     test2_7;
+  // uint8_t     test2_8;
+  // uint8_t     test2_9;
+  // uint8_t     test2_10;
+  // uint8_t     test2_11;
+  // uint8_t     test2_12;
+  // uint8_t     test2_13;
+  // uint8_t     test2_14;
+  // uint8_t     test2_15;
+  // uint8_t     test2_16;
+  // uint8_t     test2_17;
+  // uint8_t     test2_18;
+  // uint8_t     test2_19;
+  // uint8_t     test2_20;
+  // uint8_t     test2_21;
+  // uint8_t     test2_22;
+  // uint8_t     test2_23;
+  // uint8_t     test2_24;
 
 	bool gateTrig(){ //should the gate be turned on this step?
 		switch(gateType){

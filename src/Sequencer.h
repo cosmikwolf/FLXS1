@@ -48,6 +48,7 @@ class Sequencer
 
 		int  		positive_modulo(int i, int n);
 		void 		initNewSequence(uint8_t pattern, uint8_t ch);
+		void 		initializeStep(uint8_t stepNum);
 		void 		setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
 		void 		setGateLength(uint8_t step, uint8_t length);
 		void 		setGateType(uint8_t step, uint8_t gate);

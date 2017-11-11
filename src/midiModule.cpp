@@ -81,6 +81,16 @@ void MidiModule::midiStartContinueHandler(){
   }
 }
 
+void MidiModule::midiSongPosition(int songPosition){
+  if(songPosition == 0){
+    midiClockCount = 0;
+    globalObj->midiSetClockOut = false;
+    for (int i=0; i< SEQUENCECOUNT; i++){
+      sequenceArray[i].clockReset(true);
+    }
+  }
+};
+
 void MidiModule::midiClockPulseHandler(){
   if (globalObj->clockMode != EXTERNAL_MIDI_CLOCK) {
     return; // no need to run clock pulse handler if using internal clock.

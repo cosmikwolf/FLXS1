@@ -33,7 +33,7 @@ class GlobalVariable {
     bool       multi_beatDiv_switch;
     bool       multi_velocity_switch;
     bool       multi_velocityType_switch;
-    bool       multi_lfoSpeed_switch;
+    bool       multi_cv2speed_switch;
     uint8_t    multi_pitch;
     uint8_t    multi_chord;
     uint8_t    multi_gateType;
@@ -46,7 +46,7 @@ class GlobalVariable {
     int8_t     multi_beatDiv;
     uint8_t    multi_velocity;
     uint8_t    multi_velocityType;
-    uint8_t    multi_lfoSpeed;
+    uint8_t    multi_cv2speed;
 
     uint8_t   clockMode;
     int8_t  cvInputMapped[14];
@@ -69,6 +69,7 @@ class GlobalVariable {
     uint8_t gateTestArray[4];
     uint8_t activeGate;
     uint8_t rheoTestLevel;
+    uint8_t stepCopyIndex;
 
     bool parameterSelect;
 

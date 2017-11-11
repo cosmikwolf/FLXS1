@@ -15,7 +15,7 @@ void GlobalVariable::initialize(){
       this->multi_beatDiv_switch = 0;
       this->multi_velocity_switch = 0;
       this->multi_velocityType_switch = 0;
-      this->multi_lfoSpeed_switch = 0;
+      this->multi_cv2speed_switch = 0;
       this->multi_pitch = 0;
       this->multi_chord = 0;
       this->multi_gateType = 0;
@@ -28,7 +28,7 @@ void GlobalVariable::initialize(){
       this->multi_beatDiv = 0;
       this->multi_velocity = 0;
       this->multi_velocityType = 0;
-      this->multi_lfoSpeed = 0;
+      this->multi_cv2speed = 0;
       for(int i = 0; i < 64; i++){
           this->multiSelection[i]=false;
       }
@@ -42,7 +42,7 @@ void GlobalVariable::initialize(){
       this->parameterSelect = false;
       this->midiSetClockOut = false;
       this->calibrationBuffer = 0;
-
+      this->stepCopyIndex = 255;
        for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
        for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };
        for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 0; };

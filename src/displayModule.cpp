@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("v0.17b");
+  oled.println("beta v0.17d");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -421,15 +421,29 @@ void DisplayModule::modalDisplay(){
     case MODAL_SAVE:
       displayElement[0] = strdup("SAVED");
       goto singleTextDisplay;
+    case MODAL_COPY_STEP:
+      displayElement[0] = strdup("STEP COPY");
+      goto singleTextDisplay;
+    case MODAL_PASTE_STEP:
+      displayElement[0] = strdup("STEP PASTE");
+      goto singleTextDisplay;
+    case MODAL_CLEAR_STEP:
+      displayElement[0] = strdup("STEP CLEAR");
+      goto singleTextDisplay;
 
       singleTextDisplay:
 
     //  if(!displayElement[0]){
     displayElement[5] = strdup(" ");
 
+    if(strlen(displayElement[1]) < 1 ){
+      renderStringBox(5,  DISPLAY_LABEL,    18,  30, 96, 26, true, MODALBOLD, BLACK , WHITE);
+      renderStringBox(0,  DISPLAY_LABEL,    20,  36, 92, 18, false, MODALBOLD, BLACK , WHITE);
+    } else {
       renderStringBox(5,  DISPLAY_LABEL,    18,  18, 96, 51, true, MODALBOLD, BLACK , WHITE);
-      renderStringBox(0,  DISPLAY_LABEL,    20,  24, 92, 20, false, MODALBOLD, BLACK , WHITE);
-      renderStringBox(1,  DISPLAY_LABEL,    20,  48, 92, 20, false, MODALBOLD, BLACK , WHITE);
+      renderStringBox(0,  DISPLAY_LABEL,    22,  24, 92, 20, false, MODALBOLD, BLACK , WHITE);
+      renderStringBox(1,  DISPLAY_LABEL,    22,  48, 92, 20, false, MODALBOLD, BLACK , WHITE);
+    }
     //  } else {
     //    renderStringBox(0,  DISPLAY_LABEL,    18,  28, 96, 20, true, MODALBOLD, BLACK , WHITE);
     //    renderStringBox(1,  DISPLAY_LABEL,    18,  64, 96, 20, true, MODALBOLD, BLACK , WHITE);
@@ -507,7 +521,7 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
     oled.setTextColor(color1);
     oled.print(displayElement[index]);
-    if (globalObj->parameterSelect && highlight == stepMode){
+    if ((globalObj->parameterSelect && highlight == stepMode) || border){
       oled.drawRect(x,y,w,h, color1);
     }
 
@@ -852,6 +866,16 @@ void DisplayModule::stateDisplay_arp(char *buf){
   };
 
 
+void DisplayModule::voltageToText(char *buf, int voltageValue){
+
+  if(voltageValue < 0){
+    voltageValue = abs(voltageValue);
+    sprintf(buf, "-%d.%02dv",voltageValue*10/128, (1000*voltageValue)/128-100*(voltageValue*10/128) );
+  } else {
+    sprintf(buf, "%d.%02dv",voltageValue*10/128, (1000*voltageValue)/128-100*(voltageValue*10/128) );
+  }
+
+}
 
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
@@ -866,7 +890,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
 
     displayElement[1] = strdup("ampl:");
 
-    sprintf(buf, "%d.%02dv",sequenceArray[selectedChannel].stepData[selectedStep].velocity*10/128, (1000*sequenceArray[selectedChannel].stepData[selectedStep].velocity)/128-100*(sequenceArray[selectedChannel].stepData[selectedStep].velocity*10/128) );
+    voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].velocity);
 
     displayElement[2] = strdup(buf);
     displayElement[3] = strdup("type:");
@@ -885,22 +909,23 @@ void DisplayModule::stateDisplay_arp(char *buf){
     // if (sequenceArray[selectedChannel].stepData[selectedStep].velocityType > 6){
     //     displayElement[5] = strdup("Wavelnt:");
     //     sprintf(buf, "%d.%02d x",
-    //       sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed%64))/64
+    //       sequenceArray[selectedChannel].stepData[selectedStep].cv2speed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].cv2speed%64))/64
     //    );
     //    displayElement[6] = strdup(buf);
     //
     // } else {
     //   displayElement[5] = strdup("EnvLng:");
-    //   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+    //   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2speed);
     //   displayElement[6] = strdup(buf);
     //
     // }
     displayElement[5] = strdup("Speed:");
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].lfoSpeed);
+    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2speed);
     displayElement[6] = strdup(buf);
 
     displayElement[10] = strdup("offset:");
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2offset);
+    voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].cv2offset);
+
     displayElement[11] = strdup(buf);
 
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
@@ -950,8 +975,8 @@ void DisplayModule::stateDisplay_arp(char *buf){
        }
 
       displayElement[5] = strdup("LFO spd:");
-      if(globalObj->multi_lfoSpeed_switch){
-        sprintf(buf, "%d", globalObj->multi_lfoSpeed);
+      if(globalObj->multi_cv2speed_switch){
+        sprintf(buf, "%d", globalObj->multi_cv2speed);
         displayElement[6] = strdup(buf);
       } else {
         displayElement[6]  = strdup("--");

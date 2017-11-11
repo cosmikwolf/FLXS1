@@ -315,7 +315,7 @@ void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pa
     stepDataElement.add(sequenceArray[channel].stepData[i].arpSpdDen);
     stepDataElement.add(sequenceArray[channel].stepData[i].velocity);
     stepDataElement.add(sequenceArray[channel].stepData[i].velocityType);
-    stepDataElement.add(sequenceArray[channel].stepData[i].lfoSpeed);
+    stepDataElement.add(sequenceArray[channel].stepData[i].cv2speed);
     stepDataElement.add(sequenceArray[channel].stepData[i].glide);
   }
   root.printTo(fileBuffer,4096);
@@ -383,7 +383,7 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
      stepDataBuf.arpSpdDen   = stepDataArray[i][12];
      stepDataBuf.velocity    = stepDataArray[i][13];
      stepDataBuf.velocityType= stepDataArray[i][14];
-     stepDataBuf.lfoSpeed    = stepDataArray[i][15];
+     stepDataBuf.cv2speed    = stepDataArray[i][15];
      stepDataBuf.glide       = stepDataArray[i][16];
      uint8_t index = stepDataArray[i][0];
      sequenceArray[channel].stepData[index] = stepDataBuf;

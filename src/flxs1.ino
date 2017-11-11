@@ -99,6 +99,7 @@ void setup() {
   usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
   usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
   usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
+  //usbMIDI.setHandleSongPositionPointer( midiSongPositionPointerWrapper);
 
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
@@ -164,14 +165,14 @@ void setup() {
   adc->setResolution(16, ADC_1); // set bits of resolution
   //adc->setAveraging(8, ADC_0); // set number of averages
   //adc->setResolution(16, ADC_0); // set bits of resolution
-  adc->setReference(ADC_REF_3V3, ADC_1);
+  adc->setReference(ADC_REFERENCE::REF_3V3, ADC_1);
   //adc->setReference(ADC_REF_3V3, ADC_1);
 
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   // see the documentation for more information
-  adc->setConversionSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the conversion speed
+  adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED, ADC_1); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-  adc->setSamplingSpeed(ADC_VERY_HIGH_SPEED, ADC_1); // change the sampling speed
+  adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED, ADC_1); // change the sampling speed
   // CLOCK PIN SETUP
   pinMode(CLOCK_PIN, OUTPUT);
   digitalWrite(CLOCK_PIN, LOW);
@@ -356,8 +357,12 @@ void midiStopHandlerWrapper(){
   midiControl.midiStopHandler();
 }
 
+void midiSongPositionPointerWrapper(int songPosition){
+  midiControl.midiSongPosition(songPosition);
+}
+
 void usbMidiRealTimeMessageHandler(byte realtimebyte) {
-//  Serial.println("realTimeMessage!:\t" + String(realtimebyte));
+  Serial.println("realTimeMessage!:\t" + String(realtimebyte));
   switch(realtimebyte){
     case 248:
     midiControl.midiClockPulseHandler();
@@ -372,6 +377,8 @@ void usbMidiRealTimeMessageHandler(byte realtimebyte) {
     midiControl.midiStopHandler();
     break;
   }
+
+
   if (realtimebyte == 248) {
   };
   //switch(realtimebyte){
