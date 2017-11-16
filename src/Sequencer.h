@@ -131,7 +131,7 @@ class Sequencer
 
 		int8_t 	  clockDivision;
 		uint32_t  currentFrame;
-
+		uint32_t 	lastPulseCycleCount;
 	private:
 
 		boolean  	monophonic;
@@ -143,7 +143,6 @@ class Sequencer
 		int16_t		ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
 		uint32_t	framesPerPulse;
-		uint32_t	clockSinceLastPulse;
 		uint32_t 	avgClocksPerPulse;
 
 		elapsedMicros pulseTimer;

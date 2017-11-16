@@ -25,8 +25,8 @@
 */
 #define SEQUENCECOUNT         4
 
-#define kSerialSpeed 31250
-// #define kSerialSpeed 115200
+//#define kSerialSpeed 31250
+ #define kSerialSpeed 2000000
 #define kMasterClockInterval 200
 #define kLedClockInterval 30000
 #define kSequenceTimerInterval 600

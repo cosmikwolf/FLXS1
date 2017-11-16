@@ -408,18 +408,17 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		if (stepData[stepNum].arpLastFrame < getStepLength() / 64){
 			stepData[stepNum].arpLastFrame = getStepLength() / 64;
 		}
-	//		stepData[stepNum].arpLastFrame =
-  //   Serial.println(
-  //   "stepNum: " + String(stepNum) +
-  //   "\tgateLength: " + String(stepData[stepNum].gateLength) +
-  //   "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-  //   "\tswing: "  + String(swingX100) +
-  //   "\tswinging: " + String(swingCount % 2) +
-  //   "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-  //   "\tgetStepLength: " + String(getStepLength()) +
-  //   "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
-  //   "\t(2*swingX100-100): " + String((2*swingX100-100))
-  // );
+     Serial.println(
+     "stepNum: " + String(stepNum) +
+//     "\tgateLength: " + String(stepData[stepNum].gateLength) +
+// //    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+     "\tcurrentFrame: "  + String(currentFrame) +
+//     "\tswinging: " + String(swingCount % 2) +
+     "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+     "\tgetStepLength: " + String(getStepLength()) +
+    "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame)
+  //  "\t(2*swingX100-100): " + String((2*swingX100-100))
+  );
 
 	} else {
 

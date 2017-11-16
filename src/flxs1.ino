@@ -99,7 +99,7 @@ void setup() {
   usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
   usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
   usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
-  //usbMIDI.setHandleSongPositionPointer( midiSongPositionPointerWrapper);
+  //usbMIDI.setHandleSongPositionPointer( midiSongPositionPointerWrapper );
 
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
