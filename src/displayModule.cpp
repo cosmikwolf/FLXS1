@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("beta v0.17d");
+  oled.println("beta v0.17e");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -1231,14 +1231,14 @@ void DisplayModule::inputMenuDisplay(){
    }
    renderStringBox(0,  DISPLAY_LABEL, 0, 0 , 128, 15, false, STYLE1X, background , contrastColor);
 
-   renderStringBox(1,  STATE_TEMPO, 0, 16 , 128, 29, false, BOLD4X, background , foreground);
+   renderStringBox(1,  STATE_TEMPO, 0, 16 , 127, 29, false, BOLD4X, background , foreground);
 
-   renderStringBox(3,  STATE_EXTCLOCK, 0,  45,128,17, false, STYLE1X, background , foreground);
+   renderStringBox(3,  STATE_EXTCLOCK, 0,  45,127,17, false, STYLE1X, background , foreground);
    ///renderStringBox(3,  STATE_EXTCLOCK,60, 45,68,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(4,  DISPLAY_LABEL, 0,  62,74,17, false, STYLE1X, background , foreground);
+   renderStringBox(4,  DISPLAY_LABEL, 0,  62,73,17, false, STYLE1X, background , foreground);
 
-   renderStringBox(5,  STATE_RESETINPUT,  74, 62,54,17, false, STYLE1X, background , foreground);
+   renderStringBox(5,  STATE_RESETINPUT,  74, 62,53,17, false, STYLE1X, background , foreground);
 
   //  renderStringBox(6,  DISPLAY_LABEL,    0,  79,64,16, false, STYLE1X, background , foreground);
   //  renderStringBox(7,  STATE_SKIPSTEP,     74,  79,54,16, false, STYLE1X, background , foreground);

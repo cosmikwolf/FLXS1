@@ -7,7 +7,7 @@
 
 #define NUM_LEDS 23
 
-#define BRIGHTNESS 100
+#define BRIGHTNESS 255
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRBW + NEO_KHZ800);
 
@@ -25,14 +25,14 @@ void setup() {
 
 void loop() {
   // Some example procedures showing how to display to the pixels:
-  colorWipe(strip.Color(255, 0, 0), 5); // Red
-delay(250);
-  colorWipe(strip.Color(0, 255, 0), 5); // Green
-delay(250);
-  colorWipe(strip.Color(0, 0, 255), 5); // Blue
-delay(250);
-  colorWipe(strip.Color(0, 0, 0, 255), 5); // White
-  delay(250);
+  colorWipe(strip.Color(255, 0, 0), 0); // Red
+delay(500);
+  colorWipe(strip.Color(0, 255, 0), 0); // Green
+delay(500);
+  colorWipe(strip.Color(0, 0, 255), 0); // Blue
+delay(500);
+  colorWipe(strip.Color(0, 0, 0, 255), 0); // White
+  delay(500);
 
 }
 

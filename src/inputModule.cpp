@@ -1057,7 +1057,7 @@ uint8_t chanSwIndex;
           for(int sw=0; sw<16; sw++){
             if(midplaneGPIO->pressed(sw)){
               display->displayModal(750, MODAL_PASTE_STEP);
-              sequenceArray[selectedChannel].stepData[sw] = sequenceArray[selectedChannel].stepData[getNote(globalObj->stepCopyIndex)];
+              sequenceArray[selectedChannel].stepData[getNote(sw)] = sequenceArray[selectedChannel].stepData[globalObj->stepCopyIndex];
             }
           }
         break;
