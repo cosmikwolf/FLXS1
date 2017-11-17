@@ -58,6 +58,7 @@ class Sequencer
 		void 		setBeatCount(uint16_t beatCountNew);
 
 		void 		gateInputTrigger(uint8_t inputNum);
+		uint32_t framesPerBeat(int tempoX100);
 
     uint8_t clockDivisionNum(){
       if (clockDivision > 0){
@@ -131,19 +132,19 @@ class Sequencer
 
 		int8_t 	  clockDivision;
 		uint32_t  currentFrame;
-		uint32_t 	lastPulseCycleCount;
 	private:
 
 		boolean  	monophonic;
 		boolean  	beatPulseResyncFlag;
 		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
 
-
 		uint8_t	 	lastActiveStep;
 		int16_t		ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
 		uint32_t	framesPerPulse;
 		uint32_t 	avgClocksPerPulse;
+		uint32_t 	lastPulseCycleCount;
+		uint32_t  lastMasterClockCycleCount;
 
 		elapsedMicros pulseTimer;
 		OutputController* outputControl;

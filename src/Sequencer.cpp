@@ -54,12 +54,23 @@ void Sequencer::masterClockPulse(uint8_t pulses){
   if (!playing){
     //return;
   }
+  uint32_t clockCycles = ARM_DWT_CYCCNT/10000;
 
   for (int stepNum=0; stepNum < firstStep + stepCount; stepNum++){
     if (stepData[stepNum].framesRemaining > 0){
-      stepData[stepNum].framesRemaining -= (framesPerPulse/avgClocksPerPulse);  // for arp with no swing
+      stepData[stepNum].framesRemaining -= (framesPerPulse/avgClocksPerPulse)*(clockCycles - lastMasterClockCycleCount);  // for arp with no swing
     }
   }
+
+  //
+  // avgClocksPerPulse   ---- clockCycles on the last pulse
+  // pulsesPerBeat       ---- how many pulses are in a beatDiv
+  // clockDivisionNum() / clockDivisionDen()
+
+
+
+  lastMasterClockCycleCount = clockCycles;
+
 }
 
 void Sequencer::runSequence(){
@@ -78,28 +89,39 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   }
 
   if (firstPulse == false){
-    avgClocksPerPulse = ((clockCycles-lastPulseCycleCount)+2*avgClocksPerPulse)/3;
+    //avgClocksPerPulse = ((clockCycles-lastPulseCycleCount)+2*avgClocksPerPulse)/3;
+    avgClocksPerPulse = (clockCycles-lastPulseCycleCount);
     if(channel == 1) {
   //    Serial.println("clockCyclesSinceLast: " + String((clockCycles-lastPulseCycleCount)) ) ;
     }
     ppqPulseIndex++;
   }  else {
-  //  if(globalObj->clockMode != EXTERNAL_MIDI_CLOCK){
-  //  //  ppqPulseIndex++; // this may need to be commented to get midi to work
-  //  }
-
+  // if(globalObj->clockMode != EXTERNAL_MIDI_CLOCK){
+  // //  ppqPulseIndex++; // this may need to be commented to get midi to work
+  // }
   }
 
   firstPulse = false;
-  lastPulseCycleCount = clockCycles;
 
   if (ppqPulseIndex > pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() ){
     //this->clockReset(false);
   }
   //ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() );
+  //60*120000000/10000/120 = 60000
 
-  framesPerPulse = FRAMES_PER_BEAT / pulsesPerBeat;
+  //120 bpm
+
+  //framesPerPulse = ARM_DWT_CYCCNT/10000 / pulsesPerBeat;
+  framesPerPulse = this->framesPerBeat(tempoX100)/pulsesPerBeat;
+
+  lastPulseCycleCount = clockCycles;
+
 };
+
+uint32_t Sequencer::framesPerBeat(int tempoX100){
+  //return ((60*100*96000000)/tempoX100);
+  return FRAMES_PER_BEAT;
+}
 
 uint32_t Sequencer::getCurrentFrame(){
   uint32_t clockCount = 0;
@@ -115,14 +137,13 @@ uint32_t Sequencer::getCurrentFrame(){
    }
 
   //return ((ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse) + (firstStep *  getStepLength()))% (MAX_STEPS_PER_SEQUENCE * getStepLength());
-
   currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
   lastActiveStep = activeStep;
 
+  //Serial.println("CurrentFrame: " + String(currentFrame) + "\tavgCpp: " + String(avgClocksPerPulse) + "\tclockcount:" + String(clockCount));
   //  activeStep = isFrameSwinging(currentFrame);
   uint32_t framesSinceLastStep = 0;
   uint8_t preSwingActivestep = 0;
-  uint8_t testCondition =0;
   framesSinceLastStep  =  currentFrame % getStepLength() ;
 
   if (playDirection == PLAY_REVERSE) {
@@ -142,14 +163,12 @@ uint32_t Sequencer::getCurrentFrame(){
     //  activeStep = min_max(preSwingActivestep - 1, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
       activeStep = preSwingActivestep - 1;
       swinging = false;
-      testCondition = 1;
     } else if(   (swingX100 < 50 )
               && !((swingSwitch + preSwingActivestep) % 2)
               && (currentFrame%getStepLength() >= getStepLength() * (2*swingX100)/100 ) ){
           // activeStep = min_max(preSwingActivestep + 1, firstStep, MAX_STEPS_PER_SEQUENCE - 1 );
       activeStep = preSwingActivestep + 1;
       swinging = true;
-      testCondition = 2;
     } else {
       //activeStep = min_max(preSwingActivestep, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
       activeStep = preSwingActivestep;
@@ -158,7 +177,6 @@ uint32_t Sequencer::getCurrentFrame(){
       } else {
         swinging = false;
       }
-      testCondition = 3;
     }
 
     activeStep = min_max_cycle(activeStep, firstStep, firstStep+stepCount-1);
@@ -171,9 +189,12 @@ uint32_t Sequencer::getCurrentFrame(){
 
     if ( activeStep != lastActiveStep ){
       swingCount += 1;
-      //swingSwitch = !swingSwitch;
-      if(channel == 0) Serial.println(String(millis()) + "\tSwing: "+ String(swinging) + " activeStep "  + String( activeStep ) + "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tframesSinceLastStep:" + String(framesSinceLastStep) + "\tframesPerPulse: " + String(framesPerPulse) + "\ttest: " + String(testCondition));
-
+      swingSwitch = !swingSwitch;
+       if(channel == 0) Serial.println(
+         "Swing: "+ String(swinging) + " activeStep "  + String( activeStep ) +
+          "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep)
+          + "\tstepLength: " + String(getStepLength()) + // "\tswingX100: " + String(swingX100)
+          + "\tcurrentFrame:"  + String(currentFrame) + "\tppqPulseIndex:" + String(ppqPulseIndex) + "\tfpp: " + String(framesPerPulse)+ "\tcc:" + String(clockCount) + "\tavgClocksPerPulse: " + String(avgClocksPerPulse) );
     }
   if (currentFrame > framesPerSequence() ){
     this->clockReset(false);
@@ -216,16 +237,16 @@ uint32_t Sequencer::framesPerSequence(){
 }
 
 uint32_t Sequencer::getStepLength(){
-  uint32_t returnValue = FRAMES_PER_BEAT * clockDivisionNum();
+  uint32_t returnValue = framesPerBeat(tempoX100) * clockDivisionNum();
   returnValue = returnValue / clockDivisionDen();
 
   return returnValue;
 
 		// if (clockDivision > 0){
 		// 	//return beatLength/stepData[stepNum].beatDiv;
-		// 	return FRAMES_PER_BEAT / clockDivision;
+		// 	return ARM_DWT_CYCCNT/10000 / clockDivision;
 		// } else { // negative values of beatDiv allow for whole multiples of beatLength
-		// 	return FRAMES_PER_BEAT*(abs(clockDivision)+2);
+		// 	return ARM_DWT_CYCCNT/10000*(abs(clockDivision)+2);
 		// //	return beatLength*(abs(stepData[stepNum].beatDiv)+2);
 		// }
 }
