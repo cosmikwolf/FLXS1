@@ -43,60 +43,9 @@ void MasterClock::masterClockFunc(){
 
 	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	//uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
-	uint32_t clockCycles = ARM_DWT_CYCCNT;
+	uint32_t clockCycles = ARM_DWT_CYCCNT/119;
 
 	if (globalObj->clockMode == INTERNAL_CLOCK){
-/*
-		clockCycles
-		masterClockCycleCount
-		startingClockCount
-		kMasterClockInterval
-
-		when clock is started,
-			startingClockCount is set to clockCycles
-			Time since Clock start: clockCycles-startingClockCount
-			if (timeSinceClockStart / kMasterClockInterval > masterClockCycleCount ){
-				run internal clock loop
-				masterClockCycleCount++
-			}
-
-
-		*/
-  /*
-		uint8_t clocksToAdd = ((clockCycles-startingClockCount) / (kMasterClockInterval*120))-masterClockCycleCount ;
-		if (clockCycles-startingClockCount > masterClockCycleCount*kMasterClockInterval*120 ){
-			for (int i = 0; i < SEQUENCECOUNT; i++ ){
-				sequenceArray[i].masterClockPulse(clocksToAdd);
-			}
-			globalObj->tempoMasterClkCounter += clocksToAdd;
-			clockCounter += clocksToAdd;
-			lfoClockCounter += clocksToAdd;
-			masterClockCycleCount += clocksToAdd;
-		}
-
-		// if(clockCycles > lastClockValue + (120000000)/(96*4)){
-		// 	lastClockValue = clockCycles;
-		// 	pulseTrigger = 1;
-		// }
-
-		// if(masterDebugTimer > 100000 ){
-			// masterDebugTimer = 0;
-			// Serial.println("Pulse! start: " + String(lastClockValue) + "\tdiff: " + String((unsigned long)clockCycles-(unsigned long)lastClockValue) + "\tcmpval: " +String((unsigned long)masterClockCycleCount * kMasterClockInterval*120) + "\tclockcycles: " + String(clockCycles) + "\tmasterClockCycleCount: " + String(masterClockCycleCount) + "\tclocksToAdd: " + String(clocksToAdd) );
-		// }
-
-	//	if(clocksToAdd > 2){
-			//Serial.println("additional Clocks!: " + String(startingClockCount) + "\tdiff: " + String((unsigned long)clockCycles-(unsigned long)startingClockCount) + "\tcmpval: " +String((unsigned long)masterClockCycleCount * kMasterClockInterval*120) + "\tclockcycles: " + String(clockCycles) + "\tmasterClockCycleCount: " + String(masterClockCycleCount) + "\tclocksToAdd: " + String(clocksToAdd) );
-	//	}
-
-	//if( clockCycles > 4294967295/10 ){
-	//	Serial.println("Resetting Cycle Counter");
-	//	CPU_RESET_CYCLECOUNTER_MSTR;
-	//	startingClockCount = 0;
- 	//};
-
-  */
-
-	///*
 		if ((int)masterLoopTimer > 3 * kMasterClockInterval /2){
 //			if ((int)masterLoopTimer > 2 * kMasterClockInterval-100){
 			// a subroutine to add clock counts when the masterLoopTimer was skipped
@@ -133,6 +82,8 @@ void MasterClock::masterClockFunc(){
     }
 
 		if (clockCounter * kMasterClockInterval - totalClockCount*clockPeriod >  clockPeriod){
+		//if(clockCycles > clockPeriod){
+	//		CPU_RESET_CYCLECOUNTER_MSTR;
 			// THIS IS WHERE THE CLOCK PROBLEM IS  --- was? think i fixed it.
  			// IT REDUCES EACH CLOCK COUNT TO A MULTIPLE OF CLOCK INTERVAL,
 			// SO EACH CLOCK COUNT ADDS AN OFFSET, WHICH ACCUMULATES.
@@ -153,7 +104,7 @@ void MasterClock::masterClockFunc(){
 				clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
 				totalClockCount = 0;
 			}
-			pulseTrigger = 1;
+			pulseTrigger = 1; //send ppq pulse to each internally sequenced sequence
 		}
 		if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
 				outputControl->setClockOutput(LOW);

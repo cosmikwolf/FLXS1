@@ -95,10 +95,6 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   //    Serial.println("clockCyclesSinceLast: " + String((clockCycles-lastPulseCycleCount)) ) ;
     }
     ppqPulseIndex++;
-  }  else {
-  // if(globalObj->clockMode != EXTERNAL_MIDI_CLOCK){
-  // //  ppqPulseIndex++; // this may need to be commented to get midi to work
-  // }
   }
 
   firstPulse = false;
@@ -106,12 +102,7 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   if (ppqPulseIndex > pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() ){
     //this->clockReset(false);
   }
-  //ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount* clockDivisionNum() / clockDivisionDen() );
-  //60*120000000/10000/120 = 60000
 
-  //120 bpm
-
-  //framesPerPulse = ARM_DWT_CYCCNT/10000 / pulsesPerBeat;
   framesPerPulse = this->framesPerBeat(tempoX100)/pulsesPerBeat;
 
   lastPulseCycleCount = clockCycles;
