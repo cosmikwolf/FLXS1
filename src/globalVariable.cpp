@@ -61,6 +61,14 @@ void GlobalVariable::initGlobals(){
   this->outputNegOffset[3] = 2;
 }
 
+bool GlobalVariable::extClock(){
+  if(clockMode >= EXTERNAL_CLOCK_GATE_0){
+    return true;
+  } else {
+    return false;
+  }
+}
+
 uint8_t GlobalVariable::quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction){
 
 	uint8_t count = 0;

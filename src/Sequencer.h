@@ -27,8 +27,6 @@ class Sequencer
 
     void    stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
 
-    int32_t getFramesRemaining(uint8_t stepNum);
-
 		uint32_t    framesPerSequence();
 		uint32_t   	getCurrentFrame();
 
@@ -40,7 +38,7 @@ class Sequencer
 		void 		skipStep(uint8_t count);
     void    jumpToStep(uint8_t stepNum);
 
-		void    masterClockPulse(uint8_t pulses);
+		void    masterClockPulse();
 
     bool    isFrameSwinging(uint32_t frame);
 
@@ -90,6 +88,9 @@ class Sequencer
 
     bool      swingSwitch;
     bool      swinging;
+		bool			receivedFirstExtClock;
+
+		uint8_t previousActiveStepSeqMode;
     uint8_t 	swingCount;
 		uint8_t	 	activeStep;
     uint8_t   firstStep; //first step to be played
@@ -142,8 +143,8 @@ class Sequencer
 		int16_t		ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
 		uint32_t	framesPerPulse;
-		uint32_t 	avgClocksPerPulse;
-		uint32_t 	lastPulseCycleCount;
+		uint16_t 	avgClocksPerPulse;
+		uint16_t 	lastPulseClockCount;
 		uint32_t  lastMasterClockCycleCount;
 
 		elapsedMicros pulseTimer;

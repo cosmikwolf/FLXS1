@@ -19,7 +19,6 @@ float   probability;
 float   frequency;
 
 boolean eraseAllFlag = false;
-boolean extClock = false;
 boolean midiTestActive;
 
 //uint8_t clockMode = INTERNAL_CLOCK;

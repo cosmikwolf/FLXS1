@@ -64,7 +64,7 @@ class GlobalVariable {
 
     uint32_t tapTempoClockValues[4];
     uint8_t tapTempoCount;
-    uint32_t tempoMasterClkCounter;
+    uint32_t tapTempoMasterClkCounter;
 
     uint8_t gateTestArray[4];
     uint8_t activeGate;
@@ -77,6 +77,7 @@ class GlobalVariable {
     bool gateTestComplete;
     elapsedMillis testTimer;
 
+    bool extClock();
     uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
 
     void initialize();

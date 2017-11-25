@@ -211,17 +211,6 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
 		}
   }
 };
-int32_t Sequencer::getFramesRemaining(uint8_t stepNum){
-
-//   if (swingSwitch){
-//     return stepData[stepNum].framesRemaining;
-// //    return stepData[stepNum].framesRemaining + (getStepLength() * swingX100 )/ 100;
-//   } else {
-//     return stepData[stepNum].framesRemaining;
-//   }
-  return stepData[stepNum].framesRemaining;
-
-};
 
 void Sequencer::skipStep(uint8_t count){
 //Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
@@ -281,6 +270,11 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
     skipNextNoteTrigger = false;
     return;
   }
+
+
+	if(globalObj->extClock() && !receivedFirstExtClock){
+		return;
+	}
 
 	//figure out how many steps are nil (255)
 	uint8_t arpSteps = 4;
@@ -408,7 +402,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		if (stepData[stepNum].arpLastFrame < getStepLength() / 64){
 			stepData[stepNum].arpLastFrame = getStepLength() / 64;
 		}
-     Serial.println(
+/*     Serial.println(
      "stepNum: " + String(stepNum) +
 //     "\tgateLength: " + String(stepData[stepNum].gateLength) +
 // //    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
@@ -419,7 +413,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
     "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame)
   //  "\t(2*swingX100-100): " + String((2*swingX100-100))
   );
-
+*/
 	} else {
 
     stepData[stepNum].framesRemaining += framesPerBeat(tempoX100) * clockDivisionNum();

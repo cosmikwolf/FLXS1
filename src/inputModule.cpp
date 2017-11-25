@@ -338,13 +338,13 @@ void InputModule::loop(uint16_t frequency){
     if (midplaneGPIO->fell(SW_SHIFT)){
       //tap tempo
       if (globalObj->tapTempoCount == 0){
-        globalObj->tempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
+        globalObj->tapTempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
         for(int i = 0; i<4; i++){
           globalObj->tapTempoClockValues[i] = 0;
         }
       } else {
-        globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tempoMasterClkCounter;
-        globalObj->tempoMasterClkCounter = 0;
+        globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tapTempoMasterClkCounter;
+        globalObj->tapTempoMasterClkCounter = 0;
       };
       globalObj->tapTempoCount++;
 
@@ -360,7 +360,7 @@ void InputModule::loop(uint16_t frequency){
       }
     } else {
       if(globalObj->tapTempoCount){
-        if (globalObj->tempoMasterClkCounter > 1000000/kMasterClockInterval){
+        if (globalObj->tapTempoMasterClkCounter > 1000000/kMasterClockInterval){
           Serial.println("Resetting tap tempo : prev count: " + String(globalObj->tapTempoCount));
           globalObj->tapTempoCount = 0;
         }

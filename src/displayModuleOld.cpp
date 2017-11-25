@@ -41,7 +41,7 @@ void DisplayModule::renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8
       oled.drawRect(x,y,w,h, color1);
     }
   }
-  clockMaster->clockRunCheck();
+  //clockMaster->clockRunCheck();
 }
 
 

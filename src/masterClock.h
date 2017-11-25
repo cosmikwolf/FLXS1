@@ -24,10 +24,7 @@ public:
   void sequencerFunc();
   void internalClockTick();
   void midiClockTick();
-  void clockRunCheck();
   void externalClockTick(uint8_t gateNum);
-
-  bool gateTrigger(uint8_t gateNum);
   void checkGateClock();
 
   bool masterDebugSwitch;
@@ -43,7 +40,8 @@ public:
   uint32_t lastClockValue;
   uint32_t startingClockCount;
 
-  elapsedMicros masterLoopTimer;
+  uint32_t lastPulseClockCount;
+
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
   boolean displayRunSwitch;
