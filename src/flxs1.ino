@@ -99,8 +99,8 @@ void setup() {
   usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
   usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
   usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
-  //usbMIDI.setHandleSongPositionPointer( midiSongPositionPointerWrapper );
-
+  usbMIDI.setHandleSongPositionPointer( midiSongPositionPointerWrapper );
+  usbMIDI.setHandleTimeCodeQuarterFrame(midiTimeCodePointerWrapper );
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
   //usbMIDI.setHandleVelocityChange(OnVelocityChange)
@@ -357,7 +357,12 @@ void midiStopHandlerWrapper(){
   midiControl.midiStopHandler();
 }
 
-void midiSongPositionPointerWrapper(int songPosition){
+void midiTimeCodePointerWrapper(uint16_t data){
+  //Serial.println("MIDI TIME CODE: " + String(data));
+}
+
+void midiSongPositionPointerWrapper(uint16_t songPosition){
+  Serial.println("Song position Pointer: " + String(songPosition));
   midiControl.midiSongPosition(songPosition);
 }
 
