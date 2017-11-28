@@ -90,7 +90,7 @@ class Sequencer
     bool      swinging;
 		bool			receivedFirstExtClock;
 
-		uint8_t previousActiveStepSeqMode;
+//		uint8_t previousActiveStepSeqMode; // debug variable
     uint8_t 	swingCount;
 		uint8_t	 	activeStep;
     uint8_t   firstStep; //first step to be played
@@ -133,6 +133,7 @@ class Sequencer
 
 		int8_t 	  clockDivision;
 		uint32_t  currentFrame;
+
 	private:
 
 		boolean  	monophonic;
@@ -140,14 +141,15 @@ class Sequencer
 		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
 
 		uint8_t	 	lastActiveStep;
-		int16_t		ppqPulseIndex;
 		uint8_t 	pulsesPerBeat;
+		uint16_t	ppqPulseIndex;
+
+		uint32_t lastStepFrame;
 		uint32_t	framesPerPulse;
-		uint16_t 	avgClocksPerPulse;
-		uint16_t 	lastPulseClockCount;
+		uint32_t 	avgClocksPerPulse;
+		uint32_t 	lastPulseClockCount;
 		uint32_t  lastMasterClockCycleCount;
 
-		elapsedMicros pulseTimer;
 		OutputController* outputControl;
 		GlobalVariable *globalObj;
 

@@ -20,18 +20,21 @@ void Sequencer::clockReset(bool activeStepReset){
     swingSwitch = false;
     firstPulse = true;
     receivedFirstExtClock = false;
-    lastPulseClockCount = ARM_DWT_CYCCNT/65536 - avgClocksPerPulse;
+    lastPulseClockCount = ARM_DWT_CYCCNT;
   }
 
   getCurrentFrame();
 
-  for (int stepNum = 0; stepNum < (firstStep + stepCount); stepNum++){
+  for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
     if(stepNum == activeStep){
-       break;
+       //break;
     }
     stepData[stepNum].noteStatus = AWAITING_TRIGGER;
     stepData[stepNum].arpStatus = 0;
+    stepData[stepNum].framesRemaining = 0;
   }
+
+  outputControl->allNotesOff(channel);
 
   //calculateStepTimers();
   //lastStepOffset = 0;
@@ -51,9 +54,8 @@ void Sequencer::clockReset(bool activeStepReset){
 }
 
 void Sequencer::clockStart(){
-	pulseTimer = 0;
   swingSwitch = 0;
-  lastPulseClockCount = ARM_DWT_CYCCNT/65536 - avgClocksPerPulse;
+  lastPulseClockCount = ARM_DWT_CYCCNT;
 
   if(channel == 0) Serial.println(
     "CLOCKSTART Swing: "+ String(swinging) + " activeStep "  + String( activeStep ) +
@@ -66,25 +68,22 @@ void Sequencer::masterClockPulse(){
   if (!playing){
     //return;
   }
-  uint16_t clockCycles = ARM_DWT_CYCCNT/65536;
+  uint32_t clockCycles = ARM_DWT_CYCCNT;
+  uint32_t framesToSubtract = ((long long)framesPerPulse * (clockCycles - lastMasterClockCycleCount) ) / avgClocksPerPulse;
 
   for (int stepNum=0; stepNum < firstStep + stepCount; stepNum++){
-    if (stepData[stepNum].framesRemaining > 0){
-      stepData[stepNum].framesRemaining -= (framesPerPulse/avgClocksPerPulse)*(clockCycles - lastMasterClockCycleCount);  // for arp with no swing
-      if(stepData[stepNum].framesRemaining < 0 || stepData[stepNum].framesRemaining > framesPerSequence()){
+    if (stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
+      if(framesToSubtract >= stepData[stepNum].framesRemaining){
         stepData[stepNum].framesRemaining = 0;
+      } else {
+        stepData[stepNum].framesRemaining -= framesToSubtract;
       }
-      //Serial.println("removing frames: " + String((framesPerPulse/avgClocksPerPulse)*(clockCycles - lastMasterClockCycleCount)));
+    //  if(framesToSubtract > 0) {
+    //    Serial.println(String(stepNum) + " f2s: "+ String(framesToSubtract) + "\tavgCPP: " + String(avgClocksPerPulse) + "\tfpp: " + String(framesPerPulse) +"\tclock: " + String(clockCycles));
+    //  }
+
     }
   }
-
-  //
-  // avgClocksPerPulse   ---- clockCycles on the last pulse
-  // pulsesPerBeat       ---- how many pulses are in a beatDiv
-  // clockDivisionNum() / clockDivisionDen()
-
-
-
   lastMasterClockCycleCount = clockCycles;
 
 }
@@ -97,15 +96,15 @@ void Sequencer::runSequence(){
 }
 
 void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
-  uint16_t clockCycles = ARM_DWT_CYCCNT/65536;
+  uint32_t clockCycles = ARM_DWT_CYCCNT;
   this->pulsesPerBeat = pulsesPerBeat;
 
   if(globalObj->extClock() ){
     receivedFirstExtClock = true;
   }
 
-  if (ppqPulseIndex == pulsesPerBeat*clockDivisionDen()-1 ){
-    this->clockReset(true);
+  if (ppqPulseIndex > stepCount*pulsesPerBeat*clockDivisionDen() ){
+  //  this->clockReset(true);
   }
 
 
@@ -117,7 +116,8 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     }
     if(playing){
       ppqPulseIndex++;
-      //ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount*clockDivisionDen() );
+      ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount );
+
     }
   }
 
@@ -130,7 +130,6 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
 
   lastPulseClockCount = clockCycles;
 
-  getCurrentFrame();
 };
 
 uint32_t Sequencer::framesPerBeat(int tempoX100){
@@ -139,8 +138,8 @@ uint32_t Sequencer::framesPerBeat(int tempoX100){
 }
 
 uint32_t Sequencer::getCurrentFrame(){
-  uint16_t clockCount = 0;
-  uint16_t clockCycles = ARM_DWT_CYCCNT/65536;
+  int clockCount = 0;
+  uint32_t clockCycles = ARM_DWT_CYCCNT;
 
   uint8_t lastActiveStep;
   // this prevents clocksSinceLastPulse from exceeding avgClocksPerPulse, which results in the currentFrame going backwards
@@ -156,10 +155,13 @@ uint32_t Sequencer::getCurrentFrame(){
    //
   //  framesPerPulse
 
-
-
   //return ((ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * workingCpp / avgClocksPerPulse) + (firstStep *  getStepLength()))% (MAX_STEPS_PER_SEQUENCE * getStepLength());
-  currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
+//  long long framesSincePulse = framesPerPulse * clockCount;
+//  framesSincePulse /= avgClocksPerPulse;
+  currentFrame = (((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse) ) % framesPerSequence() ;
+
+
+//  currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
   lastActiveStep = activeStep;
 
   //Serial.println("CurrentFrame: " + String(currentFrame) + "\tavgCpp: " + String(avgClocksPerPulse) + "\tclockcount:" + String(clockCount));
@@ -212,16 +214,30 @@ uint32_t Sequencer::getCurrentFrame(){
     if ( activeStep != lastActiveStep ){
       swingCount += 1;
       swingSwitch = !swingSwitch;
-        if(channel == 0) Serial.println(
-          "Swing: "+ String(swinging) + " activeStep "  + String( activeStep ) +
-           "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep)
-           + "\tstepLength: " + String(getStepLength()) + // "\tswingX100: " + String(swingX100)
-           + "\tcurrentFrame:"  + String(currentFrame) + "\tppqPulseIndex:" + String(ppqPulseIndex) + "\tfpp: " + String(framesPerPulse)+ "\tcc:" + String(clockCount) + "\tavgClocksPerPulse: " + String(avgClocksPerPulse) );
+
+          //  if(channel == 0){
+          //    Serial.println(
+          //       "Swing: "+ String(swinging) + " activeStep "  + String( activeStep ) +
+          //     //   "\tpreSwingActivestep "  + String( preSwingActivestep ) + "\tlastActiveStep: " + String(lastActiveStep)
+          //        + "\tstepLength: " + String(getStepLength()) + // "\tswingX100: " + String(swingX100)
+           //
+          //        + "\tppqPulseIndex:" + String(ppqPulseIndex) + "\tfpp: " + String(framesPerPulse)+ "\tcc:" + String(clockCount) + "\t\tavgCsPP: " + String(avgClocksPerPulse)
+          //        + "\tframeSincePulse: " + String((uint32_t)(((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse)) + "\tclockCycles: " + String(clockCycles));
+          //        if(currentFrame < lastStepFrame){
+          //          Serial.println("currentFrame:"  + String(currentFrame) + "\tfpp: " + String(framesPerSequence()) + "\tstepFrames: " + String((int)framesPerSequence() - (int)lastStepFrame) + "\tlastSTep: " + String(lastStepFrame));
+          //        } else{
+          //           Serial.println("currentFrame:"  + String(currentFrame) + "\tfpp: " + String(framesPerSequence()) + "\tstepFrames: " + String((int)currentFrame-(int)lastStepFrame) + "\tlastSTep: " + String(lastStepFrame) );
+          //        }
+           //
+           //
+          //     lastStepFrame = currentFrame;
+          //    if( swingSwitch ){
+          //      outputControl->setClockOutput(LOW);
+          //    } else {
+          //      outputControl->setClockOutput(HIGH);
+          //    }
+          //  }
     }
-  if (currentFrame > framesPerSequence() ){
-  //  this->clockReset(false);
-   //if (channel == 1){ Serial.println("CLOCK RESET!"); };
-  }
 
   return currentFrame;
 
@@ -309,7 +325,7 @@ void Sequencer::sequenceModeStandardStep(){
       arpSpeedModulation[activeStep] = outputControl->cvInputCheck(cv_arpspdmod)/15;
       noteTrigger(activeStep, stepData[activeStep].gateTrig(), arpTypeModulated[activeStep], arpOctaveModulated[activeStep] );
       stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
-      Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));
+      //Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));
       //stepData[activeStep].offset = currentFrame;
     }
   }
@@ -353,15 +369,15 @@ void Sequencer::sequenceModeStandardStep(){
       break;
     }
 	}
-  if(previousActiveStepSeqMode != activeStep && channel == 0){
-    for (int stepNum = 0; stepNum <= (firstStep + stepCount); stepNum++){
-      if(stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-        Serial.println("X - " + String(stepData[stepNum].framesRemaining) + "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame));
-      } else {
-        Serial.println("0");
-      }
-    }
-    Serial.println(" ");
-  }
-  previousActiveStepSeqMode = activeStep;
+  // if(previousActiveStepSeqMode != activeStep && channel == 0){
+  //   for (int stepNum = 0; stepNum <= (firstStep + stepCount); stepNum++){
+  //     if(stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
+  //       Serial.println(String(stepNum) + " - " + String(stepData[stepNum].framesRemaining) + "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame));
+  //     } else {
+  //       Serial.println("----");
+  //     }
+  //   }
+  //   Serial.println(" ");
+  // }
+  // previousActiveStepSeqMode = activeStep;
 }

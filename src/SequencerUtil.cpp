@@ -379,7 +379,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
     stepData[stepNum].framesRemaining += (2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod) )*   framesPerBeat(tempoX100) * clockDivisionNum() / (8*clockDivisionDen());
 
-    if (swingX100 != 50 ){
+		if (swingX100 != 50 ){
       if ((stepNum + swingSwitch) % 2){
 				stepData[stepNum].framesRemaining *= 200-2*swingX100;
 				stepData[stepNum].framesRemaining /= 100;
@@ -402,18 +402,18 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		if (stepData[stepNum].arpLastFrame < getStepLength() / 64){
 			stepData[stepNum].arpLastFrame = getStepLength() / 64;
 		}
-/*     Serial.println(
-     "stepNum: " + String(stepNum) +
-//     "\tgateLength: " + String(stepData[stepNum].gateLength) +
-// //    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-     "\tcurrentFrame: "  + String(currentFrame) +
-//     "\tswinging: " + String(swingCount % 2) +
-     "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-     "\tgetStepLength: " + String(getStepLength()) +
-    "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame)
-  //  "\t(2*swingX100-100): " + String((2*swingX100-100))
-  );
-*/
+//      Serial.println(
+//      "stepNum: " + String(stepNum) +
+// //     "\tgateLength: " + String(stepData[stepNum].gateLength) +
+// // //    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+//      "\tcurrentFrame: "  + String(currentFrame) +
+// //     "\tswinging: " + String(swingCount % 2) +
+//      "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+//      "\tgetStepLength: " + String(getStepLength()) +
+//     "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame)
+//   //  "\t(2*swingX100-100): " + String((2*swingX100-100))
+//   );
+
 	} else {
 
     stepData[stepNum].framesRemaining += framesPerBeat(tempoX100) * clockDivisionNum();

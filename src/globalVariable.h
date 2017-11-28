@@ -71,6 +71,7 @@ class GlobalVariable {
     uint8_t rheoTestLevel;
     uint8_t stepCopyIndex;
 
+    bool muteChannelSelect[4];
     bool parameterSelect;
 
     bool midiSetClockOut;

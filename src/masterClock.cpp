@@ -202,7 +202,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 			}
 		}
 	}
-	
+
 		if (gateTrig[gateNum]){
 			//Serial.print("PPQPULSE: ");
 			for (int i=0; i< SEQUENCECOUNT; i++){
@@ -216,7 +216,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 		} else {
 			outputControl->setClockOutput(LOW);
 		}
-	//}
+
 
 	for (int i=0; i< SEQUENCECOUNT; i++){
 		sequenceArray[i].runSequence();

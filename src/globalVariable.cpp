@@ -29,6 +29,8 @@ void GlobalVariable::initialize(){
       this->multi_velocity = 0;
       this->multi_velocityType = 0;
       this->multi_cv2speed = 0;
+      this->muteChannelSelect[4] = {false};
+
       for(int i = 0; i < 64; i++){
           this->multiSelection[i]=false;
       }

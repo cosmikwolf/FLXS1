@@ -155,7 +155,7 @@ class DisplayModule
 
     void cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeValue);
     void voltageToText(char *buf, int voltageValue);
-
+    void createChList(char * buf);
 
     uint16_t foreground, background, contrastColor;
 

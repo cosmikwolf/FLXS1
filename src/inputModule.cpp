@@ -863,17 +863,26 @@ bool InputModule::altButtonHandler(){
   uint8_t channelButton;
   chPressedSelector = 0;
   if (midplaneGPIO->pressed(SW_CH0)){
-      chPressedSelector = chPressedSelector | 0b0001;
-  } else {chPressedSelector = chPressedSelector & ~0b0001;}
+    chPressedSelector = chPressedSelector | 0b0001;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b0001;
+  }
   if (midplaneGPIO->pressed(SW_CH1)){
-      chPressedSelector = chPressedSelector | 0b0010;
-  } else {chPressedSelector = chPressedSelector & ~0b0010;}
+    chPressedSelector = chPressedSelector | 0b0010;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b0010;
+  }
   if (midplaneGPIO->pressed(SW_CH2)){
-      chPressedSelector = chPressedSelector | 0b0100;
-  } else {chPressedSelector = chPressedSelector & ~0b0100;}
+    chPressedSelector = chPressedSelector | 0b0100;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b0100;
+  }
   if (midplaneGPIO->pressed(SW_CH3)){
-      chPressedSelector = chPressedSelector | 0b1000;
-  } else {chPressedSelector = chPressedSelector & ~0b1000;}
+    chPressedSelector = chPressedSelector | 0b1000;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b1000;
+  }
+
 
 // shortcut button loop
 uint8_t chanSwIndex;
@@ -895,26 +904,30 @@ uint8_t chanSwIndex;
     if(midplaneGPIO->pressed(chanSwIndex)){
       for (int i=0; i <16; i++){
         if (midplaneGPIO->fell(i) ){
+          globalObj->muteChannelSelect[0] = chPressedSelector & 0b0001;
+          globalObj->muteChannelSelect[1] = chPressedSelector & 0b0010;
+          globalObj->muteChannelSelect[2] = chPressedSelector & 0b0100;
+          globalObj->muteChannelSelect[3] = chPressedSelector & 0b1000;
           switch (i){
             case SW_00:
                 if( sequenceArray[chan].toggleMute(0) ){
-                  display->displayModal(750, MODAL_MUTE_CH1);
+                  display->displayModal(750, MODAL_MUTE_GATE);
                 } else {
-                  display->displayModal(750, MODAL_UNMUTE_CH1);
+                  display->displayModal(750, MODAL_UNMUTE_GATE);
                 }
             break;
             case SW_01:
                 if( sequenceArray[chan].toggleMute(1) ){
-                  display->displayModal(750, MODAL_MUTE_CH1);
+                  display->displayModal(750, MODAL_MUTE_CVA);
                 } else {
-                  display->displayModal(750, MODAL_UNMUTE_CH1);
+                  display->displayModal(750, MODAL_UNMUTE_CVA);
                 }
            break;
            case SW_02:
                 if( sequenceArray[chan].toggleMute(2) ){
-                  display->displayModal(750, MODAL_MUTE_CH1);
+                  display->displayModal(750, MODAL_MUTE_CVB);
                 } else {
-                  display->displayModal(750, MODAL_UNMUTE_CH1);
+                  display->displayModal(750, MODAL_UNMUTE_CVB);
                 }
             break;
             case SW_03:

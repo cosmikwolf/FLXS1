@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("beta v0.17e");
+  oled.println("beta v0.17f");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -309,8 +309,36 @@ void DisplayModule::displayModal(uint16_t ms, uint8_t select){
 //  Serial.println("resetting modal timer");
 }
 
+void DisplayModule::createChList(char * buf){
+  uint8_t count = 0;
+  uint8_t numbers[4] = {0,0,0,0};
+
+  for(int i=0; i<4; i++){
+    if(globalObj->muteChannelSelect[i]){
+      numbers[count] = i+1;
+    }
+    count += globalObj->muteChannelSelect[i];
+  }
+
+  switch(count){
+    case 1:
+      sprintf(buf, "ch: %d", numbers[0]);
+    break;
+    case 2:
+      sprintf(buf, "ch: %d,%d", numbers[0], numbers[1]);
+    break;
+    case 3:
+      sprintf(buf, "ch: %d,%d,%d", numbers[0], numbers[1], numbers[2]);
+    break;
+    case 4:
+      sprintf(buf, "ch: %d,%d,%d,%d", numbers[0], numbers[1], numbers[2], numbers[3]);
+    break;
+  }
+}
+
 void DisplayModule::modalDisplay(){
   //Serial.println("displaying modal");
+
   switch (modalSelect){
     case MODAL_ERASEARMED:
     displayElement[0] = strdup("press again");
@@ -373,33 +401,39 @@ void DisplayModule::modalDisplay(){
           break;      }
 
       goto singleTextDisplay;
-    case MODAL_MUTE_CH1:
-    displayElement[0] = strdup("CH1");
-    displayElement[1] = strdup("MUTE");
+    case MODAL_MUTE_GATE:
+      this->createChList(buf);
+      displayElement[1] = strdup(buf);
+      displayElement[0] = strdup("MUTE GATE");
       goto singleTextDisplay;
-    case MODAL_MUTE_CH2:
-      displayElement[0] = strdup("CH2");
-      displayElement[1] = strdup("MUTE");
+    case MODAL_MUTE_CVA:
+      this->createChList(buf);
+      displayElement[1] = strdup(buf);
+      displayElement[0] = strdup("MUTE CV A");
       goto singleTextDisplay;
-    case MODAL_MUTE_CH3:
-      displayElement[0] = strdup("CH3");
-      displayElement[1] = strdup("MUTE");
+    case MODAL_MUTE_CVB:
+      this->createChList(buf);
+      displayElement[1] = strdup(buf);
+      displayElement[0] = strdup("MUTE CV B");
       goto singleTextDisplay;
     case MODAL_MUTE_CH4:
       displayElement[0] = strdup("CH4");
       displayElement[1] = strdup("MUTE");
       goto singleTextDisplay;
-    case MODAL_UNMUTE_CH1:
-      displayElement[0] = strdup("CH1");
-      displayElement[1] = strdup("UNMUTE");
+    case MODAL_UNMUTE_GATE:
+      this->createChList(buf);
+      displayElement[1] = strdup(buf);
+      displayElement[0] = strdup("UNMUTE GATE");
       goto singleTextDisplay;
-    case MODAL_UNMUTE_CH2:
-      displayElement[0] = strdup("CH2");
-      displayElement[1] = strdup("UNMUTE");
+    case MODAL_UNMUTE_CVA:
+      this->createChList(buf);
+      displayElement[1] = strdup(buf);
+      displayElement[0] = strdup("UNMUTE CV A");
       goto singleTextDisplay;
-    case MODAL_UNMUTE_CH3:
-      displayElement[0] = strdup("CH3");
-      displayElement[1] = strdup("UNMUTE");
+    case MODAL_UNMUTE_CVB:
+      this->createChList(buf);
+      displayElement[1] = strdup(buf);
+      displayElement[0] = strdup("UNMUTE CV B");
       goto singleTextDisplay;
     case MODAL_UNMUTE_CH4:
       displayElement[0] = strdup("CH4");
@@ -437,12 +471,12 @@ void DisplayModule::modalDisplay(){
     displayElement[5] = strdup(" ");
 
     if(strlen(displayElement[1]) < 1 ){
-      renderStringBox(5,  DISPLAY_LABEL,    18,  30, 96, 26, true, MODALBOLD, BLACK , WHITE);
-      renderStringBox(0,  DISPLAY_LABEL,    20,  36, 92, 18, false, MODALBOLD, BLACK , WHITE);
+      renderStringBox(5,  DISPLAY_LABEL,    10,  30, 107, 26, true, MODALBOLD, BLACK , WHITE);
+      renderStringBox(0,  DISPLAY_LABEL,    12,  36, 103, 18, false, MODALBOLD, BLACK , WHITE);
     } else {
-      renderStringBox(5,  DISPLAY_LABEL,    18,  18, 96, 51, true, MODALBOLD, BLACK , WHITE);
-      renderStringBox(0,  DISPLAY_LABEL,    22,  24, 92, 20, false, MODALBOLD, BLACK , WHITE);
-      renderStringBox(1,  DISPLAY_LABEL,    22,  48, 92, 20, false, MODALBOLD, BLACK , WHITE);
+      renderStringBox(5,  DISPLAY_LABEL,    10,  18, 107, 51, true, MODALBOLD, BLACK , WHITE);
+      renderStringBox(0,  DISPLAY_LABEL,    12,  24, 103, 20, false, MODALBOLD, BLACK , WHITE);
+      renderStringBox(1,  DISPLAY_LABEL,    12,  48, 103, 20, false, MODALBOLD, BLACK , WHITE);
     }
     //  } else {
     //    renderStringBox(0,  DISPLAY_LABEL,    18,  28, 96, 20, true, MODALBOLD, BLACK , WHITE);
