@@ -1062,6 +1062,14 @@ uint8_t chanSwIndex;
               goto PLAYEND;
             }
           }
+
+          for(int ch=0; ch<4; ch++){
+            if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
+              globalObj->chCopyIndex = ch;
+              display->displayModal(750, MODAL_COPY_CHANNEL);
+              goto PLAYEND;
+            }
+          }
           playing = !playing;
           PLAYEND:
         break;
@@ -1073,42 +1081,50 @@ uint8_t chanSwIndex;
               sequenceArray[selectedChannel].stepData[getNote(sw)] = sequenceArray[selectedChannel].stepData[globalObj->stepCopyIndex];
             }
           }
+          for(int ch=0; ch<4; ch++){
+            if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
+              sequenceArray[ch] = sequenceArray[globalObj->chCopyIndex];
+              sequenceArray[ch].channel = ch;
+              display->displayModal(750, MODAL_PASTE_CHANNEL);
+            }
+          }
+
         break;
 
-                case SW_STOP:
-                  for(int sw=0; sw<16; sw++){
-                    if(midplaneGPIO->pressed(sw)){
-                      sequenceArray[selectedChannel].initializeStep(sw);
-                      display->displayModal(750, MODAL_CLEAR_STEP);
-                      goto STOPEND;
-                    }
-                  }
+      case SW_STOP:
+        for(int sw=0; sw<16; sw++){
+          if(midplaneGPIO->pressed(sw)){
+            sequenceArray[selectedChannel].initializeStep(sw);
+            display->displayModal(750, MODAL_CLEAR_STEP);
+            goto STOPEND;
+          }
+        }
 
-                  if (chPressedSelector && chRecEraseTimer > 750){
-                      chRecEraseTimer = 0;
-                      display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
-                  } else if (chPressedSelector && chRecEraseTimer < 750) {
-                      for(int i=0; i<4; i++){
-                        if ((0b001 << i) & chPressedSelector){
-                          sequenceArray[i].initNewSequence(currentPattern, i);
-                        }
-                      }
-                      display->displayModal(750, MODAL_ERASED, chPressedSelector);
-                  } else {
-                    if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-                      for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
-                        outputControl->allNotesOff(channel);
-                      }
-                    }
-                    playing = false;
+        if (chPressedSelector && chRecEraseTimer > 750){
+            chRecEraseTimer = 0;
+            display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
+        } else if (chPressedSelector && chRecEraseTimer < 750) {
+            for(int i=0; i<4; i++){
+              if ((0b001 << i) & chPressedSelector){
+                sequenceArray[i].initNewSequence(currentPattern, i);
+              }
+            }
+            display->displayModal(750, MODAL_ERASED, chPressedSelector);
+        } else {
+          if (!playing){ //if the sequence is already paused, stop kills all internal sound.
+            for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
+              outputControl->allNotesOff(channel);
+            }
+          }
+          playing = false;
 
-                    for(int s = 0; s < SEQUENCECOUNT; s++){
-                      sequenceArray[s].clockReset(true);
-                    }
+          for(int s = 0; s < SEQUENCECOUNT; s++){
+            sequenceArray[s].clockReset(true);
+          }
 
-                  }
-                  STOPEND:
-                  break;
+        }
+        STOPEND:
+        break;
 
         case SW_PATTERN:
           globalObj->multiSelectSwitch = false;
@@ -1761,3 +1777,20 @@ void InputModule::calibrationMenuHandler(){
   }
 
 }
+
+uint8_t InputModule::getChannelButtonSw(uint8_t channel){
+  switch(channel){
+    case 0:
+      return SW_CH0;
+    break;
+    case 1:
+      return SW_CH1;
+    break;
+    case 2:
+      return SW_CH2;
+    break;
+    case 3:
+      return SW_CH3;
+    break;
+  }
+};

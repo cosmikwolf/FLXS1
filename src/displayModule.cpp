@@ -456,13 +456,28 @@ void DisplayModule::modalDisplay(){
       displayElement[0] = strdup("SAVED");
       goto singleTextDisplay;
     case MODAL_COPY_STEP:
-      displayElement[0] = strdup("STEP COPY");
+    sprintf(buf, "STEP %d COPY", globalObj->stepCopyIndex+1 );
+      displayElement[0] = strdup(buf);
       goto singleTextDisplay;
     case MODAL_PASTE_STEP:
       displayElement[0] = strdup("STEP PASTE");
       goto singleTextDisplay;
     case MODAL_CLEAR_STEP:
-      displayElement[0] = strdup("STEP CLEAR");
+      sprintf(buf, "STEP %d CLEAR", globalObj->stepCopyIndex+1 );
+      displayElement[0] = strdup(buf);
+      goto singleTextDisplay;
+    case MODAL_COPY_CHANNEL:
+      sprintf(buf, "CHANNEL %d", globalObj->chCopyIndex+1 );
+      displayElement[0] = strdup(buf);
+      displayElement[1] = strdup("COPY");
+      goto singleTextDisplay;
+    case MODAL_PASTE_CHANNEL:
+      displayElement[0] = strdup("CHANNEL PASTE");
+      goto singleTextDisplay;
+    case MODAL_CLEAR_CHANNEL:
+      sprintf(buf, "CHANNEL %d", globalObj->chCopyIndex+1 );
+      displayElement[0] = strdup(buf);
+      displayElement[1] = strdup("CHANNEL CLEAR");
       goto singleTextDisplay;
 
       singleTextDisplay:

@@ -45,6 +45,8 @@ void GlobalVariable::initialize(){
       this->midiSetClockOut = false;
       this->calibrationBuffer = 0;
       this->stepCopyIndex = 255;
+      this->chCopyIndex = 255;
+      
        for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
        for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };
        for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 0; };

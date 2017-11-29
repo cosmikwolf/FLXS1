@@ -144,7 +144,7 @@ class Sequencer
 		uint8_t 	pulsesPerBeat;
 		uint16_t	ppqPulseIndex;
 
-		uint32_t lastStepFrame;
+		uint32_t  lastStepFrame;
 		uint32_t	framesPerPulse;
 		uint32_t 	avgClocksPerPulse;
 		uint32_t 	lastPulseClockCount;

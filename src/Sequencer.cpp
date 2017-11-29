@@ -166,9 +166,7 @@ uint32_t Sequencer::getCurrentFrame(){
 
   //Serial.println("CurrentFrame: " + String(currentFrame) + "\tavgCpp: " + String(avgClocksPerPulse) + "\tclockcount:" + String(clockCount));
   //  activeStep = isFrameSwinging(currentFrame);
-  uint32_t framesSinceLastStep = 0;
   uint8_t preSwingActivestep = 0;
-  framesSinceLastStep  =  currentFrame % getStepLength() ;
 
   if (playDirection == PLAY_REVERSE) {
     preSwingActivestep = firstStep + stepCount - currentFrame / getStepLength();
@@ -202,7 +200,7 @@ uint32_t Sequencer::getCurrentFrame(){
         swinging = false;
       }
     }
-
+    
     activeStep = min_max_cycle(activeStep, firstStep, firstStep+stepCount-1);
   };
 

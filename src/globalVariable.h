@@ -70,6 +70,7 @@ class GlobalVariable {
     uint8_t activeGate;
     uint8_t rheoTestLevel;
     uint8_t stepCopyIndex;
+    uint8_t chCopyIndex;
 
     bool muteChannelSelect[4];
     bool parameterSelect;

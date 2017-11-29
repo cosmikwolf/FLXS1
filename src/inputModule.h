@@ -77,6 +77,7 @@ public:
   void resetKnobValues();
   void changeState(uint8_t state);
 
+  uint8_t getChannelButtonSw(uint8_t channel);
   elapsedMillis chRecEraseTimer;
   bool chRecEraseSwitch;
   uint8_t chPressedSelector;
