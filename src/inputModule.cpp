@@ -512,6 +512,7 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_QUANTIZESCALE:
     case STATE_QUANTIZEKEY:
     case STATE_QUANTIZEMODE:
+    case STATE_PLAYMODE:
       currentMenu = QUANTIZE_MENU;
       break;
     case STATE_NOTEDISPLAY:
@@ -674,8 +675,8 @@ void InputModule::sequenceMenuHandler(){
           //sequenceArray[selectedChannel].firstStepChanged == TRUE;
           break;
         case STATE_STEPCOUNT:
-          sequenceArray[selectedChannel].stepCount = min_max(sequenceArray[selectedChannel].stepCount + knobChange, 1, 64);
-
+          //sequenceArray[selectedChannel].stepCount = min_max(sequenceArray[selectedChannel].stepCount + knobChange, 1, 64);
+          sequenceArray[selectedChannel].setStepCount(min_max(sequenceArray[selectedChannel].stepCount + knobChange, 1, 64));
           // if (sequenceArray[selectedChannel].stepCount == 0) {
           //   sequenceArray[selectedChannel].stepCount = 64;
           // }
@@ -697,7 +698,9 @@ void InputModule::sequenceMenuHandler(){
         case STATE_QUANTIZESCALE:
           sequenceArray[selectedChannel].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 3);
           break;
-
+        case STATE_PLAYMODE:
+          sequenceArray[selectedChannel].playMode = positive_modulo(sequenceArray[selectedChannel].playMode + knobChange, 4);
+          break;
         case STATE_RESETINPUT:
           sequenceArray[selectedChannel].gpio_reset = min_max_skip(sequenceArray[selectedChannel].gpio_reset, knobChange, -9, 8, selectedChannel+5);
 
@@ -1075,17 +1078,21 @@ uint8_t chanSwIndex;
         break;
 
         case SW_REC:
-          for(int sw=0; sw<16; sw++){
-            if(midplaneGPIO->pressed(sw)){
-              display->displayModal(750, MODAL_PASTE_STEP);
-              sequenceArray[selectedChannel].stepData[getNote(sw)] = sequenceArray[selectedChannel].stepData[globalObj->stepCopyIndex];
+          if(globalObj->stepCopyIndex < 64){
+            for(int sw=0; sw<16; sw++){
+              if(midplaneGPIO->pressed(sw)){
+                display->displayModal(750, MODAL_PASTE_STEP);
+                sequenceArray[selectedChannel].stepData[getNote(sw)] = sequenceArray[selectedChannel].stepData[globalObj->stepCopyIndex];
+              }
             }
           }
-          for(int ch=0; ch<4; ch++){
-            if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
-              sequenceArray[ch] = sequenceArray[globalObj->chCopyIndex];
-              sequenceArray[ch].channel = ch;
-              display->displayModal(750, MODAL_PASTE_CHANNEL);
+          if(globalObj->chCopyIndex < 4){
+            for(int ch=0; ch<4; ch++){
+              if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
+                sequenceArray[ch] = sequenceArray[globalObj->chCopyIndex];
+                sequenceArray[ch].channel = ch;
+                display->displayModal(750, MODAL_PASTE_CHANNEL);
+              }
             }
           }
 
@@ -1653,8 +1660,9 @@ void InputModule::calibrationMenuHandler(){
               globalObj->dacCalibrationNeg[dacMap[n]] = (5*calibLow - 3*calibHigh)/2;
 
 
-            //  int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/115;
-              int compensation = 0;
+              //int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/115;
+              int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/500;
+            //  int compensation = 0 ;
               globalObj->dacCalibrationPos[dacMap[n]] = globalObj->dacCalibrationPos[dacMap[n]] - compensation;
               globalObj->dacCalibrationNeg[dacMap[n]] = globalObj->dacCalibrationNeg[dacMap[n]] + compensation;
 

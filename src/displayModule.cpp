@@ -46,7 +46,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
-  oled.fillScreen(RED);
+  oled.fillScreen(BLUE);
   oled.setCursor(CENTER,8);
   oled.setTextColor(BLACK);
   oled.setFont(&LadyRadical_16);//this will load the font
@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setCursor(CENTER,110);
   oled.setTextColor(BLACK);
-  oled.println("beta v0.17f");
+  oled.println("beta v0.17h");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -1085,15 +1085,6 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
    displayElement[5] = strdup(buf);
 
-  // if (sequenceArray[selectedChannel].gpio_skipstep < 4){
-  //   sprintf(buf, "gi%d", sequenceArray[selectedChannel].gpio_skipstep +1 );
-  //   displayElement[6] = strdup(buf);
-  // } else if (sequenceArray[selectedChannel].gpio_skipstep > 5){
-  //   sprintf(buf, "ch%d", sequenceArray[selectedChannel].gpio_skipstep +1 );
-  //   displayElement[6] = strdup(buf);
-  // } else {
-  //   displayElement[6] = strdup("--");
-  // }
     gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
     displayElement[6] = strdup(buf);
 
@@ -1167,10 +1158,10 @@ void DisplayModule::scaleMenuDisplay(){
 
      displayElement[0] = strdup(buf);
 
-     displayElement[9] = strdup("scale:");
+     displayElement[3] = strdup("scale:");
      char *scaleArray[] = {"semitone", "pythagorean", "colundi"};
 
-      displayElement[10] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
+      displayElement[4] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
 
      displayElement[5] = strdup("key:");
      char *keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
@@ -1188,17 +1179,36 @@ void DisplayModule::scaleMenuDisplay(){
        break;
      }
 
+     switch(sequenceArray[selectedChannel].playMode){
+       case PLAY_FORWARD:
+        displayElement[10] = strdup("FWD");
+       break;
+       case PLAY_REVERSE:
+        displayElement[10] = strdup("REV");
+       break;
+       case PLAY_RANDOM:
+        displayElement[10] = strdup("RNDM");
+       break;
+       case PLAY_PENDULUM:
+        displayElement[10] = strdup("PEND");
+       break;
+     }
+     displayElement[9] = strdup("direction:");
+
 
      renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
 
-     renderStringBox(9,  DISPLAY_LABEL,           0, 15,48,16, false, STYLE1X, background , foreground);
-     renderStringBox(10,  STATE_QUANTIZESCALE,    48, 15,79,16, false, STYLE1X, background , foreground);
+     renderStringBox(3,  DISPLAY_LABEL,           0, 15,48,16, false, STYLE1X, background , foreground);
+     renderStringBox(4,  STATE_QUANTIZESCALE,    48, 15,79,16, false, STYLE1X, background , foreground);
 
      renderStringBox(5,  DISPLAY_LABEL,        0, 31,48,16, false, STYLE1X, background , foreground);
      renderStringBox(6,  STATE_QUANTIZEKEY,     48, 31,79,16, false, STYLE1X, background , foreground);
 
      renderStringBox(7,  DISPLAY_LABEL,        0, 47,48,16, false, STYLE1X, background , foreground);
      renderStringBox(8,  STATE_QUANTIZEMODE,     48, 47, 79,16, false, STYLE1X, background , foreground);
+
+     renderStringBox(9,  DISPLAY_LABEL,   0,  63,89,16, false, STYLE1X, background , foreground);
+     renderStringBox(10,  STATE_PLAYMODE,    72, 63, 55,16, false, STYLE1X, background , foreground);
 
 };
 
@@ -1377,6 +1387,18 @@ displayElement[7] = strdup("arp intvl:");
   cvMappingText(buf, sequenceArray[selectedChannel].cv_arpintmod);
  displayElement[8] = strdup(buf);
 
+
+ if(sequenceArray[selectedChannel].skipStepCount == 0){
+   sprintf(buf, "skip rndm:" );
+ } else {
+   sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
+ }
+
+ displayElement[9] = strdup(buf);
+
+  gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
+  displayElement[10] = strdup(buf);
+
 /*
 displayElement[9] = strdup("GLIDETIME:");
 
@@ -1396,6 +1418,8 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
    renderStringBox(6,  STATE_ARPOCTMOD, 90,   47,  37,16, false, STYLE1X, background , foreground);
    renderStringBox(7,  DISPLAY_LABEL,      0,   63,  64,16, false, STYLE1X, background , foreground);
    renderStringBox(8,  STATE_ARPINTMOD,    90,   63,  37,16, false, STYLE1X, background , foreground);
+   //renderStringBox(9,  STATE_SKIPSTEPCOUNT, 0,   79,  64,16, false, STYLE1X, background , foreground);
+   //renderStringBox(10,  STATE_SKIPSTEP,    90,   79,  37,16, false, STYLE1X, background , foreground);
    //renderStringBox(9,  DISPLAY_LABEL,      0,   79,  64,16, false, STYLE1X, background , foreground);
    //renderStringBox(10,  STATE_GLIDEMOD,   96,   79,  32,16, false, STYLE1X, background , foreground);
 

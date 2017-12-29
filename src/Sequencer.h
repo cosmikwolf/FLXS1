@@ -27,8 +27,9 @@ class Sequencer
 
     void    stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
 
-		uint32_t    framesPerSequence();
-		uint32_t   	getCurrentFrame();
+		uint32_t  framesPerSequence();
+		uint32_t	calculateCurrentFrame();
+		void   	calculateActiveStep();
 
 		void 		clockStart();
 		void 		clockReset(bool activeStepReset);
@@ -55,6 +56,8 @@ class Sequencer
     void    setPlayRange(uint8_t first, uint8_t last);
 		void 		setBeatCount(uint16_t beatCountNew);
 
+		void 		setStepCount(uint8_t newStepCount);
+
 		void 		gateInputTrigger(uint8_t inputNum);
 		uint32_t framesPerBeat(int tempoX100);
 
@@ -76,8 +79,8 @@ class Sequencer
 
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
-		uint8_t   getArpCount(uint8_t stepNum);
-    uint32_t  getArpStartFrame(uint8_t stepNum, uint8_t arpNum);
+		uint16_t  getArpCount(uint8_t stepNum);
+    uint32_t  getArpStartFrame(uint8_t stepNum, uint16_t arpNum);
 		uint8_t  getArpSpeedNumerator(uint8_t stepNum);
 		uint8_t  getArpSpeedDenominator(uint8_t stepNum);
 
@@ -89,7 +92,7 @@ class Sequencer
     bool      swingSwitch;
     bool      swinging;
 		bool			receivedFirstExtClock;
-
+		bool 			pendulumSwitch;
 //		uint8_t previousActiveStepSeqMode; // debug variable
     uint8_t 	swingCount;
 		uint8_t	 	activeStep;
@@ -98,7 +101,7 @@ class Sequencer
 		uint8_t 	stepsPlayed;
 
     uint8_t   swingX100;
-    uint8_t   playDirection; //forward, backward, pendulum
+    uint8_t   playMode; //forward, backward, pendulum
     uint8_t   skipStepCount;
     uint8_t		randomLow;
     uint8_t		randomHigh;
@@ -141,6 +144,7 @@ class Sequencer
 		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
 
 		uint8_t	 	lastActiveStep;
+		uint8_t	 	lastStepIndex;
 		uint8_t 	pulsesPerBeat;
 		uint16_t	ppqPulseIndex;
 

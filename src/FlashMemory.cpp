@@ -289,7 +289,7 @@ void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pa
   seqSettingsArray.add(sequenceArray[channel].cv_glidemod);         // array index: 17
   seqSettingsArray.add(sequenceArray[channel].firstStep);           // array index: 18
   seqSettingsArray.add(sequenceArray[channel].swingX100);           // array index: 19
-  seqSettingsArray.add(sequenceArray[channel].playDirection);       // array index: 20
+  seqSettingsArray.add(sequenceArray[channel].playMode);       // array index: 20
   seqSettingsArray.add(sequenceArray[channel].skipStepCount);       // array index: 21
   seqSettingsArray.add(sequenceArray[channel].randomLow);           // array index: 22
   seqSettingsArray.add(sequenceArray[channel].randomHigh);          // array index: 23
@@ -349,7 +349,7 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
    sequenceArray[channel].cv_glidemod      = jsonReader["settings"][17];
    sequenceArray[channel].firstStep        = jsonReader["settings"][18];
    sequenceArray[channel].swingX100        = jsonReader["settings"][19];
-   sequenceArray[channel].playDirection    = jsonReader["settings"][20];
+   sequenceArray[channel].playMode    = jsonReader["settings"][20];
    sequenceArray[channel].skipStepCount    = jsonReader["settings"][21];
    sequenceArray[channel].randomLow        = jsonReader["settings"][22];
    sequenceArray[channel].randomHigh       = jsonReader["settings"][23];

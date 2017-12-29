@@ -254,6 +254,7 @@ int positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);
 int min_max_cycle(int value, int min, int max);
+int min_max_wrap(int value, int first, int count, int max);
 int min_max_skip(int original, int change, int min, int max, int skip);
 
 int intFloatHundreds(int value);

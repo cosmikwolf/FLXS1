@@ -362,12 +362,12 @@ void midiTimeCodePointerWrapper(uint16_t data){
 }
 
 void midiSongPositionPointerWrapper(uint16_t songPosition){
-  Serial.println("Song position Pointer: " + String(songPosition));
+  //Serial.println("Song position Pointer: " + String(songPosition));
   midiControl.midiSongPosition(songPosition);
 }
 
 void usbMidiRealTimeMessageHandler(byte realtimebyte) {
-  Serial.println("realTimeMessage!:\t" + String(realtimebyte));
+  //Serial.println("realTimeMessage!:\t" + String(realtimebyte));
   switch(realtimebyte){
     case 248:
     midiControl.midiClockPulseHandler();
@@ -382,7 +382,7 @@ void usbMidiRealTimeMessageHandler(byte realtimebyte) {
     midiControl.midiStopHandler();
     break;
   }
-
+  
 
   if (realtimebyte == 248) {
   };

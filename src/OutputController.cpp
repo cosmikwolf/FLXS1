@@ -889,8 +889,13 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   // update modulation destinations
 
   //add offset amount:
-
   voltageLevel += cv2offset[channel]*128;
+
+  if (voltageLevel > 16384){
+    voltageLevel = 16384-(voltageLevel-16384);
+  } else if( voltageLevel < -16384){
+    voltageLevel = -16384+(abs(voltageLevel)-16384);
+  }
 
   if( !skipUpdate){
     globalObj->cvInputRaw[4+2*channel+1] = voltageLevel;

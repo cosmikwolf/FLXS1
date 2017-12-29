@@ -202,7 +202,7 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
     return; //don't let a channel reset or y axis itself.
   }
   if (gpio_reset == inputNum){
-    this->clockReset(false);
+    this->clockReset(true);
   }
 
   if(gpio_skipstep == inputNum){
@@ -217,10 +217,38 @@ void Sequencer::skipStep(uint8_t count){
   if (count == 0){
     count = random(1, 16);
   }
-  uint16_t oldPpqPulseIndex = ppqPulseIndex;
-  ppqPulseIndex = (ppqPulseIndex + count*pulsesPerBeat/clockDivision) % (pulsesPerBeat*stepCount/clockDivision );
-  for(int stepNum = 0; stepNum < stepCount; stepNum++){
-    stepData[stepNum].framesRemaining += oldPpqPulseIndex-ppqPulseIndex;
+  // uint16_t oldPpqPulseIndex = ppqPulseIndex;
+  // ppqPulseIndex = (ppqPulseIndex + count*pulsesPerBeat/clockDivision) % (pulsesPerBeat*stepCount/clockDivision );
+  // for(int stepNum = 0; stepNum < stepCount; stepNum++){
+  //   stepData[stepNum].framesRemaining += oldPpqPulseIndex-ppqPulseIndex;
+  // }
+	switch(playMode){
+		case PLAY_REVERSE:
+		activeStep -= count;
+		break;
+		case PLAY_PENDULUM:
+			if(pendulumSwitch){
+				activeStep += count;
+			} else {
+				activeStep -= count;
+			}
+		break;
+		default:
+		activeStep += count;
+		break;
+
+	}
+
+	int32_t framesToSubtract = getStepLength()*count;
+
+	activeStep = min_max_wrap(activeStep, firstStep, stepCount, MAX_STEPS_PER_SEQUENCE);
+	for(int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+
+		if(framesToSubtract >= stepData[stepNum].framesRemaining){
+			stepData[stepNum].framesRemaining = 0;
+		} else {
+			stepData[stepNum].framesRemaining -= framesToSubtract;
+		}
   }
 }
 
@@ -380,7 +408,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
     stepData[stepNum].framesRemaining += (2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod) )*   framesPerBeat(tempoX100) * clockDivisionNum() / (8*clockDivisionDen());
 
 		if (swingX100 != 50 ){
-      if ((stepNum + swingSwitch) % 2){
+      if (!swinging){
 				stepData[stepNum].framesRemaining *= 200-2*swingX100;
 				stepData[stepNum].framesRemaining /= 100;
       } else {
@@ -435,8 +463,8 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 
 		if (swingX100 != 50 ){
-			if ((stepNum + swingSwitch + (stepData[stepNum].arpStatus * getArpSpeedNumerator(stepNum)) / getArpSpeedDenominator(stepNum)
-) % 2){
+			//if ((stepNum + swingSwitch + (stepData[stepNum].arpStatus * getArpSpeedNumerator(stepNum)) / getArpSpeedDenominator(stepNum)) % 2){
+			if (!swinging) {
 				stepData[stepNum].framesRemaining *= 200-2*swingX100;
 				stepData[stepNum].framesRemaining /= 100;
       } else {
@@ -475,10 +503,10 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 }
 
-uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint8_t arpNum){
+uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint16_t arpNum){
   int32_t stepFrames = (stepNum-firstStep)*getStepLength();
-  uint8_t arpFullSteps = arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum);
-	uint8_t arpRemainder = arpNum - arpFullSteps *getArpSpeedDenominator(stepNum)/ getArpSpeedNumerator(stepNum);
+  uint16_t arpFullSteps = arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum);
+	uint16_t arpRemainder = arpNum - arpFullSteps *getArpSpeedDenominator(stepNum)/ getArpSpeedNumerator(stepNum);
 
 	if(swingX100 == 50){
 		stepFrames += arpNum * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum); //unscaled arp frames
@@ -515,8 +543,8 @@ uint8_t  Sequencer::getArpSpeedDenominator(uint8_t stepNum){
 	}
 };
 
-uint8_t Sequencer::getArpCount(uint8_t stepNum){
-	uint8_t arpCount;
+uint16_t Sequencer::getArpCount(uint8_t stepNum){
+	uint16_t arpCount;
 
 	if (arpTypeModulated[stepNum] == ARPTYPE_OFF) {
 		arpCount = 0;
@@ -541,10 +569,10 @@ void Sequencer::setPlayRange(uint8_t first, uint8_t last){
   stepCount = abs(last - first)+1;
   if (first < last){
     firstStep = first + notePage*16;
-    playDirection = PLAY_FORWARD;
+    playMode = PLAY_FORWARD;
   } else {
     firstStep = last + notePage*16;
-    playDirection = PLAY_REVERSE;
+    playMode = PLAY_REVERSE;
   }
   skipNextNoteTrigger = true;
 };

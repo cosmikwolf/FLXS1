@@ -133,6 +133,15 @@ int min_max_skip(int original, int change, int min, int max, int skip){
   }
 }
 
+// if first = 48 & step = 32, go from 48 to 16
+//63 -> 63
+//64 -> 0
+//1 -> 1
+
+int min_max_wrap(int value, int first, int count, int max){
+	return (((value - (first)) % (count) ) + first ) % (max);
+}
+
 int min_max_cycle(int value, int min, int max){
 	//cycle through back to
 	if (value < min){
