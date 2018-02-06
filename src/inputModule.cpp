@@ -317,7 +317,7 @@ void InputModule::loop(uint16_t frequency){
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
 
-    if(globalObj->dataInputStyle){
+     if(globalObj->dataInputStyle){
       if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
         globalObj->parameterSelect = !globalObj->parameterSelect;
       }
@@ -367,7 +367,7 @@ void InputModule::loop(uint16_t frequency){
       }
     }
 
-    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) ){
+    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) && midplaneGPIO->pressed(SW_MENU) ){
       changeState(STATE_CALIBRATION);
     }
 
@@ -1383,7 +1383,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
           sequenceArray[channel].stepData[stepNum].arpSpdNum = min_max(sequenceArray[channel].stepData[stepNum].arpSpdNum + change, 1, 16) ;
         break;
         case STATE_ARPSPEEDDEN:
-          sequenceArray[channel].stepData[stepNum].arpSpdDen = min_max(sequenceArray[channel].stepData[stepNum].arpSpdDen + change, 1, 64);
+          sequenceArray[channel].stepData[stepNum].arpSpdDen = min_max(sequenceArray[channel].stepData[stepNum].arpSpdDen + change, 1, 32);
         break;
 
         case STATE_ARPOCTAVE:

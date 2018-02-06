@@ -430,17 +430,17 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		if (stepData[stepNum].arpLastFrame < getStepLength() / 64){
 			stepData[stepNum].arpLastFrame = getStepLength() / 64;
 		}
-//      Serial.println(
-//      "stepNum: " + String(stepNum) +
-// //     "\tgateLength: " + String(stepData[stepNum].gateLength) +
-// // //    "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-//      "\tcurrentFrame: "  + String(currentFrame) +
-// //     "\tswinging: " + String(swingCount % 2) +
-//      "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-//      "\tgetStepLength: " + String(getStepLength()) +
-//     "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame)
-//   //  "\t(2*swingX100-100): " + String((2*swingX100-100))
-//   );
+//  Serial.println(
+//  "stepNum: " + String(stepNum) +
+//    "\tgateLength: " + String(stepData[stepNum].gateLength) +
+//     "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+//  //"\tcurrentFrame: "  + String(currentFrame) +
+//    "\tswinging: " + String(swingCount % 2) +
+//  "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+//  "\tgetStepLength: " + String(getStepLength()) +
+// "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
+// "\tarptype: "  + String(stepData[stepNum].arpType)
+//    );
 
 	} else {
 
@@ -482,6 +482,20 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	}
 
+/*
+	Serial.println(
+	"millis: " + String(millis()) +
+	"\tstepNum: " + String(stepNum) +
+  //"\tgateLength: " + String(stepData[stepNum].gateLength) +
+  //"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+  //"\tcurrentFrame: "  + String(currentFrame) +
+  //"\tswinging: " + String(swingCount % 2) +
+  //"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+  //"\tgetStepLength: " + String(getStepLength()) +
+ 	//"\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
+ 	"\tarptype: "  + String(stepData[stepNum].arpType)
+);
+*/
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
 
 	//END INPUT MAPPING SECTION

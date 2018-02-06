@@ -46,7 +46,7 @@ void GlobalVariable::initialize(){
       this->calibrationBuffer = 0;
       this->stepCopyIndex = 255;
       this->chCopyIndex = 255;
-      
+
        for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
        for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };
        for(int i=0; i<4; i++){ this->adcCalibrationPos[i]= 0; };
@@ -58,7 +58,7 @@ void GlobalVariable::initialize(){
 
 void GlobalVariable::initGlobals(){
   this->dataInputStyle = 0;
-  this->pageButtonStyle = 0;
+  this->pageButtonStyle = 1;
   this->outputNegOffset[0] = 2;
   this->outputNegOffset[1] = 2;
   this->outputNegOffset[2] = 2;

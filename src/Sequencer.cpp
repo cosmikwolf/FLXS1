@@ -114,7 +114,7 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     }
     if(playing){
       ppqPulseIndex++;
-      ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount/clockDivisionDen());
+      ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
     }
   }
 
@@ -384,16 +384,20 @@ void Sequencer::sequenceModeStandardStep(){
       //stepData[activeStep].offset = currentFrame;
     }
   }
+  //return (((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse) ) % framesPerSequence() ;
 
-  // if(previousActiveStepSeqMode != activeStep && channel == 0){
-  //   for (int stepNum = 0; stepNum <= (firstStep + stepCount); stepNum++){
-  //     if(stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-  //       Serial.println(String(stepNum) + " - " + String(stepData[stepNum].framesRemaining) + "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame));
-  //     } else {
-  //       Serial.println("----");
-  //     }
-  //   }
-  //   Serial.println(" ");
-  // }
-  // previousActiveStepSeqMode = activeStep;
+  if(previousActiveStepSeqMode != activeStep && channel == 0){
+    Serial.println("ActiveStep: " + String(activeStep) + "\tppqIndex: " + String(ppqPulseIndex) + "\tcurrentFrame: " + String(currentFrame) + "\tStepLength: " + String(getStepLength()) + "\tframesPerSequence: " + String(framesPerSequence()));
+    for (int stepNum = 0; stepNum <= (firstStep + stepCount); stepNum++){
+      if(stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
+        Serial.println(String(stepNum) + " - " + String(stepData[stepNum].framesRemaining) + "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame));
+      } else if(stepData[stepNum].noteStatus == BETWEEN_APEGGIATIONS ){
+        Serial.println("step: " + String(stepNum) + "\tArpStart: " + String(getArpStartFrame(stepNum, stepData[stepNum].arpStatus)) + "\tarpStatus: " + String(stepData[stepNum].arpStatus));
+      } else {
+        Serial.println(String(stepData[stepNum].noteStatus));
+      }
+    }
+    Serial.println(" ");
+  }
+  previousActiveStepSeqMode = activeStep;
 }

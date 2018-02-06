@@ -93,7 +93,7 @@ class Sequencer
     bool      swinging;
 		bool			receivedFirstExtClock;
 		bool 			pendulumSwitch;
-//		uint8_t previousActiveStepSeqMode; // debug variable
+		uint8_t previousActiveStepSeqMode; // debug variable
     uint8_t 	swingCount;
 		uint8_t	 	activeStep;
     uint8_t   firstStep; //first step to be played

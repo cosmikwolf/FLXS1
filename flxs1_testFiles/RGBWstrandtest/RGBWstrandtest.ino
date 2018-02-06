@@ -34,13 +34,10 @@ delay(300);
   colorWipe(strip.Color(0, 0, 0, 255), 0); // White
   delay(300);
 
-for(int i=0; i<10; i++){
+for(int i=0; i<100; i++){
     colorWipe(strip.Color(255, 0, 0), 0); // Red
-delay(1);
   colorWipe(strip.Color(0, 255, 0), 0); // Green
-delay(1);
   colorWipe(strip.Color(0, 0, 255), 0); // Blue
-delay(1);
   colorWipe(strip.Color(0, 0, 0, 255), 0); // White  
 }
 
