@@ -33,6 +33,7 @@ class Sequencer
 
 		void 		clockStart();
 		void 		clockReset(bool activeStepReset);
+		void 		updateClockDivision(int8_t clockDiv);
 		void 		ppqPulse(uint8_t pulsesPerBeat);
 		bool 		toggleMute(uint8_t index);  //returns true if target was muted
 
@@ -81,6 +82,7 @@ class Sequencer
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint16_t  getArpCount(uint8_t stepNum);
     uint32_t  getArpStartFrame(uint8_t stepNum, uint16_t arpNum);
+		uint32_t getArpLastFrame(uint8_t stepNum, uint16_t arpNum);
 		uint8_t  getArpSpeedNumerator(uint8_t stepNum);
 		uint8_t  getArpSpeedDenominator(uint8_t stepNum);
 

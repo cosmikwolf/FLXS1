@@ -256,7 +256,7 @@ void Sequencer::jumpToStep(uint8_t stepNum){
 //  Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
 
   uint16_t oldPpqPulseIndex = ppqPulseIndex;
-  ppqPulseIndex = (stepNum*pulsesPerBeat/clockDivision);
+  ppqPulseIndex = clockDivisionNum()*stepNum*pulsesPerBeat/clockDivisionDen();
   for(int stepNum = 0; stepNum < stepCount; stepNum++){
     stepData[stepNum].framesRemaining += ppqPulseIndex;
   }
@@ -400,6 +400,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	}
   if (stepData[stepNum].arpStatus == 0){
     stepData[stepNum].framesRemaining = 0;
+		stepData[stepNum].stepStartFrame = currentFrame;
   }
 	if(stepData[stepNum].arpType == ARPTYPE_OFF){
 		// THIS INPUT MAPPING STILL NEEDS WORK.
@@ -416,14 +417,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 				stepData[stepNum].framesRemaining /= 100;
       }
     }
-    //stepData[stepNum].arpLastFrame =  stepData[stepNum].framesRemaining / 4;
-  //  stepData[stepNum].arpLastFrame =  getStepLength()/;
-
-    if( stepData[stepNum].framesRemaining < getStepLength()){
-//      stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining /8;
-    } else {
-  //    stepData[stepNum].arpLastFrame = getStepLength()/8;
-    }
 
 		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/5 ;
 
@@ -438,7 +431,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 //    "\tswinging: " + String(swingCount % 2) +
 //  "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
 //  "\tgetStepLength: " + String(getStepLength()) +
-// "\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
 // "\tarptype: "  + String(stepData[stepNum].arpType)
 //    );
 
@@ -448,19 +440,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
     stepData[stepNum].framesRemaining *= getArpSpeedNumerator(stepNum);
     stepData[stepNum].framesRemaining /= getArpSpeedDenominator(stepNum);
     stepData[stepNum].framesRemaining /= clockDivisionDen();
-
-		//stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/3;
-    //stepData[stepNum].arpLastFrame =  FRAMES_PER_BEAT * clockDivisionNum() / (8 * clockDivisionDen()); // stop notes 1/8 early.
-
-    // if (swinging){
-    //   stepData[stepNum].framesRemaining *= 200 - 2*swingX100;
-    //   stepData[stepNum].framesRemaining /= 100;
-    // } else {
-    //   stepData[stepNum].framesRemaining *= 2*swingX100;
-    //   stepData[stepNum].framesRemaining /= 100;
-    // }
-
-
 
 		if (swingX100 != 50 ){
 			//if ((stepNum + swingSwitch + (stepData[stepNum].arpStatus * getArpSpeedNumerator(stepNum)) / getArpSpeedDenominator(stepNum)) % 2){
@@ -478,8 +457,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			stepData[stepNum].arpLastFrame = getStepLength() / 16;
 		}
 
-		//Serial.println("Setting note with gate length:\tframesremaining; " + String(stepData[stepNum].framesRemaining) + "\tarplastframe: " + String(stepData[stepNum].arpLastFrame) + "\tSL: " + String(getStepLength()));
-
 	}
 
 /*
@@ -492,11 +469,10 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //"\tswinging: " + String(swingCount % 2) +
   //"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
   //"\tgetStepLength: " + String(getStepLength()) +
- 	//"\tarpLastFrame: " + String(stepData[stepNum].arpLastFrame) +
  	"\tarptype: "  + String(stepData[stepNum].arpType)
 );
 */
-  //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) + "arpLastFrame: " + String(stepData[stepNum].arpLastFrame));
+  //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) );
 
 	//END INPUT MAPPING SECTION
 	outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1, currentFrame, stepData[stepNum].arpStatus );
@@ -516,30 +492,28 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 
 }
+uint32_t Sequencer::getArpLastFrame(uint8_t stepNum, uint16_t arpNum){
+
+}
 
 uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint16_t arpNum){
-  int32_t stepFrames = (stepNum-firstStep)*getStepLength();
+  uint32_t stepFrames = stepData[stepNum].stepStartFrame;
   uint16_t arpFullSteps = arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum);
 	uint16_t arpRemainder = arpNum - arpFullSteps *getArpSpeedDenominator(stepNum)/ getArpSpeedNumerator(stepNum);
 
 	if(swingX100 == 50){
 		stepFrames += arpNum * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum); //unscaled arp frames
-
 	} else if ((stepNum + swingSwitch + (arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum) ) % 2)){
 		stepFrames += arpFullSteps	* getStepLength(); //full steps within the arpeggiation
 		stepFrames += (getStepLength() * 2 * swingX100)/ 100 - getStepLength(); // swing step offset
 		stepFrames += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum) )*(200-2*swingX100)/100; //scaled arp frames
 		//Serial.println("+ swing Arp " + String(arpNum) + "\t" + String(stepFrames) + "\tarpFullSteps: " + String(arpFullSteps) + "\tarpRemainder: " + String(arpRemainder) + "\tinitialStepFrames: " + String( (stepNum-firstStep)*getStepLength()) + "\tswingOffset: " + String( (getStepLength() * 2 * swingX100)/ 100 - getStepLength()) + "\tstepLength: " +  String(getStepLength()));
   } else {
-
 		stepFrames += arpFullSteps	* getStepLength(); //full steps within the arpeggiation
 		stepFrames += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum) )*(2*swingX100)/100; //scaled arp frames
-
 		//Serial.println("- swing Arp " + String(arpNum) + "\t" + String(stepFrames) + "\tarpFullSteps: " + String(arpFullSteps) + "\tarpRemainder: " + String(arpRemainder) + "\tinitialStepFrames: " + String( (stepNum-firstStep)*getStepLength()) + "\tswingOffset: " + String((getStepLength() * (100 - 2 * swingX100) )/ 100));
-
- }
+ };
  return stepFrames;
-
 };
 
 uint8_t  Sequencer::getArpSpeedNumerator(uint8_t stepNum){

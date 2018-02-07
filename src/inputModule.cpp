@@ -683,7 +683,7 @@ void InputModule::sequenceMenuHandler(){
           break;
         case STATE_BEATCOUNT:
            newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange, -16, 16);
-           sequenceArray[selectedChannel].clockDivision = newBeatDiv;
+           sequenceArray[selectedChannel].updateClockDivision(newBeatDiv);
         //   Serial.println("newBeatDiv: " + String(newBeatDiv));
           // Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
 
@@ -1118,13 +1118,8 @@ uint8_t chanSwIndex;
             }
             display->displayModal(750, MODAL_ERASED, chPressedSelector);
         } else {
-          if (!playing){ //if the sequence is already paused, stop kills all internal sound.
-            for(uint8_t channel = 0; channel < SEQUENCECOUNT; channel++){
-              outputControl->allNotesOff(channel);
-            }
-          }
-          playing = false;
 
+          playing = false;
           for(int s = 0; s < SEQUENCECOUNT; s++){
             sequenceArray[s].clockReset(true);
           }

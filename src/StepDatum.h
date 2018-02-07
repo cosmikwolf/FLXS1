@@ -25,7 +25,8 @@ typedef	struct StepDatum {
 	//int32_t			offset;		    // note start time offset in mcs from the beat start - recalculated each beat
 	uint16_t		arpStatus;		// if note is playing or not. Value indicates arp number.
 	uint32_t 	  framesRemaining;  // number of frames to continue playing.
-	uint32_t 	  arpLastFrame;  // When to end current arp.
+	uint32_t 	  stepStartFrame;  // frame where the arp started
+	uint32_t 	  arpLastFrame;  // arplastframe
 
   // uint8_t     test1;
   // uint8_t     test2;
