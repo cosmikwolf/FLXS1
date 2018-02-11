@@ -51,10 +51,6 @@ public:
   void stepModeMatrixHandler();
 
   void channelPitchModeInputHandler();
-  void channelVelocityModeInputHandler();
-  void channelEnvelopeModeInputHandler();
-  void channelStepModeInputHandler();
-  void channelInputInputHandler();
   void multiSelectInputHandler();
 
   void saveMenuInputHandler();
@@ -64,12 +60,10 @@ public:
   void globalMenuHandler();
   void tempoMenuHandler();
   void changeStepData(uint8_t channel, uint8_t stepNum, int change);
-  void setStepAbsolute(uint8_t channel, uint8_t stepNum, int value);
 
   void modMenu1_InputHandler();
   void modMenu2_InputHandler();
 
-  void timingMenuInputHandler();
   void debugScreenInputHandler();
   void calibrationMenuHandler();
   void calibrationSaveHandler();
@@ -78,6 +72,7 @@ public:
   void changeState(uint8_t state);
 
   uint8_t getChannelButtonSw(uint8_t channel);
+  int getChannelFromSw(int switchNum);
   elapsedMillis chRecEraseTimer;
   bool chRecEraseSwitch;
   uint8_t chPressedSelector;

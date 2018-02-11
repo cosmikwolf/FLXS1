@@ -1,31 +1,6 @@
 
 #ifndef _global_state_definitions_h_
 #define _global_state_definitions_h_
-//STATE DEFINITIONS:
-#define STEP_DISPLAY		     	 7
-#define TIMING_MENU 	      	 66
-#define GENERATIVE_MENU     	 71
-#define SEQUENCE_TRAN       	 67
-#define SEQUENCE_NAME       	 65
-#define SEQUENCE_QUAN       	 69
-#define SEQUENCE_EUCL       	 70
-#define SEQUENCE_ORDE       	 72
-#define SEQUENCE_RAND       	 73
-#define SEQUENCE_POSI       	 74
-#define SEQUENCE_GLID       	 75
-#define SEQUENCE_MIDI       	 76
-#define SEQUENCE_CV         	 77
-#define SEQUENCE_GATE       	 78
-#define GLOBAL_MIDI         	 91
-#define GLOBAL_SAVE         	 92
-#define GLOBAL_LOAD         	 93
-#define GLOBAL_FILE         	 94
-#define	CHANNEL_ENVELOPE_MODE	 99
-#define	CHANNEL_STEP_MODE		   241
-#define	CHANNEL_INPUT_MODE		 243
-#define	DELETE_MENU			    	 242
-#define	DEBUG_SCREEN		       127
-#define	INPUT_DEBUG_MENU		     125
 
 // MENUS
 #define	PITCH_GATE_MENU   1
@@ -46,6 +21,8 @@
 #define NOTE_DISPLAY      MENU_MODAL +1
 #define SAVE_MENU         NOTE_DISPLAY +1
 #define MENU_MULTISELECT  SAVE_MENU +1
+#define	INPUT_DEBUG_MENU		     MENU_MULTISELECT + 1
+
 //PITCH PAGE STEPMODES
 #define STATE_PITCH0       1
 #define STATE_GATELENGTH   STATE_PITCH0 +1
@@ -101,8 +78,11 @@
 #define STATE_CALIBRATION       STATE_PATTERNSELECT +1
 #define STATE_INPUTDEBUG        STATE_CALIBRATION +1
 
+//CHANNEL BUTTON SHORTCUTS
+#define STATE_SHORTCUT_RANDOM        STATE_INPUTDEBUG +1
+
 //GLOBAL MENU
-#define STATE_PG_BTN_SWITCH       STATE_INPUTDEBUG +1
+#define STATE_PG_BTN_SWITCH       STATE_SHORTCUT_RANDOM +1
 #define STATE_DATA_KNOB_SWITCH  STATE_PG_BTN_SWITCH + 1
 #define STATE_CH1_VOLT_RANGE      STATE_DATA_KNOB_SWITCH + 1
 #define STATE_CH2_VOLT_RANGE      STATE_CH1_VOLT_RANGE + 1

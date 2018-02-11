@@ -111,7 +111,7 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     }
     if(playing){
       ppqPulseIndex++;
-      ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
+    //  ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
     }
   }
 
@@ -175,6 +175,8 @@ uint32_t Sequencer::calculateCurrentFrame(){
   uint32_t unquantizedCF;
   int clockCount = 0;
 
+  BEGINCURRENTFRAME:
+
   // this prevents clocksSinceLastPulse from exceeding avgClocksPerPulse, which results in the currentFrame going backwards
    if(clockCycles-lastPulseClockCount >= avgClocksPerPulse){
      clockCount = avgClocksPerPulse - 1;
@@ -185,11 +187,13 @@ uint32_t Sequencer::calculateCurrentFrame(){
 
   unquantizedCF = ((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse);
   if (unquantizedCF >= framesPerSequence()){
-    //Serial.println("omg currentFrame Exceeded frames per sequence");
-    this->clockReset(true);
+//    Serial.println(String(channel) + " reset-------------");
+    this->clockReset(false);
+    goto BEGINCURRENTFRAME;
   }
 
-  return unquantizedCF % framesPerSequence();
+  //return unquantizedCF % framesPerSequence();
+  return unquantizedCF;
 
 }
 

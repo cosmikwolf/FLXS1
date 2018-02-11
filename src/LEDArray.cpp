@@ -93,13 +93,13 @@ void LEDArray::loop(uint16_t interval){
           channelGateModeLEDHandler();
         }
       break;
-      case CHANNEL_STEP_MODE:
-        if(globalObj->multiSelectSwitch){
-          multiSelectLEDHandler();
-        } else {
-          channelStepModeLEDHandler();
-        }
-      break;
+      // case CHANNEL_STEP_MODE:
+      //   if(globalObj->multiSelectSwitch){
+      //     multiSelectLEDHandler();
+      //   } else {
+      //     channelStepModeLEDHandler();
+      //   }
+      // break;
 
       case MENU_MULTISELECT:
       //  multiSelectLEDHandler();
@@ -364,7 +364,7 @@ void ledLoop(){
   noInterrupts();
   if (pixelTimer > 20000){
     switch (currentMenu ){
-      case STEP_DISPLAY:
+      case MENU_STEP_DISPLAY:
         for (int i=0; i < 16; i++){
           if (getNote(i) == sequenceArray[selectedChannel]->activeStep ){
             pixels.setPixelColor(ledMapping[i], pixels.Color(255,255,255) );

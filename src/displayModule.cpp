@@ -222,10 +222,6 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           channelTunerDisplay(buf);
         break;
 
-        case CHANNEL_INPUT_MODE:
-          channelInputDisplay(buf);
-        break;
-
         case GLOBAL_MENU_1:
           globalMenuDisplay();
         break;
