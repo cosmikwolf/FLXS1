@@ -251,15 +251,14 @@ void LEDArray::channelLEDHandler(){
 
 }
 void LEDArray::channelGateModeLEDHandler(){
-  for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
-    //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
-      leds.setPixelColor(ledChannelButtons[i], wheel(64));
 
+    if(playing){
+      leds.setPixelColor(0, wheel(64));
     } else {
-      leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);
+      leds.setPixelColor(0, wheel(255));
     }
-  }
+    channelLEDHandler();
+
   for (int i=0; i < 16; i++){
     if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
     //  leds[ledMapping[i]] = CRGB(255, 255, 255);
@@ -293,6 +292,12 @@ void LEDArray::channelGateModeLEDHandler(){
   }
 };
 void LEDArray::channelEnvelopeModeLEDHandler(){
+
+  if(playing){
+    leds.setPixelColor(0, wheel(64));
+  } else {
+    leds.setPixelColor(0, wheel(255));
+  }
   for (int i=0; i < 4; i++){
     if (selectedChannel == i) {
     //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);
@@ -306,6 +311,12 @@ void LEDArray::channelEnvelopeModeLEDHandler(){
 };
 
 void LEDArray::channelStepModeLEDHandler(){
+
+    if(playing){
+      leds.setPixelColor(0, wheel(64));
+    } else {
+      leds.setPixelColor(0, wheel(255));
+    }
   for (int i=0; i < 4; i++){
     if (selectedChannel == i) {
     //  leds[ledMapping[i+16]] = CHSV((sequenceArray[selectedChannel].patternIndex * 16) % 255,255,255);

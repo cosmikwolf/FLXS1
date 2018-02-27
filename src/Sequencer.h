@@ -28,7 +28,7 @@ class Sequencer
     void    stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
 
 		uint32_t  framesPerSequence();
-		uint32_t	calculateCurrentFrame();
+		uint32_t	getCurrentFrame();
 		void   	calculateActiveStep();
 
 		void 		clockStart();
@@ -60,6 +60,9 @@ class Sequencer
 		void 		setStepCount(uint8_t newStepCount);
 
 		void 		gateInputTrigger(uint8_t inputNum);
+
+		void 		randomize();
+
 		uint32_t framesPerBeat(int tempoX100);
 
     uint8_t clockDivisionNum(){

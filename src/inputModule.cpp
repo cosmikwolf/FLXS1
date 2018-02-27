@@ -29,6 +29,8 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   this->backplaneGPIO= backplaneGPIO;
   this->globalObj = globalObj;
   this->display = display;
+  this->shortcutRandomOctaveSpan = 2;
+  this->shortcutRandomSwitch = 5000;
 
   midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
 
@@ -361,6 +363,9 @@ void InputModule::loop(uint16_t frequency){
   }
 }
 
+void InputModule::clearMidplaneBuffers(){
+  midplaneGPIO->clearBuffers();
+}
 void InputModule::changeState(uint8_t targetState){
   //Serial.println("change state: " + String(targetState));
 
@@ -482,6 +487,10 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_MULTISELECT:
     //  currentMenu = MENU_MULTISELECT;
       break;
+
+    case STATE_SHORTCUT_RANDOM:
+      currentMenu = MENU_RANDOM;
+    break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;
@@ -798,6 +807,7 @@ uint8_t chanSwIndex;
           globalObj->muteChannelSelect[1] = chPressedSelector & 0b0010;
           globalObj->muteChannelSelect[2] = chPressedSelector & 0b0100;
           globalObj->muteChannelSelect[3] = chPressedSelector & 0b1000;
+          channelButtonOperationInProgress = true;
           switch (i){
             case SW_00:
                 if( sequenceArray[chan].toggleMute(0) ){
@@ -821,43 +831,63 @@ uint8_t chanSwIndex;
                 }
             break;
             case SW_03:
-
+              display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_04:
-
+              display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_05:
-
+              sequenceArray[chan].clockReset(true);
+              display->displayModal(300, MODAL_SHORTCUT_RESET);
             break;
-            case SW_06:
-
+            case SW_06: // shortcut reverse
+              switch(sequenceArray[chan].playMode){
+                case PLAY_PENDULUM:
+                    sequenceArray[chan].pendulumSwitch = !sequenceArray[chan].pendulumSwitch;
+                break;
+                case  PLAY_FORWARD:
+                  sequenceArray[chan].playMode = PLAY_REVERSE;
+                break;
+                case  PLAY_REVERSE:
+                  sequenceArray[chan].playMode = PLAY_FORWARD;
+                break;
+              }
+              display->displayModal(300, MODAL_SHORTCUT_REVERSE);
             break;
             case SW_07:
-
+              display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
-            case SW_08:
-
+            case SW_08:// shortcut_random
+              if(this->shortcutRandomSwitch < 750){
+                sequenceArray[chan].randomize();
+                display->displayModal(750, MODAL_RANDOM_PITCH_GATE);
+                this->clearMidplaneBuffers();
+                shortcutRandomSwitch = 10000;
+              } else {
+                shortcutRandomSwitch = 0;
+                display->displayModal(750, MODAL_RANDOM_PITCH_GATE_WARNING);
+              }
             break;
             case SW_09:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_10:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_11:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_12:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_13:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_14:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_15:
-
+                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             }
             return 1;
@@ -868,18 +898,6 @@ uint8_t chanSwIndex;
 
 // non matrix button loop
   for (uint8_t i=16; i <28; i++){
-    if (midplaneGPIO->rose(i) ){
-      //this section controls the behavior of the channel buttons on press
-      switch (i){
-        // left row bottom up
-        case SW_CH0:
-        case SW_CH1:
-        case SW_CH2:
-        case SW_CH3:
-          changeState(STATE_FIRSTSTEP);
-        break;
-       }
-    }
     if (midplaneGPIO->fell(i) ){
       switch (i){
         // left row bottom up
@@ -924,26 +942,29 @@ uint8_t chanSwIndex;
                  channelButtonShiftHandler(getChannelFromSw(i));
                }
              } else if (selectedChannel == getChannelFromSw(i) ) {
+               channelButtonOperationInProgress = true;
                switch(currentMenu){
                  case SEQUENCE_MENU:
-                 changeState(STATE_QUANTIZESCALE);
+                    changeState(STATE_QUANTIZESCALE);
                  break;
                  case QUANTIZE_MENU:
-                 changeState(STATE_GATEMOD);
+                    changeState(STATE_GATEMOD);
                  break;
                  case MOD_MENU_1:
-                 changeState(STATE_ARPTYPEMOD);
+                    changeState(STATE_ARPTYPEMOD);
                  break;
                  case MOD_MENU_2:
-                 changeState(STATE_FIRSTSTEP);
+                    changeState(STATE_FIRSTSTEP);
                  break;
                  default:
+                    channelButtonOperationInProgress = false;
               //    changeState(STATE_FIRSTSTEP);
                  break;
                }
              } else {
                if (selectedChannel != getChannelFromSw(i)){
                  selectedChannel = getChannelFromSw(i);
+                 channelButtonOperationInProgress = true;
                }
              }
          }
@@ -1115,6 +1136,22 @@ uint8_t chanSwIndex;
 
 
         }
+      }
+      if (midplaneGPIO->rose(i) ){
+        //this section controls the behavior of the channel buttons on press
+        switch (i){
+          // left row bottom up
+          case SW_CH0:
+          case SW_CH1:
+          case SW_CH2:
+          case SW_CH3:
+            if(channelButtonOperationInProgress){
+                channelButtonOperationInProgress = false;
+            } else{
+              changeState(STATE_FIRSTSTEP);
+            }
+          break;
+         }
       }
     }
     //Serial.println("Return at the end of alt");
@@ -1363,6 +1400,8 @@ void InputModule::calibrationMenuHandler(){
   uint32_t calibHigh;
   uint32_t calibLow;
   elapsedMillis timeoutTimer;
+  channelButtonOperationInProgress = true;
+
   //if (midplaneGPIO->pressed(SW_REC)){
   //  multiplier = 10;
 ///  }

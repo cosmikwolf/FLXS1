@@ -35,7 +35,7 @@ public:
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   uint16_t getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey);
   void setDacVoltage( uint8_t dac, uint16_t output );
-  void cv2update(uint8_t channel, uint32_t currentFrame, uint32_t stepLength, bool mute);
+  void cv2update(uint8_t channel, uint32_t currentFrame,  uint32_t framesPerSequence, uint32_t stepLength, bool mute);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
   void setGateOutputDebug(uint8_t index, bool value);
@@ -72,6 +72,7 @@ public:
 
   uint8_t outputMap(uint8_t channel, uint8_t mapType);
 
+  uint32_t debugFrameCount;
 
 private:
   Zetaohm_AD5676 ad5676;

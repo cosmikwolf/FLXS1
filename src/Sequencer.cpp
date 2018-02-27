@@ -166,11 +166,11 @@ void Sequencer::updateClockDivision(int8_t clockDiv){
   // tempPulseIndex /= currentFrame;
 
 //  ppqPulseIndex = tempPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
-  calculateCurrentFrame();
+currentFrame = this->getCurrentFrame();
   Serial.println("new ppq index: " + String(ppqPulseIndex) + "\tnewNum: " + String(clockDivisionNum()) + "\tnewDen: " + String(clockDivisionDen()) + "\torgCF: " + String(origCurrentFrame) + "\torgFPS: " + String(origFramesPerSequence) );
 }
 
-uint32_t Sequencer::calculateCurrentFrame(){
+uint32_t Sequencer::getCurrentFrame(){
   uint32_t clockCycles = ARM_DWT_CYCCNT;
   uint32_t unquantizedCF;
   int clockCount = 0;
@@ -200,7 +200,7 @@ uint32_t Sequencer::calculateCurrentFrame(){
 void Sequencer::calculateActiveStep(){
   uint8_t lastActiveStep = activeStep;
 
-  currentFrame = this->calculateCurrentFrame();
+  currentFrame = this->getCurrentFrame();
   // currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
   //Serial.println("CurrentFrame: " + String(currentFrame) + "\tavgCpp: " + String(avgClocksPerPulse) + "\tclockcount:" + String(clockCount));
   //  activeStep = isFrameSwinging(currentFrame);

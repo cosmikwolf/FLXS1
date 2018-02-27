@@ -169,7 +169,7 @@ void MasterClock::sequencerFunc(void){
   }
 	if(lfoTimer > 2){
 		for (int i=0; i< SEQUENCECOUNT; i++){
-			outputControl->cv2update(i, sequenceArray[i].currentFrame, sequenceArray[i].getStepLength(), sequenceArray[i].muteCV2 );
+			outputControl->cv2update(i, sequenceArray[i].currentFrame, sequenceArray[i].framesPerSequence(), sequenceArray[i].getStepLength(), sequenceArray[i].muteCV2 );
 		}
 		lfoTimer = 0;
 	}
@@ -197,6 +197,7 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 		if (!wasPlaying){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->allNotesOff(i);
+				//outputControl->clearVelocityOutput(i);
 				sequenceArray[i].clockStart();
 				//Serial.println("Starting sequence: " + String(i));
 			}
@@ -240,6 +241,7 @@ void MasterClock::internalClockTick(){
 
     for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->allNotesOff(i);
+			//outputControl->clearVelocityOutput(i);
     	sequenceArray[i].clockStart();
 			lastClockValue = clockCycles;
 			startingClockCount = clockCycles;

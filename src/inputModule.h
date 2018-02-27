@@ -69,6 +69,7 @@ public:
   void calibrationSaveHandler();
 
   void resetKnobValues();
+  void clearMidplaneBuffers();
   void changeState(uint8_t state);
 
   uint8_t getChannelButtonSw(uint8_t channel);
@@ -86,6 +87,10 @@ public:
   int8_t knobChange;
   int8_t menuSelector;
   int8_t instBuffer;
+
+  uint8_t shortcutRandomOctaveSpan;
+  elapsedMillis shortcutRandomSwitch;
+
   int16_t stepModeBuffer;
   uint8_t previousMenu;
 
@@ -101,6 +106,9 @@ private:
   DisplayModule *display;
   GlobalVariable* globalObj;
   elapsedMicros inputTimer;
+
+  bool channelButtonOperationInProgress;
+
 
 };
 

@@ -98,6 +98,7 @@ bool Sequencer::toggleMute(uint8_t index){
             stepData[stepNum].arpStatus = 0;
           }
           outputControl->allNotesOff(channel);
+					//outputControl->clearVelocityOutput(channel);
         }
 
         return muteGate;
@@ -108,6 +109,7 @@ bool Sequencer::toggleMute(uint8_t index){
       break;
       case 2:
         this->muteCV2 = !muteCV2;
+				outputControl->clearVelocityOutput(channel);
         return muteCV2;
       break;
   }
@@ -141,7 +143,6 @@ void Sequencer::setStepVelocity(uint8_t step, uint8_t velocity){
 void Sequencer::setStepGlide(uint8_t step, uint8_t glideTime){
 	stepData[step].glide = glideTime;
 }
-
 
 
 uint8_t Sequencer::quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction){
@@ -212,6 +213,14 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
   }
 };
 
+void Sequencer::randomize(){
+	for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+		this->stepData[stepNum].pitch[0]     = (rand()%60)+12;
+		this->stepData[stepNum].gateType		 = rand()%2;
+		this->stepData[stepNum].gateLength	 = rand()%10;
+	}
+}
+
 void Sequencer::skipStep(uint8_t count){
 //Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );
   if (count == 0){
@@ -273,7 +282,7 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
   //	}
 
 	//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
-    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey, muteCV1, currentFrame, true);
+    outputControl->noteOn(channel,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey, muteCV1, stepData[stepNum].stepStartFrame, true);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
   } else {
@@ -503,7 +512,7 @@ uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint16_t arpNum){
 
 	if(swingX100 == 50){
 		stepFrames += arpNum * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum); //unscaled arp frames
-	} else if ((stepNum + swingSwitch + (arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum) ) % 2)){
+	} else if ((stepNum + swingSwitch + (arpNum * getArpSpeedNumerator(stepNum) / 	getArpSpeedDenominator(stepNum) ) % 2)){
 		stepFrames += arpFullSteps	* getStepLength(); //full steps within the arpeggiation
 		stepFrames += (getStepLength() * 2 * swingX100)/ 100 - getStepLength(); // swing step offset
 		stepFrames += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum) )*(200-2*swingX100)/100; //scaled arp frames
