@@ -28,6 +28,7 @@ class LEDArray
     void channelEnvelopeModeLEDHandler();
     void channelStepModeLEDHandler();
     void channelLEDHandler();
+    void playPauseHandler();
     void multiSelectLEDHandler();
 
   private:
