@@ -96,12 +96,9 @@ class DisplayModule
 
     void channelSequenceDisplay(char *buf);
     void stateDisplay_pitch(char*buf);
-    void stateDisplay_pitchMulti(char*buf);
     void stateDisplay_pitchRender();
     void stateDisplay_arp(char *buf);
-    void stateDisplay_arp_multi(char *buf);
     void stateDisplay_velocity(char *buf);
-    void stateDisplay_velocity_multi(char *buf);
 
     void stepMode_gateLength(char *buf);
     void stepMode_chord(char *buf);
@@ -154,7 +151,7 @@ class DisplayModule
     void inputDebugMenuDisplay();
 
     void shortcutRandomMenu();
-    
+
     void cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeValue);
     void voltageToText(char *buf, int voltageValue);
     void createChList(char * buf);

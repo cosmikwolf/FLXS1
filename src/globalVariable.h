@@ -22,7 +22,7 @@ class GlobalVariable {
     uint8_t    pageButtonStyle;
     uint8_t    outputNegOffset[4];
     bool       multi_pitch_switch;
-    bool       multi_chord_switch;
+    bool       multi_arpInterval_switch;
     bool       multi_gateType_switch;
     bool       multi_gateLength_switch;
     bool       multi_arpType_switch;
@@ -35,7 +35,7 @@ class GlobalVariable {
     bool       multi_velocityType_switch;
     bool       multi_cv2speed_switch;
     uint8_t    multi_pitch;
-    uint8_t    multi_chord;
+    uint8_t    multi_arpInterval;
     uint8_t    multi_gateType;
     uint8_t    multi_gateLength;
     uint8_t    multi_arpType;

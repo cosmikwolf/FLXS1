@@ -183,21 +183,11 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         break;
 
         case ARPEGGIO_MENU:
-          if(globalObj->multiSelectSwitch){
-            stateDisplay_arp_multi(buf);
-          } else {
-            stateDisplay_arp(buf);
-          }
-
+          stateDisplay_arp(buf);
         break;
 
         case VELOCITY_MENU:
-          if(globalObj->multiSelectSwitch){
-            stateDisplay_velocity_multi(buf);
-          } else {
-            stateDisplay_velocity(buf);
-          }
-
+          stateDisplay_velocity(buf);
         break;
 
         case SEQUENCE_MENU:
@@ -771,7 +761,12 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
     displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
   }
-  renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+
+  if(globalObj->multiSelectSwitch) {
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background  ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor );
+  }
   renderStringBox(2,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
   renderStringBox(3,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
 
@@ -791,123 +786,104 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
 void DisplayModule::stateDisplay_arp(char *buf){
 
-
-  sprintf(buf, "arpeggio");
-    displayElement[0] = strdup(buf);
-    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-      displayElement[7] = strdup(buf);
-    sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
-      displayElement[12] = strdup(buf);
-
+  const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
+  const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
 
   displayElement[1]  = strdup("algo");
-  const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
-    displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
-
   displayElement[4] = strdup("speed");
-  sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
-  displayElement[5] = strdup(buf);
-  sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
-  displayElement[6] = strdup(buf);
-
   displayElement[8] = strdup("octve");
-  sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
-  displayElement[9] = strdup(buf);
-  displayElement[10] = strdup("intvl");
 
-    const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
+  if(globalObj->multiSelectSwitch) {
+    sprintf(buf, "arpmulti");
+    displayElement[0] = strdup(buf);
+    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    displayElement[7] = strdup(buf);
+    sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+    displayElement[12] = strdup(buf);
 
-      //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
-   displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
-
-   renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor ); //  digitalWriteFast(PIN_EXT_RX, LOW);
-   renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
-   renderStringBox(12,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
-
-   renderStringBox(1,  DISPLAY_LABEL,      0, 20,63,17, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_ARPTYPE,     63, 20,64,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  DISPLAY_LABEL,      0, 37,63,17, false, STYLE1X, background , foreground);
-   renderStringBox(5,  STATE_ARPSPEEDNUM, 63, 37,32,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_ARPSPEEDDEN, 95, 37,32,17, false, STYLE1X, background , foreground);
-
-   renderStringBox(8,  DISPLAY_LABEL,      0, 54,63,17, false, STYLE1X, background , foreground);
-   renderStringBox(9,  STATE_ARPOCTAVE,   63, 54,64,17, false, STYLE1X, background , foreground);
-
-   renderStringBox(10,  DISPLAY_LABEL,     0, 71,63,17, false, STYLE1X, background , foreground);
-   renderStringBox(11,  STATE_CHORD,      63, 71,64,17, false, STYLE1X, background , foreground);
- };
-
- void DisplayModule::stateDisplay_arp_multi(char *buf){
-
-   sprintf(buf, "arpeggio");
-     displayElement[0] = strdup(buf);
-     sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-     displayElement[7] = strdup(buf);
-     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
-     displayElement[12] = strdup(buf);
-
-   displayElement[1]  = strdup("algo");
-   const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
-   if(globalObj->multi_arpType_switch){
+    if(globalObj->multi_arpType_switch){
      displayElement[2] = strdup(arpTypeArray[globalObj->multi_arpType]);
-   }  else {
+    }  else {
      displayElement[2]  = strdup("--");
-   }
+    }
 
-   displayElement[4] = strdup("speed");
-   if(globalObj->multi_arpSpdNum_switch){
+    if(globalObj->multi_arpSpdNum_switch){
      sprintf(buf, "%d/", globalObj->multi_arpSpdNum);
      displayElement[5] = strdup(buf);
-   } else {
+    } else {
      displayElement[5]  = strdup("-");
-   }
+    }
 
-   if(globalObj->multi_arpSpdDen_switch){
+    if(globalObj->multi_arpSpdDen_switch){
      sprintf(buf, "%d",  globalObj->multi_arpSpdDen);
      displayElement[6] = strdup(buf);
-   } else {
+    } else {
      displayElement[6]  = strdup("-");
-   }
+    }
 
-   displayElement[8] = strdup("octve");
 
-   if(globalObj->multi_arpOctave_switch){
+    if(globalObj->multi_arpOctave_switch){
      sprintf(buf, "%doct", globalObj->multi_arpOctave);
      displayElement[9] = strdup(buf);
-   } else {
+    } else {
      displayElement[9]  = strdup("--");
+    }
+
+    displayElement[10] = strdup("intvl");
+
+           //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
+
+   if(globalObj->multi_arpInterval_switch){
+     displayElement[11] = strdup(chordSelectionArray[globalObj->multi_arpInterval]);
+   } else {
+     displayElement[11]  = strdup("--");
    }
 
-
-   displayElement[10] = strdup("intvl");
-
-     const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
-
-       //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
-
-     if(globalObj->multi_chord_switch){
-       displayElement[11] = strdup(chordSelectionArray[globalObj->multi_chord]);
-     } else {
-       displayElement[11]  = strdup("--");
-     }
+  } else {
+    sprintf(buf, "arpeggio");
+    displayElement[0] = strdup(buf);
+    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    displayElement[7] = strdup(buf);
+    sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+    displayElement[12] = strdup(buf);
 
 
-    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
-    renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
-    renderStringBox(12,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
+    displayElement[1]  = strdup("algo");
+    displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
-    renderStringBox(1,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(2,  STATE_ARPTYPE,     60, 20,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(4,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(5,  STATE_ARPSPEEDNUM, 60, 37,34,17, false, STYLE1X, background , foreground);
-    renderStringBox(6,  STATE_ARPSPEEDDEN, 94, 37,34,17, false, STYLE1X, background , foreground);
+    displayElement[4] = strdup("speed");
+    sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
+    displayElement[5] = strdup(buf);
+    sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
+    displayElement[6] = strdup(buf);
 
-    renderStringBox(8,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(9,  STATE_ARPOCTAVE, 60, 54,68,17, false, STYLE1X, background , foreground);
+    displayElement[8] = strdup("octve");
+    sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
+    displayElement[9] = strdup(buf);
+    displayElement[10] = strdup("intvl");
+    //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
+    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+  }
+    if(globalObj->multiSelectSwitch) {
+      renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background );
+    } else {
+      renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor );
+    }
+    renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
+    renderStringBox(12,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
 
-    renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
-    renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
-  };
+    renderStringBox(1,  DISPLAY_LABEL,      0, 20,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(2,  STATE_ARPTYPE,     63, 20,64,17, false, STYLE1X, background , foreground);
+    renderStringBox(4,  DISPLAY_LABEL,      0, 37,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(5,  STATE_ARPSPEEDNUM, 63, 37,32,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_ARPSPEEDDEN, 95, 37,32,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(8,  DISPLAY_LABEL,      0, 54,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(9,  STATE_ARPOCTAVE,   63, 54,64,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(10,  DISPLAY_LABEL,     0, 71,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(11,  STATE_CHORD,      63, 71,64,17, false, STYLE1X, background , foreground);
+ };
 
 
 void DisplayModule::voltageToText(char *buf, int voltageValue){
@@ -923,8 +899,45 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
+   char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
+
+       displayElement[1] = strdup("ampl:");
+       displayElement[3] = strdup("type:");
+       displayElement[5] = strdup("Speed:");
+       displayElement[10] = strdup("offset:");
+
+   if(globalObj->multiSelectSwitch){
+     sprintf(buf, "lfoenvmult ");
+      displayElement[0] = strdup(buf);
+      sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+      displayElement[7] = strdup(buf);
+      sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+      displayElement[8] = strdup(buf);
 
 
+
+    if(globalObj->multi_velocity_switch){
+      sprintf(buf, "%d", globalObj->multi_velocity);
+      displayElement[2] = strdup(buf);
+    } else {
+      displayElement[2]  = strdup("--");
+    }
+
+
+   if(globalObj->multi_velocityType_switch){
+       displayElement[4] = strdup(velTypeArray[globalObj->multi_velocityType]);
+   } else {
+       displayElement[4]  = strdup("--");
+   }
+
+    if(globalObj->multi_cv2speed_switch){
+      sprintf(buf, "%d", globalObj->multi_cv2speed);
+      displayElement[6] = strdup(buf);
+    } else {
+      displayElement[6]  = strdup("--");
+    }
+
+  } else {
     sprintf(buf, "LFO & ENV");
     displayElement[0] = strdup(buf);
     sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
@@ -932,14 +945,10 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[8] = strdup(buf);
 
-    displayElement[1] = strdup("ampl:");
-
     voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].velocity);
 
     displayElement[2] = strdup(buf);
-    displayElement[3] = strdup("type:");
-    char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
-    displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
+      displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
     //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].velocityType).c_str());
 
     /*
@@ -963,17 +972,19 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
     //   displayElement[6] = strdup(buf);
     //
     // }
-    displayElement[5] = strdup("Speed:");
     sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2speed);
     displayElement[6] = strdup(buf);
 
-    displayElement[10] = strdup("offset:");
     voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].cv2offset);
 
     displayElement[11] = strdup(buf);
+  }
 
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
-
+  }
     renderStringBox(3,  DISPLAY_LABEL,        0, 20,63,17, false, STYLE1X, background , foreground);
     renderStringBox(1,  DISPLAY_LABEL,        0, 37,63,17, false, STYLE1X, background , foreground);
     renderStringBox(5,  DISPLAY_LABEL,        0, 54,63,17, false, STYLE1X, background , foreground);
@@ -988,63 +999,6 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
 }
 
-
- void DisplayModule::stateDisplay_velocity_multi(char *buf) {
-
-       sprintf(buf, "LFO & ENV");
-        displayElement[0] = strdup(buf);
-        sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
-        displayElement[7] = strdup(buf);
-        sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
-        displayElement[8] = strdup(buf);
-
-
-      displayElement[1] = strdup("level:");
-
-      if(globalObj->multi_velocity_switch){
-        sprintf(buf, "%d", globalObj->multi_velocity);
-        displayElement[2] = strdup(buf);
-      } else {
-        displayElement[2]  = strdup("--");
-      }
-
-      displayElement[3] = strdup("type:");
-      char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square","LFO SawUp","LFO SawDn","LFO S+H" };
-
-
-       if(globalObj->multi_velocityType_switch){
-         displayElement[4] = strdup(velTypeArray[globalObj->multi_velocityType]);
-       } else {
-         displayElement[4]  = strdup("--");
-       }
-
-      displayElement[5] = strdup("LFO spd:");
-      if(globalObj->multi_cv2speed_switch){
-        sprintf(buf, "%d", globalObj->multi_cv2speed);
-        displayElement[6] = strdup(buf);
-      } else {
-        displayElement[6]  = strdup("--");
-      }
-
-
-   renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
-   renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
-   renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
-
-   renderStringBox(3,  DISPLAY_LABEL,        0, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_CV2_TYPE,     60, 20,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(1,  DISPLAY_LABEL,        0, 37,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_CV2_LEVEL, 50, 37,78,17, false, STYLE1X, background , foreground);
-
-   renderStringBox(5,  DISPLAY_LABEL,        0,  54,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_CV2_SPEED, 90, 54,47,17, false, STYLE1X, background , foreground);
-
-   renderStringBox(10,  DISPLAY_LABEL,        0, 71,68,17, false, STYLE1X, background , foreground);
-   renderStringBox(11,  STATE_CHORD,    60, 71,68,17, false, STYLE1X, background , foreground);
-
-}
-
-
  void DisplayModule::sequenceMenuDisplay(){
 
    sprintf(buf, "ch%d transport", selectedChannel+1);
@@ -1054,7 +1008,6 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
    displayElement[9] = strdup("first step:");
    sprintf(buf, "%d", sequenceArray[selectedChannel].firstStep+1);
    displayElement[10] = strdup(buf);
-
 
    displayElement[1] = strdup("step count:");
 
@@ -1425,7 +1378,6 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
 
  void DisplayModule::patternSelectDisplay(){
 
-   uint8_t previousHighlight = highlight;
    highlight = currentPattern;
 
    displayElement[0] = strdup("01");
@@ -1578,7 +1530,6 @@ void DisplayModule::saveMenuDisplayHandler(){
  }
 
 void DisplayModule::modalPopup(){
-  uint8_t previousHighlight = highlight;
   highlight = currentPattern;
 
   sprintf(buf, "Calibration Saved!");
@@ -1589,7 +1540,6 @@ void DisplayModule::modalPopup(){
 
 
  void DisplayModule::inputCalibrationMenuDisplay(){
-   uint8_t previousHighlight = highlight;
    highlight = currentPattern;
    oled.setTextWrap(true);
 
@@ -1804,7 +1754,6 @@ void DisplayModule::midiTestDisplay(){
     sprintf(buf, "%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d" , midiControl->midiTestArray[16*i+0], midiControl->midiTestArray[16*i+1], midiControl->midiTestArray[16*i+2], midiControl->midiTestArray[16*i+3], midiControl->midiTestArray[16*i+4], midiControl->midiTestArray[16*i+5], midiControl->midiTestArray[16*i+6], midiControl->midiTestArray[16*i+7], midiControl->midiTestArray[16*i+8], midiControl->midiTestArray[16*i+9], midiControl->midiTestArray[16*i+10], midiControl->midiTestArray[16*i+11], midiControl->midiTestArray[16*i+12], midiControl->midiTestArray[16*i+13], midiControl->midiTestArray[16*i+14], midiControl->midiTestArray[16*i+15]);
     displayElement[i+1] = strdup(buf);
   }
-
   renderStringBox(0, DISPLAY_LABEL,  0, 0, 128 , 8, false, REGULAR1X, BLACK, WHITE);
   renderStringBox(1, DISPLAY_LABEL,  0, 8, 128 , 8, false, REGULAR1X, BLACK, WHITE);
   renderStringBox(2, DISPLAY_LABEL,  0, 16, 128 , 8, false, REGULAR1X, BLACK, WHITE);
@@ -1815,8 +1764,6 @@ void DisplayModule::midiTestDisplay(){
   renderStringBox(7, DISPLAY_LABEL,  0, 56, 128 , 8, false, REGULAR1X, BLACK, WHITE);
   renderStringBox(8, DISPLAY_LABEL,  0, 64, 128 , 8, false, REGULAR1X, BLACK, WHITE);
   renderStringBox(9, DISPLAY_LABEL,  0, 72, 128 , 24, false, REGULAR1X, BLACK, WHITE);
-
-
 }
 
  void DisplayModule::inputDebugMenuDisplay(){

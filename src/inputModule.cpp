@@ -96,9 +96,8 @@ void InputModule::multiSelectInputHandler(){
           break;
 
         case STATE_CHORD:
-          globalObj->multi_chord_switch = true;
-          globalObj->multi_chord = min_max(globalObj->multi_chord + knobChange, 0, 26 );
-
+          globalObj->multi_arpInterval_switch = true;
+          globalObj->multi_arpInterval = min_max(globalObj->multi_arpInterval + knobChange, 0, 26 );
           break;
         case STATE_GATETYPE:
           globalObj->multi_gateType_switch = true;
@@ -160,7 +159,11 @@ void InputModule::multiSelectInputHandler(){
 
               break;
             case STATE_CHORD:
-            //  setStepAbsolute(selectedChannel, i, globalObj->multi_chord);
+            //  setStepAbsolute(selectedChannel, i, globalObj->multi_arpInterval);
+              sequenceArray[selectedChannel].stepData[i].chord = globalObj->multi_arpInterval;
+              sequenceArray[selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][0],1);
+              sequenceArray[selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][1],2);
+              sequenceArray[selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][2],3);
               break;
 
             case STATE_GATETYPE:

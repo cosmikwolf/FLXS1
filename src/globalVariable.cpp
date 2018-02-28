@@ -4,7 +4,7 @@
 void GlobalVariable::initialize(){
       this->clockMode = INTERNAL_CLOCK;
       this->multi_pitch_switch = 0;
-      this->multi_chord_switch = 0;
+      this->multi_arpInterval_switch = 0;
       this->multi_gateType_switch = 0;
       this->multi_gateLength_switch = 0;
       this->multi_arpType_switch = 0;
@@ -17,7 +17,7 @@ void GlobalVariable::initialize(){
       this->multi_velocityType_switch = 0;
       this->multi_cv2speed_switch = 0;
       this->multi_pitch = 0;
-      this->multi_chord = 0;
+      this->multi_arpInterval = 0;
       this->multi_gateType = 0;
       this->multi_gateLength = 0;
       this->multi_arpType = 0;
