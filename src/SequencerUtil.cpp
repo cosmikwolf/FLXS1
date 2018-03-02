@@ -215,8 +215,9 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
 
 void Sequencer::randomize(){
 	for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
-		this->stepData[stepNum].pitch[0]     = (rand()%60)+12;
-		this->stepData[stepNum].gateType		 = rand()%2;
+		srand(micros());
+		this->stepData[stepNum].pitch[0]     = (rand()%60)+12;	srand(micros());
+		this->stepData[stepNum].gateType		 = rand()%2;				srand(micros());
 		this->stepData[stepNum].gateLength	 = rand()%10;
 	}
 }
