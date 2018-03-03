@@ -48,7 +48,7 @@ void Sequencer::clockReset(bool activeStepReset){
    //currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
 
  // );
-    Serial.println("reset --------------------------------------------");
+    // Serial.println("reset --------------------------------------------");
   }
 
 }

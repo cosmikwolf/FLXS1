@@ -898,8 +898,7 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
 }
 
-
- void DisplayModule::stateDisplay_velocity(char *buf) {
+void DisplayModule::stateDisplay_velocity(char *buf) {
    char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
 
        displayElement[1] = strdup("ampl:");
@@ -915,15 +914,12 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
       sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
       displayElement[8] = strdup(buf);
 
-
-
     if(globalObj->multi_velocity_switch){
       sprintf(buf, "%d", globalObj->multi_velocity);
       displayElement[2] = strdup(buf);
     } else {
       displayElement[2]  = strdup("--");
     }
-
 
    if(globalObj->multi_velocityType_switch){
        displayElement[4] = strdup(velTypeArray[globalObj->multi_velocityType]);

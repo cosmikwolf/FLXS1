@@ -893,7 +893,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
   //add offset amount:
   if(channel == 0 && currentFrame > debugFrameCount){
-    Serial.print("q:" + String(globalObj->quantizeSemitonePitch(cv2amplitude[channel], sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0)));
+    // Serial.print("q:" + String(globalObj->quantizeSemitonePitch(cv2amplitude[channel], sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0)));
   }
   voltageLevel += cv2offset[channel]*128;
 
@@ -906,7 +906,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   if(channel == 0 && currentFrame > debugFrameCount){
     debugFrameCount += (stepLength/2);
     debugFrameCount = debugFrameCount  % framesPerSequence;
-    Serial.println("\tcf: " + String(currentFrame) + "\tlfoTime: " + String(lfoTime) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tfps: " + String(framesPerSequence) + "\ttype: " + String(cv2type[channel]) + "\tvl: " + String(voltageLevel) + "\tamp: " + String(cv2amplitude[channel]) );
+    // Serial.println("\tcf: " + String(currentFrame) + "\tlfoTime: " + String(lfoTime) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tfps: " + String(framesPerSequence) + "\ttype: " + String(cv2type[channel]) + "\tvl: " + String(voltageLevel) + "\tamp: " + String(cv2amplitude[channel]) );
   }
 
 
