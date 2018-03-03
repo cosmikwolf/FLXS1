@@ -25,7 +25,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
 	this->beatCount 				= 4;
   this->swingX100         = 50;
 	this->quantizeKey 			= 0;
-	this->quantizeMode 		  = 0;
+	this->quantizeMode 		  = 0b111111111111;
 	this->quantizeScale     = 0;
 	this->pattern 					= pattern;
 	this->channel 					= ch;

@@ -112,7 +112,8 @@ class Sequencer
     uint8_t		randomHigh;
 
 		uint8_t		quantizeKey;
-    uint8_t		quantizeMode;
+		uint16_t	quantizeMode;
+		uint8_t		quantizeModeIndex;
     uint8_t		quantizeScale;
 		uint8_t 	pattern;
 		uint8_t		channel;

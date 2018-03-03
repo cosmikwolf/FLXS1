@@ -152,7 +152,7 @@ class DisplayModule
 
     void shortcutRandomMenu();
 
-    void cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeValue);
+    void cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeValue);
     void voltageToText(char *buf, int voltageValue);
     void createChList(char * buf);
 

@@ -86,7 +86,7 @@ uint16_t colundiArrayX100[56] = {  0, 161, 165, 212, 235, 247, 254, 254, 270, 27
 // 	}
 //}
 
-int positive_modulo(int i, int n) {
+uint32_t positive_modulo(int i, int n) {
 	return (i % n + n) % n;
 }
 

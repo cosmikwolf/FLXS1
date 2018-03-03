@@ -94,7 +94,6 @@ void InputModule::multiSelectInputHandler(){
           globalObj->multi_pitch_switch = true;
           globalObj->multi_pitch += knobChange;
           break;
-
         case STATE_CHORD:
           globalObj->multi_arpInterval_switch = true;
           globalObj->multi_arpInterval = min_max(globalObj->multi_arpInterval + knobChange, 0, 26 );
@@ -565,9 +564,14 @@ void InputModule::sequenceMenuHandler(){
 
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
-      changeState(STATE_PITCH0);
-      selectedStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
-      notePage =   sequenceArray[selectedChannel].getActivePage();
+      if(stepMode == STATE_QUANTIZEMODE){
+        // put in quantize mode custom button input code here
+        sequenceArray[selectedChannel].quantizeMode ^= (1<<i);
+      } else {
+        changeState(STATE_PITCH0);
+        selectedStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
+        notePage =   sequenceArray[selectedChannel].getActivePage();
+      }
     }
   }
   if(knobChange){
@@ -598,7 +602,30 @@ void InputModule::sequenceMenuHandler(){
           sequenceArray[selectedChannel].quantizeKey = positive_modulo(sequenceArray[selectedChannel].quantizeKey + knobChange, 12);
           break;
         case STATE_QUANTIZEMODE:
-          sequenceArray[selectedChannel].quantizeMode = positive_modulo(sequenceArray[selectedChannel].quantizeMode + knobChange, 19);
+          sequenceArray[selectedChannel].quantizeModeIndex = positive_modulo(sequenceArray[selectedChannel].quantizeModeIndex + knobChange, 19);
+          switch(sequenceArray[selectedChannel].quantizeModeIndex){
+            case 0: sequenceArray[selectedChannel].quantizeMode = SEMITONE_SCALE_12;    break;
+            case 1: sequenceArray[selectedChannel].quantizeMode = MAJOR_SCALE_12;       break;
+            case 2: sequenceArray[selectedChannel].quantizeMode = MINOR_SCALE_12;       break;
+            case 3: sequenceArray[selectedChannel].quantizeMode = MAJORMINOR_SCALE_12;  break;
+            case 4: sequenceArray[selectedChannel].quantizeMode = BLUESMAJOR_SCALE_12;  break;
+            case 5: sequenceArray[selectedChannel].quantizeMode = BLUESMINOR_SCALE_12;  break;
+            case 6: sequenceArray[selectedChannel].quantizeMode = PENT_MAJOR_SCALE_12;  break;
+            case 7: sequenceArray[selectedChannel].quantizeMode = PENT_MINOR_SCALE_12;  break;
+            case 8: sequenceArray[selectedChannel].quantizeMode = FOLK_SCALE_12;        break;
+            case 9: sequenceArray[selectedChannel].quantizeMode = AEOLIAN_SCALE_12;     break;
+            case 10: sequenceArray[selectedChannel].quantizeMode = DORIAN_SCALE_12;      break;
+            case 11: sequenceArray[selectedChannel].quantizeMode = MIXOLYDIAN_SCALE_12;  break;
+            case 12: sequenceArray[selectedChannel].quantizeMode = PHRYGIAN_SCALE_12;    break;
+            case 13: sequenceArray[selectedChannel].quantizeMode = LYDIAN_SCALE_12;      break;
+            case 14: sequenceArray[selectedChannel].quantizeMode = LOCRIAN_SCALE_12;     break;
+            case 15: sequenceArray[selectedChannel].quantizeMode = GAMELAN_SCALE_12;     break;
+            case 16: sequenceArray[selectedChannel].quantizeMode = JAPANESE_SCALE_12;    break;
+            case 17: sequenceArray[selectedChannel].quantizeMode = GYPSY_SCALE_12;       break;
+            case 18: sequenceArray[selectedChannel].quantizeMode = ARABIAN_SCALE_12;     break;
+            case 19: sequenceArray[selectedChannel].quantizeMode = FLAMENCO_SCALE_12;    break;
+            case 20: sequenceArray[selectedChannel].quantizeMode = WHOLETONE_SCALE_12;   break;
+          }
           break;
         case STATE_QUANTIZESCALE:
           sequenceArray[selectedChannel].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 3);

@@ -211,7 +211,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         break;
 
         case TUNER_MENU:
-          channelTunerDisplay(buf);
+          //channelTunerDisplay(buf);
         break;
 
         case GLOBAL_MENU_1:
@@ -740,7 +740,8 @@ void DisplayModule::stateDisplay_pitch(char*buf){
         displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
       break;
       case SEMITONE:
-        displayElement[1] = strdup(midiNotes[ globalObj->quantizeSemitonePitch(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], sequenceArray[selectedChannel].quantizeMode, sequenceArray[selectedChannel].quantizeKey, 0)]);
+        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantizeSemitonePitch(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0],  sequenceArray[selectedChannel].quantizeKey, sequenceArray[selectedChannel].quantizeMode, 0)]);
+        //displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
       break;
       default:
       displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]).c_str());
@@ -1115,17 +1116,42 @@ void DisplayModule::scaleMenuDisplay(){
      char *keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
      displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
      displayElement[7] = strdup("mode:");
-     char *modeArray[] = {"chromatic", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone" };
+     //char *modeArray[] = {"chromatic", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone" };
 
-     switch(sequenceArray[selectedChannel].quantizeScale){
-       case SEMITONE:
-       case PYTHAGOREAN:
-         displayElement[8] = strdup(modeArray[sequenceArray[selectedChannel].quantizeMode]);
-       break;
-       case COLUNDI:
-         displayElement[8] = strdup("--");
-       break;
-     }
+     // switch(sequenceArray[selectedChannel].quantizeScale){
+     //   case SEMITONE:
+     //   case PYTHAGOREAN:
+     //     displayElement[8] = strdup(modeArray[sequenceArray[selectedChannel].quantizeMode]);
+     //   break;
+     //   case COLUNDI:
+     //     displayElement[8] = strdup("--");
+     //   break;
+     // }
+
+    switch(sequenceArray[selectedChannel].quantizeMode){
+      case SEMITONE_SCALE_12:     displayElement[8] = strdup("CHROMATIC"); break;
+      case MAJOR_SCALE_12:        displayElement[8] = strdup("MAJOR"); break;
+      case MINOR_SCALE_12:        displayElement[8] = strdup("MINOR"); break;
+      case MAJORMINOR_SCALE_12:   displayElement[8] = strdup("MAJORMINOR"); break;
+      case BLUESMAJOR_SCALE_12:   displayElement[8] = strdup("BLUESMAJOR"); break;
+      case BLUESMINOR_SCALE_12:   displayElement[8] = strdup("BLUESMINOR"); break;
+      case PENT_MAJOR_SCALE_12:   displayElement[8] = strdup("PENT_MAJOR"); break;
+      case PENT_MINOR_SCALE_12:   displayElement[8] = strdup("PENT_MINOR"); break;
+      case FOLK_SCALE_12:         displayElement[8] = strdup("FOLK"); break;
+      case AEOLIAN_SCALE_12:      displayElement[8] = strdup("AEOLIAN"); break;
+      case DORIAN_SCALE_12:       displayElement[8] = strdup("DORIAN"); break;
+      case MIXOLYDIAN_SCALE_12:   displayElement[8] = strdup("MIXOLYDIAN"); break;
+      case PHRYGIAN_SCALE_12:     displayElement[8] = strdup("PHRYGIAN"); break;
+      case LYDIAN_SCALE_12:       displayElement[8] = strdup("LYDIAN"); break;
+      case LOCRIAN_SCALE_12:      displayElement[8] = strdup("LOCRIAN"); break;
+      case GAMELAN_SCALE_12:      displayElement[8] = strdup("GAMELAN"); break;
+      case JAPANESE_SCALE_12:     displayElement[8] = strdup("JAPANESE"); break;
+      case GYPSY_SCALE_12:        displayElement[8] = strdup("GYPSY"); break;
+      case ARABIAN_SCALE_12:      displayElement[8] = strdup("ARABIAN"); break;
+      case FLAMENCO_SCALE_12:     displayElement[8] = strdup("FLAMENCO"); break;
+      case WHOLETONE_SCALE_12:    displayElement[8] = strdup("WHOLETONE"); break;
+      default:               displayElement[8] = strdup("CUSTOM"); break;
+      }
 
      switch(sequenceArray[selectedChannel].playMode){
        case PLAY_FORWARD:
@@ -1861,7 +1887,7 @@ prevSelectedText = selectedText;
 
  }
 
-void DisplayModule::cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeValue){
+void DisplayModule::cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeValue){
   switch(outputRangeValue){
     case 5:
       displayElement[dispElement] = strdup("-5v to 5v");
@@ -1889,16 +1915,16 @@ void DisplayModule::cvOuputRangeText(uint8_t dispElement, uint8_t outputRangeVal
    displayElement[5] = strdup("pitch CV range");
 
    displayElement[6] = strdup("cv1a:");
-   this->cvOuputRangeText(7, globalObj->outputNegOffset[0]);
+   this->cvOutputRangeText(7, globalObj->outputNegOffset[0]);
 
    displayElement[8] = strdup("cv2a:");
-   this->cvOuputRangeText(9, globalObj->outputNegOffset[1]);
+   this->cvOutputRangeText(9, globalObj->outputNegOffset[1]);
 
    displayElement[10] = strdup("cv3a:");
-   this->cvOuputRangeText(11, globalObj->outputNegOffset[2]);
+   this->cvOutputRangeText(11, globalObj->outputNegOffset[2]);
 
    displayElement[12] = strdup("cv4a:");
-   this->cvOuputRangeText(13, globalObj->outputNegOffset[3]);
+   this->cvOutputRangeText(13, globalObj->outputNegOffset[3]);
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
 

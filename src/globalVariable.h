@@ -80,7 +80,7 @@ class GlobalVariable {
     elapsedMillis testTimer;
 
     bool extClock();
-    uint8_t quantizeSemitonePitch(uint8_t note, uint8_t quantizeMode, uint8_t quantizeKey, bool direction);
+    int16_t quantizeSemitonePitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction);
 
     void initialize();
     void initGlobals();

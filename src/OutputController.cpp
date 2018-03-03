@@ -560,7 +560,7 @@ bool OutputController::gpioCheck(int8_t mapValue){
 
 };
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
+void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration

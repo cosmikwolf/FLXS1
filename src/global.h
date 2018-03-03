@@ -255,7 +255,7 @@ extern uint8_t prevSelectedText;
 
 //void//Serial.println(String text);
 
-int positive_modulo(int i, int n);
+uint32_t positive_modulo(int i, int n);
 int modulo_minimum(int i, int n, int minimum);
 int min_max(int value, int min, int max);
 int min_max_cycle(int value, int min, int max);

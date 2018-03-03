@@ -430,20 +430,20 @@ void Sequencer::sequenceModeStandardStep(){
   }
   //return (((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse) ) % framesPerSequence() ;
 
-  if(previousActiveStepSeqMode != activeStep && channel == 0){
-    Serial.println("as: " + String(activeStep) + "\tperc: " + String(currentFrame*100/framesPerSequence()) + "\tppqi: " + String(ppqPulseIndex) + "\tcf: " + String(currentFrame) + "\tsl: " + String(getStepLength()) + "\tfps: " + String(framesPerSequence()));
-    for (int stepNum = 0; stepNum <= (firstStep + stepCount-1); stepNum++){
-      if(stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
-        Serial.print("CURRENTLY_PLAYING ");
-        Serial.println("\tstp: " + String(stepNum) + "\tFR " + String(stepData[stepNum].framesRemaining) + "\tarpS: " + String(getArpStartFrame(stepNum, stepData[stepNum].arpStatus)) + "\tarpLF: " + String(stepData[stepNum].arpLastFrame) );
-      } else if(stepData[stepNum].noteStatus == BETWEEN_APEGGIATIONS ){
-        Serial.print("BETWEEN_APEGGIATIONS");
-        Serial.println("\tstp: " + String(stepNum) + "\tFR " + String(stepData[stepNum].framesRemaining) + "\tarpS: " + String(getArpStartFrame(stepNum, stepData[stepNum].arpStatus)) + "\tarpLF: " + String(stepData[stepNum].arpLastFrame) );
-      } else {
-        Serial.println("ns: " + String(stepData[stepNum].noteStatus));
-      }
-    }
-    Serial.println(" ");
-  }
+  // if(previousActiveStepSeqMode != activeStep && channel == 0){
+  //   Serial.println("as: " + String(activeStep) + "\tperc: " + String(currentFrame*100/framesPerSequence()) + "\tppqi: " + String(ppqPulseIndex) + "\tcf: " + String(currentFrame) + "\tsl: " + String(getStepLength()) + "\tfps: " + String(framesPerSequence()));
+  //   for (int stepNum = 0; stepNum <= (firstStep + stepCount-1); stepNum++){
+  //     if(stepData[stepNum].noteStatus == CURRENTLY_PLAYING){
+  //       Serial.print("CURRENTLY_PLAYING ");
+  //       Serial.println("\tstp: " + String(stepNum) + "\tFR " + String(stepData[stepNum].framesRemaining) + "\tarpS: " + String(getArpStartFrame(stepNum, stepData[stepNum].arpStatus)) + "\tarpLF: " + String(stepData[stepNum].arpLastFrame) );
+  //     } else if(stepData[stepNum].noteStatus == BETWEEN_APEGGIATIONS ){
+  //       Serial.print("BETWEEN_APEGGIATIONS");
+  //       Serial.println("\tstp: " + String(stepNum) + "\tFR " + String(stepData[stepNum].framesRemaining) + "\tarpS: " + String(getArpStartFrame(stepNum, stepData[stepNum].arpStatus)) + "\tarpLF: " + String(stepData[stepNum].arpLastFrame) );
+  //     } else {
+  //       Serial.println("ns: " + String(stepData[stepNum].noteStatus));
+  //     }
+  //   }
+  //   Serial.println(" ");
+  // }
   previousActiveStepSeqMode = activeStep;
 }

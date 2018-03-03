@@ -37,7 +37,7 @@ void LEDArray::loop(uint16_t interval){
       case TEMPO_MENU:
       case QUANTIZE_MENU:
         if(stepMode == STATE_QUANTIZEMODE){
-
+          quantizeModeLEDHandler();
         } else {
           channelSequenceModeLEDHandler();
         }
@@ -76,9 +76,24 @@ void LEDArray::loop(uint16_t interval){
       break;
     }
     leds.show();
-
   }
 }
+
+void LEDArray::quantizeModeLEDHandler(){
+  for (int i=0; i < 12; i++){
+    if (sequenceArray[selectedChannel].quantizeMode & (1 << i) ){
+      leds.setPixelColor(ledMainMatrix[i], 0,255,0,255);
+    } else {
+      leds.setPixelColor(ledMainMatrix[i], 255,0,0,1);
+    }
+  }
+  for (int i=12; i < 16; i++){
+    leds.setPixelColor(ledMainMatrix[i], 0,0,0,0);
+  }
+  playPauseHandler();
+  channelLEDHandler();
+}
+
 
 void LEDArray::channelSequenceModeLEDHandler(){
   uint8_t iStep;

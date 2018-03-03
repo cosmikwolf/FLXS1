@@ -27,6 +27,7 @@ class LEDArray
     void channelGateModeLEDHandler();
     void channelEnvelopeModeLEDHandler();
     void channelStepModeLEDHandler();
+    void quantizeModeLEDHandler();
     void channelLEDHandler();
     void playPauseHandler();
     void multiSelectLEDHandler();
