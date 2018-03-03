@@ -30,10 +30,10 @@
 
 class OutputController {
 public:
-  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj );
+  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray);
   void noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey,  bool cvMute, uint32_t startFrame, bool notFirstArp);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
-  uint16_t getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey);
+  int16_t getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue );
   void setDacVoltage( uint8_t dac, uint16_t output );
   void cv2update(uint8_t channel, uint32_t currentFrame,  uint32_t framesPerSequence, uint32_t stepLength, bool mute);
   void allNotesOff(uint8_t channel);
@@ -54,7 +54,7 @@ public:
   uint16_t calibMidscale(uint8_t mapAddress);
   uint16_t voltageOffset(uint8_t volts, uint8_t mapAddress);
 
-  uint16_t calibLow(uint8_t channel, uint8_t mapAddress, uint8_t negOffset);
+  uint16_t calibZero(uint8_t channel, uint8_t mapAddress, uint8_t negOffset);
   uint16_t calibHigh(uint8_t channel, uint8_t mapAddress, uint8_t negOffset);
 
 
@@ -65,6 +65,9 @@ public:
   uint8_t cv2speed[4];
   int8_t cv2amplitude[4];
   int8_t cv2offset[4];
+  uint8_t cv2quantizeKey[4];
+  int16_t cv2quantizeMode[4];
+
   uint32_t lfoStartFrame[4];
   bool   sampleAndHoldSwitch[4];
   bool    lfoRheoSet[4];
@@ -82,6 +85,7 @@ private:
   Zetaohm_MAX7301* backplaneGPIO;
   GlobalVariable* globalObj;
   midi::MidiInterface<HardwareSerial>* serialMidi;
+  Sequencer *sequenceArray;
 
   uint8_t gateMap[4]  = {0,1,2,3};
   uint8_t dacCvMap[4] = {7,0,5,3};

@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "OutputController.h"
 
-void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj){
+void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray){
   Serial.println("Initializing MIDI");
-
+  this->sequenceArray = sequenceArray;
   this->globalObj = globalObj;
   this->serialMidi = serialMidi;
   this->adc = adc;
@@ -622,10 +622,10 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   //delayMicroseconds(5);
 //  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel],0)) );    // set CV voltage
   if(!cvMute){
-    ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
+    ad5676.setVoltage(dacCvMap[channel], getQuantizedVoltage(channel, note, globalObj->outputNegOffset[channel], 1) );    // set CV voltage
   //delayMicroseconds(5);
     //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
-    ad5676.setVoltage(dacCvMap[channel], getVoltage(channel, note, quantizeScale, quantizeMode, quantizeKey) );    // set CV voltage
+    ad5676.setVoltage(dacCvMap[channel], getQuantizedVoltage(channel, note, globalObj->outputNegOffset[channel], 1) );    // set CV voltage
   //  delayMicroseconds(5);
     //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(globalObj->cvInputRaw[channel]));
     serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
@@ -637,30 +637,40 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
 
 };
 
-
-uint16_t OutputController::getVoltage(uint8_t channel, uint16_t note, uint8_t quantizeScale, uint8_t quantizeMode, uint8_t quantizeKey){
+int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue){
   uint32_t cents = 0;
-  uint16_t quantNote = 0;
+  int16_t quantNote = 0;
+  uint16_t calibrationLow = 0;
+  uint16_t calibrationHigh = 0;
 
-    switch (quantizeScale) {
+  if(pitchValue){
+    calibrationLow  = calibZero(channel, dacCvMap[channel], negOffset);
+    calibrationHigh = calibHigh(channel, dacCvMap[channel], negOffset);
+  } else {
+    calibrationLow  = -16384;
+    calibrationHigh = 16384;
+  }
+
+    switch (sequenceArray[channel].quantizeScale) {
       case SEMITONE:
-        quantNote = globalObj->quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
-        quantNote = map( quantNote, 0, 120,calibLow(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]), calibHigh(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]));
+        quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+        if(pitchValue){
+          quantNote = map( quantNote, 0, 120, calibrationLow, calibrationHigh);
+        } else {
+          quantNote = map( quantNote, -120, 120, calibrationLow, calibrationHigh);
+        }
       break;
       case PYTHAGOREAN:
-        quantNote = globalObj->quantizeSemitonePitch(note, quantizeMode, quantizeKey, 0);
+        quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
         cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
-        quantNote = map( cents, 0, 120000 ,calibLow(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]), calibHigh(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]));
+        quantNote = map( cents, 0, 120000 , calibrationLow, calibrationHigh);
       break;
       case COLUNDI:
-        quantNote = map( colundiArrayX100[note], 0,1012,calibLow(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]), calibHigh(channel, dacCvMap[channel], globalObj->outputNegOffset[channel]));
+        quantNote = map( colundiArrayX100[note], 0,1012, calibrationLow, calibrationHigh);
       break;
     }
-
     return quantNote;
 }
-
-
 
 uint16_t OutputController::voltageOffset(uint8_t volts, uint8_t mapAddress){
   uint16_t twentyVolts = globalObj->dacCalibrationPos[mapAddress]-globalObj->dacCalibrationNeg[mapAddress];
@@ -671,12 +681,12 @@ uint16_t OutputController::calibMidscale(uint8_t mapAddress){
   return (globalObj->dacCalibrationNeg[mapAddress]+globalObj->dacCalibrationPos[mapAddress])/2;
 };
 
-uint16_t OutputController::calibLow(uint8_t channel, uint8_t mapAddress, uint8_t negOffset){
-  return calibMidscale(dacCvMap[channel])-voltageOffset(negOffset, dacCvMap[channel]);
+uint16_t OutputController::calibZero(uint8_t channel, uint8_t mapAddress, uint8_t negOffset){
+  return calibMidscale(mapAddress)-voltageOffset(negOffset, mapAddress);
 }
 
 uint16_t OutputController::calibHigh(uint8_t channel, uint8_t mapAddress, uint8_t negOffset){
-  return globalObj->dacCalibrationPos[dacCvMap[channel]]-voltageOffset(negOffset, dacCvMap[channel]);
+  return globalObj->dacCalibrationPos[mapAddress]-voltageOffset(negOffset, mapAddress);
 }
 
 void OutputController::clearVelocityOutput(uint8_t channel){
@@ -705,21 +715,20 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   uint32_t offset = 0;
   uint32_t segmentLength = 0;
   uint32_t clockCycles = ARM_DWT_CYCCNT;
-  uint32_t lfoTime = positive_modulo(currentFrame-lfoStartFrame[channel], framesPerSequence) * cv2speed[channel]/4;
+  uint32_t lfoTime;
 
+  if (lfoStartFrame[channel] < currentFrame){
+    lfoTime = positive_modulo(currentFrame-lfoStartFrame[channel], framesPerSequence) * cv2speed[channel]/4;
+  } else {
+    lfoTime = positive_modulo(currentFrame+framesPerSequence-lfoStartFrame[channel], framesPerSequence) * cv2speed[channel]/4;
+  }
   bool   slewOn = false;
   bool skipUpdate = false;
   ///stepLength *= 8;
   //Serial.println("beginning cv2update for channel " + String(channel) );
 
   if(debugFrameCount > stepLength/2 && currentFrame < stepLength/2){
-    debugFrameCount = currentFrame;
-  }
-
-  if(channel == 0 && currentFrame > debugFrameCount){
-    debugFrameCount += (stepLength/2);
-    debugFrameCount = debugFrameCount  % framesPerSequence;
-    Serial.println("cf: " + String(currentFrame) + "\tlfoTime: " + String(lfoTime) + "\tdfc: " + String(debugFrameCount));
+    debugFrameCount =  currentFrame + stepLength/2;
   }
 
   if (cv2type[channel] < 1){
@@ -834,8 +843,9 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     case LFO_VOLTAGE:
       GOTOVOLTAGE:
       slewLevel = 0;
-      voltageLevel = cv2amplitude[channel]*128;
-      //voltageLevel = clockCycles/4096;
+      voltageLevel = this->getQuantizedVoltage(channel, cv2amplitude[channel], 0, 0);
+      //voltageLevel *= cv2amplitude[channel];
+
       slewOn = false;
     break;
 
@@ -882,6 +892,9 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   // update modulation destinations
 
   //add offset amount:
+  if(channel == 0 && currentFrame > debugFrameCount){
+    Serial.print("q:" + String(globalObj->quantizeSemitonePitch(cv2amplitude[channel], sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0)));
+  }
   voltageLevel += cv2offset[channel]*128;
 
   if (voltageLevel > 16384){
@@ -889,6 +902,13 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   } else if( voltageLevel < -16384){
     voltageLevel = -16384+(abs(voltageLevel)-16384);
   }
+
+  if(channel == 0 && currentFrame > debugFrameCount){
+    debugFrameCount += (stepLength/2);
+    debugFrameCount = debugFrameCount  % framesPerSequence;
+    Serial.println("\tcf: " + String(currentFrame) + "\tlfoTime: " + String(lfoTime) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tfps: " + String(framesPerSequence) + "\ttype: " + String(cv2type[channel]) + "\tvl: " + String(voltageLevel) + "\tamp: " + String(cv2amplitude[channel]) );
+  }
+
 
   if( !skipUpdate){
     globalObj->cvInputRaw[4+2*channel+1] = voltageLevel;
@@ -899,7 +919,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
       mcp4352_2.setResistance(outputMap(channel, CCRHEO), slewLevel);        // set digipot to 0
     }
     lfoRheoSet[channel] = 0;
-    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
+    ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );
     ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
   }
 
@@ -965,9 +985,9 @@ void OutputController::allNotesOff(uint8_t channel){
   //Serial.println("    OutputController -- all notes off ch:"  + String(channel) + " nt: "  + "\timer: " + String(debugTimer1) );
 
     backplaneGPIO->digitalWrite(channel, LOW);
-    this->cv2type[channel] = 0;
-    this->cv2amplitude[channel] = 0;
-    this->lfoRheoSet[channel] = 1;
+    //this->cv2type[channel] = 0;
+    //this->cv2amplitude[channel] = 0;
+    //this->lfoRheoSet[channel] = 1;
     //this->clearVelocityOutput(channel);
 }
 

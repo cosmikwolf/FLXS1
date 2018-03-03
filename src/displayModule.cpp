@@ -891,9 +891,9 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
   if(voltageValue < 0){
     voltageValue = abs(voltageValue);
-    sprintf(buf, "-%d.%02dv",voltageValue*10/128, (1000*voltageValue)/128-100*(voltageValue*10/128) );
+    sprintf(buf, "-%d.%02dv",voltageValue*10/120, (1000*voltageValue)/120-100*(voltageValue*10/120) );
   } else {
-    sprintf(buf, "%d.%02dv",voltageValue*10/128, (1000*voltageValue)/128-100*(voltageValue*10/128) );
+    sprintf(buf, "%d.%02dv",voltageValue*10/120, (1000*voltageValue)/120-100*(voltageValue*10/120) );
   }
 
 }
