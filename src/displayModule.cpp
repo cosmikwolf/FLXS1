@@ -787,12 +787,13 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
 void DisplayModule::stateDisplay_arp(char *buf){
 
-  const char* chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5", "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9"      };
-  const char*  arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
+  const char* const chordSelectionArray[] = { "unison", "maj", "min", "7th", "m7 ", "maj7", "m/maj7", "6th", "m6th", "aug", "flat5", "sus", "7sus4", "add9", "7#5", "m7#5", "maj7#5", "7b5",  "m7b5", "maj7b5", "sus2", "7sus2",  "dim7", "dim", "Ø7", "5th", "7#9" };
+  const char*  const arpTypeArray[] = { "off","up","down","up dn 1","up dn 2","random" };
 
   displayElement[1]  = strdup("algo");
   displayElement[4] = strdup("speed");
   displayElement[8] = strdup("octve");
+  displayElement[10] = strdup("intvl");
 
   if(globalObj->multiSelectSwitch) {
     sprintf(buf, "arpmulti");
@@ -822,17 +823,12 @@ void DisplayModule::stateDisplay_arp(char *buf){
      displayElement[6]  = strdup("-");
     }
 
-
     if(globalObj->multi_arpOctave_switch){
      sprintf(buf, "%doct", globalObj->multi_arpOctave);
      displayElement[9] = strdup(buf);
     } else {
      displayElement[9]  = strdup("--");
     }
-
-    displayElement[10] = strdup("intvl");
-
-           //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
 
    if(globalObj->multi_arpInterval_switch){
      displayElement[11] = strdup(chordSelectionArray[globalObj->multi_arpInterval]);
@@ -848,23 +844,16 @@ void DisplayModule::stateDisplay_arp(char *buf){
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[12] = strdup(buf);
 
-
-    displayElement[1]  = strdup("algo");
     displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
 
-    displayElement[4] = strdup("speed");
     sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
     displayElement[5] = strdup(buf);
     sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
     displayElement[6] = strdup(buf);
-
-    displayElement[8] = strdup("octve");
     sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
     displayElement[9] = strdup(buf);
-    displayElement[10] = strdup("intvl");
-    //displayElement[7] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord].c_str());
     displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
-  }
+   }
     if(globalObj->multiSelectSwitch) {
       renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background );
     } else {
@@ -898,8 +887,8 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
 }
 
-void DisplayModule::stateDisplay_velocity(char *buf) {
-   char *velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
+ void DisplayModule::stateDisplay_velocity(char *buf) {
+   const char * const velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
 
        displayElement[1] = strdup("ampl:");
        displayElement[3] = strdup("type:");
@@ -1104,12 +1093,12 @@ void DisplayModule::scaleMenuDisplay(){
      displayElement[0] = strdup(buf);
 
      displayElement[3] = strdup("scale:");
-     char *scaleArray[] = {"semitone", "pythagorean", "colundi"};
+     const char * const scaleArray[] = {"semitone", "pythagorean", "colundi"};
 
       displayElement[4] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
 
      displayElement[5] = strdup("key:");
-     char *keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
+     const char * const keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
      displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
      displayElement[7] = strdup("mode:");
      //char *modeArray[] = {"chromatic", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone" };
@@ -1146,7 +1135,7 @@ void DisplayModule::scaleMenuDisplay(){
       case ARABIAN_SCALE_12:      displayElement[8] = strdup("ARABIAN"); break;
       case FLAMENCO_SCALE_12:     displayElement[8] = strdup("FLAMENCO"); break;
       case WHOLETONE_SCALE_12:    displayElement[8] = strdup("WHOLETONE"); break;
-      default:               displayElement[8] = strdup("CUSTOM"); break;
+      default:                    displayElement[8] = strdup("CUSTOM"); break;
       }
 
      switch(sequenceArray[selectedChannel].playMode){
