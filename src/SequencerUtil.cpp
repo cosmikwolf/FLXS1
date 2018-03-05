@@ -49,7 +49,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->muteCV2 					= 0;
   this->fill              = 0;
   this->skipNextNoteTrigger = 0;
-  this->tieFlag           =0;
+  this->tieFlag           = 0;
 	for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
 		this->initializeStep(stepNum);
 	}
@@ -213,14 +213,36 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
   }
 };
 
-void Sequencer::randomize(){
-	for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
-		srand(micros());
-		this->stepData[stepNum].pitch[0]     = (rand()%60)+12;	srand(micros());
-		this->stepData[stepNum].gateType		 = rand()%2;				srand(micros());
-		this->stepData[stepNum].gateLength	 = rand()%10;
+void Sequencer::randomize(uint8_t parameter, uint8_t lowval, uint8_t spanval){
+	uint8_t highval;
+	switch(parameter){
+		case RANDOMIZE_PARAM_PITCHGATE:
+			highval = min_max(lowval+12*spanval, 0, 127);
+
+			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+				this->stepData[stepNum].pitch[0]     = globalObj->generateRandomNumber(lowval, highval);
+				this->stepData[stepNum].gateType		 = globalObj->generateRandomNumber(0,2);
+				this->stepData[stepNum].gateLength	 = globalObj->generateRandomNumber(1,10);;
+				//Serial.print(String(stepData[stepNum].pitch[0]) + " ");
+				//if (stepNum % 16 == 0) 			Serial.println(" ");
+			}
+			//Serial.println(" ");
+		break;
+		case RANDOMIZE_PARAM_PITCH:
+			highval = min_max(lowval+12*spanval, 0, 127);
+			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+				this->stepData[stepNum].pitch[0]     = globalObj->generateRandomNumber(lowval, highval);
+			}
+		break;
+		case RANDOMIZE_PARAM_GATE:
+		for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+			this->stepData[stepNum].gateType		 = globalObj->generateRandomNumber(0,2);
+			this->stepData[stepNum].gateLength	 = globalObj->generateRandomNumber(1,10);;
+		}
+		break;
 	}
 }
+
 
 void Sequencer::skipStep(uint8_t count){
 //Serial.println("skipStep: " + String(count) + "\tppqPulseIndex: "+ String(ppqPulseIndex) + "\tpulsesPerBeat: " + String(pulsesPerBeat) + "\t" );

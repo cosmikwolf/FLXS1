@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include "globalVariable.h"
 
-void GlobalVariable::initialize(){
+void GlobalVariable::initialize(ADC *adc){
+      this->adc = adc;
+
       this->clockMode = INTERNAL_CLOCK;
       this->multi_pitch_switch = 0;
       this->multi_arpInterval_switch = 0;
@@ -30,6 +32,9 @@ void GlobalVariable::initialize(){
       this->multi_velocityType = 0;
       this->multi_cv2speed = 0;
       this->muteChannelSelect[4] = {false};
+      this->randomizeParamSelect = 0;
+      this->randomizeLow = 36;
+      this->randomizeSpan = 3;
 
       for(int i = 0; i < 64; i++){
           this->multiSelection[i]=false;
@@ -73,6 +78,24 @@ bool GlobalVariable::extClock(){
   }
 }
 
+int GlobalVariable::generateRandomNumber(int minVal, int maxVal){
+  uint32_t randomNum;
+
+    randomNum = (adc->analogRead(A6)&0b1111);
+    randomNum |= ((adc->analogRead(A7)&0b1111) << 4);
+    randomNum |= ((adc->analogRead(A6)&0b1111) << 8);
+    randomNum |= ((adc->analogRead(A7)&0b1111) << 12);
+    randomNum |= ((adc->analogRead(A6)&0b1111) << 16);
+    randomNum |= ((adc->analogRead(A7)&0b1111) << 20);
+    randomNum |= ((adc->analogRead(A6)&0b1111) << 24);
+    randomNum |= ((adc->analogRead(A7)&0b1111) << 28);
+    randomNum ^= ARM_DWT_CYCCNT;
+
+    srand(randomNum);
+    randomNum = (rand()%(maxVal-minVal))+minVal;
+
+  return randomNum;
+}
 
 int16_t GlobalVariable::quantizeSemitonePitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction){
   uint8_t count = 0;

@@ -73,6 +73,8 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   }
 
 }
+
+
 void InputModule::multiSelectInputHandler(){
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
@@ -329,7 +331,6 @@ void InputModule::loop(uint16_t frequency){
           globalMenuHandler();
         break;
 
-
         case INPUT_DEBUG_MENU:
           if (knobChange){
             selectedText = positive_modulo(selectedText+knobChange, 5);
@@ -358,9 +359,12 @@ void InputModule::loop(uint16_t frequency){
           saveMenuInputHandler();
         break;
 
+        case MENU_RANDOM:
+          randomShortcutHandler();
+        break;
       }
     } else {
-      Serial.println("AltButton: " + String(didAltButtonsFire));
+    //  Serial.println("AltButton: " + String(didAltButtonsFire));
     }
   }
 }
@@ -489,8 +493,9 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_MULTISELECT:
     //  currentMenu = MENU_MULTISELECT;
       break;
-
-    case STATE_SHORTCUT_RANDOM:
+    case STATE_SHORTCUT_RANDOM_PARAM:
+    case STATE_SHORTCUT_RANDOM_LOW:
+    case STATE_SHORTCUT_RANDOM_SPAN:
       currentMenu = MENU_RANDOM;
     break;
     default:
@@ -693,6 +698,7 @@ void InputModule::sequenceMenuHandler(){
           sequenceArray[selectedChannel].swingX100 = min_max(sequenceArray[selectedChannel].swingX100 + knobChange, 1,99);
         break;
 
+
       }
     }
   }
@@ -831,6 +837,7 @@ uint8_t chanSwIndex;
         break;
     }
     if(midplaneGPIO->pressed(chanSwIndex)){
+
       for (int i=0; i <16; i++){
         if (midplaneGPIO->fell(i) ){
           globalObj->muteChannelSelect[0] = chPressedSelector & 0b0001;
@@ -888,14 +895,14 @@ uint8_t chanSwIndex;
               display->displayModal(300, MODAL_TOBEIMPLEMENTED);
             break;
             case SW_08:// shortcut_random
-              if(this->shortcutRandomSwitch < 750){
-                sequenceArray[chan].randomize();
-                display->displayModal(750, MODAL_RANDOM_PITCH_GATE);
-                this->clearMidplaneBuffers();
-                shortcutRandomSwitch = 10000;
-              } else {
-                shortcutRandomSwitch = 0;
-                display->displayModal(750, MODAL_RANDOM_PITCH_GATE_WARNING);
+              switch(currentMenu){
+                case MENU_RANDOM:
+                  sequenceArray[chan].randomize(globalObj->randomizeParamSelect, globalObj->randomizeLow, globalObj->randomizeSpan);
+                  changeState(STATE_PITCH0);
+                  display->displayModal(300, MODAL_RANDOM_PITCH_GATE);
+                break;
+                default:
+                changeState(STATE_SHORTCUT_RANDOM_PARAM);
               }
             break;
             case SW_09:
@@ -1358,6 +1365,25 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
       }
 }
 
+void InputModule::randomShortcutHandler(){
+  if(knobChange){
+    if ( globalObj->parameterSelect ) {// Encoder Switch
+      changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_SPAN));
+    } else {
+      switch(stepMode){
+        case STATE_SHORTCUT_RANDOM_PARAM:
+          globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
+        break;
+        case STATE_SHORTCUT_RANDOM_LOW:
+          globalObj->randomizeLow = min_max(globalObj->randomizeLow + knobChange, 0, 120);
+        break;
+        case STATE_SHORTCUT_RANDOM_SPAN:
+          globalObj->randomizeSpan = min_max(globalObj->randomizeSpan + knobChange, 1, 8);
+        break;
+      }
+    }
+  }
+}
 
 void InputModule::saveMenuInputHandler(){
   uint8_t chButtonMask = 0;

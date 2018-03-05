@@ -291,6 +291,10 @@ void DisplayModule::displayModal(uint16_t ms, uint8_t select, uint8_t chSelector
   this->chSelector = chSelector;
 }
 
+void DisplayModule::resetModalTimer(){
+  modaltimer = 0;
+}
+
 void DisplayModule::displayModal(uint16_t ms, uint8_t select){
   chSelector = 0;
   modaltimer = 0;
@@ -1926,5 +1930,46 @@ void DisplayModule::cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeVa
 
    renderStringBox(12,  DISPLAY_LABEL,          0, 79, 32,16, false, STYLE1X, background , foreground);
    renderStringBox(13,  STATE_CH4_VOLT_RANGE,   48, 79, 79,16, false, STYLE1X, background , foreground);
+
+}
+
+
+void DisplayModule::shortcutRandomMenu(){
+
+  const char * const paramsArray[] = {"pitch/gate", "pitch", "gate", "tie", "arp all", "arpalgo", "arpspeed", "arpoctave", "arpintv", "cv2type", "cv2amp", "cv2speed", "cv2offset"};
+  displayElement[0] = strdup("Random");
+
+  displayElement[11] = strdup("press ch+rndm");
+  displayElement[12] = strdup("to execute");
+
+  displayElement[1] = strdup("param:");
+  displayElement[2] = strdup("min:");
+  displayElement[3] = strdup("span:");
+
+  displayElement[5] = strdup(paramsArray[globalObj->randomizeParamSelect]);
+  displayElement[6] = strdup(midiNotes[globalObj->randomizeLow]);
+  sprintf(buf, "%d octave", globalObj->randomizeSpan);
+  displayElement[7] = strdup(buf);
+
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+    renderStringBox(11,  DISPLAY_LABEL,  64,  0, 63, 8, false, REGULAR1X, background, contrastColor );
+    renderStringBox(12,  DISPLAY_LABEL,  64,  8, 63, 8, false, REGULAR1X, background, contrastColor );
+
+    renderStringBox(1,  DISPLAY_LABEL,        0, 20,46,17, false, STYLE1X, background , foreground);
+    renderStringBox(2,  DISPLAY_LABEL,        0, 37,46,17, false, STYLE1X, background , foreground);
+    renderStringBox(3,  DISPLAY_LABEL,        0, 54,46,17, false, STYLE1X, background , foreground);
+    //renderStringBox(10,  DISPLAY_LABEL,       0, 71,46,17, false, STYLE1X, background , foreground);
+  //  renderStringBox(11,  DISPLAY_LABEL,       0, 88,46,17, false, STYLE1X, background , foreground);
+
+    renderStringBox(5,  STATE_SHORTCUT_RANDOM_PARAM,   47, 20,80,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_SHORTCUT_RANDOM_LOW,       47, 37,80,17, false, STYLE1X, background , foreground);
+    renderStringBox(7,  STATE_SHORTCUT_RANDOM_SPAN,       47, 54,80,17, false, STYLE1X, background , foreground);
+
+    //renderStringBox(11,  STATE_CV2_OFFSET,         64, 71,63,17, false, STYLE1X, background , foreground);
 
 }

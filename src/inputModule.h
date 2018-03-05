@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include "Zetaohm_MAX7301/Zetaohm_MAX7301.h"
 #define ENCODER_OPTIMIZE_INTERRUPTS
-
+#include <Entropy.h>
 #include <Encoder.h>
 #include "OutputController.h"
 #include "DisplayModule.h"
@@ -53,6 +53,8 @@ public:
   void channelPitchModeInputHandler();
   void multiSelectInputHandler();
 
+  void randomShortcutHandler();
+
   void saveMenuInputHandler();
   void sequenceMenuHandler();
   void scaleMenuHandler();
@@ -63,7 +65,6 @@ public:
 
   void modMenu1_InputHandler();
   void modMenu2_InputHandler();
-
   void debugScreenInputHandler();
   void calibrationMenuHandler();
   void calibrationSaveHandler();
@@ -71,6 +72,7 @@ public:
   void resetKnobValues();
   void clearMidplaneBuffers();
   void changeState(uint8_t state);
+  uint16_t generateRandomNumber();
 
   uint8_t getChannelButtonSw(uint8_t channel);
   int getChannelFromSw(int switchNum);
@@ -98,7 +100,6 @@ public:
   unsigned long smallButtonLoopTime;
   unsigned long encoderButtonTime;
   unsigned long matrixButtonTime;
-
 
 private:
   Sequencer *sequenceArray;

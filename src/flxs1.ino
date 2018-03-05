@@ -85,7 +85,11 @@ void setup() {
   delay(500);
   serialMidi.begin(MIDI_CHANNEL_OMNI);
 
-  globalObj.initialize();
+  globalObj.initialize(adc);
+
+  for(int i=0; i<1000; i++){
+    // Serial.println(globalObj.generateRandomNumber(0, 65535));
+  }
 
   midiControl.midiSetup(sequence, &globalObj);
 
@@ -382,7 +386,7 @@ void usbMidiRealTimeMessageHandler(byte realtimebyte) {
     midiControl.midiStopHandler();
     break;
   }
-  
+
 
   if (realtimebyte == 248) {
   };

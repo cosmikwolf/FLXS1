@@ -127,6 +127,7 @@ class DisplayModule
     void modalDisplay();
     void displayModal(uint16_t ms, uint8_t select, uint8_t chSelector);
     void displayModal(uint16_t ms, uint8_t selector);
+    void resetModalTimer();
     void saveMenuDisplayHandler();
 
     void sequenceMenuDisplay();

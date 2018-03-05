@@ -61,7 +61,7 @@ class Sequencer
 
 		void 		gateInputTrigger(uint8_t inputNum);
 
-		void 		randomize();
+		void 		randomize(uint8_t parameter, uint8_t lowval, uint8_t spanval);
 
 		uint32_t framesPerBeat(int tempoX100);
 
@@ -110,6 +110,7 @@ class Sequencer
     uint8_t   skipStepCount;
     uint8_t		randomLow;
     uint8_t		randomHigh;
+
 
 		uint8_t		quantizeKey;
 		uint16_t	quantizeMode;

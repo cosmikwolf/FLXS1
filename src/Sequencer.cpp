@@ -145,7 +145,7 @@ void Sequencer::updateClockDivision(int8_t clockDiv){
 
   this->clockDivision = clockDiv;
 
-  Serial.println("org ppq index: " + String(ppqPulseIndex) + "\torgNum: " + String(oldClockDivNum) + "\torgDen: " + String(oldClockDivDen) +"\tttlPulsOrg: " + String(pulsesPerBeat*stepCount*oldClockDivNum / oldClockDivDen)+"\tttlPulsNew: " + String(pulsesPerBeat*stepCount*clockDivisionNum() / clockDivisionDen()) + "\tcf: " + String(currentFrame) + "\tfps: " + String(framesPerSequence()));
+  //Serial.println("org ppq index: " + String(ppqPulseIndex) + "\torgNum: " + String(oldClockDivNum) + "\torgDen: " + String(oldClockDivDen) +"\tttlPulsOrg: " + String(pulsesPerBeat*stepCount*oldClockDivNum / oldClockDivDen)+"\tttlPulsNew: " + String(pulsesPerBeat*stepCount*clockDivisionNum() / clockDivisionDen()) + "\tcf: " + String(currentFrame) + "\tfps: " + String(framesPerSequence()));
 
   //recalculate the ppqPulseIndex based on the new total PpqPulseCount with the new clockDiv
   tempPulseIndex = pulsesPerBeat*stepCount*clockDivisionNum() / clockDivisionDen() ;
@@ -167,7 +167,7 @@ void Sequencer::updateClockDivision(int8_t clockDiv){
 
 //  ppqPulseIndex = tempPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
 currentFrame = this->getCurrentFrame();
-  Serial.println("new ppq index: " + String(ppqPulseIndex) + "\tnewNum: " + String(clockDivisionNum()) + "\tnewDen: " + String(clockDivisionDen()) + "\torgCF: " + String(origCurrentFrame) + "\torgFPS: " + String(origFramesPerSequence) );
+  // Serial.println("new ppq index: " + String(ppqPulseIndex) + "\tnewNum: " + String(clockDivisionNum()) + "\tnewDen: " + String(clockDivisionDen()) + "\torgCF: " + String(origCurrentFrame) + "\torgFPS: " + String(origFramesPerSequence) );
 }
 
 uint32_t Sequencer::getCurrentFrame(){

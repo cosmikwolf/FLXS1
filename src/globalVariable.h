@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "global.h"
+#include <ADC.h>
 
 #ifndef _globalVariable_h_
 #define _globalVariable_h_
@@ -71,6 +72,9 @@ class GlobalVariable {
     uint8_t rheoTestLevel;
     uint8_t stepCopyIndex;
     uint8_t chCopyIndex;
+    uint8_t 	randomizeParamSelect;
+    uint8_t 	randomizeLow;
+    uint8_t 	randomizeSpan;
 
     bool muteChannelSelect[4];
     bool parameterSelect;
@@ -78,12 +82,14 @@ class GlobalVariable {
     bool midiSetClockOut;
     bool gateTestComplete;
     elapsedMillis testTimer;
-
+    int generateRandomNumber(int minVal, int maxVal);
     bool extClock();
     int16_t quantizeSemitonePitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction);
-
-    void initialize();
+    void initialize(ADC *adc);
     void initGlobals();
+
+  private:
+    ADC *adc;
 };
 
 #endif
