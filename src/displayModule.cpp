@@ -29,26 +29,26 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setFont(&OrbitBold_14);//this will load the font
   oled.setTextScale(1);
   oled.setCursor(0,0);
-  oled.println("RESIST");delay(10);
-  oled.println("RESIST");delay(10);
-  oled.println("RESIST");delay(10);
-  oled.println("RESIST");delay(10);
-  oled.println("RESIST");delay(10);
-  oled.println("RESIST");               delay(100);
+  oled.println("MAKE MUSIC");delay(10);
+  oled.println("MAKE MUSIC");delay(10);
+  oled.println("MAKE MUSIC");delay(10);
+  oled.println("MAKE MUSIC");delay(10);
+  oled.println("MAKE MUSIC");delay(10);
+  oled.println("MAKE MUSIC");               delay(100);
   oled.fillScreen(GREEN, ORANGE);
   oled.setCursor(0,0);
-  oled.println("FASCISM"); delay(10);
-  oled.println("FASCISM"); delay(10);
-  oled.println("FASCISM"); delay(10);
-  oled.println("FASCISM"); delay(10);
-  oled.println("FASCISM"); delay(10);
-  oled.println("FASCISM"); delay(10);      delay(100);
+  oled.println("NOT WAR"); delay(10);
+  oled.println("NOT WAR"); delay(10);
+  oled.println("NOT WAR"); delay(10);
+  oled.println("NOT WAR"); delay(10);
+  oled.println("NOT WAR"); delay(10);
+  oled.println("NOT WAR"); delay(10);      delay(100);
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
-  oled.fillScreen(BLUE);
+  oled.fillScreen(NAVY);
   oled.setCursor(CENTER,8);
-  oled.setTextColor(BLACK);
+  oled.setTextColor(WHITE);
   oled.setFont(&LadyRadical_16);//this will load the font
   oled.setTextScale(2);
   oled.println("Zetaohm");
@@ -56,15 +56,15 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setFont(&NeueHaasXBlack_28);//this will load the font
 
   oled.setCursor(CENTER,35);
-  oled.setTextColor(BLACK);
+  oled.setTextColor(WHITE);
   oled.setTextScale(1);
   oled.println("FLXS1");
   oled.setFont(&flxs1_menu);//this will load the font
 
   oled.setTextScale(1);
-  oled.setCursor(CENTER,110);
-  oled.setTextColor(BLACK);
-  oled.println("beta17j");
+  oled.setTextColor(WHITE);
+  oled.setCursor(100,110);
+  oled.println("beta17k");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
