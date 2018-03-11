@@ -36,6 +36,7 @@ void LEDArray::loop(uint16_t interval){
       case MOD_MENU_2:
       case TEMPO_MENU:
       case QUANTIZE_MENU:
+      case MENU_RANDOM:
         if(stepMode == STATE_QUANTIZEMODE){
           quantizeModeLEDHandler();
         } else {

@@ -142,8 +142,10 @@ void MasterClock::sequencerFunc(void){
 	//  lastAvgInterval = avgInterval;
 
 	//	midiControl->midiClockSyncFunc(serialMidi);
-
-
+	if (playing && !wasPlaying){
+		//generate random seed
+		globalObj->generateRandomNumber(0, 65535);
+	}
 	switch(globalObj->clockMode){
     case INTERNAL_CLOCK:
 			internalClockTick();

@@ -749,14 +749,17 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     break;
 
     case LFO_ENV_AR:
-      offset = stepLength*16*4/(2*cv2speed[channel]);
+      offset = stepLength*cv2speed[channel]/8; //center point between attack and release
       segmentLength = (stepLength*16/(cv2speed[channel]));
 
-      if(currentFrame - lfoStartFrame[channel] < offset){
-        voltageLevel = min_max(-1*(cv2amplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/segmentLength), cv2amplitude[channel]*-128, cv2amplitude[channel]*128);
+      if((currentFrame < lfoStartFrame[channel]) || (currentFrame > lfoStartFrame[channel] + stepLength*cv2speed[channel]/4)){
+        voltageLevel = 0;
+      } else if(currentFrame < lfoStartFrame[channel] + offset){
+        voltageLevel = cv2amplitude[channel]*(128*((currentFrame - lfoStartFrame[channel])/128)/((stepLength*cv2speed[channel]/8)/128)) ;
       } else {
-        voltageLevel = min_max((cv2amplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel]-offset)/segmentLength), cv2amplitude[channel]*-128, cv2amplitude[channel]*128);
+        voltageLevel = cv2amplitude[channel]*(128-128*((currentFrame - lfoStartFrame[channel]-offset)/128)/((stepLength*cv2speed[channel]/8)/128)) ;
       }
+
       slewOn = false;
       //Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tstepLength: " + String(stepLength) +  "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength));
 
@@ -764,45 +767,49 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
 
 
     case LFO_ENV_ASR:
-      offset = stepLength*16*4/(3*cv2speed[channel]);
-      segmentLength = (stepLength*16*4/(6*cv2speed[channel]));
 
-      if(currentFrame - lfoStartFrame[channel] < offset){
-        voltageLevel = min_max(-1*(cv2amplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/segmentLength)  , cv2amplitude[channel]*-128, cv2amplitude[channel]*128);
-      } else if(currentFrame - lfoStartFrame[channel] < 2*offset){
-        voltageLevel = 128* cv2amplitude[channel];
-      }else {
-        voltageLevel = min_max((cv2amplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel]-2*offset)/segmentLength)  , cv2amplitude[channel]*-128, cv2amplitude[channel]*128);
+      offset = stepLength*cv2speed[channel]/12; //center point between attack and release
+      segmentLength = (stepLength*16/(cv2speed[channel]));
+
+      if((currentFrame < lfoStartFrame[channel]) || (currentFrame > lfoStartFrame[channel] + stepLength*cv2speed[channel]/4)){
+        voltageLevel = 0;
+      } else if(currentFrame < lfoStartFrame[channel] + offset){
+        voltageLevel = cv2amplitude[channel]*(128*((currentFrame - lfoStartFrame[channel])/128)/((stepLength*cv2speed[channel]/12)/128)) ;
+      } else if(currentFrame < lfoStartFrame[channel] + 2*offset){
+        voltageLevel = cv2amplitude[channel] * 128;
+      } else {
+        voltageLevel = cv2amplitude[channel]*(128-128*((currentFrame - lfoStartFrame[channel]-2*offset)/128)/((stepLength*cv2speed[channel]/12)/128)) ;
       }
+
       slewOn = false;
     break;
 
     case LFO_ENV_DECAY:
       GOTODECAY:
-      //voltageLevel = min_max(-16*cv2amplitude[channel]*log(currentFrame - lfoStartFrame[channel]),-16384, 16384);
-      voltageLevel = min_max((cv2amplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/(stepLength*16/cv2speed[channel]))  , cv2amplitude[channel]*-128, 16384);
 
-
+      if((currentFrame < lfoStartFrame[channel]) || (currentFrame > lfoStartFrame[channel] + stepLength*cv2speed[channel]/4)){
+        voltageLevel = 0;
+      } else {
+        voltageLevel = cv2amplitude[channel]*(128-128*((currentFrame - lfoStartFrame[channel])/128)/((stepLength*cv2speed[channel]/4)/128)) ;
+      }
       slewOn = false;
 
-      //Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength));
+      //Serial.println("VoltLev: " + String(voltageLevel) + "\tcurrentFrame: " + String(currentFrame) + "\tlfoStart: " + String(lfoStartFrame[channel]) + "\tdiv: " + String(100*(currentFrame - lfoStartFrame[channel])/stepLength) + "\tvoltCalc2: " + String((128-128*((int32_t)currentFrame - lfoStartFrame[channel])/(stepLength*cv2speed[channel]/4))) + "\tvc3: " + String(128*(currentFrame - lfoStartFrame[channel])));
     break;
 
     case LFO_ENV_ATTACK:
       GOTOATTACK:
-      // lfoStartFrame[channel] - first frame of env
-      // currentFrame -
-      //voltageLevel = cv2amplitude[channel] * 16384 * (currentFrame - lfoStartFrame[channel])/ (stepLength * cv2speed[channel]);
-      voltageLevel = min_max(-1*(cv2amplitude[channel]) * (128-128*(currentFrame - lfoStartFrame[channel])/(stepLength*16*4/cv2speed[channel]))  , -16384, cv2amplitude[channel]*128);
-      //voltageLevel = 8000;
+
+      if((currentFrame < lfoStartFrame[channel]) || (currentFrame > lfoStartFrame[channel] + stepLength*cv2speed[channel]/4)){
+        voltageLevel = 0;
+      } else {
+        voltageLevel = cv2amplitude[channel]*(128*((currentFrame - lfoStartFrame[channel])/128)/((stepLength*cv2speed[channel]/4)/128)) ;
+      }
+
       slewLevel = 0;
       slewOn = false;
     break;
-//lfo spd:
-//wavelnt:
     case LFO_TRIANGLE:
-    //x = m - abs(i % (2*m) - m)
-//      voltageLevel = stepLength - abs(lfoTime)
       voltageLevel = 2*abs(cv2amplitude[channel]*((int)(lfoTime/(stepLength/16)) % (256)- 128 ))  - (cv2amplitude[channel]*128);
       slewOn = false;
       slewLevel = 0;

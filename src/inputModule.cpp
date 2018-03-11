@@ -1372,7 +1372,8 @@ void InputModule::randomShortcutHandler(){
     } else {
       switch(stepMode){
         case STATE_SHORTCUT_RANDOM_PARAM:
-          globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
+//        globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
+          globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 2);
         break;
         case STATE_SHORTCUT_RANDOM_LOW:
           globalObj->randomizeLow = min_max(globalObj->randomizeLow + knobChange, 0, 120);
