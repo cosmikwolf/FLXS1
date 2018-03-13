@@ -30,13 +30,16 @@ void LEDArray::loop(uint16_t interval){
 
     pixelTimer = 0;
 
+    if(blinkTimer > 6000000/tempoX100){
+      blinkTimer = 0;
+    }
+
     switch (currentMenu ){
       case SEQUENCE_MENU:
       case MOD_MENU_1:
       case MOD_MENU_2:
       case TEMPO_MENU:
       case QUANTIZE_MENU:
-      case MENU_RANDOM:
         if(stepMode == STATE_QUANTIZEMODE){
           quantizeModeLEDHandler();
         } else {
@@ -44,11 +47,12 @@ void LEDArray::loop(uint16_t interval){
         }
       break;
       case PITCH_GATE_MENU:
+      case MENU_RANDOM:
       case ARPEGGIO_MENU:
         if(globalObj->multiSelectSwitch){
           multiSelectLEDHandler();
         } else {
-          channelPitchModeLEDHandler();
+          channelPitchModeLEDHandler(selectedStep);
         }
       break;
       case VELOCITY_MENU:
@@ -115,34 +119,32 @@ void LEDArray::channelSequenceModeLEDHandler(){
 }
 
 void LEDArray::multiSelectLEDHandler(){
-  for (int i=0; i < 16; i++){
-    if (globalObj->multiSelection[getNote(i)]){
-      leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
-    } else {
-      leds.setPixelColor(ledMainMatrix[i], 64,0,0,0);
+    for (int i=0; i < 16; i++){
+      if (globalObj->multiSelection[getNote(i)] && blinkTimer > 3000000/tempoX100){
+        leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
+      } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType != 0){
+        leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
+      } else {
+        leds.setPixelColor(ledMainMatrix[i], 16,0,16,0);
+      }
     }
-  }
-  playPauseHandler();
-  channelLEDHandler();
+    this->playPauseHandler();
+    this->channelLEDHandler();
 };
 
 
-void LEDArray::channelPitchModeLEDHandler(){
-  if(blinkTimer > 6000000/tempoX100){
-    blinkTimer = 0;
-  }
+void LEDArray::channelPitchModeLEDHandler(uint8_t stepSelect){
 
   for (int i=0; i < 16; i++){
     if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
       leds.setPixelColor(ledMainMatrix[i], 127,127,127,255);
-
     } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
         leds.setPixelColor(ledMainMatrix[i], 1,1,1,1);
     } else {
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
     }
 
-    if (getNote(i) == selectedStep && blinkTimer < 3000000/tempoX100) {
+    if (getNote(i) == stepSelect && blinkTimer < 3000000/tempoX100) {
       leds.setPixelColor(ledMainMatrix[i], 255,255,255,0);
     }
 }

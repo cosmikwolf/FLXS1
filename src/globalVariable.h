@@ -35,6 +35,7 @@ class GlobalVariable {
     bool       multi_velocity_switch;
     bool       multi_velocityType_switch;
     bool       multi_cv2speed_switch;
+    bool       multi_cv2offset_switch;
     uint8_t    multi_pitch;
     uint8_t    multi_arpInterval;
     uint8_t    multi_gateType;
@@ -48,6 +49,7 @@ class GlobalVariable {
     uint8_t    multi_velocity;
     uint8_t    multi_velocityType;
     uint8_t    multi_cv2speed;
+    uint8_t    multi_cv2offset;
 
     uint8_t   clockMode;
     int8_t  cvInputMapped[14];

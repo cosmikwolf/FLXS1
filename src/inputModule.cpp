@@ -83,8 +83,24 @@ void InputModule::multiSelectInputHandler(){
 
       buttonMode = BUTTON_MODE_MULTISELECT;
       globalObj->multiSelection[getNote(i)] =  !globalObj->multiSelection[getNote(i)];
+      globalObj->multi_pitch_switch = 0;
+      globalObj->multi_arpInterval_switch = 0;
+      globalObj->multi_gateType_switch = 0;
+      globalObj->multi_gateLength_switch = 0;
+      globalObj->multi_arpType_switch = 0;
+      globalObj->multi_arpOctave_switch = 0;
+      globalObj->multi_arpSpdNum_switch = 0;
+      globalObj->multi_arpSpdDen_switch = 0;
+      globalObj->multi_glide_switch = 0;
+      globalObj->multi_beatDiv_switch = 0;
+      globalObj->multi_velocity_switch = 0;
+      globalObj->multi_velocityType_switch = 0;
+      globalObj->multi_cv2speed_switch = 0;
+      globalObj->multi_cv2offset_switch = 0;
+
       Serial.println("Setting " + String(getNote(i)) + " to " + String(globalObj->multiSelection[getNote(i)]));
     };
+    if (midplaneGPIO->rose(i)){ };
   };
 
   if (knobChange){
@@ -93,60 +109,63 @@ void InputModule::multiSelectInputHandler(){
     } else {
       switch(stepMode){
         case STATE_PITCH0:
-          globalObj->multi_pitch_switch = true;
-          globalObj->multi_pitch += knobChange;
+          if(!globalObj->multi_pitch_switch){  globalObj->multi_pitch_switch = true;
+          } else { globalObj->multi_pitch += knobChange; }
           break;
         case STATE_CHORD:
-          globalObj->multi_arpInterval_switch = true;
-          globalObj->multi_arpInterval = min_max(globalObj->multi_arpInterval + knobChange, 0, 26 );
+          if(!globalObj->multi_arpInterval_switch){  globalObj->multi_arpInterval_switch = true;
+          } else { globalObj->multi_arpInterval = min_max(globalObj->multi_arpInterval + knobChange, 0, 26 ); }
           break;
         case STATE_GATETYPE:
-          globalObj->multi_gateType_switch = true;
-          globalObj->multi_gateType = min_max(globalObj->multi_gateType + knobChange, 0, 3);
+          if(!globalObj->multi_gateType_switch){  globalObj->multi_gateType_switch = true;
+          } else { globalObj->multi_gateType = min_max(globalObj->multi_gateType + knobChange, 0, 3); }
           break;
         case STATE_GATELENGTH:
-          globalObj->multi_gateLength_switch = true;
-          globalObj->multi_gateLength = min_max(globalObj->multi_gateLength + knobChange, 0, 64);
-
+          if(!globalObj->multi_gateLength_switch){  globalObj->multi_gateLength_switch = true;
+          } else { globalObj->multi_gateLength = min_max(globalObj->multi_gateLength + knobChange, 0, 64); }
           break;
         case STATE_ARPTYPE:
-          globalObj->multi_arpType_switch = true;
-          globalObj->multi_arpType = min_max(globalObj->multi_arpType + knobChange, 0, 5);
+          if(!globalObj->multi_arpType_switch){  globalObj->multi_arpType_switch = true;
+          } else { globalObj->multi_arpType = min_max(globalObj->multi_arpType + knobChange, 0, 5); }
           break;
         case STATE_ARPOCTAVE:
-          globalObj->multi_arpOctave_switch = true;
-          globalObj->multi_arpOctave = min_max(globalObj->multi_arpOctave + knobChange, 0, 5);
+          if(!globalObj->multi_arpOctave_switch){  globalObj->multi_arpOctave_switch = true;
+          } else { globalObj->multi_arpOctave = min_max(globalObj->multi_arpOctave + knobChange, 0, 5); }
           break;
         case STATE_ARPSPEEDNUM:
-          globalObj->multi_arpSpdNum_switch = true;
-          globalObj->multi_arpSpdNum  =min_max(globalObj->multi_arpSpdNum + knobChange,0,16);
+          if(!globalObj->multi_arpSpdNum_switch){  globalObj->multi_arpSpdNum_switch = true;
+          } else { globalObj->multi_arpSpdNum  =min_max(globalObj->multi_arpSpdNum + knobChange,0,16); }
           break;
         case STATE_ARPSPEEDDEN:
-          globalObj->multi_arpSpdDen_switch = true;
-          globalObj->multi_arpSpdDen = min_max(globalObj->multi_arpSpdDen + knobChange,0,64);
+          if(!globalObj->multi_arpSpdDen_switch){  globalObj->multi_arpSpdDen_switch = true;
+          } else { globalObj->multi_arpSpdDen = min_max(globalObj->multi_arpSpdDen + knobChange,0,64); }
           break;
         case STATE_GLIDE:
-          globalObj->multi_glide_switch = true;
-          globalObj->multi_glide = min_max(globalObj->multi_glide + knobChange,0,255);
-
+          if(!globalObj->multi_glide_switch){  globalObj->multi_glide_switch = true;
+          } else { globalObj->multi_glide = min_max(globalObj->multi_glide + knobChange,0,255); }
           break;
         case STATE_BEATCOUNT:
-          globalObj->multi_beatDiv_switch = true;
-          globalObj->multi_beatDiv += knobChange;
+          if(!globalObj->multi_beatDiv_switch){  globalObj->multi_beatDiv_switch = true;
+          } else { globalObj->multi_beatDiv += knobChange; }
           break;
         case STATE_CV2_LEVEL:
-          globalObj->multi_velocity_switch = true;
-          globalObj->multi_velocity += knobChange;
+          if(!globalObj->multi_velocity_switch){  globalObj->multi_velocity_switch = true;
+          } else { globalObj->multi_velocity += knobChange; }
           break;
         case STATE_CV2_TYPE:
-          globalObj->multi_velocityType_switch = true;
-          globalObj->multi_velocityType = min_max(globalObj->multi_velocityType+ knobChange, 0 , 4);
+          if(!globalObj->multi_velocityType_switch){  globalObj->multi_velocityType_switch = true;
+          } else { globalObj->multi_velocityType = min_max(globalObj->multi_velocityType+ knobChange, 0 , 4); }
 
           break;
         case STATE_CV2_SPEED:
-          globalObj->multi_cv2speed_switch = true;
-          globalObj->multi_cv2speed += knobChange;
+          if(!globalObj->multi_cv2speed_switch){  globalObj->multi_cv2speed_switch = true;
+          } else { globalObj->multi_cv2speed += knobChange; }
           break;
+        case STATE_CV2_OFFSET:
+          if(!globalObj->multi_cv2offset_switch){  globalObj->multi_cv2offset_switch = true;
+          } else { globalObj->multi_cv2offset += knobChange; }
+          break;
+
       }
 
       for(int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
@@ -193,27 +212,25 @@ void InputModule::multiSelectInputHandler(){
             break;
             case STATE_ARPSPEEDNUM:
               sequenceArray[selectedChannel].stepData[i].arpSpdNum = min_max(globalObj->multi_arpSpdNum, 1, 16) ;
-
               break;
             case STATE_ARPSPEEDDEN:
               sequenceArray[selectedChannel].stepData[i].arpSpdDen = min_max(globalObj->multi_arpSpdDen, 1, 64);
-
               break;
             case STATE_GLIDE:
               sequenceArray[selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 128);
               break;
             case STATE_CV2_LEVEL:
               sequenceArray[selectedChannel].stepData[i].velocity =  positive_modulo(globalObj->multi_velocity, 127);
-
               break;
             case STATE_CV2_TYPE:
               sequenceArray[selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 13);
-
               break;
             case STATE_CV2_SPEED:
               sequenceArray[selectedChannel].stepData[i].cv2speed = min_max(globalObj->multi_cv2speed, 1, 255);
-
               break;
+            case STATE_CV2_OFFSET:
+              sequenceArray[selectedChannel].stepData[i].cv2offset = min_max(globalObj->multi_cv2offset, -64, 64);
+            break;
           }
         }
       }
@@ -517,6 +534,7 @@ void InputModule::patternSelectHandler(){
 
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->rose(i)){
+      Serial.println("pattern change " + String(i));
       saveFile->changePattern(i, patternChannelSelector, true);
 
       //delay(10);
@@ -1102,6 +1120,7 @@ uint8_t chanSwIndex;
 
             break;
             default:
+              globalObj->multiSelectSwitch = 0;
               changeState(STATE_PATTERNSELECT);
             break;
           }
@@ -1153,7 +1172,6 @@ uint8_t chanSwIndex;
               notePage = positive_modulo(notePage - 1, 4);
             }
           }
-
         break;
 
         case SW_PGUP:
@@ -1383,6 +1401,10 @@ void InputModule::randomShortcutHandler(){
         break;
       }
     }
+  }
+  for(int i = 0; i<16; i++){
+    if(midplaneGPIO->rose(i)){    };
+    if(midplaneGPIO->fell(i)){    };
   }
 }
 

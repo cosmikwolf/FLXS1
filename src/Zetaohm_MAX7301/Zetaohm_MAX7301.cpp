@@ -162,6 +162,9 @@ void Zetaohm_MAX7301::clearBuffers(){
   fellBuffer = 0;
   roseBuffer = 0;
   inputBuffer = 0;
+  for(int i = 0; i<32; i++){
+    indexCache[i] = 0;
+  }
 }
 
 void Zetaohm_MAX7301::skipNextRises(uint8_t count){

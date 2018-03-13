@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("beta17k");
+  oled.println("beta17l");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -925,6 +925,13 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
       displayElement[6] = strdup(buf);
     } else {
       displayElement[6]  = strdup("--");
+    }
+
+    if(globalObj->multi_cv2offset_switch){
+      voltageToText(buf,globalObj->multi_cv2offset);
+      displayElement[11] = strdup(buf);
+    } else {
+      displayElement[11]  = strdup("--");
     }
 
   } else {
