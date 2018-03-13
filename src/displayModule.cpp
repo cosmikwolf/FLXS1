@@ -908,7 +908,7 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
       displayElement[8] = strdup(buf);
 
     if(globalObj->multi_velocity_switch){
-      sprintf(buf, "%d", globalObj->multi_velocity);
+      voltageToText(buf,globalObj->multi_velocity);
       displayElement[2] = strdup(buf);
     } else {
       displayElement[2]  = strdup("--");
