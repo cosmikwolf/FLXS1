@@ -70,7 +70,6 @@ public:
   void calibrationSaveHandler();
 
   void resetKnobValues();
-  void clearMidplaneBuffers();
   void changeState(uint8_t state);
   uint16_t generateRandomNumber();
 

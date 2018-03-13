@@ -386,9 +386,6 @@ void InputModule::loop(uint16_t frequency){
   }
 }
 
-void InputModule::clearMidplaneBuffers(){
-  midplaneGPIO->clearBuffers();
-}
 void InputModule::changeState(uint8_t targetState){
   //Serial.println("change state: " + String(targetState));
 
@@ -534,7 +531,6 @@ void InputModule::patternSelectHandler(){
 
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->rose(i)){
-      Serial.println("pattern change " + String(i));
       saveFile->changePattern(i, patternChannelSelector, true);
 
       //delay(10);
@@ -1115,6 +1111,8 @@ uint8_t chanSwIndex;
             break;
             case SAVE_MENU:
               saveFile->savePattern(patternChannelSelector, saveDestination);
+              midplaneGPIO->clearBuffers();
+
               changeState(STATE_PITCH0);
               display->displayModal(750, MODAL_SAVE);
 
@@ -1402,10 +1400,7 @@ void InputModule::randomShortcutHandler(){
       }
     }
   }
-  for(int i = 0; i<16; i++){
-    if(midplaneGPIO->rose(i)){    };
-    if(midplaneGPIO->fell(i)){    };
-  }
+  midplaneGPIO->clearBuffers();
 }
 
 void InputModule::saveMenuInputHandler(){

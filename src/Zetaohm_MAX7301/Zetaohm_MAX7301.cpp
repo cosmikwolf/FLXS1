@@ -159,11 +159,12 @@ void Zetaohm_MAX7301::update(){
 };
 
 void Zetaohm_MAX7301::clearBuffers(){
-  fellBuffer = 0;
-  roseBuffer = 0;
-  inputBuffer = 0;
+  // fellBuffer = 0x0;
+  // roseBuffer = 0x0;
+  // inputBuffer = 0x0;
   for(int i = 0; i<32; i++){
-    indexCache[i] = 0;
+    if(this->rose(i)){};
+    if(this->fell(i)){};
   }
 }
 
