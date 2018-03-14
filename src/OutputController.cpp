@@ -612,11 +612,7 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
 
     lfoStartFrame[channel] = startFrame;
   }
-
-
     //Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
-
-
   int offset = 0;
   //offset = globalObj->cvInputMapped[channel];
   //delayMicroseconds(5);
@@ -636,6 +632,8 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   }
 
 };
+
+
 
 int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue){
   uint32_t cents = 0;
@@ -705,6 +703,15 @@ void OutputController::clearVelocityOutput(uint8_t channel){
   ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
 
 };
+
+void OutputController::cv2settingsChange(uint8_t channel, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting){
+  if (velocityType != 0 ){
+    this->cv2type[channel] = velocityType;
+    this->cv2amplitude[channel] = velocity;
+    this->cv2speed[channel] = cv2speedSetting;
+    this->cv2offset[channel] = cv2offsetSetting;
+  }
+}
 
 void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_t framesPerSequence, uint32_t stepLength, bool mute){
   if (mute){

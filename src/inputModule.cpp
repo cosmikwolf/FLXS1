@@ -1371,19 +1371,21 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
         case STATE_ARPOCTAVE:
           sequenceArray[channel].stepData[stepNum].arpOctave=  min_max(sequenceArray[channel].stepData[stepNum].arpOctave + change, 1, 5);
         break;
-
         case STATE_CV2_LEVEL:
           sequenceArray[channel].stepData[stepNum].velocity =  min_max(sequenceArray[channel].stepData[stepNum].velocity + change, -127, 127);
-        break;
+          goto CV2UPDATE;
         case STATE_CV2_TYPE:
           sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 13);
-        break;
+          goto CV2UPDATE;
         case STATE_CV2_SPEED:
           sequenceArray[channel].stepData[stepNum].cv2speed = min_max(sequenceArray[channel].stepData[stepNum].cv2speed + change, 1, 255);
-        break;
+          goto CV2UPDATE;
         case STATE_CV2_OFFSET:
           sequenceArray[channel].stepData[stepNum].cv2offset = min_max(sequenceArray[channel].stepData[stepNum].cv2offset + change, -64, 64);
-        break;
+          CV2UPDATE:
+          outputControl->cv2settingsChange(channel, sequenceArray[channel].stepData[stepNum].velocity, sequenceArray[channel].stepData[stepNum].velocityType, sequenceArray[channel].stepData[stepNum].cv2speed, sequenceArray[channel].stepData[stepNum].cv2offset);
+          break;
+
       }
 }
 

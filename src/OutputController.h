@@ -35,6 +35,7 @@ public:
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   int16_t getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue );
   void setDacVoltage( uint8_t dac, uint16_t output );
+  void cv2settingsChange(uint8_t channel, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting);
   void cv2update(uint8_t channel, uint32_t currentFrame,  uint32_t framesPerSequence, uint32_t stepLength, bool mute);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
