@@ -19,7 +19,7 @@ class MasterClock {
 
 public:
   void initialize(OutputController* outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, GlobalVariable* globalObj);
-  void changeTempo(uint32_t newTempoX100);
+  void changeTempo(uint32_t newtempoX100);
   void masterClockFunc();
   void sequencerFunc();
   void internalClockTick();
@@ -45,7 +45,7 @@ public:
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
   boolean displayRunSwitch;
-
+  // uint32_t beatLength;
   uint8_t gateMap[4];
   uint8_t dacCvMap[4];
   uint8_t dacCcMap[4];

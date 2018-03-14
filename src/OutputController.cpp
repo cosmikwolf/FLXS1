@@ -998,10 +998,20 @@ void OutputController::allNotesOff(uint8_t channel){
     //this->clearVelocityOutput(channel);
 }
 
+bool OutputController::readClockPort(){
+  if(globalObj->clockPortDirection() == CLOCK_PORT_INPUT){
+    return digitalReadFast(CLOCK_PIN);
+  } else {
+    return 0;
+  }
+}
+
 void OutputController::setClockOutput(bool value){
     //backplaneGPIO->digitalWrite(17, value);
-    digitalWriteFast(PIN_EXT_AD_1, value);
-    digitalWrite(CLOCK_PIN, value);
+    //digitalWriteFast(PIN_EXT_AD_1, value);
+    if(globalObj->clockPortDirection() == CLOCK_PORT_OUTPUT){
+      digitalWriteFast(CLOCK_PIN, value);
+    }
 
     clockValue = value;
     if (value == HIGH){

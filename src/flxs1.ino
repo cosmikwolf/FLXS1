@@ -145,9 +145,6 @@ void setup() {
   //CacheTimer.begin(cacheLoop,kCacheClockInterval);
   //CacheTimer.priority(2);
 
-
-
-
   pinMode(PIN_EXT_TX, OUTPUT); // debug pin - EXT_TX - exp pin 5
   pinMode(PIN_EXT_AD_1, OUTPUT);
   pinMode(PIN_EXT_AD_2, OUTPUT);
@@ -178,8 +175,8 @@ void setup() {
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED, ADC_1); // change the sampling speed
   // CLOCK PIN SETUP
-  pinMode(CLOCK_PIN, OUTPUT);
-  digitalWrite(CLOCK_PIN, LOW);
+
+  globalObj.setClockPortDirection(CLOCK_PORT_OUTPUT);
 
   pinMode(A3, INPUT);
   pinMode(A12, INPUT);
@@ -341,6 +338,7 @@ void cacheLoop(){
 
 void midiClockPulseHandlerWrapper(){
 //  timeControl.setDebugPin(3, HIGH);
+  if(globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK) return;
   midiControl.midiClockPulseHandler();
 //  timeControl.setDebugPin(3, LOW);
 }
@@ -354,10 +352,12 @@ void midiNoteOffHandlerWrapper(byte channel, byte note, byte velocity){
 }
 
 void midiStartContinueHandlerWrapper(){
+  if(globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK) return;
   midiControl.midiStartContinueHandler();
 }
 
 void midiStopHandlerWrapper(){
+  if(globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK) return;
   midiControl.midiStopHandler();
 }
 
@@ -372,6 +372,7 @@ void midiSongPositionPointerWrapper(uint16_t songPosition){
 
 void usbMidiRealTimeMessageHandler(byte realtimebyte) {
   //Serial.println("realTimeMessage!:\t" + String(realtimebyte));
+  if(globalObj.clockMode != EXTERNAL_MIDI_USB_CLOCK) return;
   switch(realtimebyte){
     case 248:
     midiControl.midiClockPulseHandler();

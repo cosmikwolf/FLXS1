@@ -18,15 +18,15 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 	lfoTimer = 0;
 };
 
-void MasterClock::changeTempo(uint32_t newTempoX100){
-	tempoX100 = newTempoX100;
-	beatLength = 58962000/(tempoX100/100);
+void MasterClock::changeTempo(uint32_t newtempoX100){
+	globalObj->tempoX100 = newtempoX100;
+	// beatLength = 58962000/(globalObj->tempoX100/100);
 
-	//uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
-	uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	//uint32_t clockPeriod = (58962000/(globalObj->tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	// uint32_t clockPeriod = (60000000/(globalObj->tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 
-	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
-	totalClockCount = 0;
+	// clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
+	// totalClockCount = 0;
 }
 
 
@@ -36,13 +36,13 @@ void MasterClock::masterClockFunc(){
 	//  masterLooptimeMax
 	digitalWriteFast(PIN_EXT_TX, HIGH);
 
-	//uint32_t clockPeriod = (60000000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	//uint32_t clockPeriod = (60000000/(globalObj->tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 	//clockPeriod = 550;
-	//uint32_t clockPeriod = (58962000/(tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	//uint32_t clockPeriod = (58962000/(globalObj->tempoX100/100) )/(INTERNAL_PPQ_COUNT);
 
 	uint32_t clockPeriod = 120000000;
 	clockPeriod /= INTERNAL_PPQ_COUNT;
-	clockPeriod /= (tempoX100/100);
+	clockPeriod /= (globalObj->tempoX100/100);
 //	clockPeriod /= 1024;
 	clockPeriod *= 60;
 
@@ -53,7 +53,7 @@ void MasterClock::masterClockFunc(){
 			sequenceArray[i].masterClockPulse();
 		}
 		globalObj->tapTempoMasterClkCounter++;
-		clockCounter++;
+		// clockCounter++;
 
 		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
 		if (extClockCounter > EXTCLOCKDIV / 2){
@@ -76,11 +76,11 @@ void MasterClock::masterClockFunc(){
 			  digitalWriteFast(PIN_EXT_AD_3, LOW);
 			}
 			//
-			totalClockCount++;
-			if(totalClockCount > INTERNAL_PPQ_COUNT){
-				clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
-				totalClockCount = 0;
-			}
+			// totalClockCount++;
+			// if(totalClockCount > INTERNAL_PPQ_COUNT){
+			// 	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
+			// 	totalClockCount = 0;
+			// }
 			pulseTrigger = 1; //send ppq pulse to each internally sequenced sequence
 
 			lastPulseClockCount += clockPeriod;
@@ -92,7 +92,7 @@ void MasterClock::masterClockFunc(){
 		}
 
 
-	} else if(globalObj->clockMode == EXTERNAL_MIDI_CLOCK){
+	} else if(globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ){
 		if (globalObj->midiSetClockOut && !outputControl->clockValue){
 			outputControl->setClockOutput(HIGH);
 		}
@@ -150,7 +150,8 @@ void MasterClock::sequencerFunc(void){
     case INTERNAL_CLOCK:
 			internalClockTick();
     	break;
-    case EXTERNAL_MIDI_CLOCK:
+    case EXTERNAL_MIDI_35_CLOCK:
+    case EXTERNAL_MIDI_USB_CLOCK:
 			midiClockTick();
 	    break;
 		case EXTERNAL_CLOCK_GATE_0:
@@ -182,13 +183,24 @@ void MasterClock::sequencerFunc(void){
 
 
 void MasterClock::checkGateClock(){
-	for (int i =0; i <9; i++){
-		if (globalObj->gateInputRaw[i] == 1 && gatePrevState[i] == 0 ){
-			gateTrig[i] = true;
+	bool clockPortVal;
+	for (int i =0; i <5; i++){
+		if( i == 4){
+			clockPortVal = outputControl->readClockPort();
+			if (clockPortVal == 1 && gatePrevState[i] == 0 ){
+				gateTrig[i] = true;
+			} else {
+				gateTrig[i] = false;
+			};
+			gatePrevState[i] = clockPortVal;
 		} else {
-			gateTrig[i] = false;
-		};
-		gatePrevState[i] = globalObj->gateInputRaw[i];
+			if (globalObj->gateInputRaw[i] == 1 && gatePrevState[i] == 0 ){
+				gateTrig[i] = true;
+			} else {
+				gateTrig[i] = false;
+			};
+			gatePrevState[i] = globalObj->gateInputRaw[i];
+		}
 	}
 }
 

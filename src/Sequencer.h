@@ -15,7 +15,7 @@ class Sequencer
 	public:
 		//Sequencer();
 
-	//	void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t tempoX100);
+	//	void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t globalObj->tempoX100);
 		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, OutputController* outputControl, GlobalVariable *globalObj);
 		void 		runSequence();
 		// Sequencing Modes

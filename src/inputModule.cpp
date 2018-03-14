@@ -285,9 +285,9 @@ void InputModule::loop(uint16_t frequency){
           tempTempo += globalObj->tapTempoClockValues[i] * kMasterClockInterval;
         }
 
-        tempoX100 = 6000000000/(tempTempo/4);
-        clockMaster->changeTempo(tempoX100);
-        Serial.println("Setting tap tempo to: " + String(tempoX100) + "\ttempTempo: " + String(tempTempo));
+        globalObj->tempoX100 = 6000000000/(tempTempo/4);
+        // clockMaster->changeTempo(globalObj->tempoX100);
+        Serial.println("Setting tap tempo to: " + String(globalObj->tempoX100) + "\ttempTempo: " + String(tempTempo));
       }
     } else {
       if(globalObj->tapTempoCount){
@@ -517,7 +517,7 @@ void InputModule::changeState(uint8_t targetState){
     break;
   }
 
-  if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && (previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2) ){
+  if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && currentMenu != TEMPO_MENU && (previousMenu == TEMPO_MENU || previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2) ){
     saveFile->saveGlobalData();
     Serial.println("Saved GlobalData");
   }
@@ -555,18 +555,24 @@ void InputModule::tempoMenuHandler(){
     } else {
       switch (stepMode){
         case STATE_TEMPO:
-        //  if (tempoX100 > 100200) {
-        //    tempoX100 = 100200;
+        //  if (globalObj->tempoX100 > 100200) {
+        //    globalObj->tempoX100 = 100200;
         //  }
-          tempoX100 = min_max_cycle(tempoX100 + knobChange*100, 100, 100000 );
-        //  if(tempoX100 == 0){
-        //    tempoX100 = 100;
+          globalObj->tempoX100 = min_max_cycle(globalObj->tempoX100 + knobChange*100, 100, 100000 );
+        //  if(globalObj->tempoX100 == 0){
+        //    globalObj->tempoX100 = 100;
         //  }
-          clockMaster->changeTempo(tempoX100);
+          // clockMaster->changeTempo(globalObj->tempoX100);
         break;
 
         case STATE_EXTCLOCK:
-          globalObj->clockMode = positive_modulo(globalObj->clockMode + knobChange, 7);
+          globalObj->clockMode = positive_modulo(globalObj->clockMode + knobChange, 8);
+          if(globalObj->clockMode == EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT){
+            Serial.println("Setting clock port to input");
+            globalObj->setClockPortDirection(CLOCK_PORT_INPUT);
+          } else {
+            globalObj->setClockPortDirection(CLOCK_PORT_OUTPUT);
+          }
         break;
 
         case STATE_RESETINPUT:

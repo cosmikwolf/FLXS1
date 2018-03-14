@@ -208,7 +208,6 @@
 #define ARPTYPE_UPDN2 4
 #define ARPTYPE_RNDM	5
 
-extern uint32_t tempoX100;
 extern uint8_t stepMode;
 extern uint8_t notePage;
 extern uint8_t currentMenu;       // Display module + LED module
@@ -231,7 +230,7 @@ extern boolean debugBoolean;
 extern boolean playing;
 
 // MasterClock
-extern unsigned long beatLength;
+// extern unsigned long beatLength;
 extern uint8_t masterPulseCount;
 extern boolean wasPlaying;
 

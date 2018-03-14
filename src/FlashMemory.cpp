@@ -191,7 +191,6 @@ bool FlashMemory::readCalibrationEEPROM(){
   }
   address += 2;
 
-
   for (int i = 0; i<4; i++){
     globalObj->adcCalibrationPos[i] = EEPROMRead16(address);
     address += 2;
@@ -224,13 +223,15 @@ void FlashMemory::serializeGlobalSettings(char* fileBuffer){
 
   JsonArray& globSettingsArray = root.createNestedArray("settings");
 
-  globSettingsArray.add(17);      // version number           // array index: 0
+  globSettingsArray.add(18);      // version number           // array index: 0
   globSettingsArray.add(globalObj->dataInputStyle);           // array index: 1
   globSettingsArray.add(globalObj->pageButtonStyle);          // array index: 2
   globSettingsArray.add(globalObj->outputNegOffset[0]);           // array index: 3
   globSettingsArray.add(globalObj->outputNegOffset[1]);           // array index: 4
   globSettingsArray.add(globalObj->outputNegOffset[2]);           // array index: 5
   globSettingsArray.add(globalObj->outputNegOffset[3]);           // array index: 6
+  globSettingsArray.add(globalObj->clockMode);           // array index: 7
+  globSettingsArray.add(globalObj->tempoX100);           // array index: 8
 
   Serial.println("Saving Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
 
@@ -246,20 +247,28 @@ bool FlashMemory::deserializeGlobalSettings(char* json){
     return 0;
   }
 
-  if( jsonReader["settings"][0] != 17) {
+  if( jsonReader["settings"][0] != 18) {
     // if global settings are not saved properly, or if it is an older version, initialize globals, re-save and exit.
+    // versions prior to 17k are settings version 17
     globalObj->initGlobals();
     this->saveGlobalData();
     return 1;
   }  // global data version is stored here.
 
-  globalObj->dataInputStyle    = jsonReader["settings"][1];
-  globalObj->pageButtonStyle   = jsonReader["settings"][2];
+  globalObj->dataInputStyle        = jsonReader["settings"][1];
+  globalObj->pageButtonStyle       = jsonReader["settings"][2];
   globalObj->outputNegOffset[0]    = jsonReader["settings"][3];
   globalObj->outputNegOffset[1]    = jsonReader["settings"][4];
   globalObj->outputNegOffset[2]    = jsonReader["settings"][5];
   globalObj->outputNegOffset[3]    = jsonReader["settings"][6];
+  globalObj->clockMode             = jsonReader["settings"][7];
+  globalObj->tempoX100             = jsonReader["settings"][8];
 
+  if(globalObj->clockMode == EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT){
+    globalObj->setClockPortDirection(CLOCK_PORT_INPUT);
+  } else {
+    globalObj->setClockPortDirection(CLOCK_PORT_OUTPUT);
+  }
   Serial.println("Reading In Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
   return 1;
 }

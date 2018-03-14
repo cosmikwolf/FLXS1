@@ -117,14 +117,14 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
 
   if(playing) { firstPulse = false; }
 
-  framesPerPulse = this->framesPerBeat(tempoX100)/pulsesPerBeat;
+  framesPerPulse = this->framesPerBeat(globalObj->tempoX100)/pulsesPerBeat;
 
   lastPulseClockCount = clockCycles;
 
 };
 
 uint32_t Sequencer::framesPerBeat(int tempoX100){
-  //return ((60*100*96000000)/tempoX100);
+  //return ((60*100*96000000)/globalObj->tempoX100);
   return FRAMES_PER_BEAT;
 }
 
@@ -330,7 +330,7 @@ uint32_t Sequencer::framesPerSequence(){
 }
 
 uint32_t Sequencer::getStepLength(){
-  uint32_t returnValue = framesPerBeat(tempoX100) * clockDivisionNum();
+  uint32_t returnValue = framesPerBeat(globalObj->tempoX100) * clockDivisionNum();
   returnValue = returnValue / clockDivisionDen();
 
   return returnValue;

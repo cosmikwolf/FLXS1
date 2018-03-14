@@ -37,6 +37,7 @@ void GlobalVariable::initialize(ADC *adc){
       this->randomizeParamSelect = 0;
       this->randomizeLow = 36;
       this->randomizeSpan = 3;
+      this->tempoX100 = 12000;
 
       for(int i = 0; i < 64; i++){
           this->multiSelection[i]=false;
@@ -70,6 +71,8 @@ void GlobalVariable::initGlobals(){
   this->outputNegOffset[1] = 2;
   this->outputNegOffset[2] = 2;
   this->outputNegOffset[3] = 2;
+  this->clockMode = INTERNAL_CLOCK;
+  this->tempoX100 = 12000;
 }
 
 bool GlobalVariable::extClock(){
@@ -77,6 +80,24 @@ bool GlobalVariable::extClock(){
     return true;
   } else {
     return false;
+  }
+}
+
+bool GlobalVariable::clockPortDirection(){
+  if(GPIOC_PDDR & CORE_PIN23_BITMASK){
+    return CLOCK_PORT_OUTPUT;
+  } else {
+    return CLOCK_PORT_INPUT;
+  }
+}
+
+void GlobalVariable::setClockPortDirection(bool direction){
+  if(direction == CLOCK_PORT_OUTPUT){
+    pinMode(CLOCK_PIN, OUTPUT);
+    digitalWriteFast(CLOCK_PIN, HIGH);
+  } else {
+    digitalWriteFast(CLOCK_PIN, HIGH);
+    pinMode(CLOCK_PIN, INPUT);
   }
 }
 

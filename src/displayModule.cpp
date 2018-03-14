@@ -1227,13 +1227,17 @@ void DisplayModule::inputMenuDisplay(){
 
    switch(globalObj->clockMode){
      case INTERNAL_CLOCK:
-       sprintf(buf, "%dbpm", int(tempoX100/100) );
+       sprintf(buf, "%dbpm", int(globalObj->tempoX100/100) );
        displayElement[1] = strdup(buf);
        displayElement[3] = strdup("INTERNAL CLOCK");
      break;
-     case EXTERNAL_MIDI_CLOCK:
-       displayElement[1] = strdup("MIDI");
-       displayElement[3] = strdup("MIDI SYNC");
+     case EXTERNAL_MIDI_35_CLOCK:
+       displayElement[1] = strdup("35MIDI");
+       displayElement[3] = strdup("MIDI SYNC 3.5mm");
+     break;
+     case EXTERNAL_MIDI_USB_CLOCK:
+       displayElement[1] = strdup("USBMID");
+       displayElement[3] = strdup("MIDI SYNC USB");
      break;
      case EXTERNAL_CLOCK_GATE_0:
        displayElement[1] = strdup("EXT CLK");
@@ -1253,7 +1257,7 @@ void DisplayModule::inputMenuDisplay(){
      break;
      case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
        displayElement[1] = strdup("EXT CLK");
-       displayElement[3] = strdup("CLOCK INPUT");
+       displayElement[3] = strdup("CLOCK PORT");
      break;
 
 

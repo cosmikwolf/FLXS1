@@ -4,8 +4,7 @@
 
 //Zetaohm_SAM2695 sam2695;
 
-uint32_t tempoX100 = 12000;
-//uint32_t tempoX100 = 99900;
+//uint32_t globalObj->tempoX100 = 99900;
 uint8_t stepMode = 0;
 uint8_t notePage;
 uint8_t	currentMenu = STATE_PITCH0;       // Display module + LED module
@@ -33,7 +32,7 @@ boolean playing = false;
 // MasterClock
 boolean wasPlaying = false;
 uint8_t masterPulseCount = 24;
-unsigned long beatLength = 60000000/(tempoX100/100);
+//unsigned long beatLength = 60000000/(globalObj->tempoX100/100);
 
 uint32_t lfoClockCounter;
 elapsedMillis modalTimer;

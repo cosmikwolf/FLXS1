@@ -30,7 +30,7 @@ void LEDArray::loop(uint16_t interval){
 
     pixelTimer = 0;
 
-    if(blinkTimer > 6000000/tempoX100){
+    if(blinkTimer > 6000000/globalObj->tempoX100){
       blinkTimer = 0;
     }
 
@@ -120,7 +120,7 @@ void LEDArray::channelSequenceModeLEDHandler(){
 
 void LEDArray::multiSelectLEDHandler(){
     for (int i=0; i < 16; i++){
-      if (globalObj->multiSelection[getNote(i)] && blinkTimer > 3000000/tempoX100){
+      if (globalObj->multiSelection[getNote(i)] && blinkTimer > 3000000/globalObj->tempoX100){
         leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
       } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType != 0){
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
@@ -144,7 +144,7 @@ void LEDArray::channelPitchModeLEDHandler(uint8_t stepSelect){
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
     }
 
-    if (getNote(i) == stepSelect && blinkTimer < 3000000/tempoX100) {
+    if (getNote(i) == stepSelect && blinkTimer < 3000000/globalObj->tempoX100) {
       leds.setPixelColor(ledMainMatrix[i], 255,255,255,0);
     }
 }

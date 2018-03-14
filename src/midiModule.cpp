@@ -25,7 +25,7 @@ void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMi
 }
 
 void MidiModule::midiStopHandler(){
-  if (globalObj->clockMode == EXTERNAL_MIDI_CLOCK) {
+  if (globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ) {
     Serial.println("Midi Stop");
     if (playing == 0){
       midiClockCount = 0;
@@ -75,7 +75,7 @@ void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
 }
 
 void MidiModule::midiStartContinueHandler(){
-  if (globalObj->clockMode == EXTERNAL_MIDI_CLOCK) {
+  if (globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK) {
     Serial.println("Midi Start / Continue");
     playing = 1;
   }
@@ -92,7 +92,7 @@ void MidiModule::midiSongPosition(int songPosition){
 };
 
 void MidiModule::midiClockPulseHandler(){
-  if (globalObj->clockMode != EXTERNAL_MIDI_CLOCK) {
+  if (globalObj->clockMode != EXTERNAL_MIDI_35_CLOCK && globalObj->clockMode != EXTERNAL_MIDI_USB_CLOCK) {
     return; // no need to run clock pulse handler if using internal clock.
   }
 

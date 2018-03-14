@@ -38,6 +38,7 @@ public:
   void cv2update(uint8_t channel, uint32_t currentFrame,  uint32_t framesPerSequence, uint32_t stepLength, bool mute);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
+  bool readClockPort();
   void setGateOutputDebug(uint8_t index, bool value);
   bool gpioCheck(int8_t mapValue);
 

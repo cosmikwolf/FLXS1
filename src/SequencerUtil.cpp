@@ -10,7 +10,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount,  Ou
 	this->beatCount = beatCount;
   this->clockDivision = 4;
   this->swingX100 = 50;
-	//this->beatLength = 60000000/(tempoX100/100);
+	//this->beatLength = 60000000/(globalObj->tempoX100/100);
 	this->monophonic = true;
 	this->outputControl = outputControl;
 	this->globalObj = globalObj;
@@ -438,7 +438,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-    stepData[stepNum].framesRemaining += (2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod) )*   framesPerBeat(tempoX100) * clockDivisionNum() / (8*clockDivisionDen());
+    stepData[stepNum].framesRemaining += (2*stepData[stepNum].gateLength+2 + outputControl->cvInputCheck(cv_gatemod) )*   framesPerBeat(globalObj->tempoX100) * clockDivisionNum() / (8*clockDivisionDen());
 
 		if (swingX100 != 50 ){
       if (!swinging){
@@ -468,7 +468,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	} else {
 
-    stepData[stepNum].framesRemaining += framesPerBeat(tempoX100) * clockDivisionNum();
+    stepData[stepNum].framesRemaining += framesPerBeat(globalObj->tempoX100) * clockDivisionNum();
     stepData[stepNum].framesRemaining *= getArpSpeedNumerator(stepNum);
     stepData[stepNum].framesRemaining /= getArpSpeedDenominator(stepNum);
     stepData[stepNum].framesRemaining /= clockDivisionDen();
