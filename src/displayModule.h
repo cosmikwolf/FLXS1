@@ -135,6 +135,7 @@ class DisplayModule
     void inputMenuDisplay();
     void globalMenuDisplay();
     void globalMenuDisplay2();
+    void sysexMenuHandler();
 
     void tempoMenuDisplay();
     void modMenu1_DisplayHandler();

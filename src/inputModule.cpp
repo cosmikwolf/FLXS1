@@ -154,16 +154,15 @@ void InputModule::multiSelectInputHandler(){
           break;
         case STATE_CV2_TYPE:
           if(!globalObj->multi_velocityType_switch){  globalObj->multi_velocityType_switch = true;
-          } else { globalObj->multi_velocityType = min_max(globalObj->multi_velocityType+ knobChange, 0 , 4); }
-
+          } else { globalObj->multi_velocityType = min_max(globalObj->multi_velocityType+ knobChange, 0 , 14); }
           break;
         case STATE_CV2_SPEED:
           if(!globalObj->multi_cv2speed_switch){  globalObj->multi_cv2speed_switch = true;
-          } else { globalObj->multi_cv2speed += knobChange; }
+          } else { globalObj->multi_cv2speed = min_max(globalObj->multi_cv2speed+ knobChange, 0 , 255);; }
           break;
         case STATE_CV2_OFFSET:
           if(!globalObj->multi_cv2offset_switch){  globalObj->multi_cv2offset_switch = true;
-          } else { globalObj->multi_cv2offset += knobChange; }
+          } else { globalObj->multi_cv2offset = min_max(globalObj->multi_cv2offset+ knobChange, -64 , 64); }
           break;
 
       }
@@ -343,6 +342,7 @@ void InputModule::loop(uint16_t frequency){
           inputMenuHandler();
         break;
 
+        case SYSEX_MENU:
         case GLOBAL_MENU_1:
         case GLOBAL_MENU_2:
           globalMenuHandler();
@@ -476,6 +476,10 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_CH4_VOLT_RANGE:
       currentMenu = GLOBAL_MENU_2;
       break;
+    case STATE_SYSEX_EXPORT:
+    case STATE_SYSEX_IMPORT:
+      currentMenu = SYSEX_MENU;
+      break;
     case STATE_CALIB_INPUT0_OFFSET:
     case STATE_CALIB_INPUT0_LOW:
     case STATE_CALIB_INPUT0_HIGH:
@@ -517,7 +521,7 @@ void InputModule::changeState(uint8_t targetState){
     break;
   }
 
-  if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && currentMenu != TEMPO_MENU && (previousMenu == TEMPO_MENU || previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2) ){
+  if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && currentMenu != SYSEX_MENU && currentMenu != TEMPO_MENU && (previousMenu == TEMPO_MENU || previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2 || previousMenu == SYSEX_MENU) ){
     saveFile->saveGlobalData();
     Serial.println("Saved GlobalData");
   }
@@ -532,7 +536,6 @@ void InputModule::patternSelectHandler(){
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->rose(i)){
       saveFile->changePattern(i, patternChannelSelector, true);
-
       //delay(10);
       changeState(STATE_PITCH0);
     }
@@ -603,6 +606,8 @@ void InputModule::sequenceMenuHandler(){
     if ( globalObj->parameterSelect ) {// Encoder Switch
     //  changeState(min_max_cycle(stepMode + knobChange,  STATE_STEPCOUNT,  STATE_QUANTIZEMODE));
     } else {
+
+
       switch(stepMode){
         case STATE_FIRSTSTEP:
           sequenceArray[selectedChannel].firstStep = min_max(sequenceArray[selectedChannel].firstStep + knobChange, 0, 63);
@@ -618,9 +623,8 @@ void InputModule::sequenceMenuHandler(){
         case STATE_BEATCOUNT:
            newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange, -16, 16);
            sequenceArray[selectedChannel].updateClockDivision(newBeatDiv);
-        //   Serial.println("newBeatDiv: " + String(newBeatDiv));
-          // Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
-
+            //Serial.println("newBeatDiv: " + String(newBeatDiv));
+            // Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
           break;
 
         case STATE_QUANTIZEKEY:
@@ -735,10 +739,12 @@ void InputModule::inputMenuHandler(){
   }
 }
 
+
+
 void InputModule::globalMenuHandler(){
   if(knobChange){
     if ( globalObj->parameterSelect ) {// Encoder Switch
-      changeState(min_max_cycle(stepMode + knobChange,  STATE_PG_BTN_SWITCH,  STATE_CH4_VOLT_RANGE));
+      changeState(min_max_cycle(stepMode + knobChange,  STATE_PG_BTN_SWITCH,  STATE_SYSEX_IMPORT));
     } else {
       switch(stepMode){
 
@@ -769,6 +775,7 @@ void InputModule::globalMenuHandler(){
         }
       }
     }
+
 }
 
 
@@ -1100,6 +1107,30 @@ uint8_t chanSwIndex;
         case SW_PATTERN:
           globalObj->multiSelectSwitch = false;
 
+          if(currentMenu == SYSEX_MENU){  //shift-pattern shortcut is used to export and import sysex data
+            if (midplaneGPIO->pressed(SW_SHIFT)){
+              switch (stepMode){
+                case STATE_SYSEX_EXPORT:
+                  playing = 0;
+                  // globalObj->importExportDisplaySwitch = 1;
+                  display->displayModal(100, MODAL_EXPORTING);
+                  display->displayLoop(0);
+                  saveFile->exportSysexData();
+                  display->displayModal(1000, MODAL_EXPORTCOMPLETE);
+                  // globalObj->importExportDisplaySwitch = 2;
+                break;
+                case STATE_SYSEX_IMPORT:
+                  playing = 0;
+                  display->displayModal(1000, MODAL_IMPORTING);
+
+//                  saveFile->importSysexData();
+
+                break;
+              }
+            }
+            break;
+          }
+
           if (midplaneGPIO->pressed(SW_SHIFT)){
             for(int i=0; i<SEQUENCECOUNT; i++){
               //saveDestination[i] = sequenceArray[i].pattern;
@@ -1125,6 +1156,7 @@ uint8_t chanSwIndex;
             break;
             default:
               globalObj->multiSelectSwitch = 0;
+              midplaneGPIO->clearBuffers();
               changeState(STATE_PATTERNSELECT);
             break;
           }
@@ -1215,6 +1247,7 @@ uint8_t chanSwIndex;
       }
     }
     //Serial.println("Return at the end of alt");
+
     return false;
   }
 
@@ -1280,7 +1313,18 @@ uint8_t chanSwIndex;
       if ( globalObj->parameterSelect ) {// Encoder Switch
         changeState(min_max_cycle(stepMode + knobChange,  STATE_PITCH0,  STATE_CV2_OFFSET));
       } else {
+
+        if( (currentMenu == PITCH_GATE_MENU) || (currentMenu == ARPEGGIO_MENU) || (currentMenu == VELOCITY_MENU) ){
+          for (int i=0; i < 16; i++){
+            if (midplaneGPIO->pressed(i)){
+              sequenceArray[selectedChannel].setStepPitch(getNote(i), min_max_cycle(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0) + knobChange, 0,120), 0);
+              goto SKIPSTEPDATACHANGE;
+            }
+          }
+        }
         changeStepData(selectedChannel, selectedStep, knobChange);
+        SKIPSTEPDATACHANGE: ;
+
       }
     }
 
@@ -1376,7 +1420,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
           sequenceArray[channel].stepData[stepNum].velocity =  min_max(sequenceArray[channel].stepData[stepNum].velocity + change, -127, 127);
           goto CV2UPDATE;
         case STATE_CV2_TYPE:
-          sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 13);
+          sequenceArray[channel].stepData[stepNum].velocityType = min_max(sequenceArray[channel].stepData[stepNum].velocityType + change, 0, 14);
           goto CV2UPDATE;
         case STATE_CV2_SPEED:
           sequenceArray[channel].stepData[stepNum].cv2speed = min_max(sequenceArray[channel].stepData[stepNum].cv2speed + change, 1, 255);
@@ -1384,7 +1428,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
         case STATE_CV2_OFFSET:
           sequenceArray[channel].stepData[stepNum].cv2offset = min_max(sequenceArray[channel].stepData[stepNum].cv2offset + change, -64, 64);
           CV2UPDATE:
-          outputControl->cv2settingsChange(channel, sequenceArray[channel].stepData[stepNum].velocity, sequenceArray[channel].stepData[stepNum].velocityType, sequenceArray[channel].stepData[stepNum].cv2speed, sequenceArray[channel].stepData[stepNum].cv2offset);
+          outputControl->cv2settingsChange(channel,stepNum, sequenceArray[channel].stepData[stepNum].velocity, sequenceArray[channel].stepData[stepNum].velocityType, sequenceArray[channel].stepData[stepNum].cv2speed, sequenceArray[channel].stepData[stepNum].cv2offset);
           break;
 
       }

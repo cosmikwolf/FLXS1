@@ -60,6 +60,7 @@ public:
   void scaleMenuHandler();
   void inputMenuHandler();
   void globalMenuHandler();
+  void sysexMenuHandler();
   void tempoMenuHandler();
   void changeStepData(uint8_t channel, uint8_t stepNum, int change);
 

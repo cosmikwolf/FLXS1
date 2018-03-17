@@ -560,7 +560,7 @@ bool OutputController::gpioCheck(int8_t mapValue){
 
 };
 
-void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
+void OutputController::noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp){
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
 //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
 /*  proto 8 basic calibration
@@ -605,6 +605,7 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
 
   }
   if (velocityType != 0 ){
+    cv2currentStep[channel] = stepNum;
     cv2type[channel] = velocityType;
     cv2amplitude[channel] = velocity;
     cv2speed[channel] = cv2speedSetting;
@@ -612,7 +613,11 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
 
     lfoStartFrame[channel] = startFrame;
   }
+
+
     //Serial.println("NO glide  ch: " + String(channel) + "\ton dacCh: " + String(dacCvMap[channel]) + "\tCVrheo: " + String(outputMap(channel, CVRHEO)) + "\ton mcp4352 " +  String(outputMap(channel, RHEOCHANNELCV)) + "\t with slew switch: " + String(outputMap(channel, SLEWSWITCHCV)) + "\tslewSetting: " + String(map(glide, 0,127,0,255)) );
+
+
   int offset = 0;
   //offset = globalObj->cvInputMapped[channel];
   //delayMicroseconds(5);
@@ -632,8 +637,6 @@ void OutputController::noteOn(uint8_t channel, uint16_t note, uint8_t velocity, 
   }
 
 };
-
-
 
 int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue){
   uint32_t cents = 0;
@@ -704,12 +707,15 @@ void OutputController::clearVelocityOutput(uint8_t channel){
 
 };
 
-void OutputController::cv2settingsChange(uint8_t channel, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting){
-  if (velocityType != 0 ){
-    this->cv2type[channel] = velocityType;
-    this->cv2amplitude[channel] = velocity;
-    this->cv2speed[channel] = cv2speedSetting;
-    this->cv2offset[channel] = cv2offsetSetting;
+
+void OutputController::cv2settingsChange(uint8_t channel, uint8_t stepNum, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting){
+  if(this->cv2currentStep[channel] == stepNum){
+    if (velocityType != 0 ){
+      this->cv2type[channel] = velocityType;
+      this->cv2amplitude[channel] = velocity;
+      this->cv2speed[channel] = cv2speedSetting;
+      this->cv2offset[channel] = cv2offsetSetting;
+    }
   }
 }
 
@@ -753,6 +759,11 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
       } else {
         voltageLevel = 0;
       }
+    break;
+
+    case LFO_QUANTIZED:
+      voltageLevel = this->getQuantizedVoltage(channel, cv2amplitude[channel], 0, 0);
+      slewLevel = 0;
     break;
 
     case LFO_ENV_AR:
@@ -857,9 +868,8 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     case LFO_VOLTAGE:
       GOTOVOLTAGE:
       slewLevel = 0;
-      voltageLevel = this->getQuantizedVoltage(channel, cv2amplitude[channel], 0, 0);
-      //voltageLevel *= cv2amplitude[channel];
-
+      voltageLevel = cv2amplitude[channel]*128;
+      //voltageLevel = clockCycles/4096;
       slewOn = false;
     break;
 

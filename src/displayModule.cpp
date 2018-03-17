@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("beta17l");
+  oled.println("beta17l_eli");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -266,6 +266,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         case MENU_RANDOM:
           shortcutRandomMenu();
         break;
+
+        case SYSEX_MENU:
+          sysexMenuHandler();
+          break;
       }
 
     }
@@ -506,6 +510,29 @@ void DisplayModule::modalDisplay(){
           displayElement[0] = strdup("reverse");
         break;
       }
+    case MODAL_EXPORTING:
+      displayElement[0] = strdup("SYSEX EXPORT");
+      displayElement[1] = strdup("exporting...");
+      goto singleTextDisplay;
+    break;
+
+    case MODAL_EXPORTCOMPLETE:
+      displayElement[0] = strdup("SYSEX EXPORT");
+      displayElement[1] = strdup("complete...");
+      goto singleTextDisplay;
+    break;
+
+    case MODAL_IMPORTING:
+      displayElement[0] = strdup("SYSEX IMPORT");
+      displayElement[1] = strdup("coming soon...");
+      goto singleTextDisplay;
+    break;
+
+    case MODAL_IMPORTCOMPLETE:
+      displayElement[0] = strdup("SYSEX IMPORT");
+      displayElement[1] = strdup("complete...");
+      goto singleTextDisplay;
+    break;
 
       displayElement[1] = strdup(buf);
       goto singleTextDisplay;
@@ -892,7 +919,7 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 }
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
-   const char * const velTypeArray[] = { "off","trigger","voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
+   const char * const velTypeArray[] = { "skip","trigger","quantized", "voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
 
        displayElement[1] = strdup("ampl:");
        displayElement[3] = strdup("type:");
@@ -941,10 +968,12 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
     displayElement[7] = strdup(buf);
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[8] = strdup(buf);
-
-    voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].velocity);
-
-    displayElement[2] = strdup(buf);
+    if((sequenceArray[selectedChannel].stepData[selectedStep].velocityType == 2) && (sequenceArray[selectedChannel].stepData[selectedStep].velocity > 0)) {
+      displayElement[2] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].velocity]);
+    } else {
+      voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].velocity);
+      displayElement[2] = strdup(buf);
+    }
       displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
     //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].velocityType).c_str());
 
@@ -982,17 +1011,17 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
   } else {
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
   }
-    renderStringBox(3,  DISPLAY_LABEL,        0, 20,63,17, false, STYLE1X, background , foreground);
-    renderStringBox(1,  DISPLAY_LABEL,        0, 37,63,17, false, STYLE1X, background , foreground);
-    renderStringBox(5,  DISPLAY_LABEL,        0, 54,63,17, false, STYLE1X, background , foreground);
-    renderStringBox(10,  DISPLAY_LABEL,       0, 71,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(3,  DISPLAY_LABEL,        0, 20,57,17, false, STYLE1X, background , foreground);
+    renderStringBox(1,  DISPLAY_LABEL,        0, 37,57,17, false, STYLE1X, background , foreground);
+    renderStringBox(5,  DISPLAY_LABEL,        0, 54,57,17, false, STYLE1X, background , foreground);
+    renderStringBox(10,  DISPLAY_LABEL,       0, 71,57,17, false, STYLE1X, background , foreground);
   //  renderStringBox(11,  DISPLAY_LABEL,       0, 88,63,17, false, STYLE1X, background , foreground);
 
-    renderStringBox(4,  STATE_CV2_TYPE,   64, 20,63,17, false, STYLE1X, background , foreground);
-    renderStringBox(2,  STATE_CV2_LEVEL,       64, 37,63,17, false, STYLE1X, background , foreground);
-    renderStringBox(6,  STATE_CV2_SPEED,       64, 54,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(4,  STATE_CV2_TYPE,      58, 20,69,17, false, STYLE1X, background , foreground);
+    renderStringBox(2,  STATE_CV2_LEVEL,     58, 37,69,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_CV2_SPEED,     58, 54,69,17, false, STYLE1X, background , foreground);
 
-    renderStringBox(11,  STATE_CV2_OFFSET,         64, 71,63,17, false, STYLE1X, background , foreground);
+    renderStringBox(11,  STATE_CV2_OFFSET,   58, 71,69,17, false, STYLE1X, background , foreground);
 
 }
 
@@ -1873,6 +1902,7 @@ prevSelectedText = selectedText;
      displayElement[4] = strdup("moment");
    }
 
+
 //   displayElement[4] = strdup("moment");
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
@@ -1882,8 +1912,6 @@ prevSelectedText = selectedText;
 
    renderStringBox(3,  DISPLAY_LABEL,              0, 31, 95,16, false, STYLE1X, background , foreground);
    renderStringBox(4,  STATE_DATA_KNOB_SWITCH,   70, 31, 57,16, false, STYLE1X, background , foreground);
-
-
 
  }
 
@@ -1943,6 +1971,47 @@ void DisplayModule::cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeVa
    renderStringBox(13,  STATE_CH4_VOLT_RANGE,   48, 79, 79,16, false, STYLE1X, background , foreground);
 
 }
+
+void DisplayModule::sysexMenuHandler(){
+  displayElement[0] = strdup("data Backup");
+
+  switch(globalObj->importExportDisplaySwitch){
+      case 0:
+        displayElement[1] = strdup("sysex export");
+        break;
+      case 1:
+        displayElement[1] = strdup("exporting..");
+        break;
+      case 2:
+        displayElement[1] = strdup("export complete");
+        break;
+  }
+  displayElement[2] = strdup("press shift+pattern to export");
+  displayElement[3] = strdup("seq data to usb midi");
+
+  displayElement[4] = strdup("sysex import");
+   displayElement[5] = strdup("coming soon... ");
+   displayElement[6] = strdup("");
+   displayElement[7] = strdup("");
+   displayElement[8] = strdup("");
+
+  // displayElement[5] = strdup("press shift+pattern to import");
+  // displayElement[6] = strdup("and replace all seq data");
+  // displayElement[7] = strdup("this will delete and");
+  // displayElement[8] = strdup("replace all sequences");
+
+  renderStringBox(0,  DISPLAY_LABEL,        0,  0,128, 15, false, STYLE1X, background , contrastColor);
+  renderStringBox(1,  STATE_SYSEX_EXPORT,   0, 15, 127,16, false, STYLE1X, background , foreground);
+  renderStringBox(2,  DISPLAY_LABEL,        0, 31, 127,8, false, REGULAR1X, background , foreground);
+  renderStringBox(3,  DISPLAY_LABEL,        0, 39, 127,8, false, REGULAR1X, background , foreground);
+
+  renderStringBox(4,  STATE_SYSEX_IMPORT,   0, 47, 127,16, false, STYLE1X, background , foreground);
+  renderStringBox(5,  DISPLAY_LABEL,        0, 63, 127,8, false, REGULAR1X, background , foreground);
+  renderStringBox(6,  DISPLAY_LABEL,        0, 71, 127,8, false, REGULAR1X, background , foreground);
+  renderStringBox(7,  DISPLAY_LABEL,        0, 79, 127,8, false, REGULAR1X, background , foreground);
+  renderStringBox(8,  DISPLAY_LABEL,        0, 87, 127,8, false, REGULAR1X, background , foreground);
+};
+
 
 
 void DisplayModule::shortcutRandomMenu(){

@@ -13,16 +13,17 @@
 #define	CALIBRATION_MENU  VELOCITY_MENU + 1
 #define TEMPO_MENU        CALIBRATION_MENU + 1
 #define PATTERN_SELECT    TEMPO_MENU + 1
-#define GLOBAL_MENU_1       PATTERN_SELECT + 1
-#define GLOBAL_MENU_2       GLOBAL_MENU_1 + 1
-#define MOD_MENU_1        GLOBAL_MENU_2 + 1
+#define GLOBAL_MENU_1     PATTERN_SELECT + 1
+#define GLOBAL_MENU_2     GLOBAL_MENU_1 + 1
+#define SYSEX_MENU        GLOBAL_MENU_2 + 1
+#define MOD_MENU_1        SYSEX_MENU + 1
 #define MOD_MENU_2        MOD_MENU_1 + 1
 #define MENU_MODAL        MOD_MENU_2 +1
 #define NOTE_DISPLAY      MENU_MODAL +1
 #define SAVE_MENU         NOTE_DISPLAY +1
 #define MENU_MULTISELECT  SAVE_MENU +1
-#define	INPUT_DEBUG_MENU		     MENU_MULTISELECT + 1
-#define MENU_RANDOM    INPUT_DEBUG_MENU +1
+#define	INPUT_DEBUG_MENU	MENU_MULTISELECT + 1
+#define MENU_RANDOM       INPUT_DEBUG_MENU +1
 
 //PITCH PAGE STEPMODES
 #define STATE_PITCH0       1
@@ -91,11 +92,14 @@
 #define STATE_CH3_VOLT_RANGE      STATE_CH2_VOLT_RANGE + 1
 #define STATE_CH4_VOLT_RANGE      STATE_CH3_VOLT_RANGE + 1
 
+#define STATE_SYSEX_EXPORT           STATE_CH4_VOLT_RANGE + 1
+#define STATE_SYSEX_IMPORT           STATE_SYSEX_EXPORT + 1
 
-#define STATE_PITCH1            STATE_CH4_VOLT_RANGE + 1
+#define STATE_PITCH1            STATE_SYSEX_IMPORT + 1
 #define STATE_PITCH2            STATE_PITCH1 +1
 #define STATE_PITCH3            STATE_PITCH2 +1
 #define STATE_TUNER             STATE_PITCH3 +1
+
 
 //SAVE MENU
 #define STATE_SAVE               STATE_TUNER +1
@@ -145,18 +149,35 @@
 
 #define LFO_OFF         0
 #define LFO_TRIGGER     1
-#define LFO_VOLTAGE     2
-#define LFO_ENV_DECAY   3
-#define LFO_ENV_ATTACK  4
-#define LFO_ENV_AR      5
-#define LFO_ENV_ASR     6
-#define LFO_SINE        7
-#define LFO_TRIANGLE    8
-#define LFO_SQUARE      9
-#define LFO_RNDSQUARE   10
-#define LFO_SAWUP       11
-#define LFO_SAWDN       12
-#define LFO_SAMPLEHOLD  13
+#define LFO_QUANTIZED   2
+#define LFO_VOLTAGE     3
+#define LFO_ENV_DECAY   4
+#define LFO_ENV_ATTACK  5
+#define LFO_ENV_AR      6
+#define LFO_ENV_ASR     7
+#define LFO_SINE        8
+#define LFO_TRIANGLE    9
+#define LFO_SQUARE      10
+#define LFO_RNDSQUARE   11
+#define LFO_SAWUP       12
+#define LFO_SAWDN       13
+#define LFO_SAMPLEHOLD  14
+
+// PRIOR TO SAVE v 18 TYPES
+// #define LFO_OFF         0
+// #define LFO_TRIGGER     1
+// #define LFO_VOLTAGE     2
+// #define LFO_ENV_DECAY   3
+// #define LFO_ENV_ATTACK  4
+// #define LFO_ENV_AR      5
+// #define LFO_ENV_ASR     6
+// #define LFO_SINE        7
+// #define LFO_TRIANGLE    8
+// #define LFO_SQUARE      9
+// #define LFO_RNDSQUARE   10
+// #define LFO_SAWUP       11
+// #define LFO_SAWDN       12
+// #define LFO_SAMPLEHOLD  13
 
 
 #endif

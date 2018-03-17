@@ -52,7 +52,7 @@ class GlobalVariable {
     uint8_t   multi_velocity;
     uint8_t   multi_velocityType;
     uint8_t   multi_cv2speed;
-    uint8_t   multi_cv2offset;
+    int8_t    multi_cv2offset;
 
     uint8_t   clockMode;
     uint32_t tempoX100;
@@ -82,7 +82,8 @@ class GlobalVariable {
     uint8_t   randomizeParamSelect;
     uint8_t   randomizeLow;
     uint8_t   randomizeSpan;
-
+    uint8_t   importExportDisplaySwitch;
+    
     bool muteChannelSelect[4];
     bool parameterSelect;
 

@@ -31,11 +31,11 @@
 class OutputController {
 public:
   void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray);
-  void noteOn(uint8_t channel, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey,  bool cvMute, uint32_t startFrame, bool notFirstArp);
+  void noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey,  bool cvMute, uint32_t startFrame, bool notFirstArp);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   int16_t getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue );
   void setDacVoltage( uint8_t dac, uint16_t output );
-  void cv2settingsChange(uint8_t channel, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting);
+  void cv2settingsChange(uint8_t channel, uint8_t stepNum, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting);
   void cv2update(uint8_t channel, uint32_t currentFrame,  uint32_t framesPerSequence, uint32_t stepLength, bool mute);
   void allNotesOff(uint8_t channel);
   void setClockOutput(bool value);
@@ -63,6 +63,7 @@ public:
   elapsedMillis clockOutputTimer;
   elapsedMillis lfoTimer;
 
+  uint8_t cv2currentStep[4];
   uint8_t cv2type[4];
   uint8_t cv2speed[4];
   int8_t cv2amplitude[4];

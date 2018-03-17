@@ -134,7 +134,31 @@ void FlashMemory::initializeSaveFile(){
   free(fileName);
 }
 
+void FlashMemory::exportSysexData(){
+  const uint8_t sysexheader[2] = {0xF0, 0xFF};
+  const uint8_t sysexfooter[1] = {0xF7};
+  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
 
+  for(uint8_t pattern = 0;pattern<16; pattern++){
+    for(uint8_t channel = 0; channel <4; channel++){
+       usbMIDI.sendSysEx(2, sysexheader);
+       this->serializePattern(fileBuffer, channel, pattern);
+       usbMIDI.sendSysEx(SECTORSIZE,(const uint8_t*) fileBuffer);
+       usbMIDI.sendSysEx(1, sysexfooter);
+      // free(fileBuffer);
+      // fileBuffer = NULL;
+    }
+  }
+
+  Serial.println("sending sysex data complete!");
+
+  free(fileBuffer);
+  fileBuffer = NULL;
+
+}
+void FlashMemory::importSysexData(){
+
+}
 bool FlashMemory::validateJson(char* fileBuffer){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.parse(fileBuffer);
@@ -275,6 +299,7 @@ bool FlashMemory::deserializeGlobalSettings(char* json){
 void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
+  root["version"] = 18;
 
   JsonArray& seqSettingsArray = root.createNestedArray("settings");
 
@@ -358,7 +383,7 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
    sequenceArray[channel].cv_glidemod      = jsonReader["settings"][17];
    sequenceArray[channel].firstStep        = jsonReader["settings"][18];
    sequenceArray[channel].swingX100        = jsonReader["settings"][19];
-   sequenceArray[channel].playMode    = jsonReader["settings"][20];
+   sequenceArray[channel].playMode         = jsonReader["settings"][20];
    sequenceArray[channel].skipStepCount    = jsonReader["settings"][21];
    sequenceArray[channel].randomLow        = jsonReader["settings"][22];
    sequenceArray[channel].randomHigh       = jsonReader["settings"][23];
@@ -391,7 +416,10 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
      stepDataBuf.arpSpdNum   = stepDataArray[i][11];
      stepDataBuf.arpSpdDen   = stepDataArray[i][12];
      stepDataBuf.velocity    = stepDataArray[i][13];
-     stepDataBuf.velocityType= stepDataArray[i][14];
+     stepDataBuf.velocityType = stepDataArray[i][14];
+     if(jsonReader["version"] < 18){
+      if(stepDataArray[i][14] > 1) stepDataBuf.velocityType += 1 ;
+     }
      stepDataBuf.cv2speed    = stepDataArray[i][15];
      stepDataBuf.glide       = stepDataArray[i][16];
      uint8_t index = stepDataArray[i][0];
@@ -511,6 +539,9 @@ void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
       Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(cacheFileName));
       Serial.println("##############");
   }
+
+
+
   free(fileBuffer);
   fileBuffer = NULL;
 
