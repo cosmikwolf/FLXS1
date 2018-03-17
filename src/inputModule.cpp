@@ -1198,6 +1198,7 @@ uint8_t chanSwIndex;
       }
       if (midplaneGPIO->rose(i) ){
         //this section controls the behavior of the channel buttons on press
+        if(currentMenu == PATTERN_SELECT || currentMenu == SAVE_MENU) break;
         switch (i){
           // left row bottom up
           case SW_CH0:
