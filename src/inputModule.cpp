@@ -742,6 +742,13 @@ void InputModule::inputMenuHandler(){
 
 
 void InputModule::globalMenuHandler(){
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->fell(i)){
+      changeState(STATE_PITCH0);
+      selectedStep = getNote(i);
+    }
+  }
+
   if(knobChange){
     if ( globalObj->parameterSelect ) {// Encoder Switch
       changeState(min_max_cycle(stepMode + knobChange,  STATE_PG_BTN_SWITCH,  STATE_SYSEX_IMPORT));
