@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("beta17l_eli");
+  oled.println("beta17m");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -915,7 +915,6 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
   } else {
     sprintf(buf, "%d.%02dv",voltageValue*10/120, (1000*voltageValue)/120-100*(voltageValue*10/120) );
   }
-
 }
 
  void DisplayModule::stateDisplay_velocity(char *buf) {
@@ -1051,16 +1050,33 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
    }
    displayElement[4] = strdup(buf);
 
-   if(sequenceArray[selectedChannel].skipStepCount == 0){
-     sprintf(buf, "skip rndm:" );
-   } else {
-     sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
-   }
+   // if(sequenceArray[selectedChannel].skipStepCount == 0){
+   //   sprintf(buf, "skip rndm:" );
+   // } else {
+   //   sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
+   // }
+   //
+   // displayElement[5] = strdup(buf);
+   //
+   //  gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
+   //  displayElement[6] = strdup(buf);
 
-   displayElement[5] = strdup(buf);
+   displayElement[5] = strdup("direction:");
 
-    gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
-    displayElement[6] = strdup(buf);
+  switch(sequenceArray[selectedChannel].playMode){
+    case PLAY_FORWARD:
+     displayElement[6] = strdup("FWD");
+    break;
+    case PLAY_REVERSE:
+     displayElement[6] = strdup("REV");
+    break;
+    case PLAY_RANDOM:
+     displayElement[6] = strdup("RNDM");
+    break;
+    case PLAY_PENDULUM:
+     displayElement[6] = strdup("PEND");
+    break;
+  }
 
     displayElement[7] = strdup("swing:");
 
@@ -1078,8 +1094,8 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
    renderStringBox(3,  DISPLAY_LABEL,        0, 47,89,16, false, STYLE1X, background , foreground);
    renderStringBox(4,  STATE_BEATCOUNT,     90, 47, 37,16, false, STYLE1X, background , foreground);
 
-   renderStringBox(5,  STATE_SKIPSTEPCOUNT,   0,  63,89,16, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_SKIPSTEP,     90, 63,37,16, false, STYLE1X, background , foreground);
+   renderStringBox(5,  DISPLAY_LABEL,   0,  63,89,16, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_PLAYMODE,     90, 63,37,16, false, STYLE1X, background , foreground);
 
    renderStringBox(7,  DISPLAY_LABEL,        0, 79,50,16, false, STYLE1X, background , foreground);
    renderStringBox(8,  STATE_SWING,        90, 79,37,16, false, STYLE1X, background , foreground);
@@ -1178,22 +1194,6 @@ void DisplayModule::scaleMenuDisplay(){
       default:                    displayElement[8] = strdup("CUSTOM"); break;
       }
 
-     switch(sequenceArray[selectedChannel].playMode){
-       case PLAY_FORWARD:
-        displayElement[10] = strdup("FWD");
-       break;
-       case PLAY_REVERSE:
-        displayElement[10] = strdup("REV");
-       break;
-       case PLAY_RANDOM:
-        displayElement[10] = strdup("RNDM");
-       break;
-       case PLAY_PENDULUM:
-        displayElement[10] = strdup("PEND");
-       break;
-     }
-     displayElement[9] = strdup("direction:");
-
 
      renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
 
@@ -1206,8 +1206,8 @@ void DisplayModule::scaleMenuDisplay(){
      renderStringBox(7,  DISPLAY_LABEL,        0, 47,48,16, false, STYLE1X, background , foreground);
      renderStringBox(8,  STATE_QUANTIZEMODE,     48, 47, 79,16, false, STYLE1X, background , foreground);
 
-     renderStringBox(9,  DISPLAY_LABEL,   0,  63,89,16, false, STYLE1X, background , foreground);
-     renderStringBox(10,  STATE_PLAYMODE,    72, 63, 55,16, false, STYLE1X, background , foreground);
+     // renderStringBox(9,  DISPLAY_LABEL,   0,  63,89,16, false, STYLE1X, background , foreground);
+     // renderStringBox(10,  STATE_PLAYMODE,    72, 63, 55,16, false, STYLE1X, background , foreground);
 
 };
 
@@ -1311,14 +1311,25 @@ void DisplayModule::inputMenuDisplay(){
    sprintf(buf, "ch%d modulation 1", selectedChannel+1);
    displayElement[0] = strdup(buf);
 
-   displayElement[1] = strdup("gate length:");
+   if(sequenceArray[selectedChannel].skipStepCount == 0){
+     sprintf(buf, "skip rndm:" );
+   }else {
+     sprintf(buf, "skip -> %d:", sequenceArray[selectedChannel].skipStepCount);
+   }
+
+   displayElement[1] = strdup(buf);
+
+    gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
+    displayElement[2] = strdup(buf);
+
+   displayElement[3] = strdup("gate lngth:");
 
   cvMappingText(buf, sequenceArray[selectedChannel].cv_gatemod);
-  displayElement[2] = strdup(buf);
+  displayElement[4] = strdup(buf);
 
-  displayElement[3] = strdup("gatemute:");
- gateMappingText(buf, sequenceArray[selectedChannel].gpio_gatemute);
- displayElement[4] = strdup(buf);
+ //  displayElement[3] = strdup("gatemute:");
+ // gateMappingText(buf, sequenceArray[selectedChannel].gpio_gatemute);
+ // displayElement[4] = strdup(buf);
 
  displayElement[5] = strdup("rndm pch");
  gateMappingText(buf, sequenceArray[selectedChannel].gpio_randompitch);
@@ -1349,10 +1360,10 @@ cvMappingText(buf, sequenceArray[selectedChannel].cv_glidemod);
 displayElement[10] = strdup(buf);
 
    renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , contrastColor);
-   renderStringBox(1,  DISPLAY_LABEL,      0,   15,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_GATEMOD,     96,   15,  31,16, false, STYLE1X, background , foreground);
+   renderStringBox(1,  STATE_SKIPSTEPCOUNT, 0,   15,  82,16, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_SKIPSTEP,     83,   15,  40,16, false, STYLE1X, background , foreground);
    renderStringBox(3,  DISPLAY_LABEL,      0,   31,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_GATEMUTE,    96,   31,  31,16, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_GATEMOD,    83,   31,  40,16, false, STYLE1X, background , foreground);
    renderStringBox(5,  DISPLAY_LABEL,      0,   47,  64,16, false, STYLE1X, background , foreground);
    renderStringBox(6,  STATE_RANDOMPITCH, 96,   47,  31,16, false, STYLE1X, background , foreground);
    renderStringBox(11,  STATE_RANDOMHIGH, 67,   47,  29, 8, false, REGULAR1X, background , foreground);
@@ -1360,9 +1371,9 @@ displayElement[10] = strdup(buf);
 
 
    renderStringBox(7,  DISPLAY_LABEL,      0,   63,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_PITCHMOD,    90,   63,  37,16, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_PITCHMOD,    83,   63,  40,16, false, STYLE1X, background , foreground);
    renderStringBox(9,  DISPLAY_LABEL,      0,   79,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(10,  STATE_GLIDEMOD,   90,   79,  37,16, false, STYLE1X, background , foreground);
+   renderStringBox(10,  STATE_GLIDEMOD,   83,   79,  40,16, false, STYLE1X, background , foreground);
 
  };
 
@@ -1414,13 +1425,13 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
 */
    renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , contrastColor);
    renderStringBox(1,  DISPLAY_LABEL,      0,   15,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(2,  STATE_ARPTYPEMOD,  90,   15,  37,16, false, STYLE1X, background , foreground);
+   renderStringBox(2,  STATE_ARPTYPEMOD,  80,   15,  47,16, false, STYLE1X, background , foreground);
    renderStringBox(3,  DISPLAY_LABEL,      0,   31,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(4,  STATE_ARPSPDMOD,  90,   31,  37,16, false, STYLE1X, background , foreground);
+   renderStringBox(4,  STATE_ARPSPDMOD,   80,   31,  47,16, false, STYLE1X, background , foreground);
    renderStringBox(5,  DISPLAY_LABEL,      0,   47,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(6,  STATE_ARPOCTMOD, 90,   47,  37,16, false, STYLE1X, background , foreground);
+   renderStringBox(6,  STATE_ARPOCTMOD,    80,   47,  47,16, false, STYLE1X, background , foreground);
    renderStringBox(7,  DISPLAY_LABEL,      0,   63,  64,16, false, STYLE1X, background , foreground);
-   renderStringBox(8,  STATE_ARPINTMOD,    90,   63,  37,16, false, STYLE1X, background , foreground);
+   renderStringBox(8,  STATE_ARPINTMOD,    80,   63,  47,16, false, STYLE1X, background , foreground);
    //renderStringBox(9,  STATE_SKIPSTEPCOUNT, 0,   79,  64,16, false, STYLE1X, background , foreground);
    //renderStringBox(10,  STATE_SKIPSTEP,    90,   79,  37,16, false, STYLE1X, background , foreground);
    //renderStringBox(9,  DISPLAY_LABEL,      0,   79,  64,16, false, STYLE1X, background , foreground);

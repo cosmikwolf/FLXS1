@@ -422,15 +422,13 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_FIRSTSTEP:
     case STATE_STEPCOUNT:
     case STATE_BEATCOUNT:
-    case STATE_SKIPSTEPCOUNT:
-    case STATE_SKIPSTEP:
+    case STATE_PLAYMODE:
     case STATE_SWING:
       currentMenu = SEQUENCE_MENU;
       break;
     case STATE_QUANTIZESCALE:
     case STATE_QUANTIZEKEY:
     case STATE_QUANTIZEMODE:
-    case STATE_PLAYMODE:
       currentMenu = QUANTIZE_MENU;
       break;
     case STATE_NOTEDISPLAY:
@@ -450,6 +448,8 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_RESETINPUT:
       currentMenu = TEMPO_MENU;
       break;
+    case STATE_SKIPSTEPCOUNT:
+    case STATE_SKIPSTEP:
     case STATE_GATEMUTE:
     case STATE_RANDOMPITCH:
     case STATE_PITCHMOD:
@@ -669,11 +669,11 @@ void InputModule::sequenceMenuHandler(){
 
 // mod menu 1
         case STATE_GLIDEMOD:
-          sequenceArray[selectedChannel].cv_glidemod = positive_modulo(sequenceArray[selectedChannel].cv_glidemod + knobChange, 12);
+          sequenceArray[selectedChannel].cv_glidemod = min_max(sequenceArray[selectedChannel].cv_glidemod + knobChange, 0, 12);
         break;
 
         case STATE_GATEMOD:
-          sequenceArray[selectedChannel].cv_gatemod = positive_modulo(sequenceArray[selectedChannel].cv_gatemod + knobChange, 12);
+          sequenceArray[selectedChannel].cv_gatemod = min_max(sequenceArray[selectedChannel].cv_gatemod + knobChange, 0, 12);
         break;
         case STATE_GATEMUTE:
           sequenceArray[selectedChannel].gpio_gatemute = min_max_skip(sequenceArray[selectedChannel].gpio_gatemute, knobChange, -9, 8, selectedChannel+5);
@@ -691,23 +691,23 @@ void InputModule::sequenceMenuHandler(){
         break;
 
         case STATE_PITCHMOD:
-          sequenceArray[selectedChannel].cv_pitchmod = positive_modulo(sequenceArray[selectedChannel].cv_pitchmod + knobChange, 13);
+          sequenceArray[selectedChannel].cv_pitchmod = min_max(sequenceArray[selectedChannel].cv_pitchmod + knobChange, 0, 12);
         break;
 // mod menu 2
         case STATE_ARPTYPEMOD:
-          sequenceArray[selectedChannel].cv_arptypemod = positive_modulo(sequenceArray[selectedChannel].cv_arptypemod + knobChange, 13);
+          sequenceArray[selectedChannel].cv_arptypemod = min_max(sequenceArray[selectedChannel].cv_arptypemod + knobChange, 0, 12);
         break;
 
         case STATE_ARPSPDMOD:
-          sequenceArray[selectedChannel].cv_arpspdmod = positive_modulo(sequenceArray[selectedChannel].cv_arpspdmod + knobChange, 13);
+          sequenceArray[selectedChannel].cv_arpspdmod = min_max(sequenceArray[selectedChannel].cv_arpspdmod + knobChange, 0, 12);
         break;
 
         case STATE_ARPOCTMOD:
-          sequenceArray[selectedChannel].cv_arpoctmod = positive_modulo(sequenceArray[selectedChannel].cv_arpoctmod + knobChange, 13);
+          sequenceArray[selectedChannel].cv_arpoctmod = min_max(sequenceArray[selectedChannel].cv_arpoctmod + knobChange, 0, 12);
         break;
 
         case STATE_ARPINTMOD:
-          sequenceArray[selectedChannel].cv_arpintmod = positive_modulo(sequenceArray[selectedChannel].cv_arpintmod + knobChange, 13);
+          sequenceArray[selectedChannel].cv_arpintmod = min_max(sequenceArray[selectedChannel].cv_arpintmod + knobChange,0, 12);
         break;
 
         case STATE_SKIPSTEP:
@@ -715,7 +715,7 @@ void InputModule::sequenceMenuHandler(){
         break;
 
         case STATE_SKIPSTEPCOUNT:
-          sequenceArray[selectedChannel].skipStepCount = positive_modulo(sequenceArray[selectedChannel].skipStepCount + knobChange, 16);
+          sequenceArray[selectedChannel].skipStepCount = min_max(sequenceArray[selectedChannel].skipStepCount + knobChange, 0, 63);
         break;
 
         case STATE_SWING:
@@ -1261,6 +1261,7 @@ uint8_t chanSwIndex;
 
   void InputModule::channelPitchModeInputHandler(){
   // selectedStep == getNote(i) means that the user pressed the button that is selected.
+  bool skipStepDataChangeSwitch = 0;
     for (int i=0; i < 16; i++){
       if (midplaneGPIO->fell(i)){
         // select the step
@@ -1317,22 +1318,26 @@ uint8_t chanSwIndex;
       }
     }
     if (knobChange){
+
+      if( (currentMenu == PITCH_GATE_MENU) || (currentMenu == ARPEGGIO_MENU) || (currentMenu == VELOCITY_MENU) ){
+        for (int i=0; i < 16; i++){
+          if (midplaneGPIO->pressed(i)){
+            sequenceArray[selectedChannel].setStepPitch(getNote(i), min_max(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0) + knobChange, 0,120), 0);
+            skipStepDataChangeSwitch = true;
+          }
+        }
+        if(skipStepDataChangeSwitch){
+            goto SKIPSTEPDATACHANGE;
+        }
+      }
+
       if ( globalObj->parameterSelect ) {// Encoder Switch
         changeState(min_max_cycle(stepMode + knobChange,  STATE_PITCH0,  STATE_CV2_OFFSET));
       } else {
-
-        if( (currentMenu == PITCH_GATE_MENU) || (currentMenu == ARPEGGIO_MENU) || (currentMenu == VELOCITY_MENU) ){
-          for (int i=0; i < 16; i++){
-            if (midplaneGPIO->pressed(i)){
-              sequenceArray[selectedChannel].setStepPitch(getNote(i), min_max_cycle(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0) + knobChange, 0,120), 0);
-              goto SKIPSTEPDATACHANGE;
-            }
-          }
-        }
         changeStepData(selectedChannel, selectedStep, knobChange);
-        SKIPSTEPDATACHANGE: ;
-
       }
+       SKIPSTEPDATACHANGE: ;
+
     }
 
 
@@ -1355,7 +1360,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
         //  }
           // and finally set the new step value!
           // monophonic so pitch[0] only
-          sequenceArray[channel].setStepPitch(stepNum, min_max_cycle(sequenceArray[channel].getStepPitch(stepNum, 0) + change, 0,120), 0);
+          sequenceArray[channel].setStepPitch(stepNum, min_max(sequenceArray[channel].getStepPitch(stepNum, 0) + change, 0,120), 0);
           if(!playing){
             sequenceArray[channel].stoppedTrig(stepNum, true, false);
           }
