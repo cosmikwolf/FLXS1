@@ -534,15 +534,15 @@ bool OutputController::gpioCheck(int8_t mapValue){
       case 0: // no mapping
         return 0;
       break;
-      case 1: globalObj->gateInputRaw[0]; break; //gate input 1
-      case 2: globalObj->gateInputRaw[1]; break; //gate input 2
-      case 3: globalObj->gateInputRaw[2]; break; //gate input 3
-      case 4: globalObj->gateInputRaw[3]; break; //gate input 4
+      case 1: return globalObj->gateInputRaw[0]; break; //gate input 1
+      case 2: return globalObj->gateInputRaw[1]; break; //gate input 2
+      case 3: return globalObj->gateInputRaw[2]; break; //gate input 3
+      case 4: return globalObj->gateInputRaw[3]; break; //gate input 4
 
-      case 5: globalObj->gateInputRaw[4]; break; //gate out ch1
-      case 6: globalObj->gateInputRaw[5]; break; //gate out ch2
-      case 7: globalObj->gateInputRaw[6]; break; //gate out ch3
-      case 8: globalObj->gateInputRaw[7]; break; //gate out ch4
+      case 5: return globalObj->gateInputRaw[4]; break; //gate out ch1
+      case 6: return globalObj->gateInputRaw[5]; break; //gate out ch2
+      case 7: return globalObj->gateInputRaw[6]; break; //gate out ch3
+      case 8: return globalObj->gateInputRaw[7]; break; //gate out ch4
 
       case -1: return (random(100) > 90); break;
       case -2: return (random(100) > 80); break;
@@ -652,25 +652,25 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
     calibrationHigh = 16384;
   }
 
-    switch (sequenceArray[channel].quantizeScale) {
-      case SEMITONE:
-        quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
-        if(pitchValue){
-          quantNote = map( quantNote, 0, 120, calibrationLow, calibrationHigh);
-        } else {
-          quantNote = map( quantNote, -120, 120, calibrationLow, calibrationHigh);
-        }
-      break;
-      case PYTHAGOREAN:
-        quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
-        cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
-        quantNote = map( cents, 0, 120000 , calibrationLow, calibrationHigh);
-      break;
-      case COLUNDI:
-        quantNote = map( colundiArrayX100[note], 0,1012, calibrationLow, calibrationHigh);
-      break;
-    }
-    return quantNote;
+  switch (sequenceArray[channel].quantizeScale) {
+    case SEMITONE:
+      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      if(pitchValue){
+        quantNote = map( quantNote, 0, 120, calibrationLow, calibrationHigh);
+      } else {
+        quantNote = map( quantNote, -120, 120, calibrationLow, calibrationHigh);
+      }
+    break;
+    case PYTHAGOREAN:
+      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
+      quantNote = map( cents, 0, 120000 , calibrationLow, calibrationHigh);
+    break;
+    case COLUNDI:
+      quantNote = map( colundiArrayX100[note], 0,1012, calibrationLow, calibrationHigh);
+    break;
+  }
+  return quantNote;
 }
 
 uint16_t OutputController::voltageOffset(uint8_t volts, uint8_t mapAddress){
@@ -704,7 +704,6 @@ void OutputController::clearVelocityOutput(uint8_t channel){
 
   ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
   ad5676.setVoltage(dacCcMap[channel],  map(voltageLevel, -16384,16384, globalObj->dacCalibrationNeg[dacCcMap[channel]], globalObj->dacCalibrationPos[dacCcMap[channel]] ) );  // set CC voltage
-
 };
 
 
@@ -753,6 +752,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
       slewLevel = 0;
       voltageLevel = 0;
     break;
+
     case LFO_TRIGGER:
       if(currentFrame < lfoStartFrame[channel] + stepLength/16){
         voltageLevel = 16384;

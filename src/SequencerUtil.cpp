@@ -420,6 +420,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	//BEGIN INPUT MAPPING SECTION
 //	if (gateInputRaw[gpio_randompitch]){
   if( outputControl->gpioCheck(gpio_randompitch) ){
+		// Serial.println("Randomizng Pitch step: " + String(stepNum) + "\tgateInputRaw 0: " + String(globalObj->gateInputRaw[0] ) + "\tgpipmaping: " + String(gpio_randompitch));
 		stepData[stepNum].notePlaying = constrain(random(stepData[stepNum].notePlaying-randomLow, stepData[stepNum].notePlaying+randomHigh),0, 127);
 	}
 
