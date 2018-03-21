@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include "OutputController.h"
 #include "StepDatum.h"
+
 #include "global.h"
 #include "globalVariable.h"
 
 #ifndef _Sequencer_h_
 #define _Sequencer_h_
-
 
 class OutputController;
 

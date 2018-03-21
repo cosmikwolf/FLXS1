@@ -47,7 +47,7 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
 void FlashMemory::formatAndInitialize(){
 
     char* fileName = (char *) malloc(sizeof(char) * 12);
-    fileName =strdup("seqData");
+    fileName = strdup("seqData");
 
     this->formatChip();
     this->initializeCache();
@@ -134,31 +134,69 @@ void FlashMemory::initializeSaveFile(){
   free(fileName);
 }
 
-void FlashMemory::exportSysexData(){
+uint8_t FlashMemory::exportSysexData(){
+  Serial.println("Beginning SYSEX export of data");
+  delay(100);
+
   const uint8_t sysexheader[2] = {0xF0, 0xFF};
   const uint8_t sysexfooter[1] = {0xF7};
-  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY");
+  } ; // wait
 
   for(uint8_t pattern = 0;pattern<16; pattern++){
-    for(uint8_t channel = 0; channel <4; channel++){
+    for(uint8_t channel = 0; channel < 4; channel++){
+       Serial.println("Sending channel " + String(channel) + " pattern " + String(pattern));
+
        usbMIDI.sendSysEx(2, sysexheader);
-       this->serializePattern(fileBuffer, channel, pattern);
-       usbMIDI.sendSysEx(SECTORSIZE,(const uint8_t*) fileBuffer);
+       char* fileName = (char *) malloc(sizeof(char) * 12);
+       fileName = strdup("seqData");
+
+       if (spiFlash->exists(fileName)){
+         file = spiFlash->open(fileName);
+         free(fileName);
+
+         if (file){
+           char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
+
+           file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
+           file.read(fileBuffer, SECTORSIZE);
+           usbMIDI.sendSysEx(SECTORSIZE,(const uint8_t*) fileBuffer);
+           file.close();
+           free(fileBuffer);
+         } else {
+           Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - &*&*&*&*&*&*&*&*&");
+           return READ_JSON_ERROR;
+         };
+
+         //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
+       } else {
+         free(fileName);
+         //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
+         return SAVEFILE_DOES_NOT_EXIST;
+       }
        usbMIDI.sendSysEx(1, sysexfooter);
+       delay(100);
       // free(fileBuffer);
       // fileBuffer = NULL;
+      Serial.println("Channel " + String(channel) + " pattern " + String(pattern) + " sent");
+
     }
   }
 
   Serial.println("sending sysex data complete!");
-
-  free(fileBuffer);
-  fileBuffer = NULL;
-
 }
+
+
+
+
 void FlashMemory::importSysexData(){
 
 }
+
+
+
 bool FlashMemory::validateJson(char* fileBuffer){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.parse(fileBuffer);
@@ -418,7 +456,7 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
   //Serial.println("jsonBuffer allocated");
    JsonObject& jsonReader = jsonBuffer.parseObject(json);
    //Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
-
+   uint8_t backoutPattern = sequenceArray[channel].pattern;
    //Serial.println("JSON object Parsed");
    sequenceArray[channel].stepCount        = jsonReader["settings"][0];
    sequenceArray[channel].beatCount        = jsonReader["settings"][1];
@@ -483,7 +521,12 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
      sequenceArray[channel].stepData[index] = stepDataBuf;
   }
 
-  return jsonReader.success();
+  bool returnVal = jsonReader.success();
+
+  if(returnVal == false){
+    sequenceArray[channel].initNewSequence(backoutPattern, channel);
+  }
+  return returnVal;
 }
 
 void FlashMemory::saveGlobalData(){
@@ -719,7 +762,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray){
   for(int i=0; i < SEQUENCECOUNT; i++){
     //need to skip the sequences that are masked out
-    if( patternChannelSelector & (1<<i) ){
+    if( globalObj->patternChannelSelector & (1<<i) ){
       saveSequenceData(i, destinationArray[i]);
     }
   }
@@ -741,7 +784,7 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, uint8_
     //Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
     loadPattern(pattern, channelSelector);
   } else {
-    queuePattern = pattern;
+    globalObj->queuePattern = pattern;
     //Serial.println("Queueing pattern: " + String(pattern));
   }
 }

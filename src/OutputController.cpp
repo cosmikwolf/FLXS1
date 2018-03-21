@@ -1,11 +1,12 @@
 #include <Arduino.h>
 #include "OutputController.h"
 
-void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray){
+void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray, FlashMemory *saveFile){
   Serial.println("Initializing MIDI");
   this->sequenceArray = sequenceArray;
   this->globalObj = globalObj;
   this->serialMidi = serialMidi;
+  this->saveFile = saveFile;
   this->adc = adc;
   this->cv2type[0] = 0;
   this->cv2type[1] = 0;
@@ -157,6 +158,10 @@ for (int i=0; i<4; i++){
   //  Serial.println("Reading port: " + String(i) + "\t" + String(backplaneGPIO->readAddress(i)));
   //}
 }
+
+void OutputController::quantizedPatternShiftTrigger(uint8_t pattern, uint8_t channelSelector){
+   saveFile->loadPattern(pattern, channelSelector);
+};
 
 void OutputController::setDacVoltage( uint8_t dac, uint16_t output ){
   ad5676.setVoltage(dac, output);

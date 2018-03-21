@@ -61,6 +61,7 @@
 #define BOLD4X         7
 #define STYLE1X         8
 #define MODALBOLD       9
+#define REGULARSPECIAL  10
 
 #define COLUNDINOTECOUNT  55
 
@@ -74,6 +75,7 @@ class DisplayModule
 
     char *displayCache[MAX_DISPLAY_ELEMENTS];
     char *displayElement[MAX_DISPLAY_ELEMENTS];
+    uint16_t previousColor[MAX_DISPLAY_ELEMENTS];
     char *buf = new char[51]; // sprintf buffer
 
     uint8_t highlight;

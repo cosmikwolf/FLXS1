@@ -38,12 +38,14 @@ void GlobalVariable::initialize(ADC *adc){
       this->randomizeLow = 36;
       this->randomizeSpan = 3;
       this->tempoX100 = 12000;
-
+      this->patternChannelSelector = 0b1111;
+      this->prevPtrnChannelSelector = 0;
+      this->queuePattern = 255; // queue pattern of 255 means that nothing is queued
       for(int channel=0; channel<4; channel++){
         this->channelResetSwich[channel] = 0;
       }
 
-      this->patternChangeTrigger = PATTERN_CHANGE_IMMEDIATE; 
+      this->patternChangeTrigger = PATTERN_CHANGE_IMMEDIATE;
       for(int pattern=0; pattern<16; pattern++){
         for(int channel=0; channel<4; channel++){
           this->savedSequences[channel][pattern] = 0;

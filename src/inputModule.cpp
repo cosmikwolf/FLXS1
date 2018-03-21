@@ -532,10 +532,12 @@ void InputModule::changeState(uint8_t targetState){
 // STATE VARIABLE INPUT HANDLERS
 
 void InputModule::patternSelectHandler(){
-
+  if(knobChange){
+    globalObj->patternChangeTrigger = min_max(globalObj->patternChangeTrigger + knobChange, 0, 4);
+  }
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->rose(i)){
-      saveFile->changePattern(i, patternChannelSelector, true);
+      saveFile->changePattern(i, globalObj->patternChannelSelector, globalObj->patternChangeTrigger);
       //delay(10);
       changeState(STATE_PITCH0);
     }
@@ -801,22 +803,22 @@ void InputModule::channelButtonShiftMenuHandler(uint8_t channel){
 void InputModule::channelButtonChannelSelectorHandler(uint8_t channel){
   switch(channel){
     case 0:
-      patternChannelSelector = patternChannelSelector ^ 0b0001;
+      globalObj->patternChannelSelector = globalObj->patternChannelSelector ^ 0b0001;
     break;
     case 1:
-      patternChannelSelector = patternChannelSelector ^ 0b0010;
+      globalObj->patternChannelSelector = globalObj->patternChannelSelector ^ 0b0010;
     break;
     case 2:
-      patternChannelSelector = patternChannelSelector ^ 0b0100;
+      globalObj->patternChannelSelector = globalObj->patternChannelSelector ^ 0b0100;
     break;
     case 3:
-      patternChannelSelector = patternChannelSelector ^ 0b1000;
+      globalObj->patternChannelSelector = globalObj->patternChannelSelector ^ 0b1000;
     break;
   }
 };
 
 void InputModule::channelButtonHandler(uint8_t channel){
-  //uint8_t previous = patternChannelSelector;
+  //uint8_t previous = globalObj->patternChannelSelector;
 
   // resetKnobValues();
   // if (selectedChannel != channel){
@@ -1154,7 +1156,7 @@ uint8_t chanSwIndex;
               changeState(STATE_PITCH0);
             break;
             case SAVE_MENU:
-              saveFile->savePattern(patternChannelSelector, saveDestination);
+              saveFile->savePattern(globalObj->patternChannelSelector, saveDestination);
               midplaneGPIO->clearBuffers();
 
               changeState(STATE_PITCH0);
@@ -1194,6 +1196,7 @@ uint8_t chanSwIndex;
 
         case SW_SHIFT:
           if (currentMenu == SAVE_MENU){
+            Serial.println("change menu");
             changeState(STATE_PITCH0);
           }
         break;

@@ -30,7 +30,7 @@
 
 class OutputController {
 public:
-  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray);
+  void initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInterface<HardwareSerial>* serialMidi, ADC *adc, GlobalVariable *globalObj, Sequencer *sequenceArray, FlashMemory *saveFile);
   void noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, uint8_t velocity, uint8_t velocityType,uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey,  bool cvMute, uint32_t startFrame, bool notFirstArp);
   void noteOff(uint8_t channel, uint8_t note, bool gateOff);
   int16_t getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue );
@@ -47,6 +47,7 @@ public:
   uint16_t cvInputCheck(uint8_t mapValue);
   uint8_t analogInputTranspose(uint8_t note);
 
+  void quantizedPatternShiftTrigger(uint8_t pattern, uint8_t channelSelector);
   void dacTestLoop();
   void midiTestLoop();
   void calibrationRoutine();
@@ -89,6 +90,7 @@ private:
   GlobalVariable* globalObj;
   midi::MidiInterface<HardwareSerial>* serialMidi;
   Sequencer *sequenceArray;
+  FlashMemory *saveFile;
 
   uint8_t gateMap[4]  = {0,1,2,3};
   uint8_t dacCvMap[4] = {7,0,5,3};

@@ -14,7 +14,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	this->adc = adc;
 	this->globalObj = globalObj;
 
-	outputControl.initialize(&backplaneGPIO, serialMidi, adc, globalObj, sequencerArray);
+	outputControl.initialize(&backplaneGPIO, serialMidi, adc, globalObj, sequencerArray, &saveFile);
 
 	sequencerArray[0].initialize(0, 16, 4, &outputControl, globalObj);
   sequencerArray[1].initialize(1, 16, 4, &outputControl, globalObj);

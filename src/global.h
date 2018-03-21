@@ -221,12 +221,9 @@ extern uint8_t previousState;      // Display module + LED moduleextern
 
 extern uint8_t selectedChannel;
 extern uint8_t selectedStep;
-extern uint8_t patternChannelSelector;
-extern uint8_t prevPtrnChannelSelector;
 //extern uint8_t clockMode;
 // FlashMemory
 extern uint8_t currentPattern;
-extern uint8_t queuePattern;
 extern uint8_t chordArray[27][3];
 extern uint16_t colundiArrayX100[56];
 extern uint8_t stepModeOrder[1][MAX_STATE_COUNT];

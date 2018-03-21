@@ -188,6 +188,17 @@ uint32_t Sequencer::getCurrentFrame(){
    }
 
   unquantizedCF = ((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse);
+
+  //quantized pattern change check. Loads next sequence just before it is supposed to end.
+  if (unquantizedCF >= framesPerSequence()-(getStepLength()*2/3) ){
+    if ((globalObj->patternChangeTrigger == channel + 1)&&(globalObj->queuePattern != 255) ){
+      Serial.println("changed sequence with ch" + String(channel));
+      outputControl->quantizedPatternShiftTrigger(globalObj->queuePattern, globalObj->patternChannelSelector);
+      globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
+      // activeStepReset = true;
+    }
+  }
+
   if (unquantizedCF >= framesPerSequence()){
 //    Serial.println(String(channel) + " reset-------------");
     this->clockReset(false);

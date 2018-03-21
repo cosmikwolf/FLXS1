@@ -88,7 +88,7 @@ public:
   void saveSequenceData(uint8_t channel, uint8_t pattern);
   int  readSequenceData(uint8_t channel, uint8_t pattern);
 
-  void exportSysexData();
+  uint8_t exportSysexData();
   void importSysexData();
 
   bool validateJson(char* fileBuffer);

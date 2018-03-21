@@ -69,25 +69,33 @@ void LEDArray::loop(uint16_t interval){
       case INPUT_DEBUG_MENU:
       case PATTERN_SELECT:
       case SAVE_MENU:
-        for (int i=0; i < 16; i++){
-          if(globalObj->savedSequences[0][i] || globalObj->savedSequences[1][i] || globalObj->savedSequences[2][i] || globalObj->savedSequences[3][i] ){
-            leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
-          } else {
-            leds.setPixelColor(ledMainMatrix[i], 0,0,0,10);
-          }
-        }
+        patternSelectSaveHandler();
 
-        for (int i=0; i < 4; i++){
-          if( patternChannelSelector & (1<<i) ){
-            leds.setPixelColor(ledChannelButtons[i], 0,0,0, 200);
-          } else {
-            leds.setPixelColor(ledChannelButtons[i], 64,64,64, 0);
-          }
-        }
       break;
     }
     leds.show();
   }
+}
+
+void LEDArray::patternSelectSaveHandler(){
+  this->playPauseHandler();
+
+  for (int i=0; i < 16; i++){
+    if(globalObj->savedSequences[0][i] || globalObj->savedSequences[1][i] || globalObj->savedSequences[2][i] || globalObj->savedSequences[3][i] ){
+      leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
+    } else {
+      leds.setPixelColor(ledMainMatrix[i], 0,0,0,10);
+    }
+  }
+
+  for (int i=0; i < 4; i++){
+    if( globalObj->patternChannelSelector & (1<<i) ){
+      leds.setPixelColor(ledChannelButtons[i], wheel(int(millis()/10 + 18*i)%255, 200));
+    } else {
+      leds.setPixelColor(ledChannelButtons[i], 16,16,16, 0);
+    }
+  }
+
 }
 
 void LEDArray::quantizeModeLEDHandler(){
@@ -285,4 +293,17 @@ uint32_t LEDArray::wheel(byte WheelPos) {
   }
   WheelPos -= 170;
   return leds.Color(WheelPos * 3, 255 - WheelPos * 3, 0,0);
+}
+
+uint32_t LEDArray::wheel(byte WheelPos, uint8_t whiteVal) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return leds.Color(255 - WheelPos * 3, 0, WheelPos * 3,whiteVal);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return leds.Color(0, WheelPos * 3, 255 - WheelPos * 3,whiteVal);
+  }
+  WheelPos -= 170;
+  return leds.Color(WheelPos * 3, 255 - WheelPos * 3, 0,whiteVal);
 }

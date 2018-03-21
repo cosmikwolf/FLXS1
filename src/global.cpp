@@ -12,8 +12,6 @@ uint8_t previousState = 0;      // Display module + LED moduleextern
 
 uint8_t selectedChannel = 0;
 uint8_t selectedStep;
-uint8_t patternChannelSelector = 0b1111;
-uint8_t prevPtrnChannelSelector = 0;;
 float   probability;
 float   frequency;
 
@@ -26,7 +24,6 @@ boolean midiTestActive;
 
 boolean debugBoolean = false;
 uint8_t currentPattern = 0;
-uint8_t queuePattern = 0;
 boolean playing = false;
 
 // MasterClock
