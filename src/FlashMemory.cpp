@@ -323,7 +323,7 @@ void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pa
   seqSettingsArray.add(sequenceArray[channel].cv_glidemod);         // array index: 17
   seqSettingsArray.add(sequenceArray[channel].firstStep);           // array index: 18
   seqSettingsArray.add(sequenceArray[channel].swingX100);           // array index: 19
-  seqSettingsArray.add(sequenceArray[channel].playMode);       // array index: 20
+  seqSettingsArray.add(sequenceArray[channel].playMode);            // array index: 20
   seqSettingsArray.add(sequenceArray[channel].skipStepCount);       // array index: 21
   seqSettingsArray.add(sequenceArray[channel].randomLow);           // array index: 22
   seqSettingsArray.add(sequenceArray[channel].randomHigh);          // array index: 23
@@ -354,6 +354,63 @@ void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pa
   }
   root.printTo(fileBuffer,4096);
 }
+
+uint8_t FlashMemory::checkForSavedSequences(){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName = strdup("seqData");
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY");
+  } ; // wait
+  if (spiFlash->exists(fileName)){
+    file = spiFlash->open(fileName);
+    if (file){
+      for(int pattern=0; pattern<16; pattern++){
+        for(int channel=0; channel<4; channel++){
+          char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
+          file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
+          file.read(fileBuffer, SECTORSIZE);
+          globalObj->savedSequences[channel][pattern] = this->checkifSequenceHasBeenSaved(fileBuffer);
+          file.close();
+          free(fileBuffer);
+        }
+      }
+    } else {
+      Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
+      free(fileName);
+      return READ_JSON_ERROR;
+    };
+    free(fileName);
+    return FILE_EXISTS;
+  } else {
+    free(fileName);
+    return SAVEFILE_DOES_NOT_EXIST;
+  }
+  free(fileName);
+}
+
+bool FlashMemory::checkifSequenceHasBeenSaved(char* json){
+  StaticJsonBuffer<16384> jsonBuffer;
+
+   JsonObject& jsonReader = jsonBuffer.parseObject(json);
+
+   JsonArray& stepDataArray = jsonReader["data"];
+
+    for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
+     StepDatum stepDataBuf;
+
+    if(stepDataArray[i][7] != 0) { // if there are any gate types that are not zero, that means that sequence has been saved
+      return true;
+    };
+
+    if(stepDataArray[i][1] != 24) { // if there are any pitches that are nto the default 24, that means that sequence has been saved
+      return true;
+    };
+  }
+ return false;
+
+}
+
+
 
 bool FlashMemory::deserializePattern(uint8_t channel, char* json){
   StaticJsonBuffer<16384> jsonBuffer;
@@ -509,7 +566,7 @@ int FlashMemory::readGlobalData(){
 
 void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
-
+  globalObj->savedSequences[channel][pattern] = true;
   uint8_t cacheIndex = getCacheIndex(channel, pattern);
   //Serial.println("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
   while (cacheStatus[cacheIndex] != 0){

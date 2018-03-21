@@ -36,10 +36,13 @@ void LEDArray::loop(uint16_t interval){
 
     switch (currentMenu ){
       case SEQUENCE_MENU:
+      case QUANTIZE_MENU:
       case MOD_MENU_1:
       case MOD_MENU_2:
       case TEMPO_MENU:
-      case QUANTIZE_MENU:
+      case GLOBAL_MENU_1:
+      case GLOBAL_MENU_2:
+      case SYSEX_MENU:
         if(stepMode == STATE_QUANTIZEMODE){
           quantizeModeLEDHandler();
         } else {
@@ -67,7 +70,11 @@ void LEDArray::loop(uint16_t interval){
       case PATTERN_SELECT:
       case SAVE_MENU:
         for (int i=0; i < 16; i++){
-          leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
+          if(globalObj->savedSequences[0][i] || globalObj->savedSequences[1][i] || globalObj->savedSequences[2][i] || globalObj->savedSequences[3][i] ){
+            leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
+          } else {
+            leds.setPixelColor(ledMainMatrix[i], 0,0,0,10);
+          }
         }
 
         for (int i=0; i < 4; i++){
@@ -76,7 +83,6 @@ void LEDArray::loop(uint16_t interval){
           } else {
             leds.setPixelColor(ledChannelButtons[i], 64,64,64, 0);
           }
-
         }
       break;
     }

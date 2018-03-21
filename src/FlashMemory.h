@@ -72,11 +72,12 @@ public:
 
   void listFiles();
 
-
-
   int getSaveAddress(uint8_t index);
   void serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern);
   bool deserializePattern(uint8_t channel, char* json);
+
+  uint8_t checkForSavedSequences();
+  bool checkifSequenceHasBeenSaved(char* json);
 
   void serializeGlobalSettings(char* fileBuffer);
   bool deserializeGlobalSettings(char* json);
@@ -89,7 +90,7 @@ public:
 
   void exportSysexData();
   void importSysexData();
-  
+
   bool validateJson(char* fileBuffer);
 
   void deleteAllFiles();

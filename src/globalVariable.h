@@ -83,7 +83,8 @@ class GlobalVariable {
     uint8_t   randomizeLow;
     uint8_t   randomizeSpan;
     uint8_t   importExportDisplaySwitch;
-    
+
+    bool savedSequences[4][16]; //[channel][sequence]
     bool muteChannelSelect[4];
     bool parameterSelect;
 

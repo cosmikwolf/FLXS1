@@ -63,6 +63,22 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 		Serial.println("SAVE FILE FOUND");
 		delay(5);
 	}
+	//
+	// char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+	//
+	// for(int i=0; i<16; i++){
+	// 	saveFile.serializePattern(fileBuffer, 0, i);
+	// 	free(fileBuffer);
+	// 	fileBuffer = NULL;
+	// }
+	saveFile.checkForSavedSequences();
+	Serial.println("================ checking to see which sequences have been saved ================");
+	for(int pattern=0; pattern<16; pattern++){
+		for(int channel=0; channel<4; channel++){
+			Serial.print(String(globalObj->savedSequences[channel][pattern]));
+		}
+	}
+	Serial.println();
 
 	buttonIo.changeState(STATE_PITCH0);
 	midiTestValue = 0;
@@ -83,6 +99,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	File root = SD.open("/");
   saveFile.printDirectory(root, 2);
 	*/
+	Serial.println("===== TIMECONTROLLER INITIALIZATION COMPLETE =====");
 
 }
 
