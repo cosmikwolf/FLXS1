@@ -510,6 +510,7 @@ void DisplayModule::modalDisplay(){
           displayElement[0] = strdup("reverse");
         break;
       }
+      break;
     case MODAL_EXPORTING:
       displayElement[0] = strdup("SYSEX EXPORT");
       displayElement[1] = strdup("exporting...");
@@ -1446,45 +1447,61 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
 
    highlight = currentPattern;
 
-   displayElement[0] = strdup("01");
-   displayElement[1] = strdup("02");
-   displayElement[2] = strdup("03");
-   displayElement[3] = strdup("04");
-   displayElement[4] = strdup("05");
-   displayElement[5] = strdup("06");
-   displayElement[6] = strdup("07");
-   displayElement[7] = strdup("08");
-   displayElement[8] = strdup("09");
-   displayElement[9] = strdup("10");
-   displayElement[10] = strdup("11");
-   displayElement[11] = strdup("12");
-   displayElement[12] = strdup("13");
-   displayElement[13] = strdup("14");
-   displayElement[14] = strdup("15");
-   displayElement[15] = strdup("16");
+  uint8_t dispSelector;
+
+  for(int pattern=0; pattern<16; pattern++){
+    dispSelector = 0;
+    for(int channel=0; channel<4; channel++){
+      if(globalObj->savedSequences[channel][pattern]){
+        dispSelector |= 1 << channel;
+      }
+     }
+     switch(dispSelector){
+       case 0b0000: sprintf(buf, "____" ); break;
+       case 0b0001: sprintf(buf, "1___" ); break;
+       case 0b0010: sprintf(buf, "_2__" ); break;
+       case 0b0011: sprintf(buf, "12__" ); break;
+       case 0b0100: sprintf(buf, "__3_" ); break;
+       case 0b0101: sprintf(buf, "1_3_" ); break;
+       case 0b0110: sprintf(buf, "_23_" ); break;
+       case 0b0111: sprintf(buf, "123_" ); break;
+       case 0b1000: sprintf(buf, "___4" ); break;
+       case 0b1001: sprintf(buf, "1__4" ); break;
+       case 0b1010: sprintf(buf, "_2_4" ); break;
+       case 0b1011: sprintf(buf, "12_4" ); break;
+       case 0b1100: sprintf(buf, "__34" ); break;
+       case 0b1101: sprintf(buf, "1_34" ); break;
+       case 0b1111: sprintf(buf, "1234" ); break;
+     }
+     displayElement[pattern]  = strdup(buf);
+   }
 
    displayElement[16] = strdup("PATTERN SELECT");
    sprintf(buf, "current: %02d", currentPattern );
    sprintf(buf, "ch1:%02d ch2:%02d ch3:%02d ch4:%02d ", sequenceArray[0].pattern+1,sequenceArray[1].pattern+1, sequenceArray[2].pattern+1, sequenceArray[3].pattern+1 );
    displayElement[17] = strdup(buf);
 
-   renderStringBox( 0, DISPLAY_LABEL,  0, 30, 32 , 16, false, STYLE1X, BLACK, RED);
-   renderStringBox( 1, DISPLAY_LABEL, 32, 30, 32 , 16, false, STYLE1X, BLACK, GREEN);
-   renderStringBox( 2, DISPLAY_LABEL, 64, 30, 32 , 16, false, STYLE1X, BLACK, BLUE);
-   renderStringBox( 3, DISPLAY_LABEL, 96, 30, 32 , 16, false, STYLE1X, BLACK, PURPLE);
-   renderStringBox( 4, DISPLAY_LABEL,  0, 47, 32 , 16, false, STYLE1X, BLACK, RED);
-   renderStringBox( 5, DISPLAY_LABEL, 32, 47, 32 , 16, false, STYLE1X, BLACK, GREEN);
-   renderStringBox( 6, DISPLAY_LABEL, 64, 47, 32 , 16, false, STYLE1X, BLACK, BLUE);
-   renderStringBox( 7, DISPLAY_LABEL, 96, 47, 32 , 16, false, STYLE1X, BLACK, PURPLE);
-   renderStringBox( 8, DISPLAY_LABEL,  0, 63, 32 , 16, false, STYLE1X, BLACK, RED);
-   renderStringBox( 9, DISPLAY_LABEL, 32, 63, 32 , 16, false, STYLE1X, BLACK, GREEN);
-   renderStringBox(10, DISPLAY_LABEL, 64, 63, 32 , 16, false, STYLE1X, BLACK, BLUE);
-   renderStringBox(11, DISPLAY_LABEL, 96, 63, 32 , 16, false, STYLE1X, BLACK, PURPLE);
-   renderStringBox(12, DISPLAY_LABEL,  0, 79, 32 , 16, false, STYLE1X, BLACK, RED);
-   renderStringBox(13, DISPLAY_LABEL, 32, 79, 32 , 16, false, STYLE1X, BLACK, GREEN);
-   renderStringBox(14, DISPLAY_LABEL, 64, 79, 32 , 16, false, STYLE1X, BLACK, BLUE);
-   renderStringBox(15, DISPLAY_LABEL, 96, 79, 32 , 16, false, STYLE1X, BLACK, PURPLE);
+   uint8_t y = 50;
+   uint8_t yoffset = 10;
+   uint8_t x = 2;
+   uint8_t xoffset = 30;
 
+   renderStringBox( 0, DISPLAY_LABEL, x+0*xoffset, y+0*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 1, DISPLAY_LABEL, x+1*xoffset, y+0*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 2, DISPLAY_LABEL, x+2*xoffset, y+0*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 3, DISPLAY_LABEL, x+3*xoffset, y+0*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 4, DISPLAY_LABEL, x+0*xoffset, y+1*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 5, DISPLAY_LABEL, x+1*xoffset, y+1*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 6, DISPLAY_LABEL, x+2*xoffset, y+1*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 7, DISPLAY_LABEL, x+3*xoffset, y+1*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 8, DISPLAY_LABEL, x+0*xoffset, y+2*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox( 9, DISPLAY_LABEL, x+1*xoffset, y+2*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox(10, DISPLAY_LABEL, x+2*xoffset, y+2*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox(11, DISPLAY_LABEL, x+3*xoffset, y+2*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox(12, DISPLAY_LABEL, x+0*xoffset, y+3*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox(13, DISPLAY_LABEL, x+1*xoffset, y+3*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox(14, DISPLAY_LABEL, x+2*xoffset, y+3*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
+   renderStringBox(15, DISPLAY_LABEL, x+3*xoffset, y+3*yoffset, 32 , 16, false, REGULAR1X, BLACK, RED);
 
    renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 8, false, STYLE1X, BLACK, PINK);
    renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, BLACK, PINK);

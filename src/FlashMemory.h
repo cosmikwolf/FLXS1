@@ -40,7 +40,7 @@ class FlashMemory
 public:
   FlashMemory();
 
-  void changePattern(uint8_t pattern, uint8_t channelSelector, boolean instant);
+  void changePattern(uint8_t pattern, uint8_t channelSelector, uint8_t changeTrigger);
   void savePattern(uint8_t channelSelector, uint8_t *destinationArray);
 
   void initialize(OutputController* outputControl, Sequencer *sequenceArray,  SerialFlashChip *spiFlash, ADC *adc, GlobalVariable *globalObj);

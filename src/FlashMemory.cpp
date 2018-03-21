@@ -726,7 +726,7 @@ void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray)
 }
 
 
-void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolean instant){
+void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, uint8_t changeTrigger){
 	//Serial.println("currentPattern: " + String(currentPattern) + "\tSEQUENCECOUNT: " + String(SEQUENCECOUNT));
 	//if(saveFirst){
 //    for(int i=0; i < SEQUENCECOUNT; i++){
@@ -737,7 +737,7 @@ void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, boolea
     //Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
 	//}
 
-  if (instant || !playing) {
+  if (changeTrigger == 0) {
     //Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
     loadPattern(pattern, channelSelector);
   } else {

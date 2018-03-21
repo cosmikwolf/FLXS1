@@ -13,6 +13,8 @@
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
 void Sequencer::clockReset(bool activeStepReset){
+  globalObj->channelResetSwich[channel] = true;
+
   ppqPulseIndex = 0;
 
   if (activeStepReset){

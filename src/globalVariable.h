@@ -13,6 +13,13 @@
 #define EXTERNAL_CLOCK_GATE_2 5
 #define EXTERNAL_CLOCK_GATE_3 6
 #define EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT 7
+
+#define PATTERN_CHANGE_IMMEDIATE 0
+#define PATTERN_CHANGE_CHANNEL_0 1
+#define PATTERN_CHANGE_CHANNEL_1 2
+#define PATTERN_CHANGE_CHANNEL_2 3
+#define PATTERN_CHANGE_CHANNEL_3 4
+
 #define GATE_CLOCK_TIMEOUT 5000000
 
 #define CLOCK_PORT_OUTPUT 1
@@ -84,6 +91,8 @@ class GlobalVariable {
     uint8_t   randomizeSpan;
     uint8_t   importExportDisplaySwitch;
 
+    uint8_t   patternChangeTrigger;
+    bool channelResetSwich[4];
     bool savedSequences[4][16]; //[channel][sequence]
     bool muteChannelSelect[4];
     bool parameterSelect;
