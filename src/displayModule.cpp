@@ -64,7 +64,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("beta17m");
+  oled.println("beta17n");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
