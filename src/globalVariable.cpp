@@ -38,6 +38,7 @@ void GlobalVariable::initialize(ADC *adc){
       this->randomizeLow = 36;
       this->randomizeSpan = 3;
       this->tempoX100 = 12000;
+      this->selectedStep = 0;
       this->patternChannelSelector = 0b1111;
       this->prevPtrnChannelSelector = 0;
       this->queuePattern = 255; // queue pattern of 255 means that nothing is queued

@@ -220,7 +220,6 @@ extern uint8_t previousState;      // Display module + LED moduleextern
 
 
 extern uint8_t selectedChannel;
-extern uint8_t selectedStep;
 //extern uint8_t clockMode;
 // FlashMemory
 extern uint8_t currentPattern;

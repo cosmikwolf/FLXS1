@@ -79,7 +79,7 @@ void InputModule::multiSelectInputHandler(){
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
       // select the step
-      selectedStep = getNote(i);
+      globalObj->selectedStep = getNote(i);
 
       buttonMode = BUTTON_MODE_MULTISELECT;
       globalObj->multiSelection[getNote(i)] =  !globalObj->multiSelection[getNote(i)];
@@ -267,32 +267,35 @@ void InputModule::loop(uint16_t frequency){
 
     if (midplaneGPIO->fell(SW_SHIFT)){
       //tap tempo
-      if (globalObj->tapTempoCount == 0){
-        globalObj->tapTempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
-        for(int i = 0; i<4; i++){
-          globalObj->tapTempoClockValues[i] = 0;
+      if(globalObj->clockMode == INTERNAL_CLOCK){
+
+        if (globalObj->tapTempoCount == 0){
+          globalObj->tapTempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
+          for(int i = 0; i<4; i++){
+            globalObj->tapTempoClockValues[i] = 0;
+          }
+        } else {
+          globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tapTempoMasterClkCounter;
+          globalObj->tapTempoMasterClkCounter = 0;
+        };
+        globalObj->tapTempoCount++;
+
+        if(globalObj->tapTempoCount > 4){
+          uint32_t tempTempo = 0;
+          for(int i = 0; i<4; i++){
+            tempTempo += globalObj->tapTempoClockValues[i] * kMasterClockInterval;
+          }
+
+          globalObj->tempoX100 = 6000000000/(tempTempo/4);
+          // clockMaster->changeTempo(globalObj->tempoX100);
+          Serial.println("Setting tap tempo to: " + String(globalObj->tempoX100) + "\ttempTempo: " + String(tempTempo));
         }
       } else {
-        globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tapTempoMasterClkCounter;
-        globalObj->tapTempoMasterClkCounter = 0;
-      };
-      globalObj->tapTempoCount++;
-
-      if(globalObj->tapTempoCount > 4){
-        uint32_t tempTempo = 0;
-        for(int i = 0; i<4; i++){
-          tempTempo += globalObj->tapTempoClockValues[i] * kMasterClockInterval;
-        }
-
-        globalObj->tempoX100 = 6000000000/(tempTempo/4);
-        // clockMaster->changeTempo(globalObj->tempoX100);
-        Serial.println("Setting tap tempo to: " + String(globalObj->tempoX100) + "\ttempTempo: " + String(tempTempo));
-      }
-    } else {
-      if(globalObj->tapTempoCount){
-        if (globalObj->tapTempoMasterClkCounter > 1000000/kMasterClockInterval){
-          Serial.println("Resetting tap tempo : prev count: " + String(globalObj->tapTempoCount));
-          globalObj->tapTempoCount = 0;
+        if(globalObj->tapTempoCount){
+          if (globalObj->tapTempoMasterClkCounter > 1000000/kMasterClockInterval){
+            Serial.println("Resetting tap tempo : prev count: " + String(globalObj->tapTempoCount));
+            globalObj->tapTempoCount = 0;
+          }
         }
       }
     }
@@ -550,7 +553,7 @@ void InputModule::tempoMenuHandler(){
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
       changeState(STATE_PITCH0);
-      selectedStep = getNote(i);
+      globalObj->selectedStep = getNote(i);
     }
   }
 
@@ -599,7 +602,7 @@ void InputModule::sequenceMenuHandler(){
         sequenceArray[selectedChannel].quantizeMode ^= (1<<i);
       } else {
         changeState(STATE_PITCH0);
-        selectedStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
+        globalObj->selectedStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
         notePage =   sequenceArray[selectedChannel].getActivePage();
       }
     }
@@ -747,7 +750,7 @@ void InputModule::globalMenuHandler(){
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
       changeState(STATE_PITCH0);
-      selectedStep = getNote(i);
+      globalObj->selectedStep = getNote(i);
     }
   }
 
@@ -1263,12 +1266,12 @@ uint8_t chanSwIndex;
 
 
   void InputModule::channelPitchModeInputHandler(){
-  // selectedStep == getNote(i) means that the user pressed the button that is selected.
+  // globalObj->selectedStep == getNote(i) means that the user pressed the button that is selected.
   bool skipStepDataChangeSwitch = 0;
     for (int i=0; i < 16; i++){
       if (midplaneGPIO->fell(i)){
         // select the step
-        selectedStep = getNote(i);
+        globalObj->selectedStep = getNote(i);
 
           buttonMode = BUTTON_MODE_XOX;
 
@@ -1282,7 +1285,7 @@ uint8_t chanSwIndex;
             if (i == n) continue;
             if (midplaneGPIO->pressed(n)){
               buttonMode = BUTTON_MODE_PLAYRANGE;
-              if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
+              if(lastselectedStep == globalObj->selectedStep && selectedStepTimer < DOUBLECLICKMS){
                 sequenceArray[selectedChannel].setPlayRange(n,i);
                 break;
               }
@@ -1292,7 +1295,7 @@ uint8_t chanSwIndex;
         }
 
         if(!playing){
-          sequenceArray[selectedChannel].stoppedTrig(selectedStep, true, true);
+          sequenceArray[selectedChannel].stoppedTrig(globalObj->selectedStep, true, true);
         }
 
 
@@ -1304,18 +1307,18 @@ uint8_t chanSwIndex;
         if(buttonMode == BUTTON_MODE_XOX ){
           // tap to turn a step on, double tap to turn step off
           // skip turning step on or of it was just copied
-          selectedStep = getNote(i);
-          if(lastSelectedStep == selectedStep && selectedStepTimer < DOUBLECLICKMS){
-            sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_REST;
+          globalObj->selectedStep = getNote(i);
+          if(lastselectedStep == globalObj->selectedStep && selectedStepTimer < DOUBLECLICKMS){
+            sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_REST;
           } else {
-            if (sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
-              sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP ;
+            if (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST){
+              sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_STEP ;
             }
-  //            sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
+  //            sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
           }
         }
 
-        lastSelectedStep = selectedStep;
+        lastselectedStep = globalObj->selectedStep;
         selectedStepTimer = 0;
 
       }
@@ -1337,7 +1340,7 @@ uint8_t chanSwIndex;
       if ( globalObj->parameterSelect ) {// Encoder Switch
         changeState(min_max_cycle(stepMode + knobChange,  STATE_PITCH0,  STATE_CV2_OFFSET));
       } else {
-        changeStepData(selectedChannel, selectedStep, knobChange);
+        changeStepData(selectedChannel, globalObj->selectedStep, knobChange);
       }
        SKIPSTEPDATACHANGE: ;
 
@@ -1350,16 +1353,16 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
     //knobPrev = knobRead;
     uint8_t chrd;
 
-//      if (midplaneGPIO->pressed(selectedStep%16) ){
+//      if (midplaneGPIO->pressed(globalObj->selectedStep%16) ){
 
       switch (stepMode) {
         case STATE_PITCH0:
       // just change the note
 
-        //  if(sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST){
+        //  if(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST){
         //    // if a note is not active, turn it on and give it a length.
-        //    sequenceArray[selectedChannel].stepData[selectedStep].gateType = GATETYPE_STEP;
-        //    sequenceArray[selectedChannel].stepData[selectedStep].gateLength = 1;
+        //    sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_STEP;
+        //    sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
         //  }
           // and finally set the new step value!
           // monophonic so pitch[0] only

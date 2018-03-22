@@ -80,7 +80,7 @@ public:
   bool chRecEraseSwitch;
   uint8_t chPressedSelector;
   uint8_t buttonMode;
-  uint8_t lastSelectedStep;
+  uint8_t lastselectedStep;
   elapsedMillis selectedStepTimer;
   // Encoder vars
   int8_t knobRead;

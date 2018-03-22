@@ -11,7 +11,6 @@ uint8_t	currentMenu = STATE_PITCH0;       // Display module + LED module
 uint8_t previousState = 0;      // Display module + LED moduleextern
 
 uint8_t selectedChannel = 0;
-uint8_t selectedStep;
 float   probability;
 float   frequency;
 

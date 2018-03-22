@@ -55,7 +55,7 @@ void LEDArray::loop(uint16_t interval){
         if(globalObj->multiSelectSwitch){
           multiSelectLEDHandler();
         } else {
-          channelPitchModeLEDHandler(selectedStep);
+          channelPitchModeLEDHandler(globalObj->selectedStep);
         }
       break;
       case VELOCITY_MENU:
@@ -134,7 +134,7 @@ void LEDArray::channelSequenceModeLEDHandler(){
 
 void LEDArray::multiSelectLEDHandler(){
     for (int i=0; i < 16; i++){
-      if (globalObj->multiSelection[getNote(i)] && blinkTimer > 3000000/globalObj->tempoX100){
+      if (globalObj->multiSelection[getNote(i)] && blinkTimer > 3000000/min_max(globalObj->tempoX100,50,500)){
         leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
       } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType != 0){
         leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
@@ -219,7 +219,7 @@ void LEDArray::channelGateModeLEDHandler(){
       leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
     }
 
-    } else if (getNote(i) == selectedStep) {
+    } else if (getNote(i) == globalObj->selectedStep) {
       leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5)%255));
 
     } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){

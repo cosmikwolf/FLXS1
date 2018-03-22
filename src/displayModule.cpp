@@ -777,30 +777,30 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
     switch(sequenceArray[selectedChannel].quantizeScale){
       case COLUNDI:
-        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
+        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
       break;
       case SEMITONE:
-        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantizeSemitonePitch(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0],  sequenceArray[selectedChannel].quantizeKey, sequenceArray[selectedChannel].quantizeMode, 0)]);
-        //displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]]);
+        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantizeSemitonePitch(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[selectedChannel].quantizeKey, sequenceArray[selectedChannel].quantizeMode, 0)]);
+        //displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
       break;
       default:
-      displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].pitch[0]).c_str());
+      displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
     }
 
-    if ( sequenceArray[selectedChannel].stepData[selectedStep].gateType == GATETYPE_REST ){
+    if ( sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST ){
       displayElement[5] = strdup("rest");
     } else {
-      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[selectedStep].gateLength+1)%4*100/4  );
+      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength+1)%4*100/4  );
       displayElement[5] = strdup(buf);
     }
-    if (sequenceArray[selectedChannel].stepData[selectedStep].glide == 0) {
+    if (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].glide == 0) {
       sprintf(buf, "off");
     } else {
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].glide);
+      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].glide);
     }
     displayElement[9] = strdup(buf);
 
-    displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].gateType].c_str() );
+    displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType].c_str() );
   }
 
   if(globalObj->multiSelectSwitch) {
@@ -884,15 +884,15 @@ void DisplayModule::stateDisplay_arp(char *buf){
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[12] = strdup(buf);
 
-    displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].arpType]);
+    displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpType]);
 
-    sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[selectedStep].arpSpdNum);
+    sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpSpdNum);
     displayElement[5] = strdup(buf);
-    sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[selectedStep].arpSpdDen);
+    sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpSpdDen);
     displayElement[6] = strdup(buf);
-    sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[selectedStep].arpOctave);
+    sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpOctave);
     displayElement[9] = strdup(buf);
-    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[selectedStep].chord]);
+    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].chord]);
    }
     if(globalObj->multiSelectSwitch) {
       renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background );
@@ -976,14 +976,14 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
     displayElement[7] = strdup(buf);
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[8] = strdup(buf);
-    if((sequenceArray[selectedChannel].stepData[selectedStep].velocityType == 2) && (sequenceArray[selectedChannel].stepData[selectedStep].velocity > 0)) {
-      displayElement[2] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[selectedStep].velocity]);
+    if((sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType == 2) && (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocity > 0)) {
+      displayElement[2] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocity]);
     } else {
-      voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].velocity);
+      voltageToText(buf,sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocity);
       displayElement[2] = strdup(buf);
     }
-      displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[selectedStep].velocityType]);
-    //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[selectedStep].velocityType).c_str());
+      displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType]);
+    //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType).c_str());
 
     /*
     Speed of 128
@@ -993,23 +993,23 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
     speed of 32 is 2 step wavelenth
     which is 64/32
     */
-    // if (sequenceArray[selectedChannel].stepData[selectedStep].velocityType > 6){
+    // if (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType > 6){
     //     displayElement[5] = strdup("Wavelnt:");
     //     sprintf(buf, "%d.%02d x",
-    //       sequenceArray[selectedChannel].stepData[selectedStep].cv2speed/64, (100*(sequenceArray[selectedChannel].stepData[selectedStep].cv2speed%64))/64
+    //       sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed/64, (100*(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed%64))/64
     //    );
     //    displayElement[6] = strdup(buf);
     //
     // } else {
     //   displayElement[5] = strdup("EnvLng:");
-    //   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2speed);
+    //   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed);
     //   displayElement[6] = strdup(buf);
     //
     // }
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[selectedStep].cv2speed);
+    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed);
     displayElement[6] = strdup(buf);
 
-    voltageToText(buf,sequenceArray[selectedChannel].stepData[selectedStep].cv2offset);
+    voltageToText(buf,sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2offset);
 
     displayElement[11] = strdup(buf);
   }
