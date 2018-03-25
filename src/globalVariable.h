@@ -101,6 +101,11 @@ class GlobalVariable {
     bool muteChannelSelect[4];
     bool parameterSelect;
 
+    bool    chainChannelSelect[4][16]; //channel, chain index
+    uint8_t chainPatternSelect[16];
+    uint8_t chainPatternRepeatCount[16];
+    uint8_t chainSelectedPattern;
+    uint8_t previousChainSelectedPattern;
     bool midiSetClockOut;
     bool gateTestComplete;
     elapsedMillis testTimer;

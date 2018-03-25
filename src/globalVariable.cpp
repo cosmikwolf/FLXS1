@@ -53,13 +53,23 @@ void GlobalVariable::initialize(ADC *adc){
         }
       }
 
-
       for(int i = 0; i < 64; i++){
           this->multiSelection[i]=false;
       }
       for(int i = 0; i < 4; i++){
         this->gateTestArray[i]=255;
       }
+
+      for(int pattern=0; pattern<16; pattern++){
+        for(int channel=0; channel<4; channel++){
+          this->chainChannelSelect[channel][pattern] = 0; //channel, chain index
+        }
+        this->chainPatternSelect[pattern] = 0;
+        this->chainPatternRepeatCount[pattern] = 0;
+      }
+      this->chainSelectedPattern = 2;
+      this->previousChainSelectedPattern = 0;;
+
       activeGate = 0;
       rheoTestLevel = 0;
       gateTestComplete = false;

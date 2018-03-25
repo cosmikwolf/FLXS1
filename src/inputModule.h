@@ -56,6 +56,7 @@ public:
   void randomShortcutHandler();
 
   void saveMenuInputHandler();
+  void patternChainInputHandler();
   void sequenceMenuHandler();
   void scaleMenuHandler();
   void inputMenuHandler();

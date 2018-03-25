@@ -270,6 +270,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
         case SYSEX_MENU:
           sysexMenuHandler();
           break;
+
+        case MENU_PATTERN_CHAIN:
+          patternChainMenuHandler();
+        break;
       }
 
     }
@@ -554,15 +558,16 @@ void DisplayModule::modalDisplay(){
     //    renderStringBox(0,  DISPLAY_LABEL,    18,  28, 96, 20, true, MODALBOLD, BLACK , WHITE);
     //    renderStringBox(1,  DISPLAY_LABEL,    18,  64, 96, 20, true, MODALBOLD, BLACK , WHITE);
     //  }
-
-
     break;
   }
 
 }
 
+void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor){
+  this->renderStringBox(index, highlight, x, y, w, h, border, textSize, color, bgColor, false);
+};
 
-void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) {
+void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor, bool forceHighlight) {
   // renders a string box only once.
   uint16_t color1;
   uint16_t color2;
@@ -573,12 +578,12 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
   if (strcmp(displayElement[index], displayCache[index]) != 0 ){ refresh = 1;};
   if( previousStepMode != highlight && highlight == stepMode)  { refresh = 1;};
   if (previousStepMode == highlight && highlight != stepMode)  { refresh = 1;};
-  if (previousParameterSelect != globalObj->parameterSelect )  {
-    refresh = 1;
-  };
-
+  if (previousParameterSelect != globalObj->parameterSelect )  { refresh = 1;};
+  if(globalObj->chainSelectedPattern != globalObj->previousChainSelectedPattern){ refresh = 1;  };
+  globalObj->previousChainSelectedPattern = globalObj->chainSelectedPattern;
+  
   if ( refresh ) {
-    if ( (highlight == stepMode) && !globalObj->parameterSelect){
+    if ( ((highlight == stepMode)|| forceHighlight ) && !globalObj->parameterSelect)  {
       color1 = color;
       color2 = bgColor;
     } else {
@@ -2046,15 +2051,15 @@ void DisplayModule::sysexMenuHandler(){
   displayElement[0] = strdup("data Backup");
 
   switch(globalObj->importExportDisplaySwitch){
-      case 0:
-        displayElement[1] = strdup("sysex export");
-        break;
-      case 1:
-        displayElement[1] = strdup("exporting..");
-        break;
-      case 2:
-        displayElement[1] = strdup("export complete");
-        break;
+    case 0:
+      displayElement[1] = strdup("sysex export");
+      break;
+    case 1:
+      displayElement[1] = strdup("exporting..");
+      break;
+    case 2:
+      displayElement[1] = strdup("export complete");
+      break;
   }
   displayElement[2] = strdup("press shift+pattern to export");
   displayElement[3] = strdup("seq data to usb midi");
@@ -2070,18 +2075,51 @@ void DisplayModule::sysexMenuHandler(){
   // displayElement[7] = strdup("this will delete and");
   // displayElement[8] = strdup("replace all sequences");
 
-  renderStringBox(0,  DISPLAY_LABEL,        0,  0,128, 15, false, STYLE1X, background , contrastColor);
+  renderStringBox(0,  DISPLAY_LABEL,        0,  0, 128,15, false, STYLE1X, background , contrastColor);
   renderStringBox(1,  STATE_SYSEX_EXPORT,   0, 15, 127,16, false, STYLE1X, background , foreground);
-  renderStringBox(2,  DISPLAY_LABEL,        0, 31, 127,8, false, REGULAR1X, background , foreground);
-  renderStringBox(3,  DISPLAY_LABEL,        0, 39, 127,8, false, REGULAR1X, background , foreground);
-
+  renderStringBox(2,  DISPLAY_LABEL,        0, 31, 127,8,  false, REGULAR1X, background , foreground);
+  renderStringBox(3,  DISPLAY_LABEL,        0, 39, 127,8,  false, REGULAR1X, background , foreground);
   renderStringBox(4,  STATE_SYSEX_IMPORT,   0, 47, 127,16, false, STYLE1X, background , foreground);
-  renderStringBox(5,  DISPLAY_LABEL,        0, 63, 127,8, false, REGULAR1X, background , foreground);
-  renderStringBox(6,  DISPLAY_LABEL,        0, 71, 127,8, false, REGULAR1X, background , foreground);
-  renderStringBox(7,  DISPLAY_LABEL,        0, 79, 127,8, false, REGULAR1X, background , foreground);
-  renderStringBox(8,  DISPLAY_LABEL,        0, 87, 127,8, false, REGULAR1X, background , foreground);
+  renderStringBox(5,  DISPLAY_LABEL,        0, 63, 127,8,  false, REGULAR1X, background , foreground);
+  renderStringBox(6,  DISPLAY_LABEL,        0, 71, 127,8,  false, REGULAR1X, background , foreground);
+  renderStringBox(7,  DISPLAY_LABEL,        0, 79, 127,8,  false, REGULAR1X, background , foreground);
+  renderStringBox(8,  DISPLAY_LABEL,        0, 87, 127,8,  false, REGULAR1X, background , foreground);
 };
 
+void DisplayModule::patternChainMenuHandler(){
+  displayElement[0] = strdup("PATTERN CHAIN");
+
+  for(int patternChainIndex = 0; patternChainIndex < 4 ; patternChainIndex++ ){
+    sprintf(buf, "%02d %s%s%s%s %02d",
+    globalObj->chainPatternSelect[patternChainIndex],
+    globalObj->chainChannelSelect[0][patternChainIndex] ? "X" : "-",
+    globalObj->chainChannelSelect[1][patternChainIndex] ? "X" : "-",
+    globalObj->chainChannelSelect[2][patternChainIndex] ? "X" : "-" ,
+    globalObj->chainChannelSelect[3][patternChainIndex] ? "X" : "-",
+    globalObj->chainPatternRepeatCount[patternChainIndex]
+  );
+    displayElement[patternChainIndex+1] = strdup(buf);
+  }
+
+  displayElement[5] = strdup("pt# chmsk count");
+
+uint8_t yindex = 30;
+uint8_t yoffset = 16;
+uint8_t chainIndex = 0;
+bool highlightBool;
+  renderStringBox(0,  DISPLAY_LABEL,  0,                0, 128, 15, false, STYLE1X, background , contrastColor);
+
+  renderStringBox(5,  DISPLAY_LABEL,  0,               16, 128, 15, false, STYLE1X, background , contrastColor);
+
+  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  renderStringBox(1,  DISPLAY_LABEL,  0, yindex+0*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
+  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  renderStringBox(2,  DISPLAY_LABEL,  0, yindex+1*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
+  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  renderStringBox(3,  DISPLAY_LABEL,  0, yindex+2*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
+  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  renderStringBox(4,  DISPLAY_LABEL,  0, yindex+3*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
+};
 
 
 void DisplayModule::shortcutRandomMenu(){

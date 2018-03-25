@@ -382,6 +382,10 @@ void InputModule::loop(uint16_t frequency){
         case MENU_RANDOM:
           randomShortcutHandler();
         break;
+
+        case MENU_PATTERN_CHAIN:
+          patternChainInputHandler();
+        break;
       }
     } else {
     //  Serial.println("AltButton: " + String(didAltButtonsFire));
@@ -518,6 +522,9 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_SHORTCUT_RANDOM_LOW:
     case STATE_SHORTCUT_RANDOM_SPAN:
       currentMenu = MENU_RANDOM;
+    break;
+    case STATE_PATTERN_CHAIN:
+      currentMenu = MENU_PATTERN_CHAIN;
     break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
@@ -787,6 +794,13 @@ void InputModule::globalMenuHandler(){
         }
       }
     }
+
+}
+
+void InputModule::patternChainInputHandler(){
+  if(knobChange){
+    globalObj->chainSelectedPattern = min_max(globalObj->chainSelectedPattern + knobChange, 0, 4);
+  }
 
 }
 
@@ -1225,7 +1239,7 @@ uint8_t chanSwIndex;
 
         case SW_PGUP:
           if (midplaneGPIO->pressed(SW_SHIFT)){
-            //changeState(GLOBAL_MENU_1);
+            changeState(STATE_PATTERN_CHAIN);
           } else {
             if(globalObj->pageButtonStyle){
               notePage = positive_modulo(notePage + 1, 4);

@@ -121,7 +121,6 @@ class DisplayModule
     void channelInputDisplay(char *buf);
 
     void multiSelectMenu(char *buf);
-
     void modalPopup();
     void gateMappingText(char *buf, int8_t mapping);
     void cvMappingText(char *buf, int8_t mapping);
@@ -138,6 +137,7 @@ class DisplayModule
     void globalMenuDisplay();
     void globalMenuDisplay2();
     void sysexMenuHandler();
+    void patternChainMenuHandler();
 
     void tempoMenuDisplay();
     void modMenu1_DisplayHandler();
@@ -165,6 +165,8 @@ class DisplayModule
     void renderOnce_StringBox(uint8_t index, uint8_t highlight, uint8_t previousHighlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 
     void renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
+    void renderStringBox(uint8_t index, uint8_t highlight, int16_t x, int16_t y, int16_t w, int16_t h, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor, bool forceHighlight);
+
     void renderString(uint8_t index, uint8_t highlight, int16_t x, int16_t y, bool border, uint8_t textSize, uint16_t color, uint16_t bgColor) ;
 
     //void renderOnce_StringBox(Element element);

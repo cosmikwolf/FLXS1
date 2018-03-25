@@ -103,7 +103,7 @@ void setup() {
   usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
   usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
   usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
-  usbMIDI.setHandleSongPositionPointer( midiSongPositionPointerWrapper );
+  usbMIDI.setHandleSongPosition( midiSongPositionPointerWrapper );
   usbMIDI.setHandleTimeCodeQuarterFrame(midiTimeCodePointerWrapper );
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
@@ -290,15 +290,11 @@ void sequencerLoop(){
 	// 	Serial.println(incomingByte, DEC);
   //    incomingByte = Serial3.read();
   //   Serial.println(incomingByte, DEC);
-  //
 	// }
-
 }
 
 void masterLoop(){
   timeControl.masterClockHandler();
-
-
   //  unsigned long    cycles = ARM_DWT_CYCCNT;
   //  if(cycles > cycleIntervalCount * 10000 ){
   //    cycleIntervalCount++;
@@ -308,7 +304,6 @@ void masterLoop(){
   //      digitalWriteFast(CLOCK_PIN, LOW);
   //    }
   //  }
-   //
   //  Serial.println("cycles: " + String(cycles/65535) + "\tsinceLast: " + String(cycles-cyclesLast) + "\tcyclesPerMicros: " + String((cycles-cyclesLast)/cyclesTimer) + "\ttimer: " + String(cyclesTimer));
   //  cyclesTimer = 0;
   //  cyclesLast = cycles;
@@ -361,7 +356,7 @@ void midiStopHandlerWrapper(){
   midiControl.midiStopHandler();
 }
 
-void midiTimeCodePointerWrapper(uint16_t data){
+void midiTimeCodePointerWrapper(uint8_t data){
   //Serial.println("MIDI TIME CODE: " + String(data));
 }
 
