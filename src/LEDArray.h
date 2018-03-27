@@ -33,6 +33,9 @@ class LEDArray
     void playPauseHandler();
     void patternSelectSaveHandler();
     void multiSelectLEDHandler();
+    void patternChainLEDHandler();
+    uint32_t dim(uint32_t color, uint8_t brightness);
+
 
   private:
     Sequencer *sequenceArray;

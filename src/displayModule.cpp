@@ -291,6 +291,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     previousStepMode = stepMode;
     previousMenu = currentMenu;
     previousParameterSelect = globalObj->parameterSelect;
+    globalObj->previousChainSelectedPattern = globalObj->chainSelectedPattern;
   };
 };
 
@@ -576,20 +577,23 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
   if( previousColor[index] != color){ refresh = 1 ;};
   previousColor[index] = color;
   if (strcmp(displayElement[index], displayCache[index]) != 0 ){ refresh = 1;};
-  if( previousStepMode != highlight && highlight == stepMode)  { refresh = 1;};
+  if (previousStepMode != highlight && highlight == stepMode)  { refresh = 1;};
   if (previousStepMode == highlight && highlight != stepMode)  { refresh = 1;};
   if (previousParameterSelect != globalObj->parameterSelect )  { refresh = 1;};
-  if(globalObj->chainSelectedPattern != globalObj->previousChainSelectedPattern){ refresh = 1;  };
-  globalObj->previousChainSelectedPattern = globalObj->chainSelectedPattern;
-  
+  if ((globalObj->chainSelectedPattern != globalObj->previousChainSelectedPattern)) {
+    refresh = 1;
+};
+
+
   if ( refresh ) {
-    if ( ((highlight == stepMode)|| forceHighlight ) && !globalObj->parameterSelect)  {
+    if ( (((highlight == stepMode) ) && !globalObj->parameterSelect) || forceHighlight)  {
       color1 = color;
       color2 = bgColor;
     } else {
       color1 = bgColor;
       color2 = color;
     }
+  //  Serial.println("redrawing");
 
     oled.fillRect(x,y,w,h, color2);
     oled.setCursor(x, y);
@@ -635,7 +639,6 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
         oled.setFont(&flxs1_menu);
         oled.setTextScale(1);
         break;
-
     }
 
     oled.setTextColor(color1);
@@ -643,7 +646,6 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
     if ((globalObj->parameterSelect && highlight == stepMode) || border){
       oled.drawRect(x,y,w,h, color1);
     }
-
 
   }
 }
@@ -777,7 +779,11 @@ void DisplayModule::stateDisplay_pitch(char*buf){
       displayElement[9] = strdup("--");
     }
   } else {
-    sprintf(buf, "stepdata");
+    if(globalObj->chainModeActive){
+      sprintf(buf, "songmode");
+    } else {
+      sprintf(buf, "stepdata");
+    }
     displayElement[0] = strdup(buf);
 
     switch(sequenceArray[selectedChannel].quantizeScale){
@@ -2087,29 +2093,45 @@ void DisplayModule::sysexMenuHandler(){
 };
 
 void DisplayModule::patternChainMenuHandler(){
-  displayElement[0] = strdup("PATTERN CHAIN");
+  displayElement[0] = strdup("CHAIN EDIT");
 
   for(int patternChainIndex = 0; patternChainIndex < 4 ; patternChainIndex++ ){
-    sprintf(buf, "%02d %s%s%s%s %02d",
-    globalObj->chainPatternSelect[patternChainIndex],
-    globalObj->chainChannelSelect[0][patternChainIndex] ? "X" : "-",
-    globalObj->chainChannelSelect[1][patternChainIndex] ? "X" : "-",
-    globalObj->chainChannelSelect[2][patternChainIndex] ? "X" : "-" ,
-    globalObj->chainChannelSelect[3][patternChainIndex] ? "X" : "-",
-    globalObj->chainPatternRepeatCount[patternChainIndex]
-  );
+    if(globalObj->chainPatternRepeatCount[patternChainIndex] > 0){
+      sprintf(buf, "%s%02d: %02d %s%s%s%s %02dx",
+      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+      patternChainIndex+1,
+      globalObj->chainPatternSelect[patternChainIndex],
+      globalObj->chainChannelSelect[0][patternChainIndex] ? "1" : "_",
+      globalObj->chainChannelSelect[1][patternChainIndex] ? "2" : "_",
+      globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_" ,
+      globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_",
+      globalObj->chainPatternRepeatCount[patternChainIndex] );
+    } else if(globalObj->chainPatternRepeatCount[patternChainIndex] < 0){
+      sprintf(buf, "%s%02d: %02d jump %02dx",
+      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+      patternChainIndex+1,
+      globalObj->chainPatternSelect[patternChainIndex],
+      abs(globalObj->chainPatternRepeatCount[patternChainIndex]) );
+    } else {
+      sprintf(buf, "%s%02d: stop",
+      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+      patternChainIndex+1);
+    }
     displayElement[patternChainIndex+1] = strdup(buf);
   }
 
-  displayElement[5] = strdup("pt# chmsk count");
+  displayElement[6] = strdup("press play to start chain");
+
+  displayElement[5] = strdup("    # ptrn chnls count");
 
 uint8_t yindex = 30;
 uint8_t yoffset = 16;
 uint8_t chainIndex = 0;
 bool highlightBool;
   renderStringBox(0,  DISPLAY_LABEL,  0,                0, 128, 15, false, STYLE1X, background , contrastColor);
+  renderStringBox(6,  DISPLAY_LABEL,  0,               14, 128, 15, false, REGULAR1X, background , contrastColor);
 
-  renderStringBox(5,  DISPLAY_LABEL,  0,               16, 128, 15, false, STYLE1X, background , contrastColor);
+  renderStringBox(5,  DISPLAY_LABEL,  0,               20, 128, 15, false, REGULAR1X, background , contrastColor);
 
   highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
   renderStringBox(1,  DISPLAY_LABEL,  0, yindex+0*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);

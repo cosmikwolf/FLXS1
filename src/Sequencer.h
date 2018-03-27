@@ -69,7 +69,7 @@ class Sequencer
       if (clockDivision > 0){
         return 1;
       } else {
-        return -1 * clockDivision + 2;
+        return abs(clockDivision) + 2;
       }
     }
 

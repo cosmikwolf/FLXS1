@@ -48,6 +48,16 @@ public:
   void channelButtonShiftMenuHandler(uint8_t channel);
 
   bool altButtonHandler();
+  void altButtonChannelHandler(uint8_t switchIndex);
+  void altButtonPlayHandler();
+  void altButtonRecHandler();
+  void altButtonStopHandler();
+  void altButtonPatternHandler();
+  void altButtonTempoHandler();
+  void altButtonShiftHandler();
+  void altButtonPgupHandler();
+  void altButtonPgdnHandler();
+
   void stepModeMatrixHandler();
 
   void channelPitchModeInputHandler();

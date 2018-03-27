@@ -22,6 +22,7 @@
 
 #define GATE_CLOCK_TIMEOUT 5000000
 
+#define CHAIN_COUNT_MAX 4
 #define CLOCK_PORT_OUTPUT 1
 #define CLOCK_PORT_INPUT  0
 
@@ -101,9 +102,14 @@ class GlobalVariable {
     bool muteChannelSelect[4];
     bool parameterSelect;
 
+    bool chainModeActive;
+    bool chainModeCountSwitch;
+    uint8_t chainModeMasterPattern;
+    uint8_t chainModeIndex;
+    uint8_t chainModeCount[16];
     bool    chainChannelSelect[4][16]; //channel, chain index
     uint8_t chainPatternSelect[16];
-    uint8_t chainPatternRepeatCount[16];
+    int8_t  chainPatternRepeatCount[16];
     uint8_t chainSelectedPattern;
     uint8_t previousChainSelectedPattern;
     bool midiSetClockOut;

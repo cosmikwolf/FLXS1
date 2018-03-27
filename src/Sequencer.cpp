@@ -190,9 +190,43 @@ uint32_t Sequencer::getCurrentFrame(){
   unquantizedCF = ((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse);
 
   //quantized pattern change check. Loads next sequence just before it is supposed to end.
+  if ((unquantizedCF < getStepLength()/3) && (globalObj->chainModeCountSwitch == 1) && (globalObj->chainModeMasterPattern == channel) ){
+    globalObj->chainModeCountSwitch = 0;
+  //  Serial.println("resetting chain mode count switch on channel " + String(channel) + "\tchainModeIndex: " + String(globalObj->chainModeIndex));
+  }
   if (unquantizedCF >= framesPerSequence()-(getStepLength()/3) ){
+    if (globalObj->chainModeActive && (globalObj->chainModeMasterPattern == channel) && !(globalObj->chainModeCountSwitch)){
+    //  Serial.println("incrementing chain mode count on channel " + String(channel));
+      globalObj->chainModeCount[globalObj->chainModeIndex]++;
+      if(globalObj->chainModeCount[globalObj->chainModeIndex] >= globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]){
+      //  Serial.println("scheduling a pattern change");
+        globalObj->patternChangeTrigger = channel + 1;
+        globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
+        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // chain stop
+          globalObj->chainModeActive = 0;
+          playing = 0;
+        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < 0){ //chain jump
+          globalObj->chainModeCount[globalObj->chainModeIndex]++;
+          if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]) ){
+            globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+            globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
+            globalObj->patternChangeTrigger = channel + 1;
+            goto QUEUEPATTERN;
+          } else {
+            globalObj->chainModeCount[globalObj->chainModeIndex]++;
+            globalObj->chainModeIndex = globalObj->chainPatternSelect[globalObj->chainModeIndex];
+            goto QUEUEPATTERN;
+          }
+        } else {
+          QUEUEPATTERN: ;
+          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+          globalObj->queuePattern = globalObj->chainPatternSelect[globalObj->chainModeIndex];
+        }
+      }
+      globalObj->chainModeCountSwitch = 1;
+    }
     if ((globalObj->patternChangeTrigger == channel + 1)&&(globalObj->queuePattern != 255) ){
-      Serial.println("changed sequence with ch" + String(channel));
+    //  Serial.println("changed sequence with ch" + String(channel));
       outputControl->quantizedPatternShiftTrigger(globalObj->queuePattern, globalObj->patternChannelSelector);
       globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
       // activeStepReset = true;
