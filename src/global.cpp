@@ -23,10 +23,8 @@ boolean midiTestActive;
 
 boolean debugBoolean = false;
 uint8_t currentPattern = 0;
-boolean playing = false;
 
 // MasterClock
-boolean wasPlaying = false;
 uint8_t masterPulseCount = 24;
 //unsigned long beatLength = 60000000/(globalObj->tempoX100/100);
 

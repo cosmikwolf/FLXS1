@@ -67,7 +67,7 @@ void Sequencer::clockStart(){
 };
 
 void Sequencer::masterClockPulse(){
-  if (!playing){
+  if (!globalObj->playing){
     //return;
   }
   uint32_t clockCycles = ARM_DWT_CYCCNT;
@@ -92,7 +92,7 @@ void Sequencer::masterClockPulse(){
 
 void Sequencer::runSequence(){
 
-	if(playing){
+	if(globalObj->playing){
     sequenceModeStandardStep();
   }
 }
@@ -111,13 +111,13 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
     if(channel == 1) {
   //    Serial.println("clockCyclesSinceLast: " + String((clockCycles-lastPulseClockCount)) ) ;
     }
-    if(playing){
+    if(globalObj->playing){
       ppqPulseIndex++;
     //  ppqPulseIndex = ppqPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
     }
   }
 
-  if(playing) { firstPulse = false; }
+  if(globalObj->playing) { firstPulse = false; }
 
   framesPerPulse = this->framesPerBeat(globalObj->tempoX100)/pulsesPerBeat;
 
@@ -204,7 +204,7 @@ uint32_t Sequencer::getCurrentFrame(){
         globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
         if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // chain stop
           globalObj->chainModeActive = 0;
-          playing = 0;
+          globalObj->playing = 0;
         } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < 0){ //chain jump
           globalObj->chainModeCount[globalObj->chainModeIndex]++;
           if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]) ){
@@ -411,7 +411,7 @@ int Sequencer::getActivePage(){
 void Sequencer::sequenceModeStandardStep(){
   //uint32_t currentFrame = 0;
   //incrementActiveStep(currentFrame);
-  if (muteGate || !playing){
+  if (muteGate || !globalObj->playing){
     return;
   }
   calculateActiveStep();

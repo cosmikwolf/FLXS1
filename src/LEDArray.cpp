@@ -17,7 +17,7 @@ void LEDArray::initialize(Sequencer *sequenceArray, GlobalVariable* globalObj){
 };
 
 void LEDArray::playPauseHandler(){
-  if(playing){
+  if(globalObj->playing){
     leds.setPixelColor(0, wheel(64));
   } else {
     leds.setPixelColor(0, wheel(255));

@@ -101,7 +101,8 @@ class GlobalVariable {
     bool savedSequences[4][16]; //[channel][sequence]
     bool muteChannelSelect[4];
     bool parameterSelect;
-
+    bool playing;
+    bool wasPlaying;
     bool chainModeActive;
     bool chainModeCountSwitch;
     uint8_t chainModeMasterPattern;

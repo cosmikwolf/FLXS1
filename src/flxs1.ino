@@ -271,7 +271,7 @@ void usbNoteOff(){
 
 void usbNoteOn(byte channel, byte note, byte velocity){
   //Serial3.println("note on!:\t" + String(note));
-  playing = !playing;
+  globalObj.playing = !globalObj.playing;
 }
 
 // global wrapper to create pointer to ClockMaster member function

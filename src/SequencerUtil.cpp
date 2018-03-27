@@ -207,7 +207,7 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
   }
 
   if(gpio_skipstep == inputNum){
-		if(playing){
+		if(globalObj->playing){
 			this->skipStep(skipStepCount);
 		}
   }

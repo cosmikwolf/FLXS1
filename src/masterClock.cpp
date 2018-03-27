@@ -66,7 +66,7 @@ void MasterClock::masterClockFunc(){
 		if(clockCycles - lastPulseClockCount > clockPeriod){
 			extClockCounter++;
 
-			if( extClockCounter >= EXTCLOCKDIV && playing){
+			if( extClockCounter >= EXTCLOCKDIV && globalObj->playing){
 				outputControl->setClockOutput(HIGH);
 				digitalWriteFast(PIN_EXT_AD_3, HIGH);
 				serialMidi->sendRealTime(midi::Clock);
@@ -120,7 +120,7 @@ void MasterClock::sequencerFunc(void){
 	outputControl->inputRead();
 
 	if(currentMenu == CALIBRATION_MENU){
-		playing = 0;
+		globalObj->playing = 0;
 		outputControl->dacTestLoop();
 		return;
 	}
@@ -142,7 +142,7 @@ void MasterClock::sequencerFunc(void){
 	//  lastAvgInterval = avgInterval;
 
 	//	midiControl->midiClockSyncFunc(serialMidi);
-	if (playing && !wasPlaying){
+	if (globalObj->playing && !globalObj->wasPlaying){
 		//generate random seed
 		globalObj->generateRandomNumber(0, 65535);
 	}
@@ -176,7 +176,7 @@ void MasterClock::sequencerFunc(void){
 		}
 		lfoTimer = 0;
 	}
-  wasPlaying = playing;
+  globalObj->wasPlaying = globalObj->playing;
 //	digitalWriteFast(PIN_EXT_AD_2, LOW);
 
 }
@@ -207,8 +207,8 @@ void MasterClock::checkGateClock(){
 void MasterClock::externalClockTick(uint8_t gateNum){
 	checkGateClock();
 
-	if (playing){
-		if (!wasPlaying){
+	if (globalObj->playing){
+		if (!globalObj->wasPlaying){
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				outputControl->allNotesOff(i);
 				//outputControl->clearVelocityOutput(i);
@@ -246,7 +246,7 @@ void MasterClock::internalClockTick(){
         // int clock
 	uint16_t clockCycles = ARM_DWT_CYCCNT/65536;
 
-  if (playing && !wasPlaying){
+  if (globalObj->playing && !globalObj->wasPlaying){
 		serialMidi->sendRealTime(midi::Start);
 
   	// if playing has just re-started, the master tempo timer and the master beat count must be reset

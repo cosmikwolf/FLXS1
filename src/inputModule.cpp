@@ -804,7 +804,7 @@ void InputModule::patternChainInputHandler(){
      globalObj->chainModeActive = 1;
      //globalObj->chainModeIndex = 0;
      //globalObj->chainModeCount[globalObj->chainModeIndex] = 0; // = globalObj->chainPatternRepeatCount[globalObj->chainModeIndex];
-     playing = true;
+     globalObj->playing = true;
    };
 
    if (midplaneGPIO->fell(SW_STOP) ){
@@ -813,7 +813,7 @@ void InputModule::patternChainInputHandler(){
      for(int chainNum =0; chainNum <16; chainNum++){
        globalObj->chainModeCount[chainNum] = 0;
      }
-     playing = false;
+     globalObj->playing = false;
      for(int s = 0; s < SEQUENCECOUNT; s++){
        sequenceArray[s].clockReset(true);
      }
@@ -958,7 +958,7 @@ void InputModule::altButtonPlayHandler(){
       goto PLAYEND;
     }
   }
-  playing = !playing;
+  globalObj->playing = !globalObj->playing;
   PLAYEND: ;
 }
 
@@ -1002,7 +1002,7 @@ void InputModule::altButtonStopHandler(){
       display->displayModal(750, MODAL_ERASED, chPressedSelector);
   } else {
 
-    playing = false;
+    globalObj->playing = false;
     for(int s = 0; s < SEQUENCECOUNT; s++){
       sequenceArray[s].clockReset(true);
     }
@@ -1018,7 +1018,7 @@ void InputModule::altButtonPatternHandler(){
       if (midplaneGPIO->pressed(SW_SHIFT)){
         switch (stepMode){
           case STATE_SYSEX_EXPORT:
-            playing = 0;
+            globalObj->playing = 0;
             // globalObj->importExportDisplaySwitch = 1;
             display->displayModal(100, MODAL_EXPORTING);
             display->displayLoop(0);
@@ -1027,7 +1027,7 @@ void InputModule::altButtonPatternHandler(){
             // globalObj->importExportDisplaySwitch = 2;
           break;
           case STATE_SYSEX_IMPORT:
-            playing = 0;
+            globalObj->playing = 0;
             display->displayModal(1000, MODAL_IMPORTING);
 
 //                  saveFile->importSysexData();
@@ -1326,7 +1326,7 @@ uint8_t chanSwIndex;
         //  changeState(STATE_PITCH0);
         // i is the first step pressed
         // n is the second step pressed
-        if (playing){
+        if (globalObj->playing){
           //two butons are pressed simultaneously, loop between the buttons
           //play direction is dependent upon the order in which buttons are pressed.
           for (int n=0; n < 16; n++){
@@ -1342,13 +1342,13 @@ uint8_t chanSwIndex;
 
         }
 
-        if(!playing){
+        if(!globalObj->playing){
           sequenceArray[selectedChannel].stoppedTrig(globalObj->selectedStep, true, true);
         }
 
 
       } else if (midplaneGPIO->rose(i)){
-        if (!playing){
+        if (!globalObj->playing){
           sequenceArray[selectedChannel].stoppedTrig(getNote(i), false, false);
         }
 
@@ -1415,7 +1415,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
           // and finally set the new step value!
           // monophonic so pitch[0] only
           sequenceArray[channel].setStepPitch(stepNum, min_max(sequenceArray[channel].getStepPitch(stepNum, 0) + change, 0,120), 0);
-          if(!playing){
+          if(!globalObj->playing){
             sequenceArray[channel].stoppedTrig(stepNum, true, false);
           }
 
@@ -1588,7 +1588,7 @@ void InputModule::calibrationSaveHandler(){
 
 void InputModule::calibrationMenuHandler(){
 //  uint8_t multiplier = 100;
-  playing = 0;
+  globalObj->playing = 0;
 
   uint32_t calibHigh;
   uint32_t calibLow;

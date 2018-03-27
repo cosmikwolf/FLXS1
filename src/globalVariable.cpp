@@ -41,6 +41,8 @@ void GlobalVariable::initialize(ADC *adc){
       this->selectedStep = 0;
       this->patternChannelSelector = 0b1111;
       this->prevPtrnChannelSelector = 0;
+      this->playing = 0;
+      this->wasPlaying = 0;
       this->queuePattern = 255; // queue pattern of 255 means that nothing is queued
       for(int channel=0; channel<4; channel++){
         this->channelResetSwich[channel] = 0;

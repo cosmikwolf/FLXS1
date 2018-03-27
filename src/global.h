@@ -228,12 +228,10 @@ extern uint16_t colundiArrayX100[56];
 extern uint8_t stepModeOrder[1][MAX_STATE_COUNT];
 extern boolean extClock;
 extern boolean debugBoolean;
-extern boolean playing;
 
 // MasterClock
 // extern unsigned long beatLength;
 extern uint8_t masterPulseCount;
-extern boolean wasPlaying;
 
 extern uint32_t lfoClockCounter;
 
