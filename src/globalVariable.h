@@ -22,7 +22,8 @@
 
 #define GATE_CLOCK_TIMEOUT 5000000
 
-#define CHAIN_COUNT_MAX 4
+#define CHAIN_COUNT_MAX 16
+#define SONG_COUNT_MAX 1
 #define CLOCK_PORT_OUTPUT 1
 #define CLOCK_PORT_INPUT  0
 
@@ -124,6 +125,8 @@ class GlobalVariable {
     int16_t quantizeSemitonePitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction);
     void initialize(ADC *adc);
     void initGlobals();
+    void initSongData();
+
 
   private:
     ADC *adc;

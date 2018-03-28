@@ -105,7 +105,10 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 void TimeController::runLoopHandler() {
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
+
  	buttonIo.loop(INPUT_INTERVAL);
+
+	// saveFile.staggeredLoadLoop();
 
 	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch){
 		// digitalWriteFast(PIN_EXT_TX, HIGH);
@@ -113,6 +116,7 @@ void TimeController::runLoopHandler() {
 		// digitalWriteFast(PIN_EXT_TX, LOW);
 		cacheWriteTimer=0;
 	}
+
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
   if (clockMaster.displayRunSwitch){
@@ -132,6 +136,7 @@ void TimeController::runLoopHandler() {
 				midiTestValue = (midiTestValue+1)%128;
       //}
   }
+
 
 //    Serial.println("Sending Midi Test Notes");
 //    delay(1000);

@@ -2095,34 +2095,40 @@ void DisplayModule::sysexMenuHandler(){
 void DisplayModule::patternChainMenuHandler(){
   displayElement[0] = strdup("CHAIN EDIT");
 
-  for(int patternChainIndex = 0; patternChainIndex < 4 ; patternChainIndex++ ){
-    if(globalObj->chainPatternRepeatCount[patternChainIndex] > 0){
-      sprintf(buf, "%s%02d: %02d %s%s%s%s %02dx",
-      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
-      patternChainIndex+1,
-      globalObj->chainPatternSelect[patternChainIndex],
-      globalObj->chainChannelSelect[0][patternChainIndex] ? "1" : "_",
-      globalObj->chainChannelSelect[1][patternChainIndex] ? "2" : "_",
-      globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_" ,
-      globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_",
-      globalObj->chainPatternRepeatCount[patternChainIndex] );
-    } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == 0){
-      sprintf(buf, "%s%02d: repeat",
-      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
-      patternChainIndex+1);
-    } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == -1){
-      sprintf(buf, "%s%02d: stop",
-      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
-      patternChainIndex+1);
+  uint8_t chainIndexOffset = (globalObj->chainSelectedPattern/4) * 4;
+  bool repeatSet = false;
+  for(int patternChainIndex = chainIndexOffset; patternChainIndex < chainIndexOffset+4 ; patternChainIndex++ ){
+    if(repeatSet){
+      sprintf(buf, "------");
     } else {
-      sprintf(buf, "%s%02d: %02d jump %02dx",
-      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
-      patternChainIndex+1,
-      globalObj->chainPatternSelect[patternChainIndex],
-      abs(globalObj->chainPatternRepeatCount[patternChainIndex]+1) );
+      if(globalObj->chainPatternRepeatCount[patternChainIndex] > 0){
+        sprintf(buf, "%s%02d: %02d %s%s%s%s %02dx",
+        patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+        patternChainIndex+1,
+        globalObj->chainPatternSelect[patternChainIndex]+1,
+        globalObj->chainChannelSelect[0][patternChainIndex] ? "1" : "_",
+        globalObj->chainChannelSelect[1][patternChainIndex] ? "2" : "_",
+        globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_" ,
+        globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_",
+        globalObj->chainPatternRepeatCount[patternChainIndex] );
+      } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == 0){
+        sprintf(buf, "%s%02d: repeat",
+        patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+        patternChainIndex+1);
+        repeatSet = true;
+      } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == -1){
+        sprintf(buf, "%s%02d: stop",
+        patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+        patternChainIndex+1);
+      } else {
+        sprintf(buf, "%s%02d: %02d jump %02dx",
+        patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+        patternChainIndex+1,
+        globalObj->chainPatternSelect[patternChainIndex],
+        abs(globalObj->chainPatternRepeatCount[patternChainIndex]+1) );
+      }
     }
-
-    displayElement[patternChainIndex+1] = strdup(buf);
+    displayElement[patternChainIndex+1-chainIndexOffset] = strdup(buf);
   }
 
   displayElement[6] = strdup("press play to start chain");
@@ -2131,20 +2137,20 @@ void DisplayModule::patternChainMenuHandler(){
 
 uint8_t yindex = 30;
 uint8_t yoffset = 16;
-uint8_t chainIndex = 0;
+
 bool highlightBool;
   renderStringBox(0,  DISPLAY_LABEL,  0,                0, 128, 15, false, STYLE1X, background , contrastColor);
   renderStringBox(6,  DISPLAY_LABEL,  0,               14, 128, 15, false, REGULAR1X, background , contrastColor);
 
   renderStringBox(5,  DISPLAY_LABEL,  0,               20, 128, 15, false, REGULAR1X, background , contrastColor);
 
-  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
   renderStringBox(1,  DISPLAY_LABEL,  0, yindex+0*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
-  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
   renderStringBox(2,  DISPLAY_LABEL,  0, yindex+1*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
-  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
   renderStringBox(3,  DISPLAY_LABEL,  0, yindex+2*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
-  highlightBool = (chainIndex == globalObj->chainSelectedPattern); chainIndex++;
+  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
   renderStringBox(4,  DISPLAY_LABEL,  0, yindex+3*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
 };
 

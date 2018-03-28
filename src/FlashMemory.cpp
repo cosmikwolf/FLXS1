@@ -33,6 +33,7 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   noInterrupts();
   this->initializeSaveFile();
   this->initializeGlobalFile();
+  this->initializeSongData();
   interrupts();
   int readJsonReturn = this->readGlobalData();
   if(readJsonReturn){
@@ -40,6 +41,13 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   } else {
     Serial.println("Global Data Loaded" );
   }
+  readJsonReturn = this->readSongData();
+  if(readJsonReturn){
+    Serial.println("ERROR READING SONG DATA -- CODE: " + String(readJsonReturn) );
+  } else {
+    Serial.println("Song Data Loaded" );
+  }
+
 
   Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
 }
@@ -80,7 +88,6 @@ void FlashMemory::formatAndInitialize(){
 
     Serial.println("Save File Initialization complete.");
 }
-
 void FlashMemory::initializeGlobalFile(){
   Serial.println("Initializing Global Settings File");
 
@@ -109,6 +116,35 @@ void FlashMemory::initializeGlobalFile(){
   free(fileName);
 
 }
+
+void FlashMemory::initializeSongData(){
+  Serial.println("Initializing Song Data File");
+
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName =strdup("songData");
+  if (!spiFlash->exists(fileName)) {
+    Serial.println("songData file does not exist...  creating save file");
+    spiFlash->createErasable(fileName, GLOBALFILESIZE);
+    globalObj->initSongData();
+    this->saveSongData();
+  } else {
+    Serial.println("Song Data File found" );
+
+    while(!spiFlash->ready()){
+
+    }
+    file = spiFlash->open(fileName);   //open cache file
+    if(file){
+      Serial.println("Song Data File Size: " + String(file.size()));
+    } else {
+      Serial.println("Could not open Song Data file to determine size");
+    }
+    file.close();
+  }
+  free(fileName);
+
+}
+
 
 void FlashMemory::initializeSaveFile(){
   Serial.println("Initializing Save File");
@@ -279,6 +315,7 @@ bool FlashMemory::readCalibrationEEPROM(){
 };
 
 
+
 void FlashMemory::serializeGlobalSettings(char* fileBuffer){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
@@ -339,7 +376,7 @@ void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pa
   JsonObject& root = jsonBuffer.createObject();
   root["version"] = 18;
 
-  JsonArray& seqSettingsArray = root.createNestedArray("settings");
+  JsonArray& seqSettingsArray = root.createNestedArray("settings"); {}
 
   seqSettingsArray.add(sequenceArray[channel].stepCount);           // array index: 0
   seqSettingsArray.add(sequenceArray[channel].beatCount);           // array index: 1
@@ -529,6 +566,132 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
   return returnVal;
 }
 
+
+void FlashMemory::serializeSongData(char* fileBuffer){
+  StaticJsonBuffer<16384> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["version"] = 18;
+  JsonArray& songDataArray = root.createNestedArray("songs");
+  for(int songNum = 0; songNum <SONG_COUNT_MAX; songNum++){
+    JsonArray& songDataSettings = songDataArray.createNestedArray();
+    songDataSettings.add(songNum);// song index
+    for(int chainNum=0; chainNum<16; chainNum++){
+      JsonArray& songDataElement = songDataSettings.createNestedArray();
+      songDataElement.add(globalObj->chainChannelSelect[0][chainNum]);      songDataElement.add(globalObj->chainChannelSelect[1][chainNum]);      songDataElement.add(globalObj->chainChannelSelect[2][chainNum]);      songDataElement.add(globalObj->chainChannelSelect[3][chainNum]);      songDataElement.add(globalObj->chainPatternSelect[chainNum]);      songDataElement.add(globalObj->chainPatternRepeatCount[chainNum]);
+    }
+  }
+  root.printTo(fileBuffer,4096);
+}
+
+bool FlashMemory::deserializeSongData(char* json){
+  StaticJsonBuffer<16384> jsonBuffer;
+  JsonObject& jsonReader = jsonBuffer.parseObject(json);
+  if(!jsonReader.success()){
+    delay(5);
+    Serial.println("Deserializing Global Settings Failed, exiting");
+    return 0;
+  }
+
+  if( jsonReader["version"] != 18) {
+    // if global settings are not saved properly, or if it is an older version, initialize globals, re-save and exit.
+    // versions prior to 17k are settings version 17
+    Serial.println("Incorrect song file version!");
+    return 1;
+  }  // global data version is stored here.
+  for(int songNum = 0; songNum <SONG_COUNT_MAX; songNum++){
+    for(int chainNum=0; chainNum<16; chainNum++){
+      globalObj->chainChannelSelect[0][chainNum]    = jsonReader["songs"][songNum][chainNum][0];
+      globalObj->chainChannelSelect[1][chainNum]    = jsonReader["songs"][songNum][chainNum][1];
+      globalObj->chainChannelSelect[2][chainNum]    = jsonReader["songs"][songNum][chainNum][2];
+      globalObj->chainChannelSelect[3][chainNum]    = jsonReader["songs"][songNum][chainNum][3];
+      globalObj->chainPatternSelect[chainNum]       = jsonReader["songs"][songNum][chainNum][4];
+      globalObj->chainPatternRepeatCount[chainNum]  = jsonReader["songs"][songNum][chainNum][5];
+    }
+  }
+  Serial.println("Reading In Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
+  return 1;
+}
+
+
+
+void FlashMemory::saveSongData(){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName = strdup("songData");
+  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+
+  serializeGlobalSettings(fileBuffer);
+
+  while( !(spiFlash->ready()) ){
+    //delay(1);
+  }
+  // Serial.println("Filebuffer: " + String(fileBuffer));
+  file = spiFlash->open(fileName);
+  if (file){
+    file.seek(0);
+    file.erase4k();
+    file.seek(0);
+    file.write(fileBuffer,SECTORSIZE);
+    file.close();
+  } else {
+      Serial.println("##############");
+      Serial.println("UNABLE TO OPEN SAVE FILE: "  + String(fileName));
+      Serial.println("##############");
+  }
+  free(fileBuffer);
+  fileBuffer = NULL;
+}
+
+int FlashMemory::readSongData(){
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName = strdup("songData");
+
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY");
+  } ; // wait
+
+  if (spiFlash->exists(fileName)){
+    //Serial.println("Save file exists... attempting load");
+    file = spiFlash->open(fileName);
+    if (file){
+      char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
+      file.seek(0);
+      file.read(fileBuffer, SECTORSIZE);
+
+      if(this->deserializeSongData(fileBuffer) == false ){
+        file.close();
+        free(fileBuffer);
+        file = spiFlash->open(fileName);
+        Serial.println("?*?* SONG DATA LOADED BUT DATA CANNOT BE READ. attempting to re-read...");
+        file.seek(0);
+        file.read(fileBuffer, SECTORSIZE);
+        if(this->deserializeSongData(fileBuffer) == false ){
+          Serial.println(fileBuffer);
+          Serial.println("?*?* SONG DATA LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt, re-saving default data");
+          globalObj->initSongData();
+          this->saveSongData();
+        };
+
+      };
+      file.close();
+      // Serial.println("read Filebuffer: " + String(fileBuffer));
+      free(fileBuffer);
+    } else {
+      Serial.println("*&*&*&*&*&*&*&*&* Error, save file exists but cannot open - " + String(fileName) + "*&*&*&*&*&*&*&*&*&");
+      free(fileName);
+      return READ_JSON_ERROR;
+    };
+    free(fileName);
+    //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE LOAD END *&*&*&*&*&*&*&*&*&");
+    return FILE_EXISTS;
+  } else {
+    free(fileName);
+    //Serial.println("*&*&*&*&*&*&*&*&* SPI FLASH FILE DOES NOT EXIST *&*&*&*&*&*&*&*&*&");
+    return SAVEFILE_DOES_NOT_EXIST;
+  }
+  free(fileName);
+}
+
+
 void FlashMemory::saveGlobalData(){
   char* fileName = (char *) malloc(sizeof(char) * 12);
   fileName = strdup("globData");
@@ -539,7 +702,7 @@ void FlashMemory::saveGlobalData(){
   while( !(spiFlash->ready()) ){
     //delay(1);
   }
-  Serial.println("Filebuffer: " + String(fileBuffer));
+  // Serial.println("Filebuffer: " + String(fileBuffer));
   file = spiFlash->open(fileName);
   if (file){
     file.seek(0);
@@ -588,7 +751,7 @@ int FlashMemory::readGlobalData(){
 
       };
       file.close();
-      Serial.println("read Filebuffer: " + String(fileBuffer));
+      // Serial.println("read Filebuffer: " + String(fileBuffer));
       delay(10);
       free(fileBuffer);
     } else {
@@ -710,59 +873,53 @@ int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
 
 }
 
+void FlashMemory::staggeredLoadLoop(){
+  if(staggeredLoadSwitch){
+    // Serial.println("beginning staggered load " + String(staggerLoadChannelSelector, BIN) );
+    while ( !(staggerLoadChannelSelector & (1 << staggeredLoadCounter) ) ){
+    // Serial.println("skipping channel " + String(staggeredLoadCounter) );
+      staggeredLoadCounter++; // if channel is not selected to be loaded, skip to the next channel!
+      if (staggeredLoadCounter >= SEQUENCECOUNT){
+        break;
+      }
+    };
+    // Serial.println("loading channel " + String(staggeredLoadCounter) );
+    this->loadSingleChannel(staggeredLoadCounter, staggeredLoadTargetPattern);
+    staggeredLoadCounter++;
+  };
+
+  if (staggeredLoadCounter >= SEQUENCECOUNT){
+    staggeredLoadSwitch = false;
+    staggeredLoadCounter = 0;
+    currentPattern = staggeredLoadTargetPattern;
+    // Serial.println("save complete: " + String(this->saveTimer));
+  }
+
+}
+
+void FlashMemory::loadSingleChannel(uint8_t channel, uint8_t pattern){
+  int readJsonReturn = this->readSequenceData(channel, pattern);
+
+  if ( readJsonReturn == SAVEFILE_DOES_NOT_EXIST )  {
+    sequenceArray[channel].initNewSequence(pattern, channel);
+  } else if (readJsonReturn == 2) {
+    //Serial.("READ JSON ERROR - info above");
+  }
+
+}
 
 void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
-  /*
-  for (int i = 0; i<CACHE_COUNT; i++){
-    while( getCachePattern(cacheOffset, i) == pattern && getCacheStatus(cacheOffset, i) != 0 ) {
-      Serial.println("Delaying because pattern " + String(pattern) + " has pending save operation");
-      cacheWriteLoop();
-      delay(500);
-    }
-  }
-*/
-  //Serial.println("[[-]]><{{{--}}}><[[-]] LOADING PATTERN: " + String(pattern) + " [[-]]><{{{--}}}><[[-]]");
-//  printPattern();
-
-	for(int i=0; i < SEQUENCECOUNT; i++){
-
-    if ( !(channelSelector & (1 << i) ) ){
-      //Serial.println("skipping loading channel " + String(i));
-      continue; // if channel is not selected to be loaded, don't load the channel!
-    } else {
-      //Serial.println("Loading channel " + String(i));
-    };
-
-    //Serial.println("About to run readJsonReturn for channel: " + String(i));
-
-    int readJsonReturn = this->readSequenceData(i, pattern);
-
-    if ( readJsonReturn == SAVEFILE_DOES_NOT_EXIST )  {
-      //Serial.println("saveData not available, initializing sequence");
-      sequenceArray[i].initNewSequence(pattern, i);
-      //Serial.println("sequence initialized, saving sequence to JSON");
-      //saveSequenceData(i, pattern);
-
-      //Serial.println("Sequence successfully saved to JSON");
-
-    } else if (readJsonReturn == 2) {
-      //Serial.println("READ JSON ERROR - info above");
-    }
-
-    //Serial.println("reading complete!");
-
-  }
-
-  //Serial.println("changing current pattern from " + String(currentPattern) + " to " + String(pattern) + " and also this is queuePattern: " + String(queuePattern));
-  currentPattern = pattern;
-  //Serial.println("[[-]]><{{{--}}}><[[-]] PATTERN: " + String(pattern) + " LOAD COMPLETE [[-]]><{{{--}}}><[[-]]");
-  //printPattern();
+  // Serial.println("initiating pattern load ");
+  this->saveTimer = 0;
+  this->staggeredLoadTargetPattern = pattern;
+  this->staggeredLoadSwitch = true;
+  this->staggeredLoadCounter = 0;
+  this->staggerLoadChannelSelector = channelSelector;
 }
 
 void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray){
   for(int i=0; i < SEQUENCECOUNT; i++){
-    //need to skip the sequences that are masked out
-    if( globalObj->patternChannelSelector & (1<<i) ){
+    if( globalObj->patternChannelSelector & (1<<i) ){    //skip the sequences that are masked out
       saveSequenceData(i, destinationArray[i]);
     }
   }
@@ -770,21 +927,9 @@ void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray)
 
 
 void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, uint8_t changeTrigger){
-	//Serial.println("currentPattern: " + String(currentPattern) + "\tSEQUENCECOUNT: " + String(SEQUENCECOUNT));
-	//if(saveFirst){
-//    for(int i=0; i < SEQUENCECOUNT; i++){
-  		//saveChannelPattern(i);
-      //saveSequenceData(i, currentPattern);
-      //saveSequenceData(i, sequenceArray[i].pattern);
-  //  }
-    //Serial.println("=*-.-*= Pattern " + String(currentPattern) + " saved. =*-.-*= ");
-	//}
-
   if (changeTrigger == 0) {
-    //Serial.println("Changing pattern instantly: " + String(pattern) + " instant: " + String(instant) + " playing: " + String(playing) );
     loadPattern(pattern, channelSelector);
   } else {
     globalObj->queuePattern = pattern;
-    //Serial.println("Queueing pattern: " + String(pattern));
   }
 }

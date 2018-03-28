@@ -58,6 +58,7 @@ void MasterClock::masterClockFunc(){
 		if (extClockCounter > EXTCLOCKDIV / 2){
 			//digitalWriteFast(PIN_EXT_AD_2, LOW);
 			//displayRunSwitch = false;
+			staggeredLoadRunSwitch = false;
 		} else {
       displayRunSwitch = true;
     }
@@ -67,6 +68,7 @@ void MasterClock::masterClockFunc(){
 
 			if( extClockCounter >= EXTCLOCKDIV && globalObj->playing){
 				outputControl->setClockOutput(HIGH);
+				staggeredLoadRunSwitch = true;
 				digitalWriteFast(PIN_EXT_AD_3, HIGH);
 				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
@@ -84,9 +86,16 @@ void MasterClock::masterClockFunc(){
 
 			lastPulseClockCount += clockPeriod;
 		}
+		if(extClockCounter >= 3*EXTCLOCKDIV / 4 && (extClockCounter < EXTCLOCKDIV) ){
+			staggeredLoadRunSwitch = false;
+		}
+		if((extClockCounter >= EXTCLOCKDIV / 4) && (extClockCounter < EXTCLOCKDIV / 2) ){
+			staggeredLoadRunSwitch = false;
+		}
 		if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
 				outputControl->setClockOutput(LOW);
 				displayRunSwitch = true;
+				staggeredLoadRunSwitch = true;
 				digitalWriteFast(PIN_EXT_AD_2, HIGH);
 		}
 
@@ -117,6 +126,7 @@ void MasterClock::sequencerFunc(void){
 //	digitalWriteFast(PIN_EXT_AD_2, HIGH);
 
 	outputControl->inputRead();
+	this->songAndPatternLogic();
 
 	if(currentMenu == CALIBRATION_MENU){
 		globalObj->playing = 0;
@@ -176,12 +186,16 @@ void MasterClock::sequencerFunc(void){
 		lfoTimer = 0;
 	}
   globalObj->wasPlaying = globalObj->playing;
+
+	if(staggeredLoadRunSwitch || !globalObj->playing){
+		outputControl->flashMemoryStaggeredLoadLoop();
+	}
+
 //	digitalWriteFast(PIN_EXT_AD_2, LOW);
-	this->songFunc();
 }
 
-void MasterClock::songFunc(){
-	if (sequenceArray[globalObj->chainModeMasterPattern].currentFrame >= sequenceArray[globalObj->chainModeMasterPattern].framesPerSequence()-(sequenceArray[globalObj->chainModeMasterPattern].getStepLength()/3) ){
+void MasterClock::songAndPatternLogic(){
+	if (sequenceArray[globalObj->chainModeMasterPattern].currentFrame >= sequenceArray[globalObj->chainModeMasterPattern].framesPerSequence()-(sequenceArray[globalObj->chainModeMasterPattern].getStepLength()*3/4) ){
 
 		if(globalObj->chainModeActive){
  /* moved to clockReset
@@ -190,8 +204,8 @@ void MasterClock::songFunc(){
 	  }*/
 	    if (!(globalObj->chainModeCountSwitch)){
 	    //  Serial.println("incrementing chain mode count on channel " + String(channel));
-	      CHAINLOGICBEGINNING: ;
 	      globalObj->chainModeCount[globalObj->chainModeIndex]++;
+				CHAINLOGICBEGINNING: ;
 	      if(globalObj->chainModeCount[globalObj->chainModeIndex] >= globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]){
 	      //  Serial.println("scheduling a pattern change");
 	        globalObj->patternChangeTrigger = globalObj->chainModeMasterPattern + 1;
@@ -203,7 +217,7 @@ void MasterClock::songFunc(){
 	        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // repeat
 	          globalObj->chainModeIndex = 0;
 	          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
-	          goto CHAINLOGICBEGINNING;
+	          goto QUEUEPATTERN;
 	        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < -1){ //chain jump
 	          globalObj->chainModeCount[globalObj->chainModeIndex]++;
 	          if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1) ){

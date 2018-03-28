@@ -26,7 +26,7 @@ public:
   void midiClockTick();
   void externalClockTick(uint8_t gateNum);
   void checkGateClock();
-  void songFunc();
+  void songAndPatternLogic();
   bool masterDebugSwitch;
 
   bool gateTrig[9];
@@ -45,6 +45,7 @@ public:
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
   boolean displayRunSwitch;
+  bool staggeredLoadRunSwitch;
   // uint32_t beatLength;
   uint8_t gateMap[4];
   uint8_t dacCvMap[4];

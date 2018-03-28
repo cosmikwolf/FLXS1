@@ -159,6 +159,11 @@ for (int i=0; i<4; i++){
   //}
 }
 
+void OutputController::flashMemoryStaggeredLoadLoop(){
+  saveFile->staggeredLoadLoop();
+};
+
+
 void OutputController::quantizedPatternShiftTrigger(uint8_t pattern, uint8_t channelSelector){
    saveFile->loadPattern(pattern, channelSelector);
 };

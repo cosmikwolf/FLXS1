@@ -53,7 +53,8 @@ public:
   void calibrationRoutine();
   void inputLoopTest();
   void inputRead();
-
+  void flashMemoryStaggeredLoadLoop();
+  
   uint16_t calibMidscale(uint8_t mapAddress);
   uint16_t voltageOffset(uint8_t volts, uint8_t mapAddress);
 

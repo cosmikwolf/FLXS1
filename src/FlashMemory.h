@@ -19,6 +19,7 @@
 #define USE_SPI_FLASH            1
 #define FLASHFILESIZE            262144
 #define GLOBALFILESIZE           65536
+#define SONGFILESIZE             65536
 #define SECTORSIZE               4096
 #define CACHE_WRITE_DELAY        50000
 #define AWAITING_FILE_ERASURE    0
@@ -48,8 +49,8 @@ public:
   void formatChip();
   void initializeSaveFile();
   void initializeGlobalFile();
+  void initializeSongData();
   void formatAndInitialize();
-  void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
   void printDirectory(File dir, int numTabs);
   void printPattern();
   void initializeCache();
@@ -69,6 +70,9 @@ public:
   void wipeEEPROM();
 
   int cacheWriteLoop();
+  void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
+  void loadSingleChannel(uint8_t channel, uint8_t pattern);
+  void staggeredLoadLoop();
 
   void listFiles();
 
@@ -81,6 +85,12 @@ public:
 
   void serializeGlobalSettings(char* fileBuffer);
   bool deserializeGlobalSettings(char* json);
+
+  void serializeSongData(char* fileBuffer);
+  bool deserializeSongData(char* json);
+
+  void saveSongData();
+  int readSongData();
 
   void saveGlobalData();
   int readGlobalData();
@@ -95,6 +105,8 @@ public:
 
   void deleteAllFiles();
   void rm(File dir, String tempPath);
+
+
   bool  cacheWriteSwitch; // is there data in the cache to be saved?
   bool  spiFlashBusy;
   bool  cacheWriteBusy;
@@ -104,6 +116,12 @@ private:
   uint16_t cacheOffset;
   uint8_t cacheStatus[CACHE_COUNT];
   uint8_t cacheNum;
+  uint8_t staggeredLoadTargetPattern;
+  uint8_t staggerLoadChannelSelector;
+  elapsedMicros saveTimer;
+  bool staggeredLoadSwitch;
+  uint8_t staggeredLoadCounter;
+
   OutputController* outputControl;
 
   elapsedMicros cacheWriteTimer;

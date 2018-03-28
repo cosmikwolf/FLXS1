@@ -62,20 +62,6 @@ void GlobalVariable::initialize(ADC *adc){
         this->gateTestArray[i]=255;
       }
 
-      for(int chainNum=0; chainNum<16; chainNum++){
-        for(int channel=0; channel<4; channel++){
-          this->chainChannelSelect[channel][chainNum] = 1; //channel, chain index
-        }
-        this->chainModeCount[chainNum] = 0;
-        this->chainPatternSelect[chainNum] = 0;
-        this->chainPatternRepeatCount[chainNum] = 1;
-      }
-      this->chainModeMasterPattern = 0;
-      this->chainModeCountSwitch = 0;
-      this->chainModeIndex = 0;
-      this->chainModeActive = 0;
-      this->chainSelectedPattern = 0;
-      this->previousChainSelectedPattern = 0;
 
       activeGate = 0;
       rheoTestLevel = 0;
@@ -93,9 +79,27 @@ void GlobalVariable::initialize(ADC *adc){
        for(int i=0; i<4; i++){ this->adcCalibrationNeg[i]= 65535; };
        for(int i=0; i<4; i++){ this->adcCalibrationOffset[i]= 32767; };
 
+       this->initSongData();
        this->initGlobals();
     }
+void GlobalVariable::initSongData(){
+  for(int chainNum=0; chainNum<16; chainNum++){
+    for(int channel=0; channel<4; channel++){
+      this->chainChannelSelect[channel][chainNum] = 1; //channel, chain index
+    }
+    this->chainModeCount[chainNum] = 0;
+    this->chainPatternSelect[chainNum] = 0;
+    this->chainPatternRepeatCount[chainNum] = 0;
+  }
+  this->chainPatternRepeatCount[0] = 1;
 
+  this->chainModeMasterPattern = 0;
+  this->chainModeCountSwitch = 0;
+  this->chainModeIndex = 0;
+  this->chainModeActive = 0;
+  this->chainSelectedPattern = 0;
+  this->previousChainSelectedPattern = 0;
+}
 void GlobalVariable::initGlobals(){
   this->dataInputStyle = 0;
   this->pageButtonStyle = 1;

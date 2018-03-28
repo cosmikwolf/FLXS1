@@ -18,7 +18,7 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount,  Ou
 
 
 void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
-	Serial.println("*&*&*&*& Initializing pattern: " + String(pattern) + " channel: " + String(ch));
+	// Serial.println("*&*&*&*& Initializing pattern: " + String(pattern) + " channel: " + String(ch));
 
   this->stepCount 				= 16;
   this->firstStep 				= 0;

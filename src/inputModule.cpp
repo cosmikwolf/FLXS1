@@ -536,6 +536,11 @@ void InputModule::changeState(uint8_t targetState){
     Serial.println("Saved GlobalData");
   }
 
+  if((currentMenu != MENU_PATTERN_CHAIN)&&(previousMenu == MENU_PATTERN_CHAIN) ){
+    saveFile->saveSongData();
+    Serial.println("Saved Song Data");
+  }
+
   previousMenu = currentMenu;
 }
 
@@ -804,6 +809,11 @@ void InputModule::patternChainInputHandler(){
      globalObj->chainModeActive = 1;
      //globalObj->chainModeIndex = 0;
      //globalObj->chainModeCount[globalObj->chainModeIndex] = 0; // = globalObj->chainPatternRepeatCount[globalObj->chainModeIndex];
+     globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+     saveFile->changePattern(globalObj->chainPatternSelect[globalObj->chainModeIndex], globalObj->patternChannelSelector, 0);
+
+     // globalObj->queuePattern = globalObj->chainPatternSelect[globalObj->chainModeIndex];
+
      globalObj->playing = true;
    };
 
@@ -822,9 +832,17 @@ void InputModule::patternChainInputHandler(){
 
   if(knobChange){
     if ( globalObj->parameterSelect ) {// Encoder Switch
-      globalObj->chainSelectedPattern = min_max( globalObj->chainSelectedPattern + knobChange, 0, 3);
+      uint8_t selectedPatternMax;
+      for(int chain = 0; chain < CHAIN_COUNT_MAX; chain++){
+         if(globalObj->chainPatternRepeatCount[chain] == 0){selectedPatternMax = chain; break;};
+      };
+      globalObj->chainSelectedPattern = min_max( globalObj->chainSelectedPattern + knobChange, 0, selectedPatternMax);
     } else {
-      globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern] = min_max( globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern] + knobChange, -64, 64);;
+      if(globalObj->chainSelectedPattern == 0){
+        globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern] = min_max( globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern] + knobChange, 1, 64);
+      } else {
+        globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern] = min_max( globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern] + knobChange, -64, 64);;
+      }
     }
   }
 
