@@ -26,7 +26,7 @@ public:
   void midiClockTick();
   void externalClockTick(uint8_t gateNum);
   void checkGateClock();
-
+  void songFunc();
   bool masterDebugSwitch;
 
   bool gateTrig[9];

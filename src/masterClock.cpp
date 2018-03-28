@@ -29,7 +29,6 @@ void MasterClock::changeTempo(uint32_t newtempoX100){
 	// totalClockCount = 0;
 }
 
-
 void MasterClock::masterClockFunc(){
 	//	Serial.println(String((int)masterLoopTimer));
 	//  masterLooptimeMin
@@ -178,9 +177,76 @@ void MasterClock::sequencerFunc(void){
 	}
   globalObj->wasPlaying = globalObj->playing;
 //	digitalWriteFast(PIN_EXT_AD_2, LOW);
-
+	this->songFunc();
 }
 
+void MasterClock::songFunc(){
+	if (sequenceArray[globalObj->chainModeMasterPattern].currentFrame >= sequenceArray[globalObj->chainModeMasterPattern].framesPerSequence()-(sequenceArray[globalObj->chainModeMasterPattern].getStepLength()/3) ){
+
+		if(globalObj->chainModeActive){
+ /* moved to clockReset
+		if ((sequenceArray[globalObj->chainModeMasterPattern].currentFrame < sequenceArray[globalObj->chainModeMasterPattern].getStepLength()/3) && (globalObj->chainModeCountSwitch == 1)){
+	    globalObj->chainModeCountSwitch = 0;
+	  }*/
+	    if (!(globalObj->chainModeCountSwitch)){
+	    //  Serial.println("incrementing chain mode count on channel " + String(channel));
+	      CHAINLOGICBEGINNING: ;
+	      globalObj->chainModeCount[globalObj->chainModeIndex]++;
+	      if(globalObj->chainModeCount[globalObj->chainModeIndex] >= globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]){
+	      //  Serial.println("scheduling a pattern change");
+	        globalObj->patternChangeTrigger = globalObj->chainModeMasterPattern + 1;
+	        globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
+	        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == -1){ // chain stop
+	          globalObj->chainModeActive = false;
+	          globalObj->playing = false;
+	          Serial.println("Chain end detected");
+	        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // repeat
+	          globalObj->chainModeIndex = 0;
+	          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+	          goto CHAINLOGICBEGINNING;
+	        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < -1){ //chain jump
+	          globalObj->chainModeCount[globalObj->chainModeIndex]++;
+	          if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1) ){
+	            globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+	            globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
+	            if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < -1){
+	              goto CHAINLOGICBEGINNING;
+	            } else  if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == -1){ // chain stop
+	              globalObj->chainModeActive = false;
+	              globalObj->playing = false;
+								for(int channel =0; channel < SEQUENCECOUNT; channel++){
+									sequenceArray[channel].clockReset(true);
+								}
+	            } else {
+	              globalObj->patternChangeTrigger = globalObj->chainModeMasterPattern + 1;
+	              goto QUEUEPATTERN;
+	            }
+	          } else {
+	            globalObj->chainModeCount[globalObj->chainModeIndex]++;
+	            globalObj->chainModeIndex = globalObj->chainPatternSelect[globalObj->chainModeIndex];
+	            goto QUEUEPATTERN;
+	          }
+	        } else {
+	          QUEUEPATTERN: ;
+	          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+	          globalObj->queuePattern = globalObj->chainPatternSelect[globalObj->chainModeIndex];
+	        }
+	      }
+	      globalObj->chainModeCountSwitch = 1;
+	    }
+
+
+	  }
+
+		if ((globalObj->patternChangeTrigger == globalObj->chainModeMasterPattern + 1)&&(globalObj->queuePattern != 255) ){
+		//  Serial.println("changed sequence with ch" + String(channel));
+			outputControl->quantizedPatternShiftTrigger(globalObj->queuePattern, globalObj->patternChannelSelector);
+			globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
+			// activeStepReset = true;
+		}
+
+	}
+}
 
 void MasterClock::checkGateClock(){
 	bool clockPortVal;

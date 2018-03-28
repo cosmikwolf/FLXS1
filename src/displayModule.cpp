@@ -2106,17 +2106,22 @@ void DisplayModule::patternChainMenuHandler(){
       globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_" ,
       globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_",
       globalObj->chainPatternRepeatCount[patternChainIndex] );
-    } else if(globalObj->chainPatternRepeatCount[patternChainIndex] < 0){
+    } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == 0){
+      sprintf(buf, "%s%02d: repeat",
+      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+      patternChainIndex+1);
+    } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == -1){
+      sprintf(buf, "%s%02d: stop",
+      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
+      patternChainIndex+1);
+    } else {
       sprintf(buf, "%s%02d: %02d jump %02dx",
       patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
       patternChainIndex+1,
       globalObj->chainPatternSelect[patternChainIndex],
-      abs(globalObj->chainPatternRepeatCount[patternChainIndex]) );
-    } else {
-      sprintf(buf, "%s%02d: stop",
-      patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
-      patternChainIndex+1);
+      abs(globalObj->chainPatternRepeatCount[patternChainIndex]+1) );
     }
+
     displayElement[patternChainIndex+1] = strdup(buf);
   }
 

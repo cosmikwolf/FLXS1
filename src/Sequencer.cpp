@@ -15,6 +15,9 @@
 void Sequencer::clockReset(bool activeStepReset){
   globalObj->channelResetSwich[channel] = true;
 
+  if(globalObj->chainModeMasterPattern == channel){
+    globalObj->chainModeCountSwitch = 0;
+  }
   ppqPulseIndex = 0;
 
   if (activeStepReset){
@@ -190,28 +193,42 @@ uint32_t Sequencer::getCurrentFrame(){
   unquantizedCF = ((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse);
 
   //quantized pattern change check. Loads next sequence just before it is supposed to end.
-  if ((unquantizedCF < getStepLength()/3) && (globalObj->chainModeCountSwitch == 1) && (globalObj->chainModeMasterPattern == channel) ){
-    globalObj->chainModeCountSwitch = 0;
-  //  Serial.println("resetting chain mode count switch on channel " + String(channel) + "\tchainModeIndex: " + String(globalObj->chainModeIndex));
-  }
+
+
+//MOVING TO MASTERCLOCK
+/*
   if (unquantizedCF >= framesPerSequence()-(getStepLength()/3) ){
     if (globalObj->chainModeActive && (globalObj->chainModeMasterPattern == channel) && !(globalObj->chainModeCountSwitch)){
     //  Serial.println("incrementing chain mode count on channel " + String(channel));
+      CHAINLOGICBEGINNING: ;
       globalObj->chainModeCount[globalObj->chainModeIndex]++;
       if(globalObj->chainModeCount[globalObj->chainModeIndex] >= globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]){
       //  Serial.println("scheduling a pattern change");
         globalObj->patternChangeTrigger = channel + 1;
         globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
-        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // chain stop
-          globalObj->chainModeActive = 0;
-          globalObj->playing = 0;
-        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < 0){ //chain jump
+        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == -1){ // chain stop
+          globalObj->chainModeActive = false;
+          globalObj->playing = false;
+          Serial.println("Chain end detected");
+        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // repeat
+          globalObj->chainModeIndex = 0;
+          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+          goto CHAINLOGICBEGINNING;
+        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < -1){ //chain jump
           globalObj->chainModeCount[globalObj->chainModeIndex]++;
-          if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]) ){
+          if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1) ){
             globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
             globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
-            globalObj->patternChangeTrigger = channel + 1;
-            goto QUEUEPATTERN;
+            if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < 0){
+              goto CHAINLOGICBEGINNING;
+            } else  if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // chain stop
+              globalObj->chainModeActive = false;
+              globalObj->playing = false;
+              Serial.println("Chain end detected");
+            } else {
+              globalObj->patternChangeTrigger = channel + 1;
+              goto QUEUEPATTERN;
+            }
           } else {
             globalObj->chainModeCount[globalObj->chainModeIndex]++;
             globalObj->chainModeIndex = globalObj->chainPatternSelect[globalObj->chainModeIndex];
@@ -232,6 +249,8 @@ uint32_t Sequencer::getCurrentFrame(){
       // activeStepReset = true;
     }
   }
+*/
+  //MOVING TO MASTERCLOCK
 
   if (unquantizedCF >= framesPerSequence()){
 //    Serial.println(String(channel) + " reset-------------");
