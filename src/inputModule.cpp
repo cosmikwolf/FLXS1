@@ -384,6 +384,7 @@ void InputModule::loop(uint16_t frequency){
         break;
 
         case MENU_PATTERN_CHAIN:
+        case MENU_CHAIN_HELP:
           patternChainInputHandler();
         break;
       }
@@ -526,6 +527,9 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_PATTERN_CHAIN:
       currentMenu = MENU_PATTERN_CHAIN;
     break;
+    case STATE_CHAIN_HELP:
+      currentMenu = MENU_CHAIN_HELP;
+    break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;
@@ -552,7 +556,11 @@ void InputModule::patternSelectHandler(){
   }
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->rose(i)){
-      saveFile->changePattern(i, globalObj->patternChannelSelector, globalObj->patternChangeTrigger);
+      if(globalObj->playing){
+        saveFile->changePattern(i, globalObj->patternChannelSelector, globalObj->patternChangeTrigger);
+      } else {
+        saveFile->changePattern(i, globalObj->patternChannelSelector, 0);
+      }
       //delay(10);
       changeState(STATE_PITCH0);
     }
@@ -612,6 +620,8 @@ void InputModule::sequenceMenuHandler(){
       if(stepMode == STATE_QUANTIZEMODE){
         // put in quantize mode custom button input code here
         sequenceArray[selectedChannel].quantizeMode ^= (1<<i);
+        midplaneGPIO->clearBuffers();
+
       } else {
         changeState(STATE_PITCH0);
         globalObj->selectedStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
@@ -802,19 +812,23 @@ void InputModule::patternChainInputHandler(){
 
   if (midplaneGPIO->fell(SW_PATTERN) ){ this->altButtonPatternHandler(); }
   if (midplaneGPIO->fell(SW_MENU) ){ this->altButtonTempoHandler(); }
-  if (midplaneGPIO->fell(SW_PGUP) ){ globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern]++; }
-  if (midplaneGPIO->fell(SW_PGDN) ){ globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern]--; }
+  // if (midplaneGPIO->fell(SW_PGUP) && midplaneGPIO->pressed(SW_SHIFT)){
+  //  changeState(STATE_CHAIN_HELP);
+  // }
+  // if (midplaneGPIO->fell(SW_PGDN) ){ globalObj->chainPatternRepeatCount[globalObj->chainSelectedPattern]--; }
 
   if (midplaneGPIO->fell(SW_PLAY) ){
-     globalObj->chainModeActive = 1;
-     //globalObj->chainModeIndex = 0;
-     //globalObj->chainModeCount[globalObj->chainModeIndex] = 0; // = globalObj->chainPatternRepeatCount[globalObj->chainModeIndex];
-     globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+    if(!globalObj->chainModeActive){
      saveFile->changePattern(globalObj->chainPatternSelect[globalObj->chainModeIndex], globalObj->patternChannelSelector, 0);
+     globalObj->chainModeActive = 1;
+     globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
+    }
 
-     // globalObj->queuePattern = globalObj->chainPatternSelect[globalObj->chainModeIndex];
-
-     globalObj->playing = true;
+    if(globalObj->playing){
+      globalObj->playing = false;
+    } else {
+      globalObj->playing = true;
+    }
    };
 
    if (midplaneGPIO->fell(SW_STOP) ){
@@ -1019,7 +1033,9 @@ void InputModule::altButtonStopHandler(){
       }
       display->displayModal(750, MODAL_ERASED, chPressedSelector);
   } else {
-
+    if(globalObj->playing == false ){
+      globalObj->chainModeActive = false;
+    }
     globalObj->playing = false;
     for(int s = 0; s < SEQUENCECOUNT; s++){
       sequenceArray[s].clockReset(true);

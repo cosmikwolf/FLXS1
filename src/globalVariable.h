@@ -106,6 +106,8 @@ class GlobalVariable {
     bool wasPlaying;
     bool chainModeActive;
     bool chainModeCountSwitch;
+
+    uint8_t songIndex;
     uint8_t chainModeMasterPattern;
     uint8_t chainModeIndex;
     uint8_t chainModeCount[16];

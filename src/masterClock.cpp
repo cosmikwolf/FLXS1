@@ -101,6 +101,8 @@ void MasterClock::masterClockFunc(){
 
 
 	} else if(globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ){
+		staggeredLoadRunSwitch = true;
+
 		if (globalObj->midiSetClockOut && !outputControl->clockValue){
 			outputControl->setClockOutput(HIGH);
 		}
@@ -115,6 +117,8 @@ void MasterClock::masterClockFunc(){
 			sequenceArray[i].masterClockPulse();
 		}
   } else if(globalObj->clockMode >= EXTERNAL_CLOCK_GATE_0){
+		staggeredLoadRunSwitch = true;
+
 		for (int i = 0; i < SEQUENCECOUNT; i++ ){
 			sequenceArray[i].masterClockPulse();
 		}
@@ -285,6 +289,7 @@ void MasterClock::checkGateClock(){
 }
 
 void MasterClock::externalClockTick(uint8_t gateNum){
+
 	checkGateClock();
 
 	if (globalObj->playing){
@@ -331,7 +336,6 @@ void MasterClock::internalClockTick(){
 
   	// if playing has just re-started, the master tempo timer and the master beat count must be reset
    // MIDI.send(Start, 0, 0, 1);  // MIDI.sendSongPosition(0);
-    masterPulseCount = 0;
 
     for (int i=0; i< SEQUENCECOUNT; i++){
 			outputControl->allNotesOff(i);

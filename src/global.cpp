@@ -6,10 +6,10 @@
 
 //uint32_t globalObj->tempoX100 = 99900;
 uint8_t stepMode = 0;
+uint8_t currentPattern = 0;
 uint8_t notePage;
 uint8_t	currentMenu = STATE_PITCH0;       // Display module + LED module
 uint8_t previousState = 0;      // Display module + LED moduleextern
-
 uint8_t selectedChannel = 0;
 float   probability;
 float   frequency;
@@ -22,13 +22,10 @@ boolean midiTestActive;
 //uint8_t clockMode = EXTERNAL_CLOCK_GATE_0;
 
 boolean debugBoolean = false;
-uint8_t currentPattern = 0;
 
 // MasterClock
-uint8_t masterPulseCount = 24;
 //unsigned long beatLength = 60000000/(globalObj->tempoX100/100);
 
-uint32_t lfoClockCounter;
 elapsedMillis modalTimer;
 uint8_t dacMap[8] = {7,1,0,6,5,2,3,4};
 

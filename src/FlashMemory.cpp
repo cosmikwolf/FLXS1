@@ -575,9 +575,15 @@ void FlashMemory::serializeSongData(char* fileBuffer){
   for(int songNum = 0; songNum <SONG_COUNT_MAX; songNum++){
     JsonArray& songDataSettings = songDataArray.createNestedArray();
     songDataSettings.add(songNum);// song index
-    for(int chainNum=0; chainNum<16; chainNum++){
+    for(int chainNum = 0; chainNum < CHAIN_COUNT_MAX; chainNum++){
       JsonArray& songDataElement = songDataSettings.createNestedArray();
-      songDataElement.add(globalObj->chainChannelSelect[0][chainNum]);      songDataElement.add(globalObj->chainChannelSelect[1][chainNum]);      songDataElement.add(globalObj->chainChannelSelect[2][chainNum]);      songDataElement.add(globalObj->chainChannelSelect[3][chainNum]);      songDataElement.add(globalObj->chainPatternSelect[chainNum]);      songDataElement.add(globalObj->chainPatternRepeatCount[chainNum]);
+      songDataElement.add(globalObj->chainChannelSelect[0][chainNum]);
+      songDataElement.add(globalObj->chainChannelSelect[1][chainNum]);
+      songDataElement.add(globalObj->chainChannelSelect[2][chainNum]);
+      songDataElement.add(globalObj->chainChannelSelect[3][chainNum]);
+      songDataElement.add(globalObj->chainPatternSelect[chainNum]);
+      songDataElement.add(globalObj->chainPatternRepeatCount[chainNum]);
+      Serial.println("Saving song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]));
     }
   }
   root.printTo(fileBuffer,4096);
@@ -596,19 +602,20 @@ bool FlashMemory::deserializeSongData(char* json){
     // if global settings are not saved properly, or if it is an older version, initialize globals, re-save and exit.
     // versions prior to 17k are settings version 17
     Serial.println("Incorrect song file version!");
-    return 1;
+    return 0;
   }  // global data version is stored here.
   for(int songNum = 0; songNum <SONG_COUNT_MAX; songNum++){
-    for(int chainNum=0; chainNum<16; chainNum++){
-      globalObj->chainChannelSelect[0][chainNum]    = jsonReader["songs"][songNum][chainNum][0];
-      globalObj->chainChannelSelect[1][chainNum]    = jsonReader["songs"][songNum][chainNum][1];
-      globalObj->chainChannelSelect[2][chainNum]    = jsonReader["songs"][songNum][chainNum][2];
-      globalObj->chainChannelSelect[3][chainNum]    = jsonReader["songs"][songNum][chainNum][3];
-      globalObj->chainPatternSelect[chainNum]       = jsonReader["songs"][songNum][chainNum][4];
-      globalObj->chainPatternRepeatCount[chainNum]  = jsonReader["songs"][songNum][chainNum][5];
+    globalObj->songIndex =  jsonReader["songs"][songNum][0];
+    for(int chainNum= 0; chainNum< CHAIN_COUNT_MAX; chainNum++){
+      globalObj->chainChannelSelect[0][chainNum]    = jsonReader["songs"][songNum][chainNum+1][0];
+      globalObj->chainChannelSelect[1][chainNum]    = jsonReader["songs"][songNum][chainNum+1][1];
+      globalObj->chainChannelSelect[2][chainNum]    = jsonReader["songs"][songNum][chainNum+1][2];
+      globalObj->chainChannelSelect[3][chainNum]    = jsonReader["songs"][songNum][chainNum+1][3];
+      globalObj->chainPatternSelect[chainNum]       = jsonReader["songs"][songNum][chainNum+1][4];
+      globalObj->chainPatternRepeatCount[chainNum]  = jsonReader["songs"][songNum][chainNum+1][5];
+      Serial.println("loading song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]) + "\trepeat: " + String(globalObj->chainPatternRepeatCount[chainNum]));
     }
   }
-  Serial.println("Reading In Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
   return 1;
 }
 
@@ -619,7 +626,7 @@ void FlashMemory::saveSongData(){
   fileName = strdup("songData");
   char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
 
-  serializeGlobalSettings(fileBuffer);
+  serializeSongData(fileBuffer);
 
   while( !(spiFlash->ready()) ){
     //delay(1);

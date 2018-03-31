@@ -24,7 +24,11 @@ void LEDArray::playPauseHandler(){
       leds.setPixelColor(0, wheel(64));
     }
   } else {
-    leds.setPixelColor(0, wheel(255));
+    if(globalObj->chainModeActive){
+      leds.setPixelColor(0, wheel(255, 32));
+    } else {
+      leds.setPixelColor(0, wheel(255));
+    }
   }
 }
 

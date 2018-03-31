@@ -886,7 +886,6 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     case LFO_SINE:
       slewLevel = 1;
       voltageLevel =  (sin((lfoTime*3.1415926536)/(8*stepLength)))*cv2amplitude[channel]*128;
-      //voltageLevel =  (sin((cv2speed[channel]*(lfoClockCounter-lfoStartFrame[channel])*3.1415926536)/(beatLength/100)))*cv2amplitude[channel]*128;
       slewOn = true;
     break;
 

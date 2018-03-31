@@ -109,5 +109,4 @@ void MidiModule::midiClockPulseHandler(){
     }
   }
 
-  //Serial.println("Midi Clock - mpc: " + String(masterPulseCount) + "\tbeatLength: " + String(beatLength) );
 }

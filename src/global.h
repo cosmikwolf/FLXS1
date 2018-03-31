@@ -231,9 +231,7 @@ extern boolean debugBoolean;
 
 // MasterClock
 // extern unsigned long beatLength;
-extern uint8_t masterPulseCount;
 
-extern uint32_t lfoClockCounter;
 
 //save file
 extern uint8_t saveDestination[4];

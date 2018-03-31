@@ -83,7 +83,8 @@ void GlobalVariable::initialize(ADC *adc){
        this->initGlobals();
     }
 void GlobalVariable::initSongData(){
-  for(int chainNum=0; chainNum<16; chainNum++){
+  this->songIndex = 0;
+  for(int chainNum=0; chainNum< CHAIN_COUNT_MAX; chainNum++){
     for(int channel=0; channel<4; channel++){
       this->chainChannelSelect[channel][chainNum] = 1; //channel, chain index
     }

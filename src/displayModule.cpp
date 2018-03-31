@@ -37,12 +37,12 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.println("MAKE MUSIC");               delay(100);
   oled.fillScreen(GREEN, ORANGE);
   oled.setCursor(0,0);
-  oled.println("NOT WAR"); delay(10);
-  oled.println("NOT WAR"); delay(10);
-  oled.println("NOT WAR"); delay(10);
-  oled.println("NOT WAR"); delay(10);
-  oled.println("NOT WAR"); delay(10);
-  oled.println("NOT WAR"); delay(10);      delay(100);
+  oled.println("NOT WAR"); delay(15);
+  oled.println("NOT WAR"); delay(15);
+  oled.println("NOT WAR"); delay(15);
+  oled.println("NOT WAR"); delay(15);
+  oled.println("NOT WAR"); delay(15);
+  oled.println("NOT WAR"); delay(15);      delay(100);
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
@@ -273,6 +273,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
         case MENU_PATTERN_CHAIN:
           patternChainMenuHandler();
+        break;
+
+        case MENU_CHAIN_HELP:
+          patternChainHelpHandler();
         break;
       }
 
@@ -721,9 +725,18 @@ void DisplayModule::multiSelectMenu(char* buf){
 void DisplayModule::stateDisplay_pitch(char*buf){
   String gateTypeArray[] = { "off", "on", "tie","1hit" };
 
-  sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  if(globalObj->chainModeActive){
+    sprintf(buf, "pt:%02d> %02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1));
+  } else {
+    sprintf(buf, "ch%d ptn%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+  }
   displayElement[2] = strdup(buf);
-  sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
+
+  if(globalObj->chainModeActive){
+    sprintf(buf, "to go:%02dx", globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] - globalObj->chainModeCount[globalObj->chainModeIndex]);
+  } else {
+    sprintf(buf, "stp:%02d-%02d",   notePage*16+1, (notePage+1)*16 );
+  }
   displayElement[3] = strdup(buf);
 
   sprintf(buf, "gate%d", selectedChannel+1);
@@ -813,14 +826,18 @@ void DisplayModule::stateDisplay_pitch(char*buf){
 
     displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType].c_str() );
   }
-
-  if(globalObj->multiSelectSwitch) {
+  if(globalObj->multiSelectSwitch || globalObj->chainModeActive ) {
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background  ); //  digitalWriteFast(PIN_EXT_RX, LOW);
   } else {
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, background, contrastColor );
   }
-  renderStringBox(2,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
-  renderStringBox(3,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
+  if(!globalObj->chainModeActive){
+    renderStringBox(2,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
+    renderStringBox(3,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
+  } else {
+    renderStringBox(2,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
+    renderStringBox(3,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
+  }
 
   renderStringBox(1,  STATE_PITCH0, 0, 17 , 127, 27, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
 
@@ -2092,8 +2109,57 @@ void DisplayModule::sysexMenuHandler(){
   renderStringBox(8,  DISPLAY_LABEL,        0, 87, 127,8,  false, REGULAR1X, background , foreground);
 };
 
+void DisplayModule::patternChainHelpHandler(){
+  displayElement[0] = strdup("SONG HELP");
+
+  displayElement[1]  = strdup( "a song is divided into events");
+  displayElement[2]  = strdup( "press+turn knob: slect event");
+  displayElement[3]  = strdup( "turn knob: slect repeat count.");
+  displayElement[4]  = strdup( "repeat values below 1 include:");
+  displayElement[5]  = strdup( "repeat from start");
+  displayElement[6]  = strdup( "stop - song ends, play stops");
+  displayElement[7]  = strdup( "Jump to index: jumps to a ");
+  displayElement[8]  = strdup( "different song event X times");
+  displayElement[9]  = strdup( "see manual for more info");
+
+  uint8_t ystart = 16;
+  uint8_t yplus  = 9;
+  uint8_t i_ = 0;
+  renderStringBox(0,    DISPLAY_LABEL,  0,                0, 86, 15, false, STYLE1X, contrastColor, background);
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, background , contrastColor); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, contrastColor, background ); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, background , contrastColor); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, contrastColor, background ); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, background , contrastColor); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, contrastColor, background ); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, background , contrastColor); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, contrastColor, background ); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, background , contrastColor); i_++;
+  renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, contrastColor, background ); i_++;
+
+
+
+}
+
 void DisplayModule::patternChainMenuHandler(){
-  displayElement[0] = strdup("CHAIN EDIT");
+
+  displayElement[0] = strdup("SONG EDIT");
+
+  if(globalObj->chainModeActive){
+    sprintf(buf, "pt: %02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1));
+  } else {
+    sprintf(buf, "push play" );
+  }
+  displayElement[7] = strdup(buf);
+
+  if(globalObj->chainModeActive){
+    sprintf(buf, "to go: %02dx", globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] - globalObj->chainModeCount[globalObj->chainModeIndex]);
+  } else {
+    sprintf(buf, "to start" );
+  }
+  displayElement[8] = strdup(buf);
+
+
 
   uint8_t chainIndexOffset = (globalObj->chainSelectedPattern/4) * 4;
   bool repeatSet = false;
@@ -2112,12 +2178,12 @@ void DisplayModule::patternChainMenuHandler(){
         globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_",
         globalObj->chainPatternRepeatCount[patternChainIndex] );
       } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == 0){
-        sprintf(buf, "%s%02d: repeat",
+        sprintf(buf, "%s%02d: repeat song",
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
         patternChainIndex+1);
         repeatSet = true;
       } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == -1){
-        sprintf(buf, "%s%02d: stop",
+        sprintf(buf, "%s%02d: stop song",
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
         patternChainIndex+1);
       } else {
@@ -2131,18 +2197,28 @@ void DisplayModule::patternChainMenuHandler(){
     displayElement[patternChainIndex+1-chainIndexOffset] = strdup(buf);
   }
 
-  displayElement[6] = strdup("press play to start chain");
+//  displayElement[6] = strdup("shift-pgup to toggle help");
 
-  displayElement[5] = strdup("    # ptrn chnls count");
+  displayElement[5] = strdup("index  ptrn  chmask  count");
 
-uint8_t yindex = 30;
-uint8_t yoffset = 16;
+  uint8_t yindex = 30;
+  uint8_t yoffset = 16;
 
-bool highlightBool;
-  renderStringBox(0,  DISPLAY_LABEL,  0,                0, 128, 15, false, STYLE1X, background , contrastColor);
-  renderStringBox(6,  DISPLAY_LABEL,  0,               14, 128, 15, false, REGULAR1X, background , contrastColor);
+  bool highlightBool;
+  //renderStringBox(6,  DISPLAY_LABEL,  0,               14, 128, 15, false, REGULAR1X, background , contrastColor);
 
-  renderStringBox(5,  DISPLAY_LABEL,  0,               20, 128, 15, false, REGULAR1X, background , contrastColor);
+  renderStringBox(5,  DISPLAY_LABEL,  0,              19 , 128, 15, false, REGULAR1X, background , contrastColor);
+
+  if(globalObj->chainModeActive){
+    renderStringBox(0,  DISPLAY_LABEL,  0,   0, 86, 15, false, STYLE1X, contrastColor, background);
+    renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
+    renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,  0,                0, 128, 15, false, STYLE1X, background , contrastColor);
+    renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
+    renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
+  }
+
 
   highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
   renderStringBox(1,  DISPLAY_LABEL,  0, yindex+0*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
