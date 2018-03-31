@@ -2199,7 +2199,7 @@ void DisplayModule::patternChainMenuHandler(){
 
 //  displayElement[6] = strdup("shift-pgup to toggle help");
 
-  displayElement[5] = strdup("index  ptrn  chmask  count");
+  displayElement[5] = strdup("event pattern channels count");
 
   uint8_t yindex = 30;
   uint8_t yoffset = 16;
@@ -2207,14 +2207,14 @@ void DisplayModule::patternChainMenuHandler(){
   bool highlightBool;
   //renderStringBox(6,  DISPLAY_LABEL,  0,               14, 128, 15, false, REGULAR1X, background , contrastColor);
 
-  renderStringBox(5,  DISPLAY_LABEL,  0,              19 , 128, 15, false, REGULAR1X, background , contrastColor);
+  renderStringBox(5,  DISPLAY_LABEL,  0,              20 , 128, 15, false, REGULAR1X, background , contrastColor);
 
   if(globalObj->chainModeActive){
-    renderStringBox(0,  DISPLAY_LABEL,  0,   0, 86, 15, false, STYLE1X, contrastColor, background);
+    renderStringBox(0,  DISPLAY_LABEL,  0,   0, 86, 16, false, STYLE1X, contrastColor, background);
     renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, contrastColor, background );
     renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, contrastColor, background );
   } else {
-    renderStringBox(0,  DISPLAY_LABEL,  0,                0, 128, 15, false, STYLE1X, background , contrastColor);
+    renderStringBox(0,  DISPLAY_LABEL,  0, 0, 128, 16, false, STYLE1X, background , contrastColor);
     renderStringBox(7,  DISPLAY_LABEL,  86,  0, 42, 8, false, REGULAR1X, background, contrastColor );
     renderStringBox(8,  DISPLAY_LABEL,  86,  8, 42, 8, false, REGULAR1X, background, contrastColor );
   }
