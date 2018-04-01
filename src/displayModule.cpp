@@ -60,11 +60,10 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.println("FLXS1");
   oled.setFont(&flxs1_menu);//this will load the font
-
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("beta17n");
+  oled.println("beta17p");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
