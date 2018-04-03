@@ -147,11 +147,8 @@
 //these 12 bit INTs define chromatic scales
 //the bit position indicates scale degree
 
-
-
 #define POSITIVE 1
 #define NEGATIVE 0
-
 
 //INPUT MAPPINGS
 #define SW_00    0

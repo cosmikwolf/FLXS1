@@ -47,7 +47,7 @@ public:
   uint16_t cvInputCheck(uint8_t mapValue);
   uint8_t analogInputTranspose(uint8_t note);
 
-  void quantizedPatternShiftTrigger(uint8_t pattern, uint8_t channelSelector);
+  void flashMemoryLoadPattern(uint8_t pattern, uint8_t channelSelector);
   void dacTestLoop();
   void midiTestLoop();
   void calibrationRoutine();

@@ -13,11 +13,28 @@
 // stepData[activeStep].noteStatus = stepData[activeStep].pitch;
 
 void Sequencer::clockReset(bool activeStepReset){
+  this->suspendNotesUntilReset = false;
   globalObj->channelResetSwich[channel] = true;
 
-  if(globalObj->chainModeMasterPattern == channel){
+  if(globalObj->chainModeMasterChannel[globalObj->chainModeIndex] == channel){
     globalObj->chainModeCountSwitch = 0;
   }
+/*
+  if( channel == globalObj->chainModeMasterChannel[globalObj->chainModeIndex]){
+      if(globalObj->waitingToResetAfterPatternLoad){
+        for(int resetChannel = 0; resetChannel < SEQUENCECOUNT; resetChannel++){
+          if(globalObj->chainChannelSelect[resetChannel][globalObj->chainModeIndex] == 0){
+            continue;
+          }
+          if(resetChannel == channel) continue;
+        //  Serial.println(String(millis()) + "\tresetting all sequences after pattern change " + String(resetChannel), );
+        //  outputControl->sequenceArrayResetSequence(resetChannel);
+        }
+        globalObj->waitingToResetAfterPatternLoad = false;
+        activeStepReset = true;
+      }
+  }*/
+
   ppqPulseIndex = 0;
 
   if (activeStepReset){
@@ -30,7 +47,8 @@ void Sequencer::clockReset(bool activeStepReset){
     pendulumSwitch = false;
   }
 
-  calculateActiveStep();
+  this->getCurrentFrame();
+  // calculateActiveStep();
 
   for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
     if(stepNum == activeStep){
@@ -47,12 +65,11 @@ void Sequencer::clockReset(bool activeStepReset){
   //lastStepOffset = 0;
   //firstPulse = 1;
   if(channel == 0 ){
-  //  Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(calculateActiveStep()) + "\tactiveStep: " + String(activeStep)
-  //  + "\tppqPulseIndex: " + String(ppqPulseIndex) + "\tframesPerPulse: " + String(framesPerPulse) + "\tframesPerSeq: " + String(framesPerSequence())
-  //  + "\tfpp: " + String(framesPerPulse) + "\tavgCPP: " + String(avgClocksPerPulse) + "\lastClockValue: " + String(lastPulseClockCount)
-   //currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
-
- // );
+    Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(currentFrame) + "\tactiveStep: " + String(activeStep)
+   //  + "\tppqPulseIndex: " + String(ppqPulseIndex) + "\tframesPerPulse: " + String(framesPerPulse) + "\tframesPerSeq: " + String(framesPerSequence())
+   //  + "\tfpp: " + String(framesPerPulse) + "\tavgCPP: " + String(avgClocksPerPulse) + "\lastClockValue: " + String(lastPulseClockCount)
+   // currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse)
+  );
     // Serial.println("reset --------------------------------------------");
   }
 
@@ -123,10 +140,12 @@ void Sequencer::ppqPulse(uint8_t pulsesPerBeat){
   if(globalObj->playing) { firstPulse = false; }
 
   framesPerPulse = this->framesPerBeat(globalObj->tempoX100)/pulsesPerBeat;
+  pulsesRemaining = (framesPerSequence()-currentFrame)/framesPerPulse;
 
   lastPulseClockCount = clockCycles;
 
 };
+
 
 uint32_t Sequencer::framesPerBeat(int tempoX100){
   //return ((60*100*96000000)/globalObj->tempoX100);
@@ -171,7 +190,7 @@ void Sequencer::updateClockDivision(int8_t clockDiv){
   // tempPulseIndex /= currentFrame;
 
 //  ppqPulseIndex = tempPulseIndex % (pulsesPerBeat*stepCount*clockDivisionNum()/clockDivisionDen());
-currentFrame = this->getCurrentFrame();
+ this->getCurrentFrame();
   // Serial.println("new ppq index: " + String(ppqPulseIndex) + "\tnewNum: " + String(clockDivisionNum()) + "\tnewDen: " + String(clockDivisionDen()) + "\torgCF: " + String(origCurrentFrame) + "\torgFPS: " + String(origFramesPerSequence) );
 }
 
@@ -192,84 +211,20 @@ uint32_t Sequencer::getCurrentFrame(){
 
   unquantizedCF = ((uint32_t)ppqPulseIndex * framesPerPulse) + (((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse);
 
-  //quantized pattern change check. Loads next sequence just before it is supposed to end.
-
-
-//MOVING TO MASTERCLOCK
-/*
-  if (unquantizedCF >= framesPerSequence()-(getStepLength()/3) ){
-    if (globalObj->chainModeActive && (globalObj->chainModeMasterPattern == channel) && !(globalObj->chainModeCountSwitch)){
-    //  Serial.println("incrementing chain mode count on channel " + String(channel));
-      CHAINLOGICBEGINNING: ;
-      globalObj->chainModeCount[globalObj->chainModeIndex]++;
-      if(globalObj->chainModeCount[globalObj->chainModeIndex] >= globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]){
-      //  Serial.println("scheduling a pattern change");
-        globalObj->patternChangeTrigger = channel + 1;
-        globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
-        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == -1){ // chain stop
-          globalObj->chainModeActive = false;
-          globalObj->playing = false;
-          Serial.println("Chain end detected");
-        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // repeat
-          globalObj->chainModeIndex = 0;
-          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
-          goto CHAINLOGICBEGINNING;
-        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < -1){ //chain jump
-          globalObj->chainModeCount[globalObj->chainModeIndex]++;
-          if(globalObj->chainModeCount[globalObj->chainModeIndex] >= abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1) ){
-            globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
-            globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
-            if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] < 0){
-              goto CHAINLOGICBEGINNING;
-            } else  if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // chain stop
-              globalObj->chainModeActive = false;
-              globalObj->playing = false;
-              Serial.println("Chain end detected");
-            } else {
-              globalObj->patternChangeTrigger = channel + 1;
-              goto QUEUEPATTERN;
-            }
-          } else {
-            globalObj->chainModeCount[globalObj->chainModeIndex]++;
-            globalObj->chainModeIndex = globalObj->chainPatternSelect[globalObj->chainModeIndex];
-            goto QUEUEPATTERN;
-          }
-        } else {
-          QUEUEPATTERN: ;
-          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
-          globalObj->queuePattern = globalObj->chainPatternSelect[globalObj->chainModeIndex];
-        }
-      }
-      globalObj->chainModeCountSwitch = 1;
-    }
-    if ((globalObj->patternChangeTrigger == channel + 1)&&(globalObj->queuePattern != 255) ){
-    //  Serial.println("changed sequence with ch" + String(channel));
-      outputControl->quantizedPatternShiftTrigger(globalObj->queuePattern, globalObj->patternChannelSelector);
-      globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
-      // activeStepReset = true;
-    }
-  }
-*/
-  //MOVING TO MASTERCLOCK
-
-  if (unquantizedCF >= framesPerSequence()){
-//    Serial.println(String(channel) + " reset-------------");
-    this->clockReset(false);
-    goto BEGINCURRENTFRAME;
-  }
-
-  //return unquantizedCF % framesPerSequence();
+  currentFrame = unquantizedCF;
   return unquantizedCF;
 
 }
 
 void Sequencer::calculateActiveStep(){
   uint8_t lastActiveStep = activeStep;
-
   currentFrame = this->getCurrentFrame();
-  // currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse);
-  //Serial.println("CurrentFrame: " + String(currentFrame) + "\tavgCpp: " + String(avgClocksPerPulse) + "\tclockcount:" + String(clockCount));
-  //  activeStep = isFrameSwinging(currentFrame);
+
+  if (currentFrame >= framesPerSequence()){
+    this->clockReset(false);
+    this->getCurrentFrame();
+  }
+
   int16_t preSwingStepIndex = 0;
   int16_t postSwingStepIndex = 0;
   preSwingStepIndex = currentFrame / getStepLength();
@@ -278,89 +233,39 @@ void Sequencer::calculateActiveStep(){
     // if the current frame liees when the activeStep has advanced according to master clock,
     // but before the point where it should retrigger, keep activestep 1 step behind
     // swing step has not begun yet.
-  //  activeStep = min_max(preSwingStepIndex - 1, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
     postSwingStepIndex = preSwingStepIndex - 1;
     swinging = false;
-
   } else if( (swingX100 < 50) && (preSwingStepIndex%2) && (currentFrame%getStepLength() >= getStepLength() * (2*swingX100)/100 ) ){
-    // activeStep = min_max(preSwingStepIndex + 1, firstStep, MAX_STEPS_PER_SEQUENCE - 1 );
     postSwingStepIndex = preSwingStepIndex + 1;
     swinging = true;
-
   } else {
-    //activeStep = min_max(preSwingStepIndex, firstStep, MAX_STEPS_PER_SEQUENCE - 1);
     postSwingStepIndex = preSwingStepIndex;
   }
-  //postSwingStepIndex %= stepCount;
 
   if(postSwingStepIndex != lastStepIndex){
     switch(playMode){
       case PLAY_PENDULUM:
-        if(activeStep == firstStep){
-          pendulumSwitch = true;
-        } else if(activeStep == (firstStep+stepCount-1)){
-          pendulumSwitch = false;
-        }
-        if(pendulumSwitch){
-          goto FORWARD;
-        } else {
-          goto REVERSE;
-        }
-      break;
-      case  PLAY_FORWARD:
-        FORWARD:
-        activeStep = min_max_wrap(activeStep + 1, firstStep, stepCount, MAX_STEPS_PER_SEQUENCE);
-      break;
-      case  PLAY_REVERSE:
-        REVERSE:
-        activeStep = min_max_wrap(activeStep - 1, (firstStep+stepCount-1)%MAX_STEPS_PER_SEQUENCE, stepCount, MAX_STEPS_PER_SEQUENCE);
-      break;
-      case  PLAY_RANDOM:
-        activeStep = min_max_wrap(random(firstStep, firstStep + stepCount), (firstStep+stepCount-1)%MAX_STEPS_PER_SEQUENCE, stepCount, MAX_STEPS_PER_SEQUENCE);
-      break;
-
+        if(activeStep == firstStep){ pendulumSwitch = true;
+        } else if(activeStep == (firstStep+stepCount-1)){ pendulumSwitch = false; }
+        if(pendulumSwitch){ goto FORWARD; } else { goto REVERSE; }   break;
+      case  PLAY_FORWARD: FORWARD: activeStep = min_max_wrap(activeStep + 1, firstStep, stepCount, MAX_STEPS_PER_SEQUENCE); break;
+      case  PLAY_REVERSE:  REVERSE:  activeStep = min_max_wrap(activeStep - 1, (firstStep+stepCount-1)%MAX_STEPS_PER_SEQUENCE, stepCount, MAX_STEPS_PER_SEQUENCE); break;
+      case  PLAY_RANDOM:  activeStep = min_max_wrap(random(firstStep, firstStep + stepCount), (firstStep+stepCount-1)%MAX_STEPS_PER_SEQUENCE, stepCount, MAX_STEPS_PER_SEQUENCE); break;
     }
-    if (playMode == PLAY_REVERSE) {
-      //activeStep = min_max_cycle(activeStep - 1, firstStep, firstStep+stepCount-1) % MAX_STEPS_PER_SEQUENCE;
-    } else if (playMode == PLAY_FORWARD) {
-      //activeStep = (activeStep + 1) % MAX_STEPS_PER_SEQUENCE;
-    };
+
     lastStepIndex = postSwingStepIndex;
   }
-
-  if (channel == 1 && millis() % 20 == 0){
-  // Serial.println(String(millis()) + "\tSwing: "+ String(swingSwitch) + " activeStep "  + String( activeStep ) + "\tstepLength: " + String(getStepLength()) + "\tswingX100: " + String(swingX100) + "\tcurrentFrame:"  + String(currentFrame) + "\tframesSinceLastStep:" + String(framesSinceLastStep) );
-  }
+  activeStep = min_max(activeStep, firstStep, firstStep + stepCount);
 
   if ( activeStep != lastActiveStep ){
     swingCount += 1;
-
-          if(channel == 0){
-        //   Serial.println(
-        //      " activeStep "  + String( activeStep ) + "\tnext:" + String(min_max_cycle(activeStep + 1, firstStep, firstStep+stepCount-1))
-        //    );
-            //"Swing: "+ String(swinging) +
-            //    "\tpreSwingStepIndex "  + String( preSwingStepIndex ) + "\tlastActiveStep: " + String(lastActiveStep) +
-            //     "\tpost  SwingStepIndex" + String(postSwingStepIndex) + "\tlastStepIndex: " + String(lastStepIndex)
-        //        + "\tstepLength: " + String(getStepLength()) + // "\tswingX100: " + String(swingX100)
-         //
-        //        + "\tppqPulseIndex:" + String(ppqPulseIndex) + "\tfpp: " + String(framesPerPulse)+ "\tcc:" + String(clockCount) + "\t\tavgCsPP: " + String(avgClocksPerPulse)
-        //        + "\tframeSincePulse: " + String((uint32_t)(((long long)framesPerPulse * (long long)clockCount) / avgClocksPerPulse)) + "\tclockCycles: " + String(clockCycles));
-        // );
-        //        if(currentFrame < lastStepFrame){
-        //          Serial.println("currentFrame:"  + String(currentFrame) + "\tfpp: " + String(framesPerSequence()) + "\tstepFrames: " + String((int)framesPerSequence() - (int)lastStepFrame) + "\tlastSTep: " + String(lastStepFrame));
-        //        } else{
-        //           Serial.println("currentFrame:"  + String(currentFrame) + "\tfpp: " + String(framesPerSequence()) + "\tstepFrames: " + String((int)currentFrame-(int)lastStepFrame) + "\tlastSTep: " + String(lastStepFrame) );
-        //        }
-         //
-         //
-        //     lastStepFrame = currentFrame;
-        //    if( swingSwitch ){
-        //      outputControl->setClockOutput(LOW);
-        //    } else {
-        //      outputControl->setClockOutput(HIGH);
-        //    }
+/*
+    Serial.println(String(millis()) +" ch:" + String(channel) + " activeStep "  + String( activeStep ) + "\tlastActiveStep:" + String(lastActiveStep) + "\tcurrentFrame: " + String(currentFrame) );
+    if( (channel == globalObj->chainModeMasterChannel) && globalObj->waitingToResetAfterPatternLoad){
+  //    this->clockReset(true);
+      return;
     }
+    */
   }
 }
 

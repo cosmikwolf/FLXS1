@@ -71,7 +71,7 @@ public:
 
   int cacheWriteLoop();
   void loadPattern(uint8_t pattern, uint8_t channelSelector) ;
-  void loadSingleChannel(uint8_t channel, uint8_t pattern);
+  void loadSingleChannel(uint8_t channel, uint8_t pattern, bool suspendNotesUntilReset);
   void staggeredLoadLoop();
 
   void listFiles();

@@ -880,20 +880,21 @@ int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
 
 }
 
-void FlashMemory::staggeredLoadLoop(){  //stagger the load between iterations of masterClock, so that gate has less jitter during load process
+void FlashMemory::staggeredLoadLoop(){  //staggers loading of each channel between iterations of masterClock, so that gate has less jitter during load process
   if(globalObj->patternLoadOperationInProgress){
-    // Serial.println("beginning staggered load " + String(staggerLoadChannelSelector, BIN) );
-    while ( !(staggerLoadChannelSelector & (1 << staggeredLoadCounter) ) ){
-    // Serial.println("skipping channel " + String(staggeredLoadCounter) );
-      staggeredLoadCounter++; // if channel is not selected to be loaded, skip to the next channel!
-      if (staggeredLoadCounter >= SEQUENCECOUNT){
-        break;
+    Serial.println("beginning staggered load " + String(staggerLoadChannelSelector, BIN) );
+      for(int i = 0; i<4; i++){
+       if( !(staggerLoadChannelSelector & (1 << staggeredLoadCounter) ) ){
+        Serial.println("skipping channel " + String(staggeredLoadCounter) );
+        staggeredLoadCounter++; // if channel is not selected to be loaded, skip to the next channel!
+        if (staggeredLoadCounter >= SEQUENCECOUNT){ goto ENDLOAD; }
+       }
       }
-    };
-    // Serial.println("loading channel " + String(staggeredLoadCounter) );
-    this->loadSingleChannel(staggeredLoadCounter, staggeredLoadTargetPattern);
+    Serial.println(String(millis()) + " \tloading channel " + String(staggeredLoadCounter) );
+    this->loadSingleChannel(staggeredLoadCounter, staggeredLoadTargetPattern, true);
     staggeredLoadCounter++;
   };
+  ENDLOAD:
 
   if (staggeredLoadCounter >= SEQUENCECOUNT){
     globalObj->patternLoadOperationInProgress = false;
@@ -904,8 +905,19 @@ void FlashMemory::staggeredLoadLoop(){  //stagger the load between iterations of
 
 }
 
-void FlashMemory::loadSingleChannel(uint8_t channel, uint8_t pattern){
+void FlashMemory::loadSingleChannel(uint8_t channel, uint8_t pattern, bool suspendNotesUntilReset){
   int readJsonReturn = this->readSequenceData(channel, pattern);
+  if(suspendNotesUntilReset){
+  //  sequenceArray[channel].suspendNotesUntilReset = true;
+    // for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+      // if(stepNum == sequenceArray[channel].firstStep ){
+      //   sequenceArray[channel].stepData[stepNum].noteStatus = AWAITING_TRIGGER;
+      // } else {
+        // sequenceArray[channel].stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
+      // }
+    // }
+  //  Serial.println("setting step " + String(sequenceArray[channel].activeStep) + " on channel " + String(channel) + " to played");
+  }
 
   if ( readJsonReturn == SAVEFILE_DOES_NOT_EXIST )  {
     sequenceArray[channel].initNewSequence(pattern, channel);
@@ -937,6 +949,7 @@ void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray)
 void FlashMemory::changePattern(uint8_t pattern, uint8_t channelSelector, uint8_t changeTrigger){
   if (changeTrigger == 0) {
     loadPattern(pattern, channelSelector);
+    globalObj->chainModeMasterPulseToGo = 0 ;
   } else {
     globalObj->queuePattern = pattern;
   }

@@ -492,10 +492,12 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	}
 
-/*
+///*
 	Serial.println(
 	"millis: " + String(millis()) +
 	"\tstepNum: " + String(stepNum) +
+	"\tchannel: " + String(channel) +
+	"\tpattern: " + String(pattern) +
   //"\tgateLength: " + String(stepData[stepNum].gateLength) +
   //"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
   //"\tcurrentFrame: "  + String(currentFrame) +
@@ -504,14 +506,21 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //"\tgetStepLength: " + String(getStepLength()) +
  	"\tarptype: "  + String(stepData[stepNum].arpType)
 );
-*/
+//*/
+
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) );
 
 	//END INPUT MAPPING SECTION
-	outputControl->noteOn(channel,stepNum,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1, stepData[stepNum].stepStartFrame, stepData[stepNum].arpStatus );
-  tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true)  ;
 
-	stepData[stepNum].arpStatus++;
+	if( !globalObj->waitingToResetAfterPatternLoad ){
+
+		outputControl->noteOn(channel,stepNum,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1, stepData[stepNum].stepStartFrame, stepData[stepNum].arpStatus );
+	  tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true)  ;
+
+		stepData[stepNum].arpStatus++;
+	} else {
+		Serial.println("Prevented note from playing ch:" + String(channel) + "\tstep: " + String(stepNum) + "\t"+ String(globalObj->chainModeMasterPulseToGo));
+	}
 
 	//ensuring that gate is turned off before next step:
 	// uint8_t nextStep = stepCount;

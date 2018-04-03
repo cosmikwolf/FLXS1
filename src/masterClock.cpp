@@ -58,7 +58,7 @@ void MasterClock::masterClockFunc(){
 		if (extClockCounter > EXTCLOCKDIV / 2){
 			//digitalWriteFast(PIN_EXT_AD_2, LOW);
 			//displayRunSwitch = false;
-			staggeredLoadRunSwitch = false;
+			clearedToRunLoadOperation = false;
 		} else {
       displayRunSwitch = true;
     }
@@ -68,7 +68,7 @@ void MasterClock::masterClockFunc(){
 
 			if( extClockCounter >= EXTCLOCKDIV && globalObj->playing){
 				outputControl->setClockOutput(HIGH);
-				staggeredLoadRunSwitch = true;
+				clearedToRunLoadOperation = true;
 				digitalWriteFast(PIN_EXT_AD_3, HIGH);
 				serialMidi->sendRealTime(midi::Clock);
 				extClockCounter = 0;
@@ -86,16 +86,17 @@ void MasterClock::masterClockFunc(){
 
 			lastPulseClockCount += clockPeriod;
 		}
-		if(extClockCounter >= 3*EXTCLOCKDIV / 4 && (extClockCounter < EXTCLOCKDIV) ){
-			staggeredLoadRunSwitch = false;
+
+		if(extClockCounter >= 15*EXTCLOCKDIV/16 && (extClockCounter < EXTCLOCKDIV) ){
+			clearedToRunLoadOperation = false; //keep load operation from happening 1/16 of a clock cyle before it rises
 		}
-		if((extClockCounter >= EXTCLOCKDIV / 4) && (extClockCounter < EXTCLOCKDIV / 2) ){
-			staggeredLoadRunSwitch = false;
+		if((extClockCounter >= 7*EXTCLOCKDIV/16) && (extClockCounter < EXTCLOCKDIV / 2) ){
+			clearedToRunLoadOperation = false;//keep load operation from happening 1/16 of a clock cyle before it falls
 		}
 		if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
 				outputControl->setClockOutput(LOW);
 				displayRunSwitch = true;
-				staggeredLoadRunSwitch = true;
+				clearedToRunLoadOperation = true;
 				digitalWriteFast(PIN_EXT_AD_2, HIGH);
 		}
 
@@ -200,11 +201,11 @@ void MasterClock::sequencerFunc(void){
 }
 
 void MasterClock::songAndPatternLogic(){
-	if (sequenceArray[globalObj->chainModeMasterPattern].currentFrame >= sequenceArray[globalObj->chainModeMasterPattern].framesPerSequence()-(sequenceArray[globalObj->chainModeMasterPattern].getStepLength()*3/4) ){
+	if (sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].currentFrame >= sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].framesPerSequence()-(sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].getStepLength()*3/4) ){
 
 		if(globalObj->chainModeActive){
  /* moved to clockReset
-		if ((sequenceArray[globalObj->chainModeMasterPattern].currentFrame < sequenceArray[globalObj->chainModeMasterPattern].getStepLength()/3) && (globalObj->chainModeCountSwitch == 1)){
+		if ((sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].currentFrame < sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].getStepLength()/3) && (globalObj->chainModeCountSwitch == 1)){
 	    globalObj->chainModeCountSwitch = 0;
 	  }*/
 	    if (!(globalObj->chainModeCountSwitch)){
@@ -213,7 +214,7 @@ void MasterClock::songAndPatternLogic(){
 				CHAINLOGICBEGINNING: ;
 	      if(globalObj->chainModeCount[globalObj->chainModeIndex] >= globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]){
 	      //  Serial.println("scheduling a pattern change");
-	        globalObj->patternChangeTrigger = globalObj->chainModeMasterPattern + 1;
+	        globalObj->patternChangeTrigger = globalObj->chainModeMasterChannel[globalObj->chainModeIndex] + 1;
 	        globalObj->chainModeIndex = (globalObj->chainModeIndex+1)%CHAIN_COUNT_MAX ;
 	        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == -1){ // chain stop
 	          globalObj->chainModeActive = false;
@@ -237,7 +238,7 @@ void MasterClock::songAndPatternLogic(){
 									sequenceArray[channel].clockReset(true);
 								}
 	            } else {
-	              globalObj->patternChangeTrigger = globalObj->chainModeMasterPattern + 1;
+	              globalObj->patternChangeTrigger = globalObj->chainModeMasterChannel[globalObj->chainModeIndex] + 1;
 	              goto QUEUEPATTERN;
 	            }
 	          } else {
@@ -254,6 +255,7 @@ void MasterClock::songAndPatternLogic(){
 							globalObj->chainChannelSelect[2][globalObj->chainModeIndex],
 							globalObj->chainChannelSelect[3][globalObj->chainModeIndex]);
 							Serial.println(String(millis()) + "\tqueuing pattern " + String(globalObj->chainModeIndex));
+
 	        }
 	      }
 	      globalObj->chainModeCountSwitch = 1;
@@ -262,11 +264,13 @@ void MasterClock::songAndPatternLogic(){
 
 	  }
 
-		if ((globalObj->patternChangeTrigger == globalObj->chainModeMasterPattern + 1)&&(globalObj->queuePattern != 255) ){
+		if ((globalObj->patternChangeTrigger == globalObj->chainModeMasterChannel[globalObj->chainModeIndex] + 1)&&(globalObj->queuePattern != 255) ){
 		//  Serial.println("changed sequence with ch" + String(channel));
-			outputControl->quantizedPatternShiftTrigger(globalObj->queuePattern, globalObj->patternChannelSelector);
+			outputControl->flashMemoryLoadPattern(globalObj->queuePattern, globalObj->patternChannelSelector);
+			globalObj->chainModeMasterPulseToGo = sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].pulsesRemaining;
 			globalObj->patternLoadOperationInProgress = true;
 			globalObj->waitingToResetAfterPatternLoad = true;
+			Serial.println("pulses to go: " + String(globalObj->chainModeMasterPulseToGo));
 			globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
 			// activeStepReset = true;
 		}
@@ -360,8 +364,16 @@ void MasterClock::internalClockTick(){
 	if ( pulseTrigger ){
 		//Serial.println("Pulsetrigger " + String(pulseTimer));
 		pulseTimer = 0;
-		for (int i=0; i< SEQUENCECOUNT; i++){
-			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
+		globalObj->chainModeMasterPulseToGo--;
+		if((globalObj->chainModeMasterPulseToGo <= 0) && globalObj->waitingToResetAfterPatternLoad){
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				sequenceArray[i].clockReset(true);
+			}
+			globalObj->waitingToResetAfterPatternLoad = false;
+			} else {
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
+			}
 		}
 		pulseTrigger = 0;
   }

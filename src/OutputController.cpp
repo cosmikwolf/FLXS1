@@ -168,7 +168,7 @@ void OutputController::flashMemoryStaggeredLoadLoop(){
 };
 
 
-void OutputController::quantizedPatternShiftTrigger(uint8_t pattern, uint8_t channelSelector){
+void OutputController::flashMemoryLoadPattern(uint8_t pattern, uint8_t channelSelector){
    saveFile->loadPattern(pattern, channelSelector);
 };
 

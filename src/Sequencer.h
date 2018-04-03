@@ -93,7 +93,7 @@ class Sequencer
 		//uint32_t  ppqSequenceTime();
 
 		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
-
+		bool 			suspendNotesUntilReset;
     bool      swingSwitch;
     bool      swinging;
 		bool			receivedFirstExtClock;
@@ -143,6 +143,7 @@ class Sequencer
 
 		int8_t 	  clockDivision;
 		uint32_t  currentFrame;
+		uint16_t	pulsesRemaining;
 
 	private:
 

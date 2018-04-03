@@ -110,8 +110,9 @@ class GlobalVariable {
     bool waitingToResetAfterPatternLoad;
     bool patternLoadOperationInProgress;
     uint8_t songIndex;
-    uint8_t chainModeMasterPattern;
+    int16_t chainModeMasterPulseToGo;
     uint8_t chainModeIndex;
+    uint8_t chainModeMasterChannel[16];
     uint8_t chainModeCount[16];
     bool    chainChannelSelect[4][16]; //channel, chain index
     uint8_t chainPatternSelect[16];

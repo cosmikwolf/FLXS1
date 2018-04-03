@@ -2171,6 +2171,8 @@ void DisplayModule::patternChainMenuHandler(){
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
         patternChainIndex+1,
         globalObj->chainPatternSelect[patternChainIndex]+1,
+
+        
         globalObj->chainChannelSelect[0][patternChainIndex] ? "1" : "_",
         globalObj->chainChannelSelect[1][patternChainIndex] ? "2" : "_",
         globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_" ,
