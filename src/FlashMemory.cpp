@@ -583,7 +583,7 @@ void FlashMemory::serializeSongData(char* fileBuffer){
       songDataElement.add(globalObj->chainChannelSelect[3][chainNum]);
       songDataElement.add(globalObj->chainPatternSelect[chainNum]);
       songDataElement.add(globalObj->chainPatternRepeatCount[chainNum]);
-      Serial.println("Saving song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]));
+      // Serial.println("Saving song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]));
     }
   }
   root.printTo(fileBuffer,4096);
@@ -613,7 +613,7 @@ bool FlashMemory::deserializeSongData(char* json){
       globalObj->chainChannelSelect[3][chainNum]    = jsonReader["songs"][songNum][chainNum+1][3];
       globalObj->chainPatternSelect[chainNum]       = jsonReader["songs"][songNum][chainNum+1][4];
       globalObj->chainPatternRepeatCount[chainNum]  = jsonReader["songs"][songNum][chainNum+1][5];
-      Serial.println("loading song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]) + "\trepeat: " + String(globalObj->chainPatternRepeatCount[chainNum]));
+      // Serial.println("loading song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]) + "\trepeat: " + String(globalObj->chainPatternRepeatCount[chainNum]));
     }
   }
   return 1;
@@ -880,8 +880,8 @@ int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
 
 }
 
-void FlashMemory::staggeredLoadLoop(){
-  if(staggeredLoadSwitch){
+void FlashMemory::staggeredLoadLoop(){  //stagger the load between iterations of masterClock, so that gate has less jitter during load process
+  if(globalObj->patternLoadOperationInProgress){
     // Serial.println("beginning staggered load " + String(staggerLoadChannelSelector, BIN) );
     while ( !(staggerLoadChannelSelector & (1 << staggeredLoadCounter) ) ){
     // Serial.println("skipping channel " + String(staggeredLoadCounter) );
@@ -896,7 +896,7 @@ void FlashMemory::staggeredLoadLoop(){
   };
 
   if (staggeredLoadCounter >= SEQUENCECOUNT){
-    staggeredLoadSwitch = false;
+    globalObj->patternLoadOperationInProgress = false;
     staggeredLoadCounter = 0;
     currentPattern = staggeredLoadTargetPattern;
     // Serial.println("save complete: " + String(this->saveTimer));
@@ -917,9 +917,10 @@ void FlashMemory::loadSingleChannel(uint8_t channel, uint8_t pattern){
 
 void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
   // Serial.println("initiating pattern load ");
+  globalObj->patternLoadOperationInProgress = true;
+  globalObj->waitingToResetAfterPatternLoad = true;
   this->saveTimer = 0;
   this->staggeredLoadTargetPattern = pattern;
-  this->staggeredLoadSwitch = true;
   this->staggeredLoadCounter = 0;
   this->staggerLoadChannelSelector = channelSelector;
 }

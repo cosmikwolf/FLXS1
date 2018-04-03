@@ -101,7 +101,7 @@ void MasterClock::masterClockFunc(){
 
 
 	} else if(globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ){
-		staggeredLoadRunSwitch = true;
+		clearedToRunLoadOperation = true;
 
 		if (globalObj->midiSetClockOut && !outputControl->clockValue){
 			outputControl->setClockOutput(HIGH);
@@ -117,7 +117,7 @@ void MasterClock::masterClockFunc(){
 			sequenceArray[i].masterClockPulse();
 		}
   } else if(globalObj->clockMode >= EXTERNAL_CLOCK_GATE_0){
-		staggeredLoadRunSwitch = true;
+		clearedToRunLoadOperation = true;
 
 		for (int i = 0; i < SEQUENCECOUNT; i++ ){
 			sequenceArray[i].masterClockPulse();
@@ -191,9 +191,10 @@ void MasterClock::sequencerFunc(void){
 	}
   globalObj->wasPlaying = globalObj->playing;
 
-	if(staggeredLoadRunSwitch || !globalObj->playing){
+	if(clearedToRunLoadOperation || !globalObj->playing){
 		outputControl->flashMemoryStaggeredLoadLoop();
 	}
+
 
 //	digitalWriteFast(PIN_EXT_AD_2, LOW);
 }
@@ -217,7 +218,7 @@ void MasterClock::songAndPatternLogic(){
 	        if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == -1){ // chain stop
 	          globalObj->chainModeActive = false;
 	          globalObj->playing = false;
-	          Serial.println("Chain end detected");
+	          // Serial.println("Chain end detected");
 	        } else if(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] == 0){ // repeat
 	          globalObj->chainModeIndex = 0;
 	          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
@@ -248,6 +249,11 @@ void MasterClock::songAndPatternLogic(){
 	          QUEUEPATTERN: ;
 	          globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
 	          globalObj->queuePattern = globalObj->chainPatternSelect[globalObj->chainModeIndex];
+						globalObj->patternChannelSelector = globalObj->convertBoolToByte(globalObj->chainChannelSelect[0][globalObj->chainModeIndex],
+							globalObj->chainChannelSelect[1][globalObj->chainModeIndex],
+							globalObj->chainChannelSelect[2][globalObj->chainModeIndex],
+							globalObj->chainChannelSelect[3][globalObj->chainModeIndex]);
+							Serial.println(String(millis()) + "\tqueuing pattern " + String(globalObj->chainModeIndex));
 	        }
 	      }
 	      globalObj->chainModeCountSwitch = 1;
@@ -259,6 +265,8 @@ void MasterClock::songAndPatternLogic(){
 		if ((globalObj->patternChangeTrigger == globalObj->chainModeMasterPattern + 1)&&(globalObj->queuePattern != 255) ){
 		//  Serial.println("changed sequence with ch" + String(channel));
 			outputControl->quantizedPatternShiftTrigger(globalObj->queuePattern, globalObj->patternChannelSelector);
+			globalObj->patternLoadOperationInProgress = true;
+			globalObj->waitingToResetAfterPatternLoad = true;
 			globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
 			// activeStepReset = true;
 		}
@@ -345,13 +353,11 @@ void MasterClock::internalClockTick(){
 			startingClockCount = clockCycles;
 			masterClockCycleCount = 0;
     }
-
   //  Serial.println("Starting sequence - internal clock: ");
 
   }
 
 	if ( pulseTrigger ){
-
 		//Serial.println("Pulsetrigger " + String(pulseTimer));
 		pulseTimer = 0;
 		for (int i=0; i< SEQUENCECOUNT; i++){

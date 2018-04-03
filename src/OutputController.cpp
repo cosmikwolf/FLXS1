@@ -159,6 +159,10 @@ for (int i=0; i<4; i++){
   //}
 }
 
+void OutputController::sequenceArrayResetSequence(uint8_t channel){
+    sequenceArray[channel].clockReset(true);
+};
+
 void OutputController::flashMemoryStaggeredLoadLoop(){
   saveFile->staggeredLoadLoop();
 };

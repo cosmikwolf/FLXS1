@@ -51,27 +51,27 @@ void LEDArray::loop(uint16_t interval){
       case GLOBAL_MENU_1:
       case GLOBAL_MENU_2:
       case SYSEX_MENU:
-      if(stepMode == STATE_QUANTIZEMODE){
-        quantizeModeLEDHandler();
-      } else {
-        channelSequenceModeLEDHandler();
-      }
+        if(stepMode == STATE_QUANTIZEMODE){
+          quantizeModeLEDHandler();
+        } else {
+          channelSequenceModeLEDHandler();
+        }
       break;
       case PITCH_GATE_MENU:
       case MENU_RANDOM:
       case ARPEGGIO_MENU:
-      if(globalObj->multiSelectSwitch){
-        multiSelectLEDHandler();
-      } else {
-        channelPitchModeLEDHandler(globalObj->selectedStep);
-      }
+        if(globalObj->multiSelectSwitch){
+          multiSelectLEDHandler();
+        } else {
+          channelPitchModeLEDHandler(globalObj->selectedStep);
+        }
       break;
       case VELOCITY_MENU:
-      if(globalObj->multiSelectSwitch){
-        multiSelectLEDHandler();
-      } else {
-        channelGateModeLEDHandler();
-      }
+        if(globalObj->multiSelectSwitch){
+          multiSelectLEDHandler();
+        } else {
+          channelGateModeLEDHandler();
+        }
       break;
 
       case INPUT_DEBUG_MENU:
@@ -165,7 +165,7 @@ void LEDArray::channelSequenceModeLEDHandler(){
 
 void LEDArray::multiSelectLEDHandler(){
   for (int i=0; i < 16; i++){
-    if (globalObj->multiSelection[getNote(i)] && blinkTimer > 3000000/min_max(globalObj->tempoX100,50,500)){
+    if (globalObj->multiSelection[getNote(i)] && blinkTimer < 3000000 / globalObj->tempoX100){
       leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
     } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType != 0){
       leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));

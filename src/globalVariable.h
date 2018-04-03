@@ -107,6 +107,8 @@ class GlobalVariable {
     bool chainModeActive;
     bool chainModeCountSwitch;
 
+    bool waitingToResetAfterPatternLoad;
+    bool patternLoadOperationInProgress;
     uint8_t songIndex;
     uint8_t chainModeMasterPattern;
     uint8_t chainModeIndex;
@@ -128,6 +130,7 @@ class GlobalVariable {
     void initialize(ADC *adc);
     void initGlobals();
     void initSongData();
+    uint8_t convertBoolToByte(bool ch1, bool ch2, bool ch3, bool ch4);
 
 
   private:

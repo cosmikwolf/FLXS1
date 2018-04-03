@@ -54,7 +54,8 @@ public:
   void inputLoopTest();
   void inputRead();
   void flashMemoryStaggeredLoadLoop();
-  
+  void sequenceArrayResetSequence(uint8_t channel);
+
   uint16_t calibMidscale(uint8_t mapAddress);
   uint16_t voltageOffset(uint8_t volts, uint8_t mapAddress);
 

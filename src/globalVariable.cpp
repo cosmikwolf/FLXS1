@@ -47,6 +47,8 @@ void GlobalVariable::initialize(ADC *adc){
       for(int channel=0; channel<4; channel++){
         this->channelResetSwich[channel] = 0;
       }
+      this->waitingToResetAfterPatternLoad = false;
+      this->patternLoadOperationInProgress = false;
 
       this->patternChangeTrigger = PATTERN_CHANGE_IMMEDIATE;
       for(int pattern=0; pattern<16; pattern++){
@@ -82,6 +84,7 @@ void GlobalVariable::initialize(ADC *adc){
        this->initSongData();
        this->initGlobals();
     }
+
 void GlobalVariable::initSongData(){
   this->songIndex = 0;
   for(int chainNum=0; chainNum< CHAIN_COUNT_MAX; chainNum++){
@@ -136,6 +139,15 @@ void GlobalVariable::setClockPortDirection(bool direction){
     digitalWriteFast(CLOCK_PIN, HIGH);
     pinMode(CLOCK_PIN, INPUT);
   }
+}
+
+uint8_t GlobalVariable::convertBoolToByte(bool ch1, bool ch2, bool ch3, bool ch4){
+  uint8_t returnValue = 0;
+  returnValue |= ch1 << 0;
+  returnValue |= ch2 << 1;
+  returnValue |= ch3 << 2;
+  returnValue |= ch4 << 3;
+  return returnValue;
 }
 
 int GlobalVariable::generateRandomNumber(int minVal, int maxVal){

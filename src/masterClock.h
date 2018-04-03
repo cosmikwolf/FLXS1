@@ -45,7 +45,7 @@ public:
   elapsedMicros masterDebugTimer;
   boolean pulseTrigger;
   boolean displayRunSwitch;
-  bool staggeredLoadRunSwitch;
+  bool clearedToRunLoadOperation;
   // uint32_t beatLength;
   uint8_t gateMap[4];
   uint8_t dacCvMap[4];
