@@ -119,7 +119,7 @@ private:
   uint8_t staggeredLoadTargetPattern;
   uint8_t staggerLoadChannelSelector;
   elapsedMicros saveTimer;
-  uint8_t staggeredLoadCounter;
+  uint8_t staggeredLoadChannelSelector;
 
   OutputController* outputControl;
 

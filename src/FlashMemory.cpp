@@ -896,23 +896,28 @@ int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
 
 void FlashMemory::staggeredLoadLoop(){  //staggers loading of each channel between iterations of masterClock, so that gate has less jitter during load process
   if(globalObj->patternLoadOperationInProgress){
-    Serial.println("beginning staggered load " + String(staggerLoadChannelSelector, BIN) );
+    // Serial.println("beginning staggered load " + String(staggerLoadChannelSelector, BIN) );
       for(int i = 0; i<4; i++){
-       if( !(staggerLoadChannelSelector & (1 << staggeredLoadCounter) ) ){
-        Serial.println("skipping channel " + String(staggeredLoadCounter) );
-        staggeredLoadCounter++; // if channel is not selected to be loaded, skip to the next channel!
-        if (staggeredLoadCounter >= SEQUENCECOUNT){ goto ENDLOAD; }
+       if( !(staggerLoadChannelSelector & (1 << staggeredLoadChannelSelector) ) ){
+        // Serial.println("skipping channel " + String(staggeredLoadChannelSelector) );
+        staggeredLoadChannelSelector++; // if channel is not selected to be loaded, skip to the next channel!
+        if (staggeredLoadChannelSelector >= SEQUENCECOUNT){ goto ENDLOAD; }
        }
       }
-    Serial.println(String(millis()) + " \tloading channel " + String(staggeredLoadCounter) );
-    this->loadSingleChannel(staggeredLoadCounter, staggeredLoadTargetPattern, true);
-    staggeredLoadCounter++;
+    // Serial.println(String(millis()) + " \tloading channel " + String(staggeredLoadChannelSelector) );
+    if(globalObj->chainModeActive && globalObj->chainChannelMute[staggeredLoadChannelSelector][globalObj->chainModeIndex]){
+      // Serial.println("initializing channel " + String(staggeredLoadChannelSelector) + " on pattern " + String(staggeredLoadChannelSelector));
+      sequenceArray[staggeredLoadChannelSelector].initNewSequence(staggeredLoadTargetPattern, staggeredLoadChannelSelector);
+    } else {
+      this->loadSingleChannel(staggeredLoadChannelSelector, staggeredLoadTargetPattern, true);
+    }
+    staggeredLoadChannelSelector++;
   };
   ENDLOAD:
 
-  if (staggeredLoadCounter >= SEQUENCECOUNT){
+  if (staggeredLoadChannelSelector >= SEQUENCECOUNT){
     globalObj->patternLoadOperationInProgress = false;
-    staggeredLoadCounter = 0;
+    staggeredLoadChannelSelector = 0;
     currentPattern = staggeredLoadTargetPattern;
     // Serial.println("save complete: " + String(this->saveTimer));
   }
@@ -947,7 +952,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
   globalObj->waitingToResetAfterPatternLoad = true;
   this->saveTimer = 0;
   this->staggeredLoadTargetPattern = pattern;
-  this->staggeredLoadCounter = 0;
+  this->staggeredLoadChannelSelector = 0;
   this->staggerLoadChannelSelector = channelSelector;
 }
 

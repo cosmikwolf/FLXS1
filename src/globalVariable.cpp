@@ -90,12 +90,12 @@ void GlobalVariable::initSongData(){
   for(int chainNum=0; chainNum< CHAIN_COUNT_MAX; chainNum++){
     for(int channel=0; channel<4; channel++){
       this->chainChannelSelect[channel][chainNum] = 1; //channel, chain index
+      this->chainChannelMute[channel][chainNum] = 0; //channel, chain index
     }
     this->chainModeCount[chainNum] = 0;
     this->chainPatternSelect[chainNum] = 0;
     this->chainPatternRepeatCount[chainNum] = 0;
     this->chainModeMasterChannel[chainNum] = 0;
-
   }
   this->chainPatternRepeatCount[0] = 1;
   this->chainModeCountSwitch = 0;

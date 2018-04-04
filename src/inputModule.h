@@ -93,6 +93,8 @@ public:
   uint8_t buttonMode;
   uint8_t lastselectedStep;
   elapsedMillis selectedStepTimer;
+  elapsedMillis buttonHoldTimer;
+  uint8_t       heldButton;
   // Encoder vars
   int8_t knobRead;
   int8_t knobBuffer;

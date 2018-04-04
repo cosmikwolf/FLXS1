@@ -63,7 +63,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("beta17q");
+  oled.println("beta17r");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -589,7 +589,9 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
 
   if ( refresh ) {
-    if ( (((highlight == stepMode) ) && !globalObj->parameterSelect) || forceHighlight)  {
+    if ( (((highlight == stepMode) ) && !globalObj->parameterSelect)
+    || forceHighlight
+    || ((currentMenu == MENU_PATTERN_CHAIN) && (highlight == globalObj->chainSelectedPattern) && !globalObj->parameterSelect) )  {
       color1 = color;
       color2 = bgColor;
     } else {
@@ -646,7 +648,8 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
     oled.setTextColor(color1);
     oled.print(displayElement[index]);
-    if ((globalObj->parameterSelect && highlight == stepMode) || border){
+    if ((globalObj->parameterSelect && highlight == stepMode) || border ||
+    (( (currentMenu == MENU_PATTERN_CHAIN) && (highlight == globalObj->chainSelectedPattern)) && globalObj->parameterSelect)  ){
       oled.drawRect(x,y,w,h, color1);
     }
 
@@ -725,9 +728,9 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   String gateTypeArray[] = { "off", "on", "tie","1hit" };
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "pt:%02d> %02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1));
+    sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1));
   } else {
-    sprintf(buf, "ch%d ptn%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    sprintf(buf, "ch%d pt%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
   }
   displayElement[2] = strdup(buf);
 
@@ -2167,17 +2170,23 @@ void DisplayModule::patternChainMenuHandler(){
       sprintf(buf, "------");
     } else {
       if(globalObj->chainPatternRepeatCount[patternChainIndex] > 0){
-        sprintf(buf, "%s%02d: %02d %s%s%s%s %02dx",
+        sprintf(buf, "%s%02d:%02d %02dx %s%s%s%s",
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
         patternChainIndex+1,
         globalObj->chainPatternSelect[patternChainIndex]+1,
-
-        
-        globalObj->chainChannelSelect[0][patternChainIndex] ? "1" : "_",
-        globalObj->chainChannelSelect[1][patternChainIndex] ? "2" : "_",
-        globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_" ,
-        globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_",
-        globalObj->chainPatternRepeatCount[patternChainIndex] );
+        globalObj->chainPatternRepeatCount[patternChainIndex],
+        (globalObj->chainModeMasterChannel[patternChainIndex] == 0) ? "k" :
+          (globalObj->chainChannelMute[0][patternChainIndex] ? "m" :
+            (globalObj->chainChannelSelect[0][patternChainIndex] ? "1" : "_")),
+        (globalObj->chainModeMasterChannel[patternChainIndex] == 1) ? "k" :
+          (globalObj->chainChannelMute[1][patternChainIndex] ? "m" :
+            (globalObj->chainChannelSelect[1][patternChainIndex] ? "2" : "_")),
+        (globalObj->chainModeMasterChannel[patternChainIndex] == 2) ? "k" :
+          (globalObj->chainChannelMute[2][patternChainIndex] ? "m" :
+            (globalObj->chainChannelSelect[2][patternChainIndex] ? "3" : "_")),
+        (globalObj->chainModeMasterChannel[patternChainIndex] == 3) ? "k" :
+          (globalObj->chainChannelMute[3][patternChainIndex] ? "m" :
+            (globalObj->chainChannelSelect[3][patternChainIndex] ? "4" : "_")) );
       } else if(globalObj->chainPatternRepeatCount[patternChainIndex] == 0){
         sprintf(buf, "%s%02d: repeat song",
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
@@ -2200,12 +2209,12 @@ void DisplayModule::patternChainMenuHandler(){
 
 //  displayElement[6] = strdup("shift-pgup to toggle help");
 
-  displayElement[5] = strdup("event pattern channels count");
+  displayElement[5] = strdup("event pattern count channels");
 
   uint8_t yindex = 30;
   uint8_t yoffset = 16;
-
-  bool highlightBool;
+  uint8_t chainIndex = 0;
+  //bool highlightBool;
   //renderStringBox(6,  DISPLAY_LABEL,  0,               14, 128, 15, false, REGULAR1X, background , contrastColor);
 
   renderStringBox(5,  DISPLAY_LABEL,  0,              20 , 128, 15, false, REGULAR1X, background , contrastColor);
@@ -2221,14 +2230,14 @@ void DisplayModule::patternChainMenuHandler(){
   }
 
 
-  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
-  renderStringBox(1,  DISPLAY_LABEL,  0, yindex+0*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
-  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
-  renderStringBox(2,  DISPLAY_LABEL,  0, yindex+1*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
-  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
-  renderStringBox(3,  DISPLAY_LABEL,  0, yindex+2*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
-  highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
-  renderStringBox(4,  DISPLAY_LABEL,  0, yindex+3*yoffset, 128, 15, false, STYLE1X, background , contrastColor, highlightBool);
+  //highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
+  renderStringBox(1,  chainIndexOffset+chainIndex++,  0, yindex+0*yoffset, 127, 16, false, STYLE1X, background , contrastColor); //, highlightBool);
+  //highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
+  renderStringBox(2,  chainIndexOffset+chainIndex++,  0, yindex+1*yoffset, 127, 16, false, STYLE1X, background , contrastColor); //, highlightBool);
+  //highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
+  renderStringBox(3,  chainIndexOffset+chainIndex++,  0, yindex+2*yoffset, 127, 16, false, STYLE1X, background , contrastColor); //, highlightBool);
+  //highlightBool = (chainIndexOffset == globalObj->chainSelectedPattern); chainIndexOffset++;
+  renderStringBox(4,  chainIndexOffset+chainIndex++,  0, yindex+3*yoffset, 127, 16, false, STYLE1X, background , contrastColor); //, highlightBool);
 };
 
 

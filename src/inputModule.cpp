@@ -873,11 +873,31 @@ void InputModule::patternChainInputHandler(){
       case 2: channelSwitch = SW_CH2; break;
       case 3: channelSwitch = SW_CH3; break;
     }
-    if (midplaneGPIO->fell(channelSwitch)){
-      globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] = !globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern];
+    if(midplaneGPIO->fell(channelSwitch)){
+      buttonHoldTimer = 0;
+      heldButton = channelSwitch;
+      if(channel != globalObj->chainModeMasterChannel[globalObj->chainSelectedPattern] ){
+        if(globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] && !globalObj->chainChannelMute[channel][globalObj->chainSelectedPattern] ){
+          globalObj->chainChannelMute[channel][globalObj->chainSelectedPattern] = 1;
+          globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] = 1;
+        } else if( globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] && globalObj->chainChannelMute[channel][globalObj->chainSelectedPattern] ){
+          globalObj->chainChannelMute[channel][globalObj->chainSelectedPattern] = 0;
+          globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] = 0;
+        } else {
+          globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] = 1;
+          globalObj->chainChannelMute[channel][globalObj->chainSelectedPattern] = 0;
+        }
+      }
+    }
+    if(midplaneGPIO->pressed(channelSwitch)){
+      if ((buttonHoldTimer > 500) && (heldButton = channelSwitch)){
+        globalObj->chainModeMasterChannel[globalObj->chainSelectedPattern] = channel;
+        globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] = true;
+        globalObj->chainChannelMute[channel][globalObj->chainSelectedPattern] = 0;
+        heldButton = 255;
+      }
     }
   }
-
 }
 
 
