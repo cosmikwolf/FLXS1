@@ -104,9 +104,18 @@ void MidiModule::midiClockPulseHandler(){
     }
     midiClockCount = (midiClockCount +1) % MIDI_PULSE_COUNT;
 
+    globalObj->chainModeMasterPulseToGo--;
+    if((globalObj->chainModeMasterPulseToGo <= 0) && globalObj->waitingToResetAfterPatternLoad){
+      for (int i=0; i< SEQUENCECOUNT; i++){
+        sequenceArray[i].clockReset(true);
+      }
+      globalObj->waitingToResetAfterPatternLoad = false;
+    }
+
     for (int i=0; i< SEQUENCECOUNT; i++){
       sequenceArray[i].ppqPulse(MIDI_PULSE_COUNT);
     }
+
   }
 
 }

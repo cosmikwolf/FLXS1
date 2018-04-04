@@ -304,6 +304,7 @@ void MasterClock::checkGateClock(){
 }
 
 void MasterClock::externalClockTick(uint8_t gateNum){
+	clearedToRunLoadOperation = true;
 
 	checkGateClock();
 
@@ -320,10 +321,17 @@ void MasterClock::externalClockTick(uint8_t gateNum){
 
 		if (gateTrig[gateNum]){
 			//Serial.print("PPQPULSE: ");
+			globalObj->chainModeMasterPulseToGo--;
+			if((globalObj->chainModeMasterPulseToGo <= 0) && globalObj->waitingToResetAfterPatternLoad){
+				for (int i=0; i< SEQUENCECOUNT; i++){
+					sequenceArray[i].clockReset(true);
+				}
+				globalObj->waitingToResetAfterPatternLoad = false;
+			}
 			for (int i=0; i< SEQUENCECOUNT; i++){
 				sequenceArray[i].ppqPulse(4);
-				//sequenceArray[i].ppqPulse(4);
 			}
+
 		}
 
 		if(globalObj->gateInputRaw[gateNum] == 1){
@@ -393,6 +401,7 @@ void MasterClock::internalClockTick(){
 
 void MasterClock::midiClockTick(){
   // ext clock sync
+	clearedToRunLoadOperation = true;
 
 	  for (int i=0; i< SEQUENCECOUNT; i++){
 			sequenceArray[i].runSequence();
