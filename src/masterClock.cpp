@@ -381,11 +381,11 @@ void MasterClock::internalClockTick(){
 				sequenceArray[i].clockReset(true);
 			}
 			globalObj->waitingToResetAfterPatternLoad = false;
-			} else {
-			for (int i=0; i< SEQUENCECOUNT; i++){
-				sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
-			}
 		}
+		for (int i=0; i< SEQUENCECOUNT; i++){
+			sequenceArray[i].ppqPulse(INTERNAL_PPQ_COUNT);
+		}
+
 		pulseTrigger = 0;
   }
 
