@@ -583,6 +583,13 @@ void FlashMemory::serializeSongData(char* fileBuffer){
       songDataElement.add(globalObj->chainChannelSelect[3][chainNum]);
       songDataElement.add(globalObj->chainPatternSelect[chainNum]);
       songDataElement.add(globalObj->chainPatternRepeatCount[chainNum]);
+      songDataElement.add(globalObj->chainModeMasterChannel[chainNum]);
+      songDataElement.add(globalObj->chainChannelMute[0][chainNum]);
+      songDataElement.add(globalObj->chainChannelMute[1][chainNum]);
+      songDataElement.add(globalObj->chainChannelMute[2][chainNum]);
+      songDataElement.add(globalObj->chainChannelMute[3][chainNum]);
+
+
       // Serial.println("Saving song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]));
     }
   }
@@ -613,6 +620,13 @@ bool FlashMemory::deserializeSongData(char* json){
       globalObj->chainChannelSelect[3][chainNum]    = jsonReader["songs"][songNum][chainNum+1][3];
       globalObj->chainPatternSelect[chainNum]       = jsonReader["songs"][songNum][chainNum+1][4];
       globalObj->chainPatternRepeatCount[chainNum]  = jsonReader["songs"][songNum][chainNum+1][5];
+      if(jsonReader["songs"][songNum].size() > 6){
+        globalObj->chainModeMasterChannel[chainNum] = jsonReader["songs"][songNum][chainNum+1][6];
+        globalObj->chainChannelMute[0][chainNum]    = jsonReader["songs"][songNum][chainNum+1][7];
+        globalObj->chainChannelMute[1][chainNum]    = jsonReader["songs"][songNum][chainNum+1][8];
+        globalObj->chainChannelMute[2][chainNum]    = jsonReader["songs"][songNum][chainNum+1][9];
+        globalObj->chainChannelMute[3][chainNum]    = jsonReader["songs"][songNum][chainNum+1][10];
+      }
       // Serial.println("loading song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]) + "\trepeat: " + String(globalObj->chainPatternRepeatCount[chainNum]));
     }
   }
