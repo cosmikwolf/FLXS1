@@ -735,7 +735,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   displayElement[2] = strdup(buf);
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "to go:%02dx", globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] - globalObj->chainModeCount[globalObj->chainModeIndex]);
+    sprintf(buf, "ch%01d->%02dx",globalObj->chainModeMasterChannel[globalObj->chainModeIndex]+1, globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] - globalObj->chainModeCount[globalObj->chainModeIndex]);
   } else {
     sprintf(buf, "stp:%02d-%02d",   notePage*16+1, (notePage+1)*16 );
   }
@@ -2197,7 +2197,7 @@ void DisplayModule::patternChainMenuHandler(){
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
         patternChainIndex+1);
       } else {
-        sprintf(buf, "%s%02d: %02d jump %02dx",
+        sprintf(buf, "%s%02d:%02d %02dx jump",
         patternChainIndex == globalObj->chainModeIndex ? ">" : "-",
         patternChainIndex+1,
         globalObj->chainPatternSelect[patternChainIndex],
