@@ -65,11 +65,11 @@ void Sequencer::clockReset(bool activeStepReset){
   //lastStepOffset = 0;
   //firstPulse = 1;
   if(channel == 0 ){
-    Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(currentFrame) + "\tactiveStep: " + String(activeStep)
+    // Serial.println("Ch " + String(channel) + " reset " + "\tcurrentFrame: " + String(currentFrame) + "\tactiveStep: " + String(activeStep)
    //  + "\tppqPulseIndex: " + String(ppqPulseIndex) + "\tframesPerPulse: " + String(framesPerPulse) + "\tframesPerSeq: " + String(framesPerSequence())
    //  + "\tfpp: " + String(framesPerPulse) + "\tavgCPP: " + String(avgClocksPerPulse) + "\lastClockValue: " + String(lastPulseClockCount)
    // currentFrame = (ppqPulseIndex * framesPerPulse % framesPerSequence() ) + (framesPerPulse * clockCount / avgClocksPerPulse)
-  );
+  // );
     // Serial.println("reset --------------------------------------------");
   }
 

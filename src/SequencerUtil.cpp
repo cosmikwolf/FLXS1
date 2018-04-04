@@ -492,7 +492,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	}
 
-///*
+/*
 	Serial.println(
 	"millis: " + String(millis()) +
 	"\tstepNum: " + String(stepNum) +
@@ -506,7 +506,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
   //"\tgetStepLength: " + String(getStepLength()) +
  	"\tarptype: "  + String(stepData[stepNum].arpType)
 );
-//*/
+*/
 
   //DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) );
 
@@ -519,7 +519,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 		stepData[stepNum].arpStatus++;
 	} else {
-		Serial.println("Prevented note from playing ch:" + String(channel) + "\tstep: " + String(stepNum) + "\t"+ String(globalObj->chainModeMasterPulseToGo));
+		// Serial.println("Prevented note from playing ch:" + String(channel) + "\tstep: " + String(stepNum) + "\t"+ String(globalObj->chainModeMasterPulseToGo));
 	}
 
 	//ensuring that gate is turned off before next step:

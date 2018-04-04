@@ -254,7 +254,7 @@ void MasterClock::songAndPatternLogic(){
 							globalObj->chainChannelSelect[1][globalObj->chainModeIndex],
 							globalObj->chainChannelSelect[2][globalObj->chainModeIndex],
 							globalObj->chainChannelSelect[3][globalObj->chainModeIndex]);
-							Serial.println(String(millis()) + "\tqueuing pattern " + String(globalObj->chainModeIndex));
+							// Serial.println(String(millis()) + "\tqueuing pattern " + String(globalObj->chainModeIndex));
 
 	        }
 	      }
@@ -264,15 +264,18 @@ void MasterClock::songAndPatternLogic(){
 
 	  }
 
-		if ((globalObj->patternChangeTrigger == globalObj->chainModeMasterChannel[globalObj->chainModeIndex] + 1)&&(globalObj->queuePattern != 255) ){
+		// if ((globalObj->patternChangeTrigger == globalObj->chainModeMasterChannel[globalObj->chainModeIndex] + 1)&&(globalObj->queuePattern != 255) ){
+		if (globalObj->queuePattern != 255){
 		//  Serial.println("changed sequence with ch" + String(channel));
 			outputControl->flashMemoryLoadPattern(globalObj->queuePattern, globalObj->patternChannelSelector);
-			globalObj->chainModeMasterPulseToGo = sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex]].pulsesRemaining;
+			 // get the pulses remaining from the previous chain mode index, since it has already been incremented
+			globalObj->chainModeMasterPulseToGo = sequenceArray[globalObj->chainModeMasterChannel[globalObj->chainModeIndex-1]].pulsesRemaining;
 			globalObj->patternLoadOperationInProgress = true;
 			globalObj->waitingToResetAfterPatternLoad = true;
-			Serial.println("pulses to go: " + String(globalObj->chainModeMasterPulseToGo));
 			globalObj->queuePattern = 255; //reset queue pattern so it doesn't get continously retriggered
 			// activeStepReset = true;
+
+			// Serial.println("Triggering pattern change index: " + String(globalObj->chainModeIndex) + "\tmaster channel: " + String(globalObj->chainModeMasterChannel[globalObj->chainModeIndex]) + "\tpulses2g: " + String(globalObj->chainModeMasterPulseToGo));
 		}
 
 	}
