@@ -99,10 +99,15 @@ void LEDArray::patternChainLEDHandler(){
   }
 
   for (int channel=0; channel < 4; channel++){
-    if(globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] == true){
-      leds.setPixelColor(ledChannelButtons[channel], 0, 0,0,255);
+    if(globalObj->chainModeMasterChannel[globalObj->chainSelectedPattern] == channel) {
+      leds.setPixelColor(ledChannelButtons[channel], wheel(int(millis()/10)%255, 255) );
     } else {
-      leds.setPixelColor(ledChannelButtons[channel], 0, 0,0,10);
+      if(globalObj->chainChannelSelect[channel][globalObj->chainSelectedPattern] == true){
+        leds.setPixelColor(ledChannelButtons[channel], 0, 0,0,200);
+      } else {
+        leds.setPixelColor(ledChannelButtons[channel], 0, 0,0,10);
+      }
+
     }
   }
 
