@@ -114,6 +114,10 @@ class GlobalVariable {
     uint8_t chainModeIndex;
     uint8_t chainModeMasterChannel[16];
     uint8_t chainModeCount[16];
+    uint8_t fastChainPatternSelect[16];
+    uint8_t fastChainModePatternCount;
+    uint8_t fastChainModeCurrentIndex;
+    bool settingFastChain;
     bool    chainChannelSelect[4][16]; //channel, chain index
     bool    chainChannelMute[4][16];
     uint8_t chainPatternSelect[16];

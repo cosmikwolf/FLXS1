@@ -943,7 +943,6 @@ void FlashMemory::loadSingleChannel(uint8_t channel, uint8_t pattern, bool suspe
   } else if (readJsonReturn == 2) {
     //Serial.("READ JSON ERROR - info above");
   }
-
 }
 
 void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {

@@ -31,6 +31,7 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   this->display = display;
   this->shortcutRandomOctaveSpan = 2;
   this->shortcutRandomSwitch = 5000;
+  this->heldButton = 255;
 
   midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
 
@@ -555,18 +556,49 @@ void InputModule::patternSelectHandler(){
     globalObj->patternChangeTrigger = min_max(globalObj->patternChangeTrigger + knobChange, 0, 4);
   }
   for (int i=0; i < 16; i++){
-    if (midplaneGPIO->rose(i)){
-      if(globalObj->playing){
-        saveFile->changePattern(i, globalObj->patternChannelSelector, globalObj->patternChangeTrigger);
-      } else {
-        saveFile->changePattern(i, globalObj->patternChannelSelector, 0);
+    if (midplaneGPIO->fell(i)){
+      if(heldButton == 255){
+        heldButton = i;
+        globalObj->fastChainModePatternCount = 0;
+        globalObj->fastChainModeCurrentIndex = 0;
       }
-      //delay(10);
-      changeState(STATE_PITCH0);
+      if (midplaneGPIO->pressed(heldButton)){
+        if(globalObj->fastChainModePatternCount < 16){
+          globalObj->fastChainPatternSelect[globalObj->fastChainModePatternCount] = i;
+          globalObj->fastChainModePatternCount++;
+        }
+      } else {
+        heldButton = 255; //if the first held button is pressed
+      }
+      Serial.println("fell heldbutton: " + String(heldButton) + "\tpatternCount: " + String(globalObj->fastChainModePatternCount) + "\tcurrentIndex: " + String(globalObj->fastChainModeCurrentIndex));
+
+    }
+  }
+  for (int i=0; i < 16; i++){
+    if (midplaneGPIO->rose(i)){
+      if(heldButton == i){
+        heldButton = 255;
+        if( globalObj->fastChainModePatternCount > 0 ){
+          for(int n =0; n<16; n++){
+            if (midplaneGPIO->pressed(n)){
+              heldButton = n;
+            }
+          }
+        }
+      }
+      if( globalObj->fastChainModePatternCount <= 1 ){// if pattern chain is not happening, then simply change the pattern
+        if(globalObj->playing){
+          saveFile->changePattern(i, globalObj->patternChannelSelector, globalObj->patternChangeTrigger);
+        } else {
+          saveFile->changePattern(i, globalObj->patternChannelSelector, 0);
+        }
+        changeState(STATE_PITCH0);
+      }
+      Serial.println("rose heldbutton: " + String(heldButton) + "\tpatternCount: " + String(globalObj->fastChainModePatternCount) + "\tcurrentIndex: " + String(globalObj->fastChainModeCurrentIndex));
+
     }
   }
 //  changeState(STATE_PITCH0);
-
 }
 
 void InputModule::tempoMenuHandler(){
@@ -821,6 +853,8 @@ void InputModule::patternChainInputHandler(){
     if(!globalObj->chainModeActive){
      saveFile->changePattern(globalObj->chainPatternSelect[globalObj->chainModeIndex], globalObj->patternChannelSelector, 0);
      globalObj->chainModeActive = 1;
+     globalObj->fastChainModePatternCount = 0;
+     globalObj->queuePattern = 255;
      globalObj->chainModeCount[globalObj->chainModeIndex] = 0;
     }
 
@@ -1119,6 +1153,7 @@ void InputModule::altButtonPatternHandler(){
         globalObj->multiSelectSwitch = 0;
         midplaneGPIO->clearBuffers();
         changeState(STATE_PATTERNSELECT);
+        heldButton == 255;
       break;
     }
 }

@@ -605,7 +605,7 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
 
     switch(textSize){
       case REGULARSPECIAL:
-        oled.drawRect(x,y,w,h, color1);
+        oled.drawRect(x,y,w,h, color2);
         oled.setCursor(x+w/2, y+h/2, REL_XY);//now draw text in the middle of the rect
         oled.setFont(&a04b03);
         oled.setTextScale(1);
@@ -728,7 +728,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   String gateTypeArray[] = { "off", "on", "tie","1hit" };
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1));
+    sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);
   } else {
     sprintf(buf, "ch%d pt%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
   }
@@ -1475,11 +1475,7 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
    //renderStringBox(10,  STATE_SKIPSTEP,    90,   79,  37,16, false, STYLE1X, background , foreground);
    //renderStringBox(9,  DISPLAY_LABEL,      0,   79,  64,16, false, STYLE1X, background , foreground);
    //renderStringBox(10,  STATE_GLIDEMOD,   96,   79,  32,16, false, STYLE1X, background , foreground);
-
-
  };
-
-
 
  void DisplayModule::patternSelectDisplay(){
 
@@ -1488,33 +1484,44 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
   uint8_t dispSelector;
 
   for(int pattern=0; pattern<16; pattern++){
-    dispSelector = 0;
-    for(int channel=0; channel<4; channel++){
-      if(globalObj->savedSequences[channel][pattern]){
-        dispSelector |= 1 << channel;
+    if(globalObj->fastChainModePatternCount > 1){
+      if(globalObj->fastChainModePatternCount > pattern){
+        sprintf(buf, "pt%d >", globalObj->fastChainPatternSelect[pattern]+1);
+      } else {
+        sprintf(buf, "--" );
       }
-     }
-     switch(dispSelector){
-       case 0b0000: sprintf(buf, "empty" ); break;
-       case 0b0001: sprintf(buf, "1___" ); break;
-       case 0b0010: sprintf(buf, "_2__" ); break;
-       case 0b0011: sprintf(buf, "12__" ); break;
-       case 0b0100: sprintf(buf, "__3_" ); break;
-       case 0b0101: sprintf(buf, "1_3_" ); break;
-       case 0b0110: sprintf(buf, "_23_" ); break;
-       case 0b0111: sprintf(buf, "123_" ); break;
-       case 0b1000: sprintf(buf, "___4" ); break;
-       case 0b1001: sprintf(buf, "1__4" ); break;
-       case 0b1010: sprintf(buf, "_2_4" ); break;
-       case 0b1011: sprintf(buf, "12_4" ); break;
-       case 0b1100: sprintf(buf, "__34" ); break;
-       case 0b1101: sprintf(buf, "1_34" ); break;
-       case 0b1111: sprintf(buf, "1234" ); break;
-     }
+    } else {
+      dispSelector = 0;
+      for(int channel=0; channel<4; channel++){
+        if(globalObj->savedSequences[channel][pattern]){
+          dispSelector |= 1 << channel;
+        }
+       }
+       switch(dispSelector){
+         case 0b0000: sprintf(buf, "empty" ); break;
+         case 0b0001: sprintf(buf, "1___" ); break;
+         case 0b0010: sprintf(buf, "_2__" ); break;
+         case 0b0011: sprintf(buf, "12__" ); break;
+         case 0b0100: sprintf(buf, "__3_" ); break;
+         case 0b0101: sprintf(buf, "1_3_" ); break;
+         case 0b0110: sprintf(buf, "_23_" ); break;
+         case 0b0111: sprintf(buf, "123_" ); break;
+         case 0b1000: sprintf(buf, "___4" ); break;
+         case 0b1001: sprintf(buf, "1__4" ); break;
+         case 0b1010: sprintf(buf, "_2_4" ); break;
+         case 0b1011: sprintf(buf, "12_4" ); break;
+         case 0b1100: sprintf(buf, "__34" ); break;
+         case 0b1101: sprintf(buf, "1_34" ); break;
+         case 0b1111: sprintf(buf, "1234" ); break;
+       }
+    }
      displayElement[pattern]  = strdup(buf);
    }
-
-  displayElement[16] = strdup("PATTERN SELECT");
+   if(globalObj->fastChainModePatternCount > 1){
+     displayElement[16] = strdup("CHAIN MODE");
+   } else {
+     displayElement[16] = strdup("PATTERN SELECT");
+   }
   sprintf(buf, "current: %02d", currentPattern );
   sprintf(buf, "ch1:%02d ch2:%02d ch3:%02d ch4:%02d ", sequenceArray[0].pattern+1,sequenceArray[1].pattern+1, sequenceArray[2].pattern+1, sequenceArray[3].pattern+1 );
 
@@ -1541,23 +1548,30 @@ if (sequenceArray[selectedChannel].cv_glidemod < 4){
   uint8_t yoffset = 12;
   uint8_t x = 3;
   uint8_t xoffset = 30;
+  uint8_t xoffset1 = 32;
   uint16_t colorA;
   uint16_t colorB;
-  renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 8, false, STYLE1X, BLACK, LIGHTGREY);
+  if(globalObj->fastChainModePatternCount > 1){
+    renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 16, false, STYLE1X,  LIGHTGREY, BLACK);
+  } else {
+    renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 16, false, STYLE1X, BLACK, LIGHTGREY);
+  }
 
   renderStringBox(21,  DISPLAY_LABEL,      0,   28,  53,16, false, STYLE1X, BLACK , LIGHTGREY);
   renderStringBox(22,  STATE_ARPTYPEMOD,  54,   28,  74,16, false, STYLE1X, LIGHTGREY , BLACK );
 
   if(globalObj->patternChannelSelector & 0b0001){ colorA = BLACK; colorB = LIGHTGREY; } else {colorA = LIGHTGREY; colorB = BLACK;};
-  renderStringBox(17, DISPLAY_LABEL, x+0*xoffset, 16, 31 ,10, false, REGULARSPECIAL, colorB, colorA);
+  renderStringBox(17, DISPLAY_LABEL, 0*xoffset1, 16, 32 ,12, false, REGULARSPECIAL, colorB, colorA);
   if(globalObj->patternChannelSelector & 0b0010){ colorA = BLACK; colorB = LIGHTGREY; } else {colorA = LIGHTGREY; colorB = BLACK;};
-  renderStringBox(18, DISPLAY_LABEL, x+1*xoffset, 16, 31 ,10, false, REGULARSPECIAL, colorB, colorA);
+  renderStringBox(18, DISPLAY_LABEL, 1*xoffset1, 16, 32 ,12, false, REGULARSPECIAL, colorB, colorA);
   if(globalObj->patternChannelSelector & 0b0100){ colorA = BLACK; colorB = LIGHTGREY; } else {colorA = LIGHTGREY; colorB = BLACK;};
-  renderStringBox(19, DISPLAY_LABEL, x+2*xoffset, 16, 31 ,10, false, REGULARSPECIAL, colorB, colorA);
+  renderStringBox(19, DISPLAY_LABEL, 2*xoffset1, 16, 32 ,12, false, REGULARSPECIAL, colorB, colorA);
   if(globalObj->patternChannelSelector & 0b1000){ colorA = BLACK; colorB = LIGHTGREY; } else {colorA = LIGHTGREY; colorB = BLACK;};
-  renderStringBox(20, DISPLAY_LABEL, x+3*xoffset, 16, 31 ,10, false, REGULARSPECIAL, colorB, colorA);
+  renderStringBox(20, DISPLAY_LABEL, 3*xoffset1, 16, 32 ,12, false, REGULARSPECIAL, colorB, colorA);
 
   x = 3;
+  uint8_t textType;
+  if(globalObj->fastChainModePatternCount > 1){ textType = REGULARSPECIAL; } else { textType = STYLE1X; }
   renderStringBox( 0, DISPLAY_LABEL, x+0*xoffset, y+0*yoffset, 31 , 13, false, REGULARSPECIAL, BLACK, ORANGE);
   renderStringBox( 1, DISPLAY_LABEL, x+1*xoffset, y+0*yoffset, 31 , 13, false, REGULARSPECIAL, BLACK, ORANGE);
   renderStringBox( 2, DISPLAY_LABEL, x+2*xoffset, y+0*yoffset, 31 , 13, false, REGULARSPECIAL, BLACK, ORANGE);
@@ -2139,8 +2153,6 @@ void DisplayModule::patternChainHelpHandler(){
   renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, background , contrastColor); i_++;
   renderStringBox(i_+1, DISPLAY_LABEL,  0,  ystart+i_*yplus, 128, 8, false, REGULAR1X, contrastColor, background ); i_++;
 
-
-
 }
 
 void DisplayModule::patternChainMenuHandler(){
@@ -2148,14 +2160,15 @@ void DisplayModule::patternChainMenuHandler(){
   displayElement[0] = strdup("SONG EDIT");
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "pt: %02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternRepeatCount[globalObj->chainModeIndex]+1));
+    sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);
   } else {
     sprintf(buf, "push play" );
   }
   displayElement[7] = strdup(buf);
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "to go: %02dx", globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] - globalObj->chainModeCount[globalObj->chainModeIndex]);
+    sprintf(buf, "ch%01d->%02dx",globalObj->chainModeMasterChannel[globalObj->chainModeIndex]+1, globalObj->chainPatternRepeatCount[globalObj->chainModeIndex] - globalObj->chainModeCount[globalObj->chainModeIndex]);
+
   } else {
     sprintf(buf, "to start" );
   }

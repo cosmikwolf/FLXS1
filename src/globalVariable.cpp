@@ -96,7 +96,11 @@ void GlobalVariable::initSongData(){
     this->chainPatternSelect[chainNum] = 0;
     this->chainPatternRepeatCount[chainNum] = 0;
     this->chainModeMasterChannel[chainNum] = 0;
+    this->fastChainPatternSelect[chainNum] = 0;
   }
+  this->settingFastChain = 0;
+  this->fastChainModePatternCount = 0;
+  this->fastChainModeCurrentIndex = 0;
   this->chainPatternRepeatCount[0] = 1;
   this->chainModeCountSwitch = 0;
   this->chainModeIndex = 0;

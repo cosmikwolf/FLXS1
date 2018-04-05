@@ -27,6 +27,8 @@ public:
   void externalClockTick(uint8_t gateNum);
   void checkGateClock();
   void songAndPatternLogic();
+  void triggerQueuedPattern(uint8_t triggerChannel);
+
   bool masterDebugSwitch;
 
   bool gateTrig[9];
