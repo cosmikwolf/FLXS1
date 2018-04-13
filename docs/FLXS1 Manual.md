@@ -133,7 +133,7 @@ Selecting a step will allow you to begin editing step specific parameters
 The transport menu contains parameters that define how the sequencer advances
 
 | First Step                     | Step Count                                                   | Clock Div                                                    | Direction                                                    | Swing                               |
-| ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ----------------------------------- |
+| ---------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ----------------------------------- |
 | The first step of the sequence | The number of steps the sequence will advance before it resets back to the first step | The division of the main clock time with which this channel will advance | The direction in which the sequencer advances. Can set to Fwd, Rev, Pend, Rand | the amount of swing on this channel |
 
 ###**Quantizer Menu**
