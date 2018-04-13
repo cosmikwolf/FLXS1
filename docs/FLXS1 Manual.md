@@ -89,6 +89,7 @@ Selecting a step will allow you to begin editing step specific parameters
 
 - **Gate** specifies the length that the gate is open when the step is triggered
 - **Type**  specifies the behavior of the gate. 
+
 |                              On                              |                             Tie                              |                             Hold                             |                          **1-Hit**                           |
 | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
 | gate turns on and off normally. Arpeggios are retriggered.gate turns on and off normally. Arpeggios are retriggered. | gate is held open through the next step, and glide is turned on | gate is held open through the end of the step (arpeggio is not retriggered) | gate acts as a trigger, and closes immediately after opening. Arpeggios do not retrigger the gate in this state |
@@ -296,7 +297,6 @@ Many buttons have gold text labels. These are channel button shortcuts. Many sti
 ### **Other Channel Shortcuts**
 
 		**Are not implemented yet! These are coming soon!** 
-
 
 ##Updating Firmware
 
