@@ -1,20 +1,17 @@
-# ZETAOHM FLXS1
-
-![image-20180412215051015](/var/folders/hn/ch6s89_14b1fvg7y7pb4qlyr0000gn/T/abnerworks.Typora/image-20180412215051015.png)
-
-# **USER MANUAL**
+# FLXS1 USER MANUAL
 
 ###### Firmware v18
 
 #### Introduction
 
-```
-Fluxus One is a 4 channel, 64 step sequencer for the Eurorack Modular Synthesizer format. It is designed to provide maximum compositional capabilities with as simple of a user interface as possible in 26 HP. 
-```
+
+> Fluxus One is a 4 channel, 64 step sequencer for the Eurorack Modular Synthesizer format. 
+> It is designed to provide maximum compositional capabilities with as simple of a user interface as possible in 26 HP.
+
 
 ## **Front Panel Layout Overview**
 
-![image-20180412213159969](/var/folders/hn/ch6s89_14b1fvg7y7pb4qlyr0000gn/T/abnerworks.Typora/image-20180412213159969.png)
+![image-20180412213159969](https://www.zetaohm.com/wp-content/uploads/2018/04/FLXS1_Front_PanelOverview.jpg)
 
 #### Interface Elements
 
@@ -104,9 +101,9 @@ Selecting a step will allow you to begin editing step specific parameters
 | the direction of the arpeggio: up, down, up down1, up down 2, random | the speed which the arpeggio will arpeggiate, in relation to step length. You can specify numerator and denominator of the fraction to achieve polyrhythmic arpeggios. | the number of octaves over which the arpeggio will span | the intervals of notes which will be present in the arpeggio |
 
 
-   - ##### **LFO / Env  Settings**
+##### **LFO / Env  Settings**
 
-     - **Type** the type of modulation output that will be sent from **cv#b** on this step
+- **Type** the type of modulation output that will be sent from **cv#b** on this step
 
      |                          Envelopes                           |                           Signals                            |                             LFO                              |                             LFO                              |
      | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
@@ -115,11 +112,11 @@ Selecting a step will allow you to begin editing step specific parameters
      | **Env ar**  - an envelope will rise to the amp voltage, and then slope down to zero | **Quantized Voltage** - A steady quantized voltage will be sent from cv#b |    **Square** - a square wave LFO will be sent from cv#b     | **S+H** - a sample and hold wave LFO will be sent from cv#b  |
      | **Env atta** - an envelope will rise to the amp voltage and then reset to zero. | **Voltage** - A steady unquantized voltage will be sent from cv#b | **RndSq** - a rounded square wave LFO will be sent from cv#b |                                                              |
 
-      - **Amplitude -** Specifies the amplitude of the LFO being sent in volts. Envelopes are unipolar voltages, and LFOs are bipolar voltages
+- **Amplitude -** Specifies the amplitude of the LFO being sent in volts. Envelopes are unipolar voltages, and LFOs are bipolar voltages
 
-     - **Speed -** Specifies the speed of the LFO or envelope. For LFOs, a speed of 64 is 1 wavelength per step. 
+- **Speed -** Specifies the speed of the LFO or envelope. For LFOs, a speed of 64 is 1 wavelength per step. 
 
-      - **Offset -** Specifies a voltage offset added or subtracted to the cv#b output. 
+- **Offset -** Specifies a voltage offset added or subtracted to the cv#b output. 
 
 ## Channel Configuration
 
@@ -174,36 +171,36 @@ The transport menu contains parameters that define how the sequencer advances
 - **Arp Octave** - CV input
 - **Arp Intvl** - CV Input
 
-## **Tempo Menu**
+## Tempo Menu
 
-###**Changing Clock Source**
+### Changing Clock Source
 
 - Highlight the current clock source to change its value. You can select **Internal Clock, Gate Input 1-4, 3.5mm MIDI, or USB MIDI.**
 - External Gate Clock inputs are currently 4ppq. MIDI clock inputs are 24ppq (midi standard)
 
-###**Changing Tempo**
+### Changing Tempo
 
 - If the clock source is set to **Internal Clock** you can change the tempo. Highlight tempo to change it.
 
-###**Reset Input**
+### Reset Input
 
 - There is a reset input which will reset the current sequence when an external gate signal is received. 
 
-###**Tap Tempo**
+### Tap Tempo
 
 - When in the tempo menu, the shift button can be tapped to manually enter a tempo. 
 
-##**Pattern Save, Select and Chain**
+## Pattern Save, Select and Chain
 
 
-###**Press shift-pattern to enter pattern save mode**
+### Press shift-pattern to enter pattern save mode
 
 - The matrix buttons each represent a save slot
 - Matrix buttons that are not highlighted represent empty save slots
 - Pressing the channel buttons will mask the save. If a channel button that channel will not be saved.
 - Press a matrix button to execute the save operation
 
-###**Press the Pattern button to enter pattern select mode**
+### Press the Pattern button to enter pattern select mode
 
 - Again, the matrix buttons represent which slots have saved data in them. The display also shows you which slots have saved data in which channels. If a slot channel has an underscore on the display, that means that specific channel has no data saved. If there is a number in that slot, it means there are steps programmed in that save slot. A slot that is represented by 1__4 means that channels 1 and 4 have saved data in them, while channels 2 and 3 are empty.
 - You can mask the loading operation with the channel buttons. Press a channel button to disable loading that channel.
@@ -211,15 +208,15 @@ The transport menu contains parameters that define how the sequencer advances
 - **Trigger**  - this allows you to set exactly when the saved pattern will be loaded. **Instant** means that the pattern will be loaded as soon as the matrix button is pressed and released. **ch#reset** indicates that the pattern will be loaded when the specified channel next resets. if **ch1reset** is selected, the pattern will change all selected channels when the sequence running on channel 1 ends its current iteration, and resets to the beginning. 
 - To execute a pattern load operation, press a matrix button to select which save slot will be loaded.
 
-###**Fast Chain Mode**
+### Fast Chain Mode
 
 - Pattern select mode has the ability to allow you chain multiple patterns in quick succession.
 - When in pattern select mode, press and hold a matrix button. While holding at least one matrix button down at all times, enter a sequence of patterns you wish to play. You can enter up to 16 patterns in this way, and FLXS1 will play through them in sequence. 
 
-##**Song Mode**
+## Song Mode
 
 
-###**Using Song Mode**
+### Using Song Mode
 
 - To enter song edit menu, press shift-page up.
 
@@ -229,7 +226,7 @@ The transport menu contains parameters that define how the sequencer advances
 	- If sequencer is not currently playing, it will begin playing the song immediately.
 - Pressing stop twice from any menu will disable song mode. 
 
-###**Editing a song**
+### Editing a song
 
 - First, compose a few patterns outside of song mode, and save them into different save slots.
 - Enter song edit menu by pressing **shift-page up**
@@ -251,7 +248,7 @@ After selecting a song event, turning the data encoder will change the event par
 
 
 
-## **Button Shortcuts** 
+## Button Shortcuts
 
 Many buttons have gold text labels. These are channel button shortcuts. Many still have to be implemented properly. The following are currently working. If it is not listed here, the function may not be fully working yet. 
 
@@ -294,11 +291,11 @@ Many buttons have gold text labels. These are channel button shortcuts. Many sti
 - span allows you to select the number of octaves which the randomization operation will select from
 - Press **ch+`rndm`** again to execute the randomization operation.
 
-### **Other Channel Shortcuts**
+### Other Channel Shortcuts
 
 		**Are not implemented yet! These are coming soon!** 
 
-##Updating Firmware
+## Updating Firmware
 
 Firmware can be updated using a computer, a MicroUSB cable and a paperclip
 First, download the latest version of Teensy Loader on to your computer from PJRC:
@@ -317,9 +314,15 @@ First, download the latest version of Teensy Loader on to your computer from PJR
 7. You will see a progress bar appear in the teensy loader app,   and then a message that says “Reboot OK”.
 8. Your Fluxus One should reboot and you should be able to see the firmware version appear on the splash screen
 9. If it does not reboot properly, you can try flashing the firmware again, or shutting off power manually and turning it back on.
-####TROUBLESHOOTING
+
+
+### Troubleshooting Firmware Update Problems
 - If your firmware flashing does not seem to be working properly, make sure that the button labeled “Auto” on Teensy Loader is bright green and lit up (as opposed to dim).
 - If it is dimmed, then press that button to make sure it will automatically program when you press the PGRM button on your Fluxus One
 - If you attempted to flash the firmware, but the splash screen did not seem to update firmware versions, try the firmware update again until it updates properly. Make sure you are properly pressing the program button in (once, for about 1 second, and then release)
 - If you receive a "File too large" message, try downloading the Teensy loader and FLXS1 firmware from the website again
 - If you are reciving ANY unexplained errors or improper flashing, try using a different USB cable. A bad USB connection has been isolated for a number of FLXS1 firmware update failures.
+
+##Support
+
+If you experience problems that are not addressed in this manual, please visit www.zetaohm.com/support to open a support ticket. Please describe your issue with as much verbosity as possible, and we will see what we can do to help!
