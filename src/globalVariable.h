@@ -97,7 +97,7 @@ class GlobalVariable {
     uint8_t   queuePattern;
     uint8_t   patternChangeTrigger;
     uint8_t   selectedStep;
-
+    uint8_t   midiChannel[4];
     bool channelResetSwich[4];
     bool savedSequences[4][16]; //[channel][sequence]
     bool muteChannelSelect[4];

@@ -349,6 +349,7 @@ void InputModule::loop(uint16_t frequency){
         case SYSEX_MENU:
         case GLOBAL_MENU_1:
         case GLOBAL_MENU_2:
+        case GLOBAL_MENU_3:
           globalMenuHandler();
         break;
 
@@ -485,6 +486,12 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_CH4_VOLT_RANGE:
       currentMenu = GLOBAL_MENU_2;
       break;
+    case STATE_MIDI_CHANNEL_1:
+    case STATE_MIDI_CHANNEL_2:
+    case STATE_MIDI_CHANNEL_3:
+    case STATE_MIDI_CHANNEL_4:
+      currentMenu = GLOBAL_MENU_3;
+    break;
     case STATE_SYSEX_EXPORT:
     case STATE_SYSEX_IMPORT:
       currentMenu = SYSEX_MENU;
@@ -831,8 +838,20 @@ void InputModule::globalMenuHandler(){
             break;
         case STATE_CH4_VOLT_RANGE:
         globalObj->outputNegOffset[3] = min_max( globalObj->outputNegOffset[3] + knobChange, 0, 5);
-
             break;
+
+        case STATE_MIDI_CHANNEL_1:
+          globalObj->midiChannel[0] = min_max(globalObj->midiChannel[0] + knobChange, 1, 16);
+        break;
+        case STATE_MIDI_CHANNEL_2:
+          globalObj->midiChannel[1] = min_max(globalObj->midiChannel[1] + knobChange, 1, 16);
+        break;
+        case STATE_MIDI_CHANNEL_3:
+          globalObj->midiChannel[2] = min_max(globalObj->midiChannel[2] + knobChange, 1, 16);
+        break;
+        case STATE_MIDI_CHANNEL_4:
+          globalObj->midiChannel[3] = min_max(globalObj->midiChannel[3] + knobChange, 1, 16);
+        break;
         }
       }
     }

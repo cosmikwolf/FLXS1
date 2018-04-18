@@ -643,7 +643,8 @@ void OutputController::noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, u
     ad5676.setVoltage(dacCvMap[channel], getQuantizedVoltage(channel, note, globalObj->outputNegOffset[channel], 1) );    // set CV voltage
   //  delayMicroseconds(5);
     //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(globalObj->cvInputRaw[channel]));
-    serialMidi->sendNoteOn(note, velocity, channel);                                   // send midi note out
+    serialMidi->sendNoteOn(note, velocity, globalObj->midiChannel[channel]);                                   // send midi note out
+    usbMIDI.sendNoteOn(note, velocity, globalObj->midiChannel[channel]);                                   // send midi note out
   }
 
   if (gate){
@@ -657,6 +658,11 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
   int16_t quantNote = 0;
   uint16_t calibrationLow = 0;
   uint16_t calibrationHigh = 0;
+  uint16_t quantizeMode = sequenceArray[channel].quantizeMode;
+
+  if (quantizeMode == 0){
+    quantizeMode = 0xFFFF;
+  }
 
   if(pitchValue){
     calibrationLow  = calibZero(channel, dacCvMap[channel], negOffset);
@@ -668,7 +674,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
 
   switch (sequenceArray[channel].quantizeScale) {
     case SEMITONE:
-      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, quantizeMode, 0);
       if(pitchValue){
         quantNote = map( quantNote, 0, 120, calibrationLow, calibrationHigh);
       } else {
@@ -676,7 +682,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
       }
     break;
     case PYTHAGOREAN:
-      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, quantizeMode, 0);
       cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
       quantNote = map( cents, 0, 120000 , calibrationLow, calibrationHigh);
     break;
@@ -1014,7 +1020,8 @@ void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff){
   if (gateOff){
     backplaneGPIO->digitalWrite(channel, LOW);
   }
-  serialMidi->sendNoteOff(note, 64, channel);
+  serialMidi->sendNoteOff(note, 64, globalObj->midiChannel[channel]);
+  usbMIDI.sendNoteOff(note, 64, globalObj->midiChannel[channel]);
 
 }
 

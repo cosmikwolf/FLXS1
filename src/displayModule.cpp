@@ -221,6 +221,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           globalMenuDisplay2();
         break;
 
+        case GLOBAL_MENU_3:
+          globalMenuDisplay3();
+        break;
+
         case TEMPO_MENU:
           tempoMenuDisplay();
         break;
@@ -2083,6 +2087,43 @@ void DisplayModule::cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeVa
 
    renderStringBox(12,  DISPLAY_LABEL,          0, 79, 32,16, false, STYLE1X, background , foreground);
    renderStringBox(13,  STATE_CH4_VOLT_RANGE,   48, 79, 79,16, false, STYLE1X, background , foreground);
+
+}
+
+
+ void DisplayModule::globalMenuDisplay3(){
+   displayElement[0] = strdup("global settings");
+
+   displayElement[5] = strdup("MIDI output channels");
+   displayElement[6] = strdup("ch1:");
+
+    sprintf(buf, "MIDI ch%d", globalObj->midiChannel[0] );
+    displayElement[7] = strdup(buf);
+   displayElement[8] = strdup("ch2:");
+    sprintf(buf, "MIDI ch%d", globalObj->midiChannel[1]);
+    displayElement[9] = strdup(buf);
+   displayElement[10] = strdup("ch3:");
+    sprintf(buf, "MIDI ch%d", globalObj->midiChannel[2] );
+    displayElement[11] = strdup(buf);
+   displayElement[12] = strdup("ch4:");
+    sprintf(buf, "MIDI ch%d", globalObj->midiChannel[3] );
+    displayElement[13] = strdup(buf);
+
+   renderStringBox(0,  DISPLAY_LABEL,    0,  0,128, 15, false, STYLE1X, background , contrastColor);
+
+   renderStringBox(5,  DISPLAY_LABEL,    0, 15, 90,17, false, STYLE1X, background , contrastColor);
+
+   renderStringBox(6,  DISPLAY_LABEL,            0, 31, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(7,  STATE_MIDI_CHANNEL_1,    48, 31, 79,16, false, STYLE1X, background , foreground);
+
+   renderStringBox(8,  DISPLAY_LABEL,           0, 47, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(9,  STATE_MIDI_CHANNEL_2,    48, 47, 79,16, false, STYLE1X, background , foreground);
+
+   renderStringBox(10,  DISPLAY_LABEL,           0, 63, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(11,  STATE_MIDI_CHANNEL_3,   48, 63, 79,16, false, STYLE1X, background , foreground);
+
+   renderStringBox(12,  DISPLAY_LABEL,          0, 79, 32,16, false, STYLE1X, background , foreground);
+   renderStringBox(13,  STATE_MIDI_CHANNEL_4,   48, 79, 79,16, false, STYLE1X, background , foreground);
 
 }
 

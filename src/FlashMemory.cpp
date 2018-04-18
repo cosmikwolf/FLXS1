@@ -332,6 +332,11 @@ void FlashMemory::serializeGlobalSettings(char* fileBuffer){
   globSettingsArray.add(globalObj->clockMode);           // array index: 7
   globSettingsArray.add(globalObj->tempoX100);           // array index: 8
 
+  globSettingsArray.add(globalObj->midiChannel[0]);
+  globSettingsArray.add(globalObj->midiChannel[1]);
+  globSettingsArray.add(globalObj->midiChannel[2]);
+  globSettingsArray.add(globalObj->midiChannel[3]);
+
   Serial.println("Saving Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
 
   root.printTo(fileBuffer,4096);
@@ -363,6 +368,17 @@ bool FlashMemory::deserializeGlobalSettings(char* json){
   globalObj->clockMode             = jsonReader["settings"][7];
   globalObj->tempoX100             = jsonReader["settings"][8];
 
+  if( jsonReader["settings"].size() > 9 ) {
+    globalObj->midiChannel[0] = jsonReader["settings"][9];
+    globalObj->midiChannel[1] = jsonReader["settings"][10];
+    globalObj->midiChannel[2] = jsonReader["settings"][11];
+    globalObj->midiChannel[3] = jsonReader["settings"][12];
+  } else {
+    globalObj->midiChannel[0] = 1;
+    globalObj->midiChannel[1] = 2;
+    globalObj->midiChannel[2] = 3;
+    globalObj->midiChannel[3] = 4;
+  }
   if(globalObj->clockMode == EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT){
     globalObj->setClockPortDirection(CLOCK_PORT_INPUT);
   } else {

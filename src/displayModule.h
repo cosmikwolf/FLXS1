@@ -136,10 +136,11 @@ class DisplayModule
     void inputMenuDisplay();
     void globalMenuDisplay();
     void globalMenuDisplay2();
+    void globalMenuDisplay3();
     void sysexMenuHandler();
     void patternChainMenuHandler();
     void patternChainHelpHandler();
-    
+
     void tempoMenuDisplay();
     void modMenu1_DisplayHandler();
     void modMenu2_DisplayHandler();

@@ -37,6 +37,7 @@ void GlobalVariable::initialize(ADC *adc){
       this->randomizeParamSelect = 0;
       this->randomizeLow = 36;
       this->randomizeSpan = 3;
+
       this->tempoX100 = 12000;
       this->selectedStep = 0;
       this->patternChannelSelector = 0b1111;
@@ -46,6 +47,7 @@ void GlobalVariable::initialize(ADC *adc){
       this->queuePattern = 255; // queue pattern of 255 means that nothing is queued
       for(int channel=0; channel<4; channel++){
         this->channelResetSwich[channel] = 0;
+        this->midiChannel[channel] = channel+1;
       }
       this->waitingToResetAfterPatternLoad = false;
       this->patternLoadOperationInProgress = false;
