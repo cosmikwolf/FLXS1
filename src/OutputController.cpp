@@ -658,11 +658,6 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
   int16_t quantNote = 0;
   uint16_t calibrationLow = 0;
   uint16_t calibrationHigh = 0;
-  uint16_t quantizeMode = sequenceArray[channel].quantizeMode;
-
-  if (quantizeMode == 0){
-    quantizeMode = 0xFFFF;
-  }
 
   if(pitchValue){
     calibrationLow  = calibZero(channel, dacCvMap[channel], negOffset);
@@ -674,7 +669,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
 
   switch (sequenceArray[channel].quantizeScale) {
     case SEMITONE:
-      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, quantizeMode, 0);
+      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
       if(pitchValue){
         quantNote = map( quantNote, 0, 120, calibrationLow, calibrationHigh);
       } else {
@@ -682,7 +677,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
       }
     break;
     case PYTHAGOREAN:
-      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, quantizeMode, 0);
+      quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
       cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount ;
       quantNote = map( cents, 0, 120000 , calibrationLow, calibrationHigh);
     break;
