@@ -53,7 +53,7 @@ ADC *adc = new ADC(); // adc object
  unsigned long clockCycles;
 GlobalVariable globalObj;
 uint8_t cycleIntervalCount;
-
+uint16_t sysexCounter;
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
 
 
@@ -105,6 +105,7 @@ void setup() {
   usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
   usbMIDI.setHandleSongPosition( midiSongPositionPointerWrapper );
   usbMIDI.setHandleTimeCodeQuarterFrame(midiTimeCodePointerWrapper );
+  usbMIDI.setHandleSystemExclusive(midiSysexHandlerWrapper);
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
   //usbMIDI.setHandleVelocityChange(OnVelocityChange)
@@ -265,6 +266,8 @@ void loop() {
 
 };
 
+
+
 void usbNoteOff(){
 //  Serial.println("note off!:\t" + String(note));
 }
@@ -330,6 +333,22 @@ void cacheLoop(){
 // global wrappers to create pointers to MidiModule member functions
 // https://isocpp.org/wiki/faq/pointers-to-members
 
+void midiSysexHandlerWrapper(const uint8_t *data, uint16_t length, bool complete){
+  //
+  // Serial.println(String(sysexCounter) + "\trecieving sysex L: " + String(length) + "\tcomplete: " + String(complete) + "\tdata: " + String((int)data));
+  // // void setHandleSystemExclusive(void (*fptr)(const uint8_t *data, uint16_t length, bool complete)) {
+	// // 	// type: 0xF0  SystemExclusive - multiple calls for message bigger than buffer
+	// // 	handleSysExPartial = (void (*)(const uint8_t *, uint16_t, uint8_t))fptr;
+	// // }
+	// // void setHandleSystemExclusive(void (*fptr)(uint8_t *data, unsigned int size)) {
+	// // 	// type: 0xF0  SystemExclusive - single call, message larger than buffer is truncated
+	// // 	handleSysExComplete = fptr;
+	// // }
+  // sysexCounter++;
+}
+// void midiSysexHandlerWrapper(uint8_t *data, unsigned int size){
+//
+// }
 
 void midiClockPulseHandlerWrapper(){
 //  timeControl.setDebugPin(3, HIGH);

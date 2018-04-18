@@ -178,6 +178,10 @@ int GlobalVariable::generateRandomNumber(int minVal, int maxVal){
 int16_t GlobalVariable::quantizeSemitonePitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction){
   uint8_t count = 0;
   uint16_t scaleExpanded = quantizeMode;
+
+  if(scaleExpanded == 0){
+    scaleExpanded = 0xffff;
+  }
   uint8_t scaleDivisions = 12;
   scaleDivisions -= 1; //minus one for the octave. 11 notes in a 12-tet scale
   //Serial.print("note: " + String(note) + "\tquantizeMode: " + String(quantizeMode, BIN));

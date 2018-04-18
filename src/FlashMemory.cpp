@@ -337,7 +337,7 @@ void FlashMemory::serializeGlobalSettings(char* fileBuffer){
   globSettingsArray.add(globalObj->midiChannel[2]);
   globSettingsArray.add(globalObj->midiChannel[3]);
 
-  Serial.println("Saving Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
+  // Serial.println("Saving Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
 
   root.printTo(fileBuffer,4096);
 }
@@ -540,6 +540,10 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
    //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
    JsonArray& stepDataArray = jsonReader["data"];
    //Serial.println("Step Data Array Success: " + String(stepDataArray.success())) ;
+
+   if(sequenceArray[channel].quantizeMode == 0 ){
+     sequenceArray[channel].quantizeMode = 0xffff;
+   }
 
     //Serial.println("jsonArray declared");
     if (sequenceArray[channel].stepCount == 0){

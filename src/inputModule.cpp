@@ -545,7 +545,7 @@ void InputModule::changeState(uint8_t targetState){
 
   if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && currentMenu != SYSEX_MENU && currentMenu != TEMPO_MENU && (previousMenu == TEMPO_MENU || previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2 || previousMenu == SYSEX_MENU) ){
     saveFile->saveGlobalData();
-    Serial.println("Saved GlobalData");
+    // Serial.println("Saved GlobalData");
   }
 
   if((currentMenu != MENU_PATTERN_CHAIN)&&(previousMenu == MENU_PATTERN_CHAIN) ){
@@ -653,12 +653,18 @@ void InputModule::tempoMenuHandler(){
 
 void InputModule::sequenceMenuHandler(){
   int8_t newBeatDiv;
+  uint16_t previousQuantizeMode;
 
   for (int i=0; i < 16; i++){
     if (midplaneGPIO->fell(i)){
       if(stepMode == STATE_QUANTIZEMODE){
         // put in quantize mode custom button input code here
+
+        previousQuantizeMode = sequenceArray[selectedChannel].quantizeMode;
         sequenceArray[selectedChannel].quantizeMode ^= (1<<i);
+        if (sequenceArray[selectedChannel].quantizeMode == 0){
+          sequenceArray[selectedChannel].quantizeMode = previousQuantizeMode;
+        }
         midplaneGPIO->clearBuffers();
 
       } else {
