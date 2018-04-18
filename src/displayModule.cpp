@@ -729,7 +729,7 @@ void DisplayModule::multiSelectMenu(char* buf){
 
 
 void DisplayModule::stateDisplay_pitch(char*buf){
-  String gateTypeArray[] = { "off", "on", "tie","1hit" };
+  String gateTypeArray[] = { "off", "on", "tie", "1hit", "hold", "half", "rand33%", "rand50%", "rand66%" };
 
   if(globalObj->chainModeActive){
     sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);

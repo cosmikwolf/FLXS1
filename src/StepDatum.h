@@ -79,6 +79,8 @@ typedef	struct StepDatum {
   // uint8_t     test2_24;
 
 	bool gateTrig(){ //should the gate be turned on this step?
+		uint16_t arpCount;
+
 		switch(gateType){
 			case GATETYPE_REST:
 				return false;
@@ -96,9 +98,52 @@ typedef	struct StepDatum {
           return true;
         }
       break;
+			case GATETYPE_HOLD:
+				return true;
+			break;
+			case GATETYPE_HALF:
+				if (arpType == ARPTYPE_OFF) {
+					arpCount = 0;
+				} else {
+					arpCount = (gateLength *  arpSpdDen / arpSpdNum)/4 ;
+				}
+
+				if(arpStatus < arpCount/2){
+					return true;
+				} else {
+					return false;
+				};
+			break;
+
+			case GATETYPE_RAND33:
+				if(rand() % 3 < 2){
+					return false;
+				} else {
+					return true;
+				}
+			break;
+
+			case GATETYPE_RAND50:
+				if(rand() % 2){
+					return false;
+				} else {
+					return true;
+				}
+			break;
+
+			case GATETYPE_RAND66:
+				if(rand() % 3){
+					return false;
+				} else {
+					return true;
+				}
+			break;
+
 		}
 	}
 	bool gateOff(){ // should the gate be turned off this step?
+		uint16_t arpCount;
+
 		switch(gateType){
 			case GATETYPE_REST:
 				return true;
@@ -112,6 +157,68 @@ typedef	struct StepDatum {
       case GATETYPE_1HIT:
         return true;
       break;
+			case GATETYPE_HOLD:
+				if (arpType == ARPTYPE_OFF) {
+					arpCount = 0;
+				} else {
+					arpCount = (gateLength *  arpSpdDen / arpSpdNum)/4 ;
+				}
+
+				if(arpStatus <= arpCount){
+					return false;
+				} else {
+					return true;
+				};
+			break;
+			case GATETYPE_HALF:
+				if (arpType == ARPTYPE_OFF) {
+					arpCount = 0;
+				} else {
+					arpCount = (gateLength *  arpSpdDen / arpSpdNum)/4 ;
+				}
+
+				if(arpStatus < arpCount/2){
+					return false;
+				} else {
+					return true;
+				};
+			break;
+			case GATETYPE_RAND33:
+				if(arpStatus <= arpCount){
+					if(rand() % 3 < 2){
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return true;
+				};
+			break;
+
+			case GATETYPE_RAND50:
+				if(arpStatus <= arpCount){
+					if(rand() % 2){
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return true;
+				};
+			break;
+
+			case GATETYPE_RAND66:
+				if(arpStatus <= arpCount){
+					if(rand() % 3){
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return true;
+				};
+			break;
+
 		}
 	}
 } StepDatum;

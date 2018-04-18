@@ -119,7 +119,7 @@ void InputModule::multiSelectInputHandler(){
           break;
         case STATE_GATETYPE:
           if(!globalObj->multi_gateType_switch){  globalObj->multi_gateType_switch = true;
-          } else { globalObj->multi_gateType = min_max(globalObj->multi_gateType + knobChange, 0, 3); }
+          } else { globalObj->multi_gateType = min_max(globalObj->multi_gateType + knobChange, 0, 8); }
           break;
         case STATE_GATELENGTH:
           if(!globalObj->multi_gateLength_switch){  globalObj->multi_gateLength_switch = true;
@@ -143,7 +143,7 @@ void InputModule::multiSelectInputHandler(){
           break;
         case STATE_GLIDE:
           if(!globalObj->multi_glide_switch){  globalObj->multi_glide_switch = true;
-          } else { globalObj->multi_glide = min_max(globalObj->multi_glide + knobChange,0,255); }
+          } else { globalObj->multi_glide = min_max(globalObj->multi_glide + knobChange,0,127); }
           break;
         case STATE_BEATCOUNT:
           if(!globalObj->multi_beatDiv_switch){  globalObj->multi_beatDiv_switch = true;
@@ -217,7 +217,7 @@ void InputModule::multiSelectInputHandler(){
               sequenceArray[selectedChannel].stepData[i].arpSpdDen = min_max(globalObj->multi_arpSpdDen, 1, 64);
               break;
             case STATE_GLIDE:
-              sequenceArray[selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 128);
+              sequenceArray[selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 127);
               break;
             case STATE_CV2_LEVEL:
               sequenceArray[selectedChannel].stepData[i].velocity =  positive_modulo(globalObj->multi_velocity, 127);
@@ -1569,11 +1569,11 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
 
 
         case STATE_GATETYPE:
-          sequenceArray[channel].stepData[stepNum].gateType =  min_max(sequenceArray[channel].stepData[stepNum].gateType + change, 0, 3);
+          sequenceArray[channel].stepData[stepNum].gateType =  min_max(sequenceArray[channel].stepData[stepNum].gateType + change, 0, 8);
           break;
 
         case STATE_GLIDE:
-          sequenceArray[channel].stepData[stepNum].glide =  min_max(sequenceArray[channel].stepData[stepNum].glide + change, 0, 128);
+          sequenceArray[channel].stepData[stepNum].glide =  min_max(sequenceArray[channel].stepData[stepNum].glide + change, 0, 127);
           break;
 
         case STATE_ARPTYPE:

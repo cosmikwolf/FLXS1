@@ -202,6 +202,12 @@
 #define GATETYPE_STEP				1
 #define GATETYPE_TIE        2
 #define GATETYPE_1HIT       3
+#define GATETYPE_HOLD       4
+#define GATETYPE_HALF       5
+#define GATETYPE_RAND33     6
+#define GATETYPE_RAND50     7
+#define GATETYPE_RAND66     8
+
 
 #define ARPTYPE_OFF   0
 #define ARPTYPE_UP		1
