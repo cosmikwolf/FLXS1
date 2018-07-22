@@ -32,7 +32,7 @@
 #define kLedClockInterval 30000
 #define kSequenceTimerInterval 600
 #define kPeripheralLoopTimer 15000
-#define kMidiClockInterval  600
+#define kMidiClockInterval  1000 
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13

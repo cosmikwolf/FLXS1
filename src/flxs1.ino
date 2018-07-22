@@ -35,6 +35,7 @@ TimeController timeControl;
 IntervalTimer MasterClockTimer;
 IntervalTimer LEDClockTimer;
 IntervalTimer SequencerTimer;
+IntervalTimer midiClockTimer;
 //IntervalTimer DisplayLoopTimer;
 //IntervalTimer PeripheralLoopTimer;
 
@@ -84,7 +85,7 @@ void setup() {
   Serial3.setRX(7);
   delay(500);
   serialMidi.begin(MIDI_CHANNEL_OMNI);
-
+  serialMidi.turnThruOff();
   globalObj.initialize(adc);
 
   for(int i=0; i<1000; i++){
@@ -137,7 +138,7 @@ void setup() {
   SPI.usingInterrupt(SequencerTimer);
   //SPI.usingInterrupt(LEDClockTimer);
 
-  //  MIDITimer.begin(midiTimerLoop,kMidiClockInterval);
+   midiClockTimer.begin(midiTimerLoop,kMidiClockInterval);
   //  MIDITimer.priority(0);
 
   //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
@@ -285,7 +286,7 @@ void sequencerLoop(){
 //  #endif
 
   usbMIDI.read();
-  timeControl.midiClockHandler();
+  // timeControl.midiClockHandler();
   timeControl.sequencerHandler();
   // if (Serial3.available() > 0) {
 	// 	int incomingByte = Serial3.read();
@@ -324,7 +325,9 @@ void peripheralLoop(){
 
 void midiTimerLoop(){
 //  usbMIDI.read();
-  //timeControl.midiClockHandler();
+  while(Serial3.available()){
+    timeControl.midiClockHandler();
+  }
 }
 
 void cacheLoop(){

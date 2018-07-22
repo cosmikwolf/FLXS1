@@ -20,7 +20,7 @@ void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial>* serialMi
   //  Serial.println("1: " + String(serialMidi->getData1()));
   //  Serial.println("2: " + String(serialMidi->getData2()));
   // }
-  serialMidi->read();
+  serialMidi->read(1);
   //interrupts();
 }
 
@@ -50,7 +50,7 @@ void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
         midiTestArray[i] = false;
       }
     }
-    Serial.println("Recieved test note " + String(note));
+    // Serial.println("Recieved test note " + String(note));
     if(note < 128){
       midiTestArray[note] = true;
     }
@@ -62,13 +62,13 @@ void MidiModule::midiNoteOnHandler(byte channel, byte note, byte velocity){
     }
     if(exitTestLoop){
       midiTestActive = false;
-      Serial.println("midi Test loop complete");
+      // Serial.println("midi Test loop complete");
     }
   } else {
     if (velocity > 0) {
-      Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
+      // Serial.println(String("Note On:  ch=") + channel + ", note=" + note + ", velocity=" + velocity);
     } else {
-      Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
+      // Serial.println(String("Note Off: ch=") + channel + ", note=" + note);
     }
   }
 
