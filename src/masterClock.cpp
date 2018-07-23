@@ -30,102 +30,147 @@ void MasterClock::changeTempo(uint32_t newtempoX100){
 }
 
 void MasterClock::masterClockFunc(){
-	//	Serial.println(String((int)masterLoopTimer));
-	//  masterLooptimeMin
-	//  masterLooptimeMax
-	digitalWriteFast(PIN_EXT_TX, HIGH);
 
-	//uint32_t clockPeriod = (60000000/(globalObj->tempoX100/100) )/(INTERNAL_PPQ_COUNT);
-	//clockPeriod = 550;
-	//uint32_t clockPeriod = (58962000/(globalObj->tempoX100/100) )/(INTERNAL_PPQ_COUNT);
+	digitalWriteFast(PIN_EXT_TX, HIGH);
 
 	uint32_t clockPeriod = 120000000;
 	clockPeriod /= INTERNAL_PPQ_COUNT;
 	clockPeriod /= (globalObj->tempoX100/100);
-//	clockPeriod /= 1024;
 	clockPeriod *= 60;
 
-	uint32_t clockCycles = ARM_DWT_CYCCNT;
-
 	if (globalObj->clockMode == INTERNAL_CLOCK){
-		for (int i = 0; i < SEQUENCECOUNT; i++ ){
-			sequenceArray[i].masterClockPulse();
-		}
-		globalObj->tapTempoMasterClkCounter++;
-		// clockCounter++;
-
-		// Make sure the LEDs do not refresh right before the clock needs to be triggered.
-		if (extClockCounter > EXTCLOCKDIV / 2){
-			//digitalWriteFast(PIN_EXT_AD_2, LOW);
-			//displayRunSwitch = false;
-			clearedToRunLoadOperation = false;
-		} else {
-      displayRunSwitch = true;
-    }
-
-		if(clockCycles - lastPulseClockCount > clockPeriod){
-			extClockCounter++;
-
-			if( extClockCounter >= EXTCLOCKDIV && globalObj->playing){
-				outputControl->setClockOutput(HIGH);
-				clearedToRunLoadOperation = true;
-				digitalWriteFast(PIN_EXT_AD_3, HIGH);
-				serialMidi->sendRealTime(midi::Clock);
-				extClockCounter = 0;
-				//Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
-				//masterDebugTimer = 0;
-			  digitalWriteFast(PIN_EXT_AD_3, LOW);
-			}
-			//
-			// totalClockCount++;
-			// if(totalClockCount > INTERNAL_PPQ_COUNT){
-			// 	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
-			// 	totalClockCount = 0;
-			// }
-			pulseTrigger = 1; //send ppq pulse to each internally sequenced sequence
-
-			lastPulseClockCount += clockPeriod;
-		}
-
-		if(extClockCounter >= 15*EXTCLOCKDIV/16 && (extClockCounter < EXTCLOCKDIV) ){
-			clearedToRunLoadOperation = false; //keep load operation from happening 1/16 of a clock cyle before it rises
-		}
-		if((extClockCounter >= 7*EXTCLOCKDIV/16) && (extClockCounter < EXTCLOCKDIV / 2) ){
-			clearedToRunLoadOperation = false;//keep load operation from happening 1/16 of a clock cyle before it falls
-		}
-		if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
-				outputControl->setClockOutput(LOW);
-				displayRunSwitch = true;
-				clearedToRunLoadOperation = true;
-				digitalWriteFast(PIN_EXT_AD_2, HIGH);
-		}
-
-
-	} else if(globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ){
-		clearedToRunLoadOperation = true;
-
-		if (globalObj->midiSetClockOut && !outputControl->clockValue){
-			outputControl->setClockOutput(HIGH);
-		}
-		if (outputControl->clockValue && !globalObj->midiSetClockOut) {
-			outputControl->setClockOutput(LOW);
-			displayRunSwitch = true;
-			digitalWriteFast(PIN_EXT_AD_2, HIGH);
-		}
-
-
-		for (int i = 0; i < SEQUENCECOUNT; i++ ){
-			sequenceArray[i].masterClockPulse();
-		}
+    internalMasterClockTick(clockPeriod);
+  } else if(globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ){
+    midiMasterClockTick(clockPeriod);
   } else if(globalObj->clockMode >= EXTERNAL_CLOCK_GATE_0){
-		clearedToRunLoadOperation = true;
+    externalMasterClockTick(clockPeriod);
+	}
+};
 
-		for (int i = 0; i < SEQUENCECOUNT; i++ ){
-			sequenceArray[i].masterClockPulse();
+void MasterClock::internalMasterClockTick(uint32_t clockPeriod){
+  uint32_t clockCycles = ARM_DWT_CYCCNT;
+
+  for (int i = 0; i < SEQUENCECOUNT; i++ ){
+    sequenceArray[i].masterClockPulse();
+  }
+  globalObj->tapTempoMasterClkCounter++;
+  // clockCounter++;
+  // Make sure the LEDs do not refresh right before the clock needs to be triggered.
+  if (extClockCounter > EXTCLOCKDIV / 2){
+    //digitalWriteFast(PIN_EXT_AD_2, LOW);
+    //displayRunSwitch = false;
+    clearedToRunLoadOperation = false;
+  } else {
+    displayRunSwitch = true;
+  }
+
+  if(clockCycles - lastPulseClockCount > clockPeriod){
+    extClockCounter++;
+
+    if( extClockCounter >= EXTCLOCKDIV && globalObj->playing){
+      outputControl->setClockOutput(HIGH);
+      clearedToRunLoadOperation = true;
+      digitalWriteFast(PIN_EXT_AD_3, HIGH);
+      serialMidi->sendRealTime(midi::Clock);
+      extClockCounter = 0;
+      //Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
+      //masterDebugTimer = 0;
+      digitalWriteFast(PIN_EXT_AD_3, LOW);
+    }
+    //
+    // totalClockCount++;
+    // if(totalClockCount > INTERNAL_PPQ_COUNT){
+    // 	clockCounter = clockCounter % (clockPeriod/kMasterClockInterval);
+    // 	totalClockCount = 0;
+    // }
+    pulseTrigger = 1; //send ppq pulse to each internally sequenced sequence
+
+    lastPulseClockCount += clockPeriod;
+  }
+
+  if(extClockCounter >= 15*EXTCLOCKDIV/16 && (extClockCounter < EXTCLOCKDIV) ){
+    clearedToRunLoadOperation = false; //keep load operation from happening 1/16 of a clock cyle before it rises
+  }
+  if((extClockCounter >= 7*EXTCLOCKDIV/16) && (extClockCounter < EXTCLOCKDIV / 2) ){
+    clearedToRunLoadOperation = false;//keep load operation from happening 1/16 of a clock cyle before it falls
+  }
+  if ((extClockCounter >= EXTCLOCKDIV / 2) && outputControl->clockValue) {
+      outputControl->setClockOutput(LOW);
+      displayRunSwitch = true;
+      clearedToRunLoadOperation = true;
+      digitalWriteFast(PIN_EXT_AD_2, HIGH);
+  }
+};
+
+void MasterClock::externalMasterClockTick(uint32_t clockPeriod){
+  clearedToRunLoadOperation = true;
+
+  for (int i = 0; i < SEQUENCECOUNT; i++ ){
+    sequenceArray[i].masterClockPulse();
+  }
+};
+
+void MasterClock::externalSeqFunc(uint8_t gateNum){
+	clearedToRunLoadOperation = true;
+
+	checkGateClock();
+
+	if (globalObj->playing){
+		if (!globalObj->wasPlaying){
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				outputControl->allNotesOff(i);
+				//outputControl->clearVelocityOutput(i);
+				sequenceArray[i].clockStart();
+				//Serial.println("Starting sequence: " + String(i));
+			}
 		}
 	}
 
+	if (gateTrig[gateNum]){
+		//Serial.print("PPQPULSE: ");
+		globalObj->chainModeMasterPulseToGo--;
+		if((globalObj->chainModeMasterPulseToGo <= 0) && globalObj->waitingToResetAfterPatternLoad){
+			for (int i=0; i< SEQUENCECOUNT; i++){
+				sequenceArray[i].clockReset(true);
+			}
+			globalObj->waitingToResetAfterPatternLoad = false;
+		}
+		for (int i=0; i< SEQUENCECOUNT; i++){
+			sequenceArray[i].ppqPulse(4);
+		}
+
+	}
+
+	if(globalObj->gateInputRaw[gateNum] == 1){
+		outputControl->setClockOutput(HIGH);
+	} else {
+		outputControl->setClockOutput(LOW);
+	}
+
+	for (int i=0; i< SEQUENCECOUNT; i++){
+		sequenceArray[i].runSequence();
+	}
+	displayRunSwitch = true;
+
+}
+
+void MasterClock::midiMasterClockTick(uint32_t clockPeriod){
+  clearedToRunLoadOperation = true;
+
+  if (globalObj->midiSetClockOut && !outputControl->clockValue){
+    outputControl->setClockOutput(HIGH);
+  }
+  if (outputControl->clockValue && !globalObj->midiSetClockOut) {
+    outputControl->setClockOutput(LOW);
+    displayRunSwitch = true;
+    digitalWriteFast(PIN_EXT_AD_2, HIGH);
+  }
+
+  for (int i = 0; i < SEQUENCECOUNT; i++ ){
+    sequenceArray[i].masterClockPulse();
+  }
 };
+
 
 void MasterClock::sequencerFunc(void){
 //	digitalWriteFast(PIN_EXT_AD_2, HIGH);
@@ -162,26 +207,26 @@ void MasterClock::sequencerFunc(void){
 	}
 	switch(globalObj->clockMode){
     case INTERNAL_CLOCK:
-			internalClockTick();
+			internalSeqFunc();
     	break;
     case EXTERNAL_MIDI_35_CLOCK:
     case EXTERNAL_MIDI_USB_CLOCK:
 			midiClockTick();
 	    break;
 		case EXTERNAL_CLOCK_GATE_0:
-			externalClockTick(0);
+			externalSeqFunc(0);
 			break;
     case EXTERNAL_CLOCK_GATE_1:
-			externalClockTick(1);
+			externalSeqFunc(1);
 		  break;
     case EXTERNAL_CLOCK_GATE_2:
-			externalClockTick(2);
+			externalSeqFunc(2);
 	    break;
     case EXTERNAL_CLOCK_GATE_3:
-			externalClockTick(3);
+			externalSeqFunc(3);
 		  break;
 		case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
-			externalClockTick(4);
+			externalSeqFunc(4);
 			break;
   }
 	if(lfoTimer > 2){
@@ -313,52 +358,8 @@ void MasterClock::checkGateClock(){
 	}
 }
 
-void MasterClock::externalClockTick(uint8_t gateNum){
-	clearedToRunLoadOperation = true;
 
-	checkGateClock();
-
-	if (globalObj->playing){
-		if (!globalObj->wasPlaying){
-			for (int i=0; i< SEQUENCECOUNT; i++){
-				outputControl->allNotesOff(i);
-				//outputControl->clearVelocityOutput(i);
-				sequenceArray[i].clockStart();
-				//Serial.println("Starting sequence: " + String(i));
-			}
-		}
-	}
-
-		if (gateTrig[gateNum]){
-			//Serial.print("PPQPULSE: ");
-			globalObj->chainModeMasterPulseToGo--;
-			if((globalObj->chainModeMasterPulseToGo <= 0) && globalObj->waitingToResetAfterPatternLoad){
-				for (int i=0; i< SEQUENCECOUNT; i++){
-					sequenceArray[i].clockReset(true);
-				}
-				globalObj->waitingToResetAfterPatternLoad = false;
-			}
-			for (int i=0; i< SEQUENCECOUNT; i++){
-				sequenceArray[i].ppqPulse(4);
-			}
-
-		}
-
-		if(globalObj->gateInputRaw[gateNum] == 1){
-			outputControl->setClockOutput(HIGH);
-		} else {
-			outputControl->setClockOutput(LOW);
-		}
-
-
-	for (int i=0; i< SEQUENCECOUNT; i++){
-		sequenceArray[i].runSequence();
-	}
-	displayRunSwitch = true;
-
-}
-
-void MasterClock::internalClockTick(){
+void MasterClock::internalSeqFunc(){
  //digitalWriteFast(PIN_EXT_TX, HIGH);
  //Serial.println("begin internal clock tick");
         // int clock

@@ -21,10 +21,13 @@ public:
   void initialize(OutputController* outputControl, Sequencer *sequenceArray, midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, GlobalVariable* globalObj);
   void changeTempo(uint32_t newtempoX100);
   void masterClockFunc();
+  void internalMasterClockTick(uint32_t clockPeriod);
+  void externalMasterClockTick(uint32_t clockPeriod);
+  void midiMasterClockTick(uint32_t clockPeriod);
   void sequencerFunc();
-  void internalClockTick();
+  void internalSeqFunc();
   void midiClockTick();
-  void externalClockTick(uint8_t gateNum);
+  void externalSeqFunc(uint8_t gateNum);
   void checkGateClock();
   void songAndPatternLogic();
   void triggerQueuedPattern(uint8_t triggerChannel);
