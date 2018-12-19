@@ -10,7 +10,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   this->clockMaster = clockMaster;
   this->sequenceArray = sequenceArray;
   this->globalObj = globalObj;
-  currentMenu = 255;
+  globalObj->currentMenu = 255;
   oled.begin();
   delay(100);
   oled.setBrightness(16);
@@ -46,7 +46,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
-  oled.fillScreen(NAVY);
+  oled.fillScreen(MAROON);
   oled.setCursor(CENTER,8);
   oled.setTextColor(WHITE);
   oled.setFont(&LadyRadical_16);//this will load the font
@@ -63,7 +63,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("firmware18a");
+  oled.println("firmware18d");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -136,7 +136,7 @@ void DisplayModule::displayLoop(uint16_t frequency) {
 
 	  displayTimer = 0;
 
-    switch (selectedChannel){
+    switch (globalObj->selectedChannel){
       case 0:
         foreground = ORANGE;
         background = BLACK;
@@ -163,13 +163,13 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     if (modaltimer < modalMaxTime ) {
       modalDisplay();
     } else {
-      if (previousMenu != currentMenu || previouslySelectedChannel != selectedChannel || modalRefreshSwitch){
+      if (previousMenu != globalObj->currentMenu || previouslySelectedChannel != globalObj->selectedChannel || modalRefreshSwitch){
          modalRefreshSwitch = false;
          freeDisplayCache();
          oled.fillScreen(background);
-//         Serial.println("Changing Menu: " + String(currentMenu));
+//         Serial.println("Changing Menu: " + String(globalObj->currentMenu));
       }
-      switch(currentMenu) {
+      switch(globalObj->currentMenu) {
         case PITCH_GATE_MENU:
           stateDisplay_pitch(buf);
 
@@ -270,6 +270,44 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           shortcutRandomMenu();
         break;
 
+        case MENU_TRANSPOSE:
+          shortcutTransposeMenu();
+          break;
+
+        case MENU_TUNER:
+          shortcutTunerMenu();
+          break;
+        case MENU_FILL:
+          shortcutFillMenu();
+          break;
+        case MENU_SKIP:
+          shortcutSkipMenu();
+          break;
+        case MENU_CLKDIV:
+          shortcutClkdivMenu();
+          break;
+        case MENU_RESET:
+          shortcutResetMenu();
+          break;
+        case MENU_REVERSE:
+          shortcutReverseMenu();
+          break;
+        case MENU_PAGE:
+          shortcutPageMenu();
+          break;
+        case MENU_FN1:
+          shortcutFn1Menu();
+          break;
+        case MENU_FN2:
+          shortcutFn2Menu();
+          break;
+        case MENU_FN3:
+          shortcutFn3Menu();
+          break;
+        case MENU_FN4:
+          shortcutFn4Menu();
+          break;
+
         case SYSEX_MENU:
           sysexMenuHandler();
           break;
@@ -286,17 +324,17 @@ void DisplayModule::displayLoop(uint16_t frequency) {
     }
 
 
-    // if (previousMenu != currentMenu){
+    // if (previousMenu != globalObj->currentMenu){
     //   Serial.println("finished first loop of displaying new state");
     // }
     cleanupTextBuffers();
-    // if (previousMenu != currentMenu){
+    // if (previousMenu != globalObj->currentMenu){
     //   Serial.println("text buffers cleaned up");
     //   Serial.println("Freeram: " + String(FreeRam2()));
     // }
-    previouslySelectedChannel = selectedChannel;
+    previouslySelectedChannel = globalObj->selectedChannel;
     previousStepMode = stepMode;
-    previousMenu = currentMenu;
+    previousMenu = globalObj->currentMenu;
     previousParameterSelect = globalObj->parameterSelect;
     globalObj->previousChainSelectedPattern = globalObj->chainSelectedPattern;
   };
@@ -477,6 +515,21 @@ void DisplayModule::modalDisplay(){
       sprintf(buf, "STEP %d CLEAR", globalObj->stepCopyIndex+1 );
       displayElement[0] = strdup(buf);
       goto singleTextDisplay;
+    case MODAL_COPY_PAGE:
+      sprintf(buf, "CH%d PG%d", globalObj->copiedChannel+1, globalObj->copiedPage+1 );
+      displayElement[0] = strdup(buf);
+      displayElement[1] = strdup("COPY");
+      goto singleTextDisplay;
+    case MODAL_PASTE_PAGE:
+    sprintf(buf, "CH%d PG%d", globalObj->copiedChannel+1, globalObj->copiedPage+1 );
+      displayElement[0] = strdup(buf);
+      displayElement[1] = strdup("PASTE");
+      goto singleTextDisplay;
+    case MODAL_CLEAR_PAGE:
+      sprintf(buf, "CH%d PG%d", globalObj->copiedChannel+1, globalObj->copiedPage+1 );
+      displayElement[0] = strdup(buf);
+      displayElement[1] = strdup("CLEAR");
+      goto singleTextDisplay;
     case MODAL_COPY_CHANNEL:
       sprintf(buf, "CHANNEL %d", globalObj->chCopyIndex+1 );
       displayElement[0] = strdup(buf);
@@ -491,12 +544,12 @@ void DisplayModule::modalDisplay(){
       displayElement[1] = strdup("CHANNEL CLEAR");
       goto singleTextDisplay;
     case MODAL_RANDOM_PITCH_GATE:
-      sprintf(buf, "CHANNEL %d", selectedChannel+1 );
+      sprintf(buf, "CHANNEL %d", globalObj->selectedChannel+1 );
       displayElement[0] = strdup(buf);
       displayElement[1] = strdup("RNDM PTCH&GT");
       goto singleTextDisplay;
     case MODAL_RANDOM_PITCH_GATE_WARNING:
-      sprintf(buf, "CHANNEL %d", selectedChannel+1 );
+      sprintf(buf, "CHANNEL %d", globalObj->selectedChannel+1 );
       displayElement[0] = strdup("Confirm randomize");
       displayElement[1] = strdup(buf);
       goto singleTextDisplay;
@@ -505,13 +558,13 @@ void DisplayModule::modalDisplay(){
       displayElement[1] = strdup("coming soon");
       goto singleTextDisplay;
     case MODAL_SHORTCUT_RESET:
-      sprintf(buf, "CHANNEL %d", selectedChannel+1 );
+      sprintf(buf, "CHANNEL %d", globalObj->selectedChannel+1 );
       displayElement[0] = strdup("Reset");
       displayElement[1] = strdup(buf);
       goto singleTextDisplay;
     case MODAL_SHORTCUT_REVERSE:
-      sprintf(buf, "CHANNEL %d", selectedChannel+1 );
-      switch(sequenceArray[selectedChannel].playMode){
+      sprintf(buf, "CHANNEL %d", globalObj->selectedChannel+1 );
+      switch(sequenceArray[globalObj->selectedChannel].playMode){
         case PLAY_PENDULUM:
           displayElement[0] = strdup("Pendulum");
         break;
@@ -595,7 +648,7 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
   if ( refresh ) {
     if ( (((highlight == stepMode) ) && !globalObj->parameterSelect)
     || forceHighlight
-    || ((currentMenu == MENU_PATTERN_CHAIN) && (highlight == globalObj->chainSelectedPattern) && !globalObj->parameterSelect) )  {
+    || ((globalObj->currentMenu == MENU_PATTERN_CHAIN) && (highlight == globalObj->chainSelectedPattern) && !globalObj->parameterSelect) )  {
       color1 = color;
       color2 = bgColor;
     } else {
@@ -653,7 +706,7 @@ void DisplayModule::renderStringBox(uint8_t index, uint8_t highlight, int16_t x,
     oled.setTextColor(color1);
     oled.print(displayElement[index]);
     if ((globalObj->parameterSelect && highlight == stepMode) || border ||
-    (( (currentMenu == MENU_PATTERN_CHAIN) && (highlight == globalObj->chainSelectedPattern)) && globalObj->parameterSelect)  ){
+    (( (globalObj->currentMenu == MENU_PATTERN_CHAIN) && (highlight == globalObj->chainSelectedPattern)) && globalObj->parameterSelect)  ){
       oled.drawRect(x,y,w,h, color1);
     }
 
@@ -732,9 +785,9 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   String gateTypeArray[] = { "off", "on", "tie", "1hit", "hold", "half", "rand33%", "rand50%", "rand66%" };
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);
+    sprintf(buf, "pt:%02d>%02d", sequenceArray[globalObj->selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);
   } else {
-    sprintf(buf, "ch%d pt%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    sprintf(buf, "ch%d pt%02d", globalObj->selectedChannel+1, sequenceArray[globalObj->selectedChannel].pattern+1 );
   }
   displayElement[2] = strdup(buf);
 
@@ -745,7 +798,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   }
   displayElement[3] = strdup(buf);
 
-  sprintf(buf, "gate%d", selectedChannel+1);
+  sprintf(buf, "gate%d", globalObj->selectedChannel+1);
   displayElement[4] = strdup(buf);
   displayElement[6] = strdup("glide");
   displayElement[8] = strdup("type:");
@@ -755,7 +808,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
     sprintf(buf, "Multiselect");
       displayElement[0] = strdup(buf);
     if(globalObj->multi_pitch_switch){
-      switch(sequenceArray[selectedChannel].quantizeScale){
+      switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
         case COLUNDI:
           displayElement[1] = strdup(colundiNotes[min_max(globalObj->multi_pitch, 0, COLUNDINOTECOUNT)] );
         break;
@@ -805,32 +858,39 @@ void DisplayModule::stateDisplay_pitch(char*buf){
     }
     displayElement[0] = strdup(buf);
 
-    switch(sequenceArray[selectedChannel].quantizeScale){
+    if( sequenceArray[globalObj->selectedChannel].transpose != 0 ){
+      sprintf(buf,"%+d", sequenceArray[globalObj->selectedChannel].transpose);
+    } else {
+      sprintf(buf, "");
+    }
+    displayElement[10] = strdup(buf);
+
+    switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
       case COLUNDI:
-        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
+        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
       break;
       case SEMITONE:
-        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantizeSemitonePitch(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[selectedChannel].quantizeKey, sequenceArray[selectedChannel].quantizeMode, 0)]);
-        //displayElement[1] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
+        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantizeSemitonePitch(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[globalObj->selectedChannel].quantizeKey, sequenceArray[globalObj->selectedChannel].quantizeMode, 0)]);
+        //displayElement[1] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
       break;
       default:
-      displayElement[1] = strdup(String(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
+      displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
     }
 
-    if ( sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST ){
+    if ( sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST ){
       displayElement[5] = strdup("rest");
     } else {
-      sprintf(buf, "%d.%02d", (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength+1)/4, (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength+1)%4*100/4  );
+      sprintf(buf, "%d.%02d", (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateLength+1)/4, (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateLength+1)%4*100/4  );
       displayElement[5] = strdup(buf);
     }
-    if (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].glide == 0) {
+    if (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].glide == 0) {
       sprintf(buf, "off");
     } else {
-      sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].glide);
+      sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].glide);
     }
     displayElement[9] = strdup(buf);
 
-    displayElement[7] = strdup(gateTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType].c_str() );
+    displayElement[7] = strdup(gateTypeArray[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType].c_str() );
   }
   if(globalObj->multiSelectSwitch || globalObj->chainModeActive ) {
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background  ); //  digitalWriteFast(PIN_EXT_RX, LOW);
@@ -855,6 +915,7 @@ void DisplayModule::stateDisplay_pitch(char*buf){
   renderStringBox(7,  STATE_GATETYPE,  63, 63,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, LOW);
   renderStringBox(9,  STATE_GLIDE,     63, 79,64,16, false, STYLE1X, background , foreground); //  digitalWriteFast(PIN_EXT_RX, HIGH);
 
+  renderStringBox(10,  DISPLAY_LABEL,  110,  25, 17, 8, false, REGULAR1X, foreground, background );
 };
 
 
@@ -872,7 +933,7 @@ void DisplayModule::stateDisplay_arp(char *buf){
   if(globalObj->multiSelectSwitch) {
     sprintf(buf, "arpmulti");
     displayElement[0] = strdup(buf);
-    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    sprintf(buf, "ch%d pt:%02d", globalObj->selectedChannel+1, sequenceArray[globalObj->selectedChannel].pattern+1 );
     displayElement[7] = strdup(buf);
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[12] = strdup(buf);
@@ -913,20 +974,20 @@ void DisplayModule::stateDisplay_arp(char *buf){
   } else {
     sprintf(buf, "arpeggio");
     displayElement[0] = strdup(buf);
-    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    sprintf(buf, "ch%d pt:%02d", globalObj->selectedChannel+1, sequenceArray[globalObj->selectedChannel].pattern+1 );
     displayElement[7] = strdup(buf);
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[12] = strdup(buf);
 
-    displayElement[2] = strdup(arpTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpType]);
+    displayElement[2] = strdup(arpTypeArray[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].arpType]);
 
-    sprintf(buf, "%d/", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpSpdNum);
+    sprintf(buf, "%d/", sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].arpSpdNum);
     displayElement[5] = strdup(buf);
-    sprintf(buf, "%d",  sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpSpdDen);
+    sprintf(buf, "%d",  sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].arpSpdDen);
     displayElement[6] = strdup(buf);
-    sprintf(buf, "%doct", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].arpOctave);
+    sprintf(buf, "%doct", sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].arpOctave);
     displayElement[9] = strdup(buf);
-    displayElement[11] = strdup(chordSelectionArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].chord]);
+    displayElement[11] = strdup(chordSelectionArray[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].chord]);
    }
     if(globalObj->multiSelectSwitch) {
       renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background );
@@ -971,7 +1032,7 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
    if(globalObj->multiSelectSwitch){
      sprintf(buf, "lfoenvmult ");
       displayElement[0] = strdup(buf);
-      sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+      sprintf(buf, "ch%d pt:%02d", globalObj->selectedChannel+1, sequenceArray[globalObj->selectedChannel].pattern+1 );
       displayElement[7] = strdup(buf);
       sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
       displayElement[8] = strdup(buf);
@@ -1006,18 +1067,18 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
   } else {
     sprintf(buf, "LFO & ENV");
     displayElement[0] = strdup(buf);
-    sprintf(buf, "ch%d pt:%02d", selectedChannel+1, sequenceArray[selectedChannel].pattern+1 );
+    sprintf(buf, "ch%d pt:%02d", globalObj->selectedChannel+1, sequenceArray[globalObj->selectedChannel].pattern+1 );
     displayElement[7] = strdup(buf);
     sprintf(buf, "p%d: %02d-%02d", notePage+1,  notePage*16+1, (notePage+1)*16 );
     displayElement[8] = strdup(buf);
-    if((sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType == 2) && (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocity > 0)) {
-      displayElement[2] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocity]);
+    if((sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocityType == 2) && (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocity > 0)) {
+      displayElement[2] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocity]);
     } else {
-      voltageToText(buf,sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocity);
+      voltageToText(buf,sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocity);
       displayElement[2] = strdup(buf);
     }
-      displayElement[4] = strdup(velTypeArray[sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType]);
-    //displayElement[4] = strdup(String(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType).c_str());
+      displayElement[4] = strdup(velTypeArray[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocityType]);
+    //displayElement[4] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocityType).c_str());
 
     /*
     Speed of 128
@@ -1027,23 +1088,23 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
     speed of 32 is 2 step wavelenth
     which is 64/32
     */
-    // if (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].velocityType > 6){
+    // if (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocityType > 6){
     //     displayElement[5] = strdup("Wavelnt:");
     //     sprintf(buf, "%d.%02d x",
-    //       sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed/64, (100*(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed%64))/64
+    //       sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].cv2speed/64, (100*(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].cv2speed%64))/64
     //    );
     //    displayElement[6] = strdup(buf);
     //
     // } else {
     //   displayElement[5] = strdup("EnvLng:");
-    //   sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed);
+    //   sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].cv2speed);
     //   displayElement[6] = strdup(buf);
     //
     // }
-    sprintf(buf, "%d", sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2speed);
+    sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].cv2speed);
     displayElement[6] = strdup(buf);
 
-    voltageToText(buf,sequenceArray[selectedChannel].stepData[globalObj->selectedStep].cv2offset);
+    voltageToText(buf,sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].cv2offset);
 
     displayElement[11] = strdup(buf);
   }
@@ -1069,44 +1130,44 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
  void DisplayModule::sequenceMenuDisplay(){
 
-   sprintf(buf, "ch%d transport", selectedChannel+1);
+   sprintf(buf, "ch%d transport", globalObj->selectedChannel+1);
 
    displayElement[0] = strdup(buf);
 
    displayElement[9] = strdup("first step:");
-   sprintf(buf, "%d", sequenceArray[selectedChannel].firstStep+1);
+   sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].firstStep+1);
    displayElement[10] = strdup(buf);
 
    displayElement[1] = strdup("step count:");
 
-   sprintf(buf, "%d", sequenceArray[selectedChannel].stepCount);
+   sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].stepCount);
    displayElement[2] = strdup(buf);
 
    displayElement[3] = strdup("clock div:");
 
-   if (sequenceArray[selectedChannel].clockDivision == 1){
-     sprintf(buf, "%d", sequenceArray[selectedChannel].clockDivision);
-   } else if (sequenceArray[selectedChannel].clockDivision > 0){
-     sprintf(buf, "1/%d", sequenceArray[selectedChannel].clockDivision);
+   if (sequenceArray[globalObj->selectedChannel].clockDivision == 1){
+     sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].clockDivision);
+   } else if (sequenceArray[globalObj->selectedChannel].clockDivision > 0){
+     sprintf(buf, "1/%d", sequenceArray[globalObj->selectedChannel].clockDivision);
    } else {
-     sprintf(buf, "%d", abs(sequenceArray[selectedChannel].clockDivision)+2 );
+     sprintf(buf, "%d", abs(sequenceArray[globalObj->selectedChannel].clockDivision)+2 );
    }
    displayElement[4] = strdup(buf);
 
-   // if(sequenceArray[selectedChannel].skipStepCount == 0){
+   // if(sequenceArray[globalObj->selectedChannel].skipStepCount == 0){
    //   sprintf(buf, "skip rndm:" );
    // } else {
-   //   sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
+   //   sprintf(buf, "skip %d:", sequenceArray[globalObj->selectedChannel].skipStepCount);
    // }
    //
    // displayElement[5] = strdup(buf);
    //
-   //  gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
+   //  gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_skipstep);
    //  displayElement[6] = strdup(buf);
 
    displayElement[5] = strdup("direction:");
 
-  switch(sequenceArray[selectedChannel].playMode){
+  switch(sequenceArray[globalObj->selectedChannel].playMode){
     case PLAY_FORWARD:
      displayElement[6] = strdup("FWD");
     break;
@@ -1123,7 +1184,7 @@ void DisplayModule::voltageToText(char *buf, int voltageValue){
 
     displayElement[7] = strdup("swing:");
 
-    sprintf(buf, "%d%%", sequenceArray[selectedChannel].swingX100);
+    sprintf(buf, "%d%%", sequenceArray[globalObj->selectedChannel].swingX100);
     displayElement[8] = strdup(buf);
 
    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X, background , contrastColor);
@@ -1187,32 +1248,32 @@ void DisplayModule::cvMappingText(char *buf, int8_t mapping){
 };
 
 void DisplayModule::scaleMenuDisplay(){
-   sprintf(buf, "ch%d quantizer", selectedChannel+1);
+   sprintf(buf, "ch%d quantizer", globalObj->selectedChannel+1);
 
      displayElement[0] = strdup(buf);
 
      displayElement[3] = strdup("scale:");
      const char * const scaleArray[] = {"semitone", "pythagorean", "colundi"};
 
-      displayElement[4] = strdup(scaleArray[sequenceArray[selectedChannel].quantizeScale]);
+      displayElement[4] = strdup(scaleArray[sequenceArray[globalObj->selectedChannel].quantizeScale]);
 
      displayElement[5] = strdup("key:");
      const char * const keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
-     displayElement[6] = strdup(keyArray[sequenceArray[selectedChannel].quantizeKey]);
+     displayElement[6] = strdup(keyArray[sequenceArray[globalObj->selectedChannel].quantizeKey]);
      displayElement[7] = strdup("mode:");
      //char *modeArray[] = {"chromatic", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian", "bluesmajor", "bluesminor", "pent_major", "pent_minor", "folk", "japanese", "gamelan", "gypsy", "arabian", "flamenco", "wholetone" };
 
-     // switch(sequenceArray[selectedChannel].quantizeScale){
+     // switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
      //   case SEMITONE:
      //   case PYTHAGOREAN:
-     //     displayElement[8] = strdup(modeArray[sequenceArray[selectedChannel].quantizeMode]);
+     //     displayElement[8] = strdup(modeArray[sequenceArray[globalObj->selectedChannel].quantizeMode]);
      //   break;
      //   case COLUNDI:
      //     displayElement[8] = strdup("--");
      //   break;
      // }
 
-    switch(sequenceArray[selectedChannel].quantizeMode){
+    switch(sequenceArray[globalObj->selectedChannel].quantizeMode){
       case SEMITONE_SCALE_12:     displayElement[8] = strdup("CHROMATIC"); break;
       case MAJOR_SCALE_12:        displayElement[8] = strdup("MAJOR"); break;
       case MINOR_SCALE_12:        displayElement[8] = strdup("MINOR"); break;
@@ -1256,13 +1317,13 @@ void DisplayModule::scaleMenuDisplay(){
 
 
 void DisplayModule::inputMenuDisplay(){
-  sprintf(buf, "CH%d INPUT MAP", selectedChannel+1);
+  sprintf(buf, "CH%d INPUT MAP", globalObj->selectedChannel+1);
 
   displayElement[0] = strdup(buf);
 /*
   displayElement[1] = strdup("X-AXIS:");
-  if (sequenceArray[selectedChannel].gpio_xaxis < 4){
-   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_xaxis +1 );
+  if (sequenceArray[globalObj->selectedChannel].gpio_xaxis < 4){
+   sprintf(buf, "GT%d", sequenceArray[globalObj->selectedChannel].gpio_xaxis +1 );
    displayElement[2] = strdup(buf);
  } else {
    displayElement[2] = strdup("NONE");
@@ -1285,13 +1346,13 @@ void DisplayModule::inputMenuDisplay(){
    displayElement[2] = strdup("SYNC");
    displayElement[4] = strdup("RESET:");
 
-  gateMappingText(buf, sequenceArray[selectedChannel].gpio_reset);
+  gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_reset);
   displayElement[5] = strdup(buf);
 
  //
  //  displayElement[6] = strdup("Y-AXIS:");
- //  if (sequenceArray[selectedChannel].gpio_skipstep < 4){
- //   sprintf(buf, "GT%d", sequenceArray[selectedChannel].gpio_skipstep +1 );
+ //  if (sequenceArray[globalObj->selectedChannel].gpio_skipstep < 4){
+ //   sprintf(buf, "GT%d", sequenceArray[globalObj->selectedChannel].gpio_skipstep +1 );
  //   displayElement[7] = strdup(buf);
  // } else {
  //   displayElement[7] = strdup("NONE");
@@ -1351,55 +1412,55 @@ void DisplayModule::inputMenuDisplay(){
  }
 
  void DisplayModule::modMenu1_DisplayHandler(){
-   sprintf(buf, "ch%d modulation 1", selectedChannel+1);
+   sprintf(buf, "ch%d modulation 1", globalObj->selectedChannel+1);
    displayElement[0] = strdup(buf);
 
-   if(sequenceArray[selectedChannel].skipStepCount == 0){
+   if(sequenceArray[globalObj->selectedChannel].skipStepCount == 0){
      sprintf(buf, "skip rndm:" );
    }else {
-     sprintf(buf, "skip -> %d:", sequenceArray[selectedChannel].skipStepCount);
+     sprintf(buf, "skip -> %d:", sequenceArray[globalObj->selectedChannel].skipStepCount);
    }
 
    displayElement[1] = strdup(buf);
 
-    gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
+    gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_skipstep);
     displayElement[2] = strdup(buf);
 
    displayElement[3] = strdup("gate lngth:");
 
-  cvMappingText(buf, sequenceArray[selectedChannel].cv_gatemod);
+  cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_gatemod);
   displayElement[4] = strdup(buf);
 
  //  displayElement[3] = strdup("gatemute:");
- // gateMappingText(buf, sequenceArray[selectedChannel].gpio_gatemute);
+ // gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_gatemute);
  // displayElement[4] = strdup(buf);
 
  displayElement[5] = strdup("rndm pch");
- gateMappingText(buf, sequenceArray[selectedChannel].gpio_randompitch);
+ gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_randompitch);
  displayElement[6] = strdup(buf);
 
 
- sprintf(buf, "add:%d", sequenceArray[selectedChannel].randomHigh);
+ sprintf(buf, "add:%d", sequenceArray[globalObj->selectedChannel].randomHigh);
  displayElement[11] = strdup(buf);
- sprintf(buf, "sub:%d", sequenceArray[selectedChannel].randomLow);
+ sprintf(buf, "sub:%d", sequenceArray[globalObj->selectedChannel].randomLow);
  displayElement[12] = strdup(buf);
 
 displayElement[7] = strdup("transpose:");
 
-// if (sequenceArray[selectedChannel].cv_pitchmod < 4){
-//  sprintf(buf, "cv%d", sequenceArray[selectedChannel].cv_pitchmod +1 );
+// if (sequenceArray[globalObj->selectedChannel].cv_pitchmod < 4){
+//  sprintf(buf, "cv%d", sequenceArray[globalObj->selectedChannel].cv_pitchmod +1 );
 //  displayElement[8] = strdup(buf);
 // } else {
 //  displayElement[8] = strdup("off");
 // }
 
-cvMappingText(buf, sequenceArray[selectedChannel].cv_pitchmod);
+cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_pitchmod);
 displayElement[8] = strdup(buf);
 
 
 displayElement[9] = strdup("glide time:");
 
-cvMappingText(buf, sequenceArray[selectedChannel].cv_glidemod);
+cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_glidemod);
 displayElement[10] = strdup(buf);
 
    renderStringBox(0,  DISPLAY_LABEL,      0,    0, 128, 15, false, STYLE1X, background , contrastColor);
@@ -1421,46 +1482,46 @@ displayElement[10] = strdup(buf);
  };
 
  void DisplayModule::modMenu2_DisplayHandler(){
-   sprintf(buf, "ch%d modulation 2", selectedChannel+1);
+   sprintf(buf, "ch%d modulation 2", globalObj->selectedChannel+1);
    displayElement[0] = strdup(buf);
 
    displayElement[1] = strdup("arp type:");
 
-  cvMappingText(buf, sequenceArray[selectedChannel].cv_arptypemod);
+  cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_arptypemod);
   displayElement[2] = strdup(buf);
 
   displayElement[3] = strdup("arp speed:");
 
- cvMappingText(buf, sequenceArray[selectedChannel].cv_arpspdmod);
+ cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_arpspdmod);
  displayElement[4] = strdup(buf);
 
  displayElement[5] = strdup("arp octve:");
 
-  cvMappingText(buf, sequenceArray[selectedChannel].cv_arpoctmod);
+  cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_arpoctmod);
   displayElement[6] = strdup(buf);
 
 displayElement[7] = strdup("arp intvl:");
 
-  cvMappingText(buf, sequenceArray[selectedChannel].cv_arpintmod);
+  cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_arpintmod);
  displayElement[8] = strdup(buf);
 
 
- if(sequenceArray[selectedChannel].skipStepCount == 0){
+ if(sequenceArray[globalObj->selectedChannel].skipStepCount == 0){
    sprintf(buf, "skip rndm:" );
  } else {
-   sprintf(buf, "skip %d:", sequenceArray[selectedChannel].skipStepCount);
+   sprintf(buf, "skip %d:", sequenceArray[globalObj->selectedChannel].skipStepCount);
  }
 
  displayElement[9] = strdup(buf);
 
-  gateMappingText(buf, sequenceArray[selectedChannel].gpio_skipstep);
+  gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_skipstep);
   displayElement[10] = strdup(buf);
 
 /*
 displayElement[9] = strdup("GLIDETIME:");
 
-if (sequenceArray[selectedChannel].cv_glidemod < 4){
- sprintf(buf, "CV%d", sequenceArray[selectedChannel].cv_glidemod +1 );
+if (sequenceArray[globalObj->selectedChannel].cv_glidemod < 4){
+ sprintf(buf, "CV%d", sequenceArray[globalObj->selectedChannel].cv_glidemod +1 );
  displayElement[10] = strdup(buf);
 } else {
  displayElement[10] = strdup("OFF");
@@ -1690,9 +1751,9 @@ void DisplayModule::saveMenuDisplayHandler(){
  void DisplayModule::noteDisplayHandler(){
 
 
-   uint8_t currentStep = sequenceArray[selectedChannel].getActivePage()*16;
+   uint8_t currentStep = sequenceArray[globalObj->selectedChannel].getActivePage()*16;
    for(int i = 0; i<16; i++){
-     displayElement[i] = strdup(midiNotes[sequenceArray[selectedChannel].stepData[currentStep+i].pitch[0]]);
+     displayElement[i] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[currentStep+i].pitch[0]]);
      renderStringBox( i, DISPLAY_LABEL, 32*(i%4), 16*(i/4+1), 32 , 16, false, STYLE1X, BLACK, GREEN);
    }
 
@@ -2201,7 +2262,7 @@ void DisplayModule::patternChainMenuHandler(){
   displayElement[0] = strdup("SONG EDIT");
 
   if(globalObj->chainModeActive){
-    sprintf(buf, "pt:%02d>%02d", sequenceArray[selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);
+    sprintf(buf, "pt:%02d>%02d", sequenceArray[globalObj->selectedChannel].pattern+1 , abs(globalObj->chainPatternSelect[globalObj->chainModeIndex]+1)+1);
   } else {
     sprintf(buf, "push play" );
   }
@@ -2294,7 +2355,37 @@ void DisplayModule::patternChainMenuHandler(){
   renderStringBox(4,  chainIndexOffset+chainIndex++,  0, yindex+3*yoffset, 127, 16, false, STYLE1X, background , contrastColor); //, highlightBool);
 };
 
+void DisplayModule::shortcutTransposeMenu(){
+  // Serial.println("transpose display");
+  displayElement[0] = strdup("Transpose");
 
+  displayElement[1] = strdup("scale degrees:");
+  // displayElement[2] = strdup(":");
+  // displayElement[3] = strdup("span:");
+
+  sprintf(buf,"%+d", sequenceArray[globalObj->selectedChannel].transpose);
+    displayElement[5] = strdup(buf);
+  // displayElement[6] = strdup(midiNotes[globalObj->randomizeLow]);
+  // sprintf(buf, "%d octave", globalObj->randomizeSpan);
+  // displayElement[7] = strdup(buf);
+
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+  renderStringBox(1,  DISPLAY_LABEL,        0, 20,128,17, false, STYLE1X, background , foreground);
+  // renderStringBox(2,  DISPLAY_LABEL,        0, 37,46,17, false, STYLE1X, background , foreground);
+  // renderStringBox(3,  DISPLAY_LABEL,        0, 54,46,17, false, STYLE1X, background , foreground);
+
+  renderStringBox(5,  STATE_SHORTCUT_TRANSPOSE, 0, 37 , 127, 27, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
+
+  // renderStringBox(5,  STATE_SHORTCUT_TRANSPOSE,   47, 20,80,17, false, STYLE1X, background , foreground);
+  // renderStringBox(6,  STATE_SHORTCUT_RANDOM_LOW,       47, 37,80,17, false, STYLE1X, background , foreground);
+  // renderStringBox(7,  STATE_SHORTCUT_RANDOM_SPAN,       47, 54,80,17, false, STYLE1X, background , foreground);
+
+
+}
 void DisplayModule::shortcutRandomMenu(){
 
   const char * const paramsArray[] = {"pitch/gate", "pitch", "gate", "tie", "arp all", "arpalgo", "arpspeed", "arpoctave", "arpintv", "cv2type", "cv2amp", "cv2speed", "cv2offset"};
@@ -2318,12 +2409,12 @@ void DisplayModule::shortcutRandomMenu(){
     renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
   }
 
-    renderStringBox(11,  DISPLAY_LABEL,  64,  0, 63, 8, false, REGULAR1X, background, contrastColor );
-    renderStringBox(12,  DISPLAY_LABEL,  64,  8, 63, 8, false, REGULAR1X, background, contrastColor );
+  renderStringBox(11,  DISPLAY_LABEL,  64,  0, 63, 8, false, REGULAR1X, background, contrastColor );
+  renderStringBox(12,  DISPLAY_LABEL,  64,  8, 63, 8, false, REGULAR1X, background, contrastColor );
 
-    renderStringBox(1,  DISPLAY_LABEL,        0, 20,46,17, false, STYLE1X, background , foreground);
-    renderStringBox(2,  DISPLAY_LABEL,        0, 37,46,17, false, STYLE1X, background , foreground);
-    renderStringBox(3,  DISPLAY_LABEL,        0, 54,46,17, false, STYLE1X, background , foreground);
+  renderStringBox(1,  DISPLAY_LABEL,        0, 20,46,17, false, STYLE1X, background , foreground);
+  renderStringBox(2,  DISPLAY_LABEL,        0, 37,46,17, false, STYLE1X, background , foreground);
+  renderStringBox(3,  DISPLAY_LABEL,        0, 54,46,17, false, STYLE1X, background , foreground);
     //renderStringBox(10,  DISPLAY_LABEL,       0, 71,46,17, false, STYLE1X, background , foreground);
   //  renderStringBox(11,  DISPLAY_LABEL,       0, 88,46,17, false, STYLE1X, background , foreground);
 
@@ -2334,3 +2425,138 @@ void DisplayModule::shortcutRandomMenu(){
     //renderStringBox(11,  STATE_CV2_OFFSET,         64, 71,63,17, false, STYLE1X, background , foreground);
 
 }
+
+
+
+void DisplayModule::shortcutTunerMenu(){
+  displayElement[0] = strdup("shortcut tuner");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+  renderStringBox(1,  STATE_SYSEX_EXPORT,   0, 15, 127,16, false, STYLE1X, background , foreground);
+
+};
+
+void DisplayModule::shortcutFillMenu(){
+  displayElement[0] = strdup("shortcut fill");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};
+
+void DisplayModule::shortcutSkipMenu(){
+  displayElement[0] = strdup("shortcut skip");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+  displayElement[1] = strdup("skip count:");
+  displayElement[3] = strdup("trigger:");
+
+  if(sequenceArray[globalObj->selectedChannel].skipStepCount == 0){
+    sprintf(buf, "random" );
+  } else {
+    sprintf(buf, "%+d", sequenceArray[globalObj->selectedChannel].skipStepCount);
+  }
+  displayElement[5] = strdup(buf);
+
+  gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_skipstep);
+  displayElement[6] = strdup(buf);
+
+  renderStringBox(1,  DISPLAY_LABEL,        0, 20,128,17, false, STYLE1X, background , foreground);
+
+  renderStringBox(5,  STATE_SHORTCUT_SKIP,  0, 37 , 127, 27, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
+
+  renderStringBox(3,  DISPLAY_LABEL,        0, 64,63,17, false, STYLE1X, background , foreground);
+
+  renderStringBox(6,  STATE_SHORTCUT_SKIP_TRIGGER,   64, 64,63,17, false, STYLE1X, background , foreground);
+
+};
+
+void DisplayModule::shortcutClkdivMenu(){
+  displayElement[0] = strdup("clock divider");
+
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+
+};
+
+void DisplayModule::shortcutResetMenu(){
+  displayElement[0] = strdup("shortcut reset");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+};
+
+void DisplayModule::shortcutReverseMenu(){
+  displayElement[0] = strdup("shortcut reverse");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};
+
+void DisplayModule::shortcutPageMenu(){
+  displayElement[0] = strdup("shortcut page");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};
+
+void DisplayModule::shortcutFn1Menu(){
+  displayElement[0] = strdup("shortcut fn1");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};
+
+void DisplayModule::shortcutFn2Menu(){
+  displayElement[0] = strdup("shortcut fn2");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};
+
+void DisplayModule::shortcutFn3Menu(){
+  displayElement[0] = strdup("shortcut fn3");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};
+
+void DisplayModule::shortcutFn4Menu(){
+  displayElement[0] = strdup("shortcut fn4");
+  if(globalObj->multiSelectSwitch){
+    renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
+  } else {
+    renderStringBox(0,  DISPLAY_LABEL,    0,  0, 128, 15, false, STYLE1X , background, contrastColor);
+  }
+
+};

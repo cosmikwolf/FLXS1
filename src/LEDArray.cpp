@@ -42,7 +42,7 @@ void LEDArray::loop(uint16_t interval){
       blinkTimer = 0;
     }
 
-    switch (currentMenu ){
+    switch (globalObj->currentMenu ){
       case SEQUENCE_MENU:
       case QUANTIZE_MENU:
       case MOD_MENU_1:
@@ -136,7 +136,7 @@ void LEDArray::patternSelectSaveHandler(){
 
 void LEDArray::quantizeModeLEDHandler(){
   for (int i=0; i < 12; i++){
-    if (sequenceArray[selectedChannel].quantizeMode & (1 << i) ){
+    if (sequenceArray[globalObj->selectedChannel].quantizeMode & (1 << i) ){
       leds.setPixelColor(ledMainMatrix[i], 0,255,0,255);
     } else {
       leds.setPixelColor(ledMainMatrix[i], 255,0,0,1);
@@ -153,14 +153,14 @@ void LEDArray::quantizeModeLEDHandler(){
 void LEDArray::channelSequenceModeLEDHandler(){
   uint8_t iStep;
   for (int i=0; i < 16; i++){
-    iStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
-    if (iStep == sequenceArray[selectedChannel].activeStep ){
+    iStep = sequenceArray[globalObj->selectedChannel].getActivePage()*16 + i;
+    if (iStep == sequenceArray[globalObj->selectedChannel].activeStep ){
       leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
 
-    } else if(sequenceArray[selectedChannel].stepData[iStep].gateType == 0){
+    } else if(sequenceArray[globalObj->selectedChannel].stepData[iStep].gateType == 0){
       leds.setPixelColor(ledMainMatrix[i], 1,1,1,1);
     } else {
-      leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(iStep, 0)));
+      leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[globalObj->selectedChannel].getStepPitch(iStep, 0)));
     }
   }
 
@@ -172,8 +172,8 @@ void LEDArray::multiSelectLEDHandler(){
   for (int i=0; i < 16; i++){
     if (globalObj->multiSelection[getNote(i)] && blinkTimer < 3000000 / globalObj->tempoX100){
       leds.setPixelColor(ledMainMatrix[i], 0,0,0,255);
-    } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType != 0){
-      leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
+    } else if(sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType != 0){
+      leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[globalObj->selectedChannel].getStepPitch(getNote(i), 0)));
     } else {
       leds.setPixelColor(ledMainMatrix[i], 16,0,16,0);
     }
@@ -186,12 +186,12 @@ void LEDArray::multiSelectLEDHandler(){
 void LEDArray::channelPitchModeLEDHandler(uint8_t stepSelect){
 
   for (int i=0; i < 16; i++){
-    if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
+    if (getNote(i) == sequenceArray[globalObj->selectedChannel].activeStep ){
       leds.setPixelColor(ledMainMatrix[i], 127,127,127,255);
-    } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
+    } else if(sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 0){
       leds.setPixelColor(ledMainMatrix[i], 1,1,1,1);
     } else {
-      leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0)));
+      leds.setPixelColor(ledMainMatrix[i], wheel(sequenceArray[globalObj->selectedChannel].getStepPitch(getNote(i), 0)));
     }
 
     if (getNote(i) == stepSelect && blinkTimer < 3000000/globalObj->tempoX100) {
@@ -223,7 +223,7 @@ void LEDArray::channelPitchModeLEDHandler(uint8_t stepSelect){
 
 void LEDArray::channelLEDHandler(){
   for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
+    if (globalObj->selectedChannel == i) {
       if(sequenceArray[i].muteGate == true){
         leds.setPixelColor(ledChannelButtons[i], 127, 0,0,32);
       } else {
@@ -244,12 +244,12 @@ void LEDArray::channelGateModeLEDHandler(){
   playPauseHandler();
 
   for (int i=0; i < 16; i++){
-    if (getNote(i) == sequenceArray[selectedChannel].activeStep ){
-      if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 1 ){
+    if (getNote(i) == sequenceArray[globalObj->selectedChannel].activeStep ){
+      if (sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 1 ){
         leds.setPixelColor(ledMainMatrix[i], 0,0,255,128);
-      } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 2 ){
+      } else if (sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 2 ){
         leds.setPixelColor(ledMainMatrix[i], 255,0,0,128);
-      } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 3 ){
+      } else if (sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 3 ){
         leds.setPixelColor(ledMainMatrix[i], 0,255,0,128);
       } else {
         leds.setPixelColor(ledMainMatrix[i], 255,255,255,255);
@@ -258,14 +258,14 @@ void LEDArray::channelGateModeLEDHandler(){
     } else if (getNote(i) == globalObj->selectedStep) {
       leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5)%255));
 
-    } else if(sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 0){
+    } else if(sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 0){
       leds.setPixelColor(ledMainMatrix[i], 0,0,0,0);
     } else {
-      if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 1 ){
+      if (sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 1 ){
         leds.setPixelColor(ledMainMatrix[i], 0,0,255,0);
-      } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 2 ){
+      } else if (sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 2 ){
         leds.setPixelColor(ledMainMatrix[i], 255,0,0,0);
-      } else if (sequenceArray[selectedChannel].stepData[getNote(i)].gateType == 3 ){
+      } else if (sequenceArray[globalObj->selectedChannel].stepData[getNote(i)].gateType == 3 ){
         leds.setPixelColor(ledMainMatrix[i], 0,255,0,0);
       }
     }
@@ -278,7 +278,7 @@ void LEDArray::channelEnvelopeModeLEDHandler(){
   playPauseHandler();
 
   for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
+    if (globalObj->selectedChannel == i) {
       leds.setPixelColor(ledChannelButtons[i], wheel(128));
 
     } else {
@@ -293,7 +293,7 @@ void LEDArray::channelStepModeLEDHandler(){
   playPauseHandler();
 
   for (int i=0; i < 4; i++){
-    if (selectedChannel == i) {
+    if (globalObj->selectedChannel == i) {
       leds.setPixelColor(ledChannelButtons[i], wheel(196));
     } else {
       leds.setPixelColor(ledChannelButtons[i], 0,0,0,0);

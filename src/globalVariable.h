@@ -62,6 +62,8 @@ class GlobalVariable {
     uint8_t   multi_velocityType;
     uint8_t   multi_cv2speed;
     int8_t    multi_cv2offset;
+    uint8_t   currentMenu;
+    uint8_t  selectedChannel;
 
     uint8_t   clockMode;
     uint32_t tempoX100;
@@ -87,6 +89,8 @@ class GlobalVariable {
     uint8_t   activeGate;
     uint8_t   rheoTestLevel;
     uint8_t   stepCopyIndex;
+    uint8_t   copiedChannel;
+    uint8_t   copiedPage;
     uint8_t   chCopyIndex;
     uint8_t   randomizeParamSelect;
     uint8_t   randomizeLow;
@@ -127,6 +131,7 @@ class GlobalVariable {
     bool midiSetClockOut;
     bool gateTestComplete;
     elapsedMillis testTimer;
+    elapsedMillis screenSaverTimeout;
     int generateRandomNumber(int minVal, int maxVal);
     bool extClock();
     bool clockPortDirection();

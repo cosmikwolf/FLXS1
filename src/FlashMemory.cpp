@@ -390,8 +390,8 @@ bool FlashMemory::deserializeGlobalSettings(char* json){
 void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
-  root["version"] = 18;
-
+  root["version"] = 19;
+  //version 19 adds transpose
   JsonArray& seqSettingsArray = root.createNestedArray("settings"); {}
 
   seqSettingsArray.add(sequenceArray[channel].stepCount);           // array index: 0
@@ -419,6 +419,7 @@ void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pa
   seqSettingsArray.add(sequenceArray[channel].randomLow);           // array index: 22
   seqSettingsArray.add(sequenceArray[channel].randomHigh);          // array index: 23
   seqSettingsArray.add(sequenceArray[channel].quantizeScale);       // array index: 24
+  seqSettingsArray.add(sequenceArray[channel].transpose);           // array index: 25
 
   JsonArray& stepDataArray = root.createNestedArray("data");
 
@@ -536,6 +537,13 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
    sequenceArray[channel].randomLow        = jsonReader["settings"][22];
    sequenceArray[channel].randomHigh       = jsonReader["settings"][23];
    sequenceArray[channel].quantizeScale    = jsonReader["settings"][24];
+   if(jsonReader["version"] < 19){
+     sequenceArray[channel].transpose = 0;
+     Serial.println("not loading transpose");
+   } else {
+     sequenceArray[channel].transpose        = jsonReader["settings"][25];
+     Serial.println("loading transpose");
+   }
     //.as<uint8_t>();
    //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
    JsonArray& stepDataArray = jsonReader["data"];

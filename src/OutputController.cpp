@@ -79,7 +79,6 @@ void OutputController::initialize(Zetaohm_MAX7301* backplaneGPIO, midi::MidiInte
 
   backplaneGPIO->updateGpioPinModes(); // send GPIO pin modes to chip
 
-
   //backplaneGPIO->digitalWrite(0, 0);
   //backplaneGPIO->digitalWrite(1, 0);
   //backplaneGPIO->digitalWrite(2, 0);
@@ -157,6 +156,8 @@ for (int i=0; i<4; i++){
   //for (int i=0; i<28; i++){
   //  Serial.println("Reading port: " + String(i) + "\t" + String(backplaneGPIO->readAddress(i)));
   //}
+  this->setClockOutput(HIGH);
+
 }
 
 void OutputController::sequenceArrayResetSequence(uint8_t channel){

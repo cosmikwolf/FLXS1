@@ -157,7 +157,19 @@ class DisplayModule
     void inputDebugMenuDisplay();
 
     void shortcutRandomMenu();
-
+    void shortcutTransposeMenu();
+    void shortcutTunerMenu();
+    void shortcutFillMenu();
+    void shortcutSkipMenu();
+    void shortcutClkdivMenu();
+    void shortcutResetMenu();
+    void shortcutReverseMenu();
+    void shortcutPageMenu();
+    void shortcutFn1Menu();
+    void shortcutFn2Menu();
+    void shortcutFn3Menu();
+    void shortcutFn4Menu();
+    
     void cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeValue);
     void voltageToText(char *buf, int voltageValue);
     void createChList(char * buf);

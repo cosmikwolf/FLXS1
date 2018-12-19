@@ -13,7 +13,6 @@ void MasterClock::initialize(OutputController * outputControl, Sequencer *sequen
 	gatePrevState[1] = false;
 	gatePrevState[2] = false;
 	gatePrevState[3] = false;
-	this->totalClockCount = 0;
 	Serial.println("Master Clock Initialized");
 	lfoTimer = 0;
 };
@@ -39,12 +38,35 @@ void MasterClock::masterClockFunc(){
 	clockPeriod *= 60;
 
 	if (globalObj->clockMode == INTERNAL_CLOCK){
-    internalMasterClockTick(clockPeriod);
   } else if(globalObj->clockMode == EXTERNAL_MIDI_35_CLOCK || globalObj->clockMode == EXTERNAL_MIDI_USB_CLOCK ){
-    midiMasterClockTick(clockPeriod);
   } else if(globalObj->clockMode >= EXTERNAL_CLOCK_GATE_0){
-    externalMasterClockTick(clockPeriod);
 	}
+
+	switch(globalObj->clockMode){
+		case INTERNAL_CLOCK:
+			internalMasterClockTick(clockPeriod);
+			break;
+		case EXTERNAL_MIDI_35_CLOCK:
+		case EXTERNAL_MIDI_USB_CLOCK:
+			midiMasterClockTick(clockPeriod);
+			break;
+		case EXTERNAL_CLOCK_GATE_0:
+			externalMasterClockTick(0, clockPeriod);
+			break;
+		case EXTERNAL_CLOCK_GATE_1:
+			externalMasterClockTick(1, clockPeriod);
+			break;
+		case EXTERNAL_CLOCK_GATE_2:
+			externalMasterClockTick(2, clockPeriod);
+			break;
+		case EXTERNAL_CLOCK_GATE_3:
+			externalMasterClockTick(3, clockPeriod);
+			break;
+		case EXTERNAL_CLOCK_BIDIRECTIONAL_INPUT:
+			externalMasterClockTick(4, clockPeriod);
+			break;
+	}
+
 };
 
 void MasterClock::internalMasterClockTick(uint32_t clockPeriod){
@@ -102,15 +124,38 @@ void MasterClock::internalMasterClockTick(uint32_t clockPeriod){
   }
 };
 
-void MasterClock::externalMasterClockTick(uint32_t clockPeriod){
+void MasterClock::externalMasterClockTick(uint8_t gateNum, uint32_t clockPeriod){
+	uint32_t clockCycles = ARM_DWT_CYCCNT;
+
   clearedToRunLoadOperation = true;
 
   for (int i = 0; i < SEQUENCECOUNT; i++ ){
     sequenceArray[i].masterClockPulse();
   }
+
+	if(globalObj->gateInputRaw[gateNum] == 1){
+		if(outputControl->readClockPort() == LOW ){
+			outputControl->setClockOutput(HIGH);
+			extCycleTimeClkCount = clockCycles - extCycleTimeClkCount;
+			extLastRunClockCount = clockCycles;
+		}
+	} else {
+		if(extCycleTimeClkCount == 0){
+			outputControl->setClockOutput(LOW);
+		}
+	}
+
+	if(outputControl->readClockPort() == HIGH ){
+		if (clockCycles > extLastRunClockCount + extCycleTimeClkCount/2){
+			outputControl->setClockOutput(LOW);
+		}
+	}
+
 };
 
 void MasterClock::externalSeqFunc(uint8_t gateNum){
+	uint32_t clockCycles = ARM_DWT_CYCCNT;
+
 	clearedToRunLoadOperation = true;
 
 	checkGateClock();
@@ -141,11 +186,16 @@ void MasterClock::externalSeqFunc(uint8_t gateNum){
 
 	}
 
-	if(globalObj->gateInputRaw[gateNum] == 1){
-		outputControl->setClockOutput(HIGH);
-	} else {
-		outputControl->setClockOutput(LOW);
-	}
+	// if(globalObj->gateInputRaw[gateNum] == 1){
+	// 	outputControl->setClockOutput(HIGH);
+	// 	lastExtSeqRunClock = clockCycles;
+	// } else {
+	// 	if(lastExtSeqRunClock == 0){
+	// 		outputControl->setClockOutput(LOW);
+	// 	}
+	// }
+
+
 
 	for (int i=0; i< SEQUENCECOUNT; i++){
 		sequenceArray[i].runSequence();
@@ -178,7 +228,7 @@ void MasterClock::sequencerFunc(void){
 	outputControl->inputRead();
 	this->songAndPatternLogic();
 
-	if(currentMenu == CALIBRATION_MENU){
+	if(globalObj->currentMenu == CALIBRATION_MENU){
 		globalObj->playing = 0;
 		outputControl->dacTestLoop();
 		return;

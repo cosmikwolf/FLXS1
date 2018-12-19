@@ -22,7 +22,7 @@ public:
   void changeTempo(uint32_t newtempoX100);
   void masterClockFunc();
   void internalMasterClockTick(uint32_t clockPeriod);
-  void externalMasterClockTick(uint32_t clockPeriod);
+  void externalMasterClockTick(uint8_t gateNum, uint32_t clockPeriod);
   void midiMasterClockTick(uint32_t clockPeriod);
   void sequencerFunc();
   void internalSeqFunc();
@@ -37,8 +37,8 @@ public:
   bool gateTrig[9];
   bool gatePrevState[9];
   elapsedMicros pulseTimer;
-  uint32_t totalClockCount;
-  uint32_t clockCounter;
+  uint32_t extCycleTimeClkCount;
+  uint32_t extLastRunClockCount;
   uint32_t extClockCounter;
 
   uint32_t masterClockCycleCount;

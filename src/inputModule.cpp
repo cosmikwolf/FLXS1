@@ -30,7 +30,6 @@ void InputModule::initialize(OutputController* outputControl, Zetaohm_MAX7301* m
   this->globalObj = globalObj;
   this->display = display;
   this->shortcutRandomOctaveSpan = 2;
-  this->shortcutRandomSwitch = 5000;
   this->heldButton = 255;
 
   midplaneGPIO->begin(MIDPLANE_MAX7301_CS_PIN);
@@ -173,63 +172,63 @@ void InputModule::multiSelectInputHandler(){
 
           switch(stepMode){
             case STATE_PITCH0:
-              sequenceArray[selectedChannel].setStepPitch(i, min_max_cycle(globalObj->multi_pitch, 0,120), 0);
+              sequenceArray[globalObj->selectedChannel].setStepPitch(i, min_max_cycle(globalObj->multi_pitch, 0,120), 0);
 
               Serial.println("Changing pitch - knobChange: : " + String(knobChange) + "\tmultiPitch: " + String(globalObj->multi_pitch));
 
               break;
             case STATE_CHORD:
-            //  setStepAbsolute(selectedChannel, i, globalObj->multi_arpInterval);
-              sequenceArray[selectedChannel].stepData[i].chord = globalObj->multi_arpInterval;
-              sequenceArray[selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][0],1);
-              sequenceArray[selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][1],2);
-              sequenceArray[selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][2],3);
+            //  setStepAbsolute(globalObj->selectedChannel, i, globalObj->multi_arpInterval);
+              sequenceArray[globalObj->selectedChannel].stepData[i].chord = globalObj->multi_arpInterval;
+              sequenceArray[globalObj->selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][0],1);
+              sequenceArray[globalObj->selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][1],2);
+              sequenceArray[globalObj->selectedChannel].setStepPitch(i, chordArray[globalObj->multi_arpInterval][2],3);
               break;
 
             case STATE_GATETYPE:
-             sequenceArray[selectedChannel].stepData[i].gateType =  globalObj->multi_gateType;
-           //sequenceArray[selectedChannel].stepData[i].gateType =  min_max(globalObj->multi_gateType, 0, 3);
+             sequenceArray[globalObj->selectedChannel].stepData[i].gateType =  globalObj->multi_gateType;
+           //sequenceArray[globalObj->selectedChannel].stepData[i].gateType =  min_max(globalObj->multi_gateType, 0, 3);
              Serial.println("Changing gatetype - knobChange: : " + String(knobChange) + "\tglobalObj->multi_gateType: " + String(globalObj->multi_gateType) + "\tquant vale: " + String(globalObj->multi_gateType) );
 
               break;
             case STATE_GATELENGTH:
                 if ( globalObj->multi_gateLength == 0  ) {
-                  sequenceArray[selectedChannel].stepData[i].gateType = GATETYPE_REST;
+                  sequenceArray[globalObj->selectedChannel].stepData[i].gateType = GATETYPE_REST;
                 } else if(globalObj->multi_gateLength > 0) {
-                  if (sequenceArray[selectedChannel].stepData[i].gateType == GATETYPE_REST){
-                    sequenceArray[selectedChannel].stepData[i].gateType = GATETYPE_STEP;
+                  if (sequenceArray[globalObj->selectedChannel].stepData[i].gateType == GATETYPE_REST){
+                    sequenceArray[globalObj->selectedChannel].stepData[i].gateType = GATETYPE_STEP;
                   }
                 }
 
-                sequenceArray[selectedChannel].stepData[i].gateLength =  min_max(globalObj->multi_gateLength, 0, 255);
+                sequenceArray[globalObj->selectedChannel].stepData[i].gateLength =  min_max(globalObj->multi_gateLength, 0, 255);
               break;
             case STATE_ARPTYPE:
-              sequenceArray[selectedChannel].stepData[i].arpType = min_max(globalObj->multi_arpType, 0, 5);
+              sequenceArray[globalObj->selectedChannel].stepData[i].arpType = min_max(globalObj->multi_arpType, 0, 5);
 
               break;
             case STATE_ARPOCTAVE:
-              sequenceArray[selectedChannel].stepData[i].arpOctave=  min_max(globalObj->multi_arpOctave, 1, 5);
+              sequenceArray[globalObj->selectedChannel].stepData[i].arpOctave=  min_max(globalObj->multi_arpOctave, 1, 5);
             break;
             case STATE_ARPSPEEDNUM:
-              sequenceArray[selectedChannel].stepData[i].arpSpdNum = min_max(globalObj->multi_arpSpdNum, 1, 16) ;
+              sequenceArray[globalObj->selectedChannel].stepData[i].arpSpdNum = min_max(globalObj->multi_arpSpdNum, 1, 16) ;
               break;
             case STATE_ARPSPEEDDEN:
-              sequenceArray[selectedChannel].stepData[i].arpSpdDen = min_max(globalObj->multi_arpSpdDen, 1, 64);
+              sequenceArray[globalObj->selectedChannel].stepData[i].arpSpdDen = min_max(globalObj->multi_arpSpdDen, 1, 64);
               break;
             case STATE_GLIDE:
-              sequenceArray[selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 127);
+              sequenceArray[globalObj->selectedChannel].stepData[i].glide =  min_max(globalObj->multi_glide, 0, 127);
               break;
             case STATE_CV2_LEVEL:
-              sequenceArray[selectedChannel].stepData[i].velocity =  positive_modulo(globalObj->multi_velocity, 127);
+              sequenceArray[globalObj->selectedChannel].stepData[i].velocity =  positive_modulo(globalObj->multi_velocity, 127);
               break;
             case STATE_CV2_TYPE:
-              sequenceArray[selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 13);
+              sequenceArray[globalObj->selectedChannel].stepData[i].velocityType = min_max(globalObj->multi_velocityType, 0, 13);
               break;
             case STATE_CV2_SPEED:
-              sequenceArray[selectedChannel].stepData[i].cv2speed = min_max(globalObj->multi_cv2speed, 1, 255);
+              sequenceArray[globalObj->selectedChannel].stepData[i].cv2speed = min_max(globalObj->multi_cv2speed, 1, 255);
               break;
             case STATE_CV2_OFFSET:
-              sequenceArray[selectedChannel].stepData[i].cv2offset = min_max(globalObj->multi_cv2offset, -64, 64);
+              sequenceArray[globalObj->selectedChannel].stepData[i].cv2offset = min_max(globalObj->multi_cv2offset, -64, 64);
             break;
           }
         }
@@ -247,6 +246,10 @@ void InputModule::loop(uint16_t frequency){
     //knobRead = -1 * knob.read()/2  ;
     knobChange = knobRead - knobPrevious;
     midplaneGPIO->update();
+
+    if(midplaneGPIO->activityCheck() || knobChange){
+      globalObj->screenSaverTimeout = 0;
+    }
 
      if(globalObj->dataInputStyle){
       if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
@@ -268,7 +271,7 @@ void InputModule::loop(uint16_t frequency){
 
     if (midplaneGPIO->fell(SW_SHIFT)){
       //tap tempo
-      if((globalObj->clockMode == INTERNAL_CLOCK) && (currentMenu == TEMPO_MENU)){
+      if((globalObj->clockMode == INTERNAL_CLOCK) && (globalObj->currentMenu == TEMPO_MENU)){
 
         if (globalObj->tapTempoCount == 0){
           globalObj->tapTempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
@@ -309,7 +312,7 @@ void InputModule::loop(uint16_t frequency){
       changeState(STATE_INPUTDEBUG);
     }
     if (knobChange){
-      switch (currentMenu) {
+      switch (globalObj->currentMenu) {
         case SEQUENCE_MENU:
         case MOD_MENU_1:
         case MOD_MENU_2:
@@ -326,7 +329,7 @@ void InputModule::loop(uint16_t frequency){
     bool didAltButtonsFire = altButtonHandler();
 
     if (didAltButtonsFire == false){
-      switch (currentMenu) {
+      switch (globalObj->currentMenu) {
         case PITCH_GATE_MENU:
         case ARPEGGIO_MENU:
         case VELOCITY_MENU:
@@ -385,6 +388,34 @@ void InputModule::loop(uint16_t frequency){
           randomShortcutHandler();
         break;
 
+        case MENU_TRANSPOSE:
+          transposeShortcutHandler();
+        break;
+
+        case MENU_TUNER:
+          tunerShortcutHandler();
+        break;
+
+        case MENU_FILL:
+          fillShortcutHandler();
+        break;
+
+        case MENU_SKIP:
+          skipShortcutHandler();
+        break;
+
+        case MENU_CLKDIV:
+          clkdivShortcutHandler();
+        break;
+
+        case MENU_RESET:
+          resetShortcutHandler();
+        break;
+
+        case MENU_REVERSE:
+          reverseShortcutHandler();
+        break;
+
         case MENU_PATTERN_CHAIN:
         case MENU_CHAIN_HELP:
           patternChainInputHandler();
@@ -414,49 +445,49 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_GATELENGTH:
     case STATE_GLIDE:
     case STATE_GATETYPE:
-      currentMenu = PITCH_GATE_MENU;
+      globalObj->currentMenu = PITCH_GATE_MENU;
       break;
     case STATE_CHORD:
     case STATE_ARPTYPE:
     case STATE_ARPSPEEDNUM:
     case STATE_ARPSPEEDDEN:
     case STATE_ARPOCTAVE:
-      currentMenu = ARPEGGIO_MENU;
+      globalObj->currentMenu = ARPEGGIO_MENU;
       break;
     case STATE_CV2_LEVEL:
     case STATE_CV2_TYPE:
     case STATE_CV2_SPEED:
     case STATE_CV2_OFFSET:
-      currentMenu = VELOCITY_MENU;
+      globalObj->currentMenu = VELOCITY_MENU;
       break;
     case STATE_FIRSTSTEP:
     case STATE_STEPCOUNT:
     case STATE_BEATCOUNT:
     case STATE_PLAYMODE:
     case STATE_SWING:
-      currentMenu = SEQUENCE_MENU;
+      globalObj->currentMenu = SEQUENCE_MENU;
       break;
     case STATE_QUANTIZESCALE:
     case STATE_QUANTIZEKEY:
     case STATE_QUANTIZEMODE:
-      currentMenu = QUANTIZE_MENU;
+      globalObj->currentMenu = QUANTIZE_MENU;
       break;
     case STATE_NOTEDISPLAY:
-      currentMenu = NOTE_DISPLAY;
+      globalObj->currentMenu = NOTE_DISPLAY;
       break;
     case STATE_PATTERNSELECT:
-      currentMenu = PATTERN_SELECT;
+      globalObj->currentMenu = PATTERN_SELECT;
       break;
     case STATE_SAVE:
-      currentMenu = SAVE_MENU;
+      globalObj->currentMenu = SAVE_MENU;
       break;
     case STATE_CALIBRATION:
-      currentMenu = CALIBRATION_MENU;
+      globalObj->currentMenu = CALIBRATION_MENU;
       break;
     case STATE_EXTCLOCK:
     case STATE_TEMPO:
     case STATE_RESETINPUT:
-      currentMenu = TEMPO_MENU;
+      globalObj->currentMenu = TEMPO_MENU;
       break;
     case STATE_SKIPSTEPCOUNT:
     case STATE_SKIPSTEP:
@@ -465,36 +496,36 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_PITCHMOD:
     case STATE_GLIDEMOD:
     case STATE_GATEMOD:
-      currentMenu = MOD_MENU_1;
+      globalObj->currentMenu = MOD_MENU_1;
       break;
     case STATE_ARPTYPEMOD:
     case STATE_ARPSPDMOD:
     case STATE_ARPOCTMOD:
     case STATE_ARPINTMOD:
-      currentMenu = MOD_MENU_2;
+      globalObj->currentMenu = MOD_MENU_2;
       break;
     case STATE_INPUTDEBUG:
-      currentMenu = INPUT_DEBUG_MENU;
+      globalObj->currentMenu = INPUT_DEBUG_MENU;
       break;
     case STATE_PG_BTN_SWITCH:
     case STATE_DATA_KNOB_SWITCH:
-      currentMenu = GLOBAL_MENU_1;
+      globalObj->currentMenu = GLOBAL_MENU_1;
       break;
     case STATE_CH1_VOLT_RANGE:
     case STATE_CH2_VOLT_RANGE:
     case STATE_CH3_VOLT_RANGE:
     case STATE_CH4_VOLT_RANGE:
-      currentMenu = GLOBAL_MENU_2;
+      globalObj->currentMenu = GLOBAL_MENU_2;
       break;
     case STATE_MIDI_CHANNEL_1:
     case STATE_MIDI_CHANNEL_2:
     case STATE_MIDI_CHANNEL_3:
     case STATE_MIDI_CHANNEL_4:
-      currentMenu = GLOBAL_MENU_3;
+      globalObj->currentMenu = GLOBAL_MENU_3;
     break;
     case STATE_SYSEX_EXPORT:
     case STATE_SYSEX_IMPORT:
-      currentMenu = SYSEX_MENU;
+      globalObj->currentMenu = SYSEX_MENU;
       break;
     case STATE_CALIB_INPUT0_OFFSET:
     case STATE_CALIB_INPUT0_LOW:
@@ -519,41 +550,73 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_TEST_MIDI:
     case STATE_TEST_GATES:
     case STATE_TEST_RHEOSTAT:
-      currentMenu = CALIBRATION_MENU;
+      globalObj->currentMenu = CALIBRATION_MENU;
       break;
     case STATE_CALIBRATION_SAVE_MODAL:
-      currentMenu = MENU_MODAL;
+      globalObj->currentMenu = MENU_MODAL;
       break;
     case STATE_MULTISELECT:
-    //  currentMenu = MENU_MULTISELECT;
+    //  globalObj->currentMenu = MENU_MULTISELECT;
       break;
     case STATE_SHORTCUT_RANDOM_PARAM:
     case STATE_SHORTCUT_RANDOM_LOW:
     case STATE_SHORTCUT_RANDOM_SPAN:
-      currentMenu = MENU_RANDOM;
+      globalObj->currentMenu = MENU_RANDOM;
     break;
+    case STATE_SHORTCUT_TRANSPOSE:
+      globalObj->currentMenu = MENU_TRANSPOSE;
+    break;
+    case STATE_SHORTCUT_FILL:
+      globalObj->currentMenu = MENU_FILL;
+      break;
+    case STATE_SHORTCUT_CLKDIV:
+      globalObj->currentMenu = MENU_CLKDIV;
+      break;
+    case STATE_SHORTCUT_SKIP:
+    case STATE_SHORTCUT_SKIP_TRIGGER:
+      globalObj->currentMenu = MENU_SKIP;
+      break;
+    case STATE_SHORTCUT_TUNER:
+      globalObj->currentMenu = MENU_TUNER;
+      break;
+    case STATE_SHORTCUT_PAGE:
+      globalObj->currentMenu = MENU_PAGE;
+      break;
+    case STATE_SHORTCUT_FN1:
+      globalObj->currentMenu = MENU_FN1;
+      break;
+    case STATE_SHORTCUT_FN2:
+      globalObj->currentMenu = MENU_FN2;
+      break;
+    case STATE_SHORTCUT_FN3:
+      globalObj->currentMenu = MENU_FN3;
+      break;
+    case STATE_SHORTCUT_FN4:
+      globalObj->currentMenu = MENU_FN4;
+      break;
+
     case STATE_PATTERN_CHAIN:
-      currentMenu = MENU_PATTERN_CHAIN;
+      globalObj->currentMenu = MENU_PATTERN_CHAIN;
     break;
     case STATE_CHAIN_HELP:
-      currentMenu = MENU_CHAIN_HELP;
+      globalObj->currentMenu = MENU_CHAIN_HELP;
     break;
     default:
       Serial.println("This state has no menu selection! " + String(targetState));
     break;
   }
 
-  if(currentMenu !=  GLOBAL_MENU_1 && currentMenu != GLOBAL_MENU_2 && currentMenu != SYSEX_MENU && currentMenu != TEMPO_MENU && (previousMenu == TEMPO_MENU || previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2 || previousMenu == SYSEX_MENU) ){
+  if(globalObj->currentMenu !=  GLOBAL_MENU_1 && globalObj->currentMenu != GLOBAL_MENU_2 && globalObj->currentMenu != SYSEX_MENU && globalObj->currentMenu != TEMPO_MENU && (previousMenu == TEMPO_MENU || previousMenu == GLOBAL_MENU_1 || previousMenu == GLOBAL_MENU_2 || previousMenu == SYSEX_MENU) ){
     saveFile->saveGlobalData();
     // Serial.println("Saved GlobalData");
   }
 
-  if((currentMenu != MENU_PATTERN_CHAIN)&&(previousMenu == MENU_PATTERN_CHAIN) ){
+  if((globalObj->currentMenu != MENU_PATTERN_CHAIN)&&(previousMenu == MENU_PATTERN_CHAIN) ){
     saveFile->saveSongData();
     Serial.println("Saved Song Data");
   }
 
-  previousMenu = currentMenu;
+  previousMenu = globalObj->currentMenu;
 }
 
 // STATE VARIABLE INPUT HANDLERS
@@ -643,7 +706,7 @@ void InputModule::tempoMenuHandler(){
         break;
 
         case STATE_RESETINPUT:
-          sequenceArray[selectedChannel].gpio_reset = min_max(sequenceArray[selectedChannel].gpio_reset + knobChange, 0,8);
+          sequenceArray[globalObj->selectedChannel].gpio_reset = min_max(sequenceArray[globalObj->selectedChannel].gpio_reset + knobChange, 0,8);
         break;
 
       }
@@ -660,17 +723,17 @@ void InputModule::sequenceMenuHandler(){
       if(stepMode == STATE_QUANTIZEMODE){
         // put in quantize mode custom button input code here
 
-        previousQuantizeMode = sequenceArray[selectedChannel].quantizeMode;
-        sequenceArray[selectedChannel].quantizeMode ^= (1<<i);
-        if (sequenceArray[selectedChannel].quantizeMode == 0){
-          sequenceArray[selectedChannel].quantizeMode = previousQuantizeMode;
+        previousQuantizeMode = sequenceArray[globalObj->selectedChannel].quantizeMode;
+        sequenceArray[globalObj->selectedChannel].quantizeMode ^= (1<<i);
+        if (sequenceArray[globalObj->selectedChannel].quantizeMode == 0){
+          sequenceArray[globalObj->selectedChannel].quantizeMode = previousQuantizeMode;
         }
         midplaneGPIO->clearBuffers();
 
       } else {
         changeState(STATE_PITCH0);
-        globalObj->selectedStep = sequenceArray[selectedChannel].getActivePage()*16 + i;
-        notePage =   sequenceArray[selectedChannel].getActivePage();
+        globalObj->selectedStep = sequenceArray[globalObj->selectedChannel].getActivePage()*16 + i;
+        notePage =   sequenceArray[globalObj->selectedChannel].getActivePage();
       }
     }
   }
@@ -682,115 +745,115 @@ void InputModule::sequenceMenuHandler(){
 
       switch(stepMode){
         case STATE_FIRSTSTEP:
-          sequenceArray[selectedChannel].firstStep = min_max(sequenceArray[selectedChannel].firstStep + knobChange, 0, 63);
-          //sequenceArray[selectedChannel].firstStepChanged == TRUE;
+          sequenceArray[globalObj->selectedChannel].firstStep = min_max(sequenceArray[globalObj->selectedChannel].firstStep + knobChange, 0, 63);
+          //sequenceArray[globalObj->selectedChannel].firstStepChanged == TRUE;
           break;
         case STATE_STEPCOUNT:
-          //sequenceArray[selectedChannel].stepCount = min_max(sequenceArray[selectedChannel].stepCount + knobChange, 1, 64);
-          sequenceArray[selectedChannel].setStepCount(min_max(sequenceArray[selectedChannel].stepCount + knobChange, 1, 64));
-          // if (sequenceArray[selectedChannel].stepCount == 0) {
-          //   sequenceArray[selectedChannel].stepCount = 64;
+          //sequenceArray[globalObj->selectedChannel].stepCount = min_max(sequenceArray[globalObj->selectedChannel].stepCount + knobChange, 1, 64);
+          sequenceArray[globalObj->selectedChannel].setStepCount(min_max(sequenceArray[globalObj->selectedChannel].stepCount + knobChange, 1, 64));
+          // if (sequenceArray[globalObj->selectedChannel].stepCount == 0) {
+          //   sequenceArray[globalObj->selectedChannel].stepCount = 64;
           // }
           break;
         case STATE_BEATCOUNT:
-           newBeatDiv = min_max(sequenceArray[selectedChannel].clockDivision + knobChange, -13, 16);
-           sequenceArray[selectedChannel].updateClockDivision(newBeatDiv);
+           newBeatDiv = min_max(sequenceArray[globalObj->selectedChannel].clockDivision + knobChange, -13, 16);
+           sequenceArray[globalObj->selectedChannel].updateClockDivision(newBeatDiv);
             //Serial.println("newBeatDiv: " + String(newBeatDiv));
-            // Serial.println("clockDiv: " + String(sequenceArray[selectedChannel].clockDivision));
+            // Serial.println("clockDiv: " + String(sequenceArray[globalObj->selectedChannel].clockDivision));
           break;
 
         case STATE_QUANTIZEKEY:
-          sequenceArray[selectedChannel].quantizeKey = positive_modulo(sequenceArray[selectedChannel].quantizeKey + knobChange, 12);
+          sequenceArray[globalObj->selectedChannel].quantizeKey = positive_modulo(sequenceArray[globalObj->selectedChannel].quantizeKey + knobChange, 12);
           break;
         case STATE_QUANTIZEMODE:
-          sequenceArray[selectedChannel].quantizeModeIndex = positive_modulo(sequenceArray[selectedChannel].quantizeModeIndex + knobChange, 19);
-          switch(sequenceArray[selectedChannel].quantizeModeIndex){
-            case 0: sequenceArray[selectedChannel].quantizeMode = SEMITONE_SCALE_12;    break;
-            case 1: sequenceArray[selectedChannel].quantizeMode = MAJOR_SCALE_12;       break;
-            case 2: sequenceArray[selectedChannel].quantizeMode = MINOR_SCALE_12;       break;
-            case 3: sequenceArray[selectedChannel].quantizeMode = MAJORMINOR_SCALE_12;  break;
-            case 4: sequenceArray[selectedChannel].quantizeMode = BLUESMAJOR_SCALE_12;  break;
-            case 5: sequenceArray[selectedChannel].quantizeMode = BLUESMINOR_SCALE_12;  break;
-            case 6: sequenceArray[selectedChannel].quantizeMode = PENT_MAJOR_SCALE_12;  break;
-            case 7: sequenceArray[selectedChannel].quantizeMode = PENT_MINOR_SCALE_12;  break;
-            case 8: sequenceArray[selectedChannel].quantizeMode = FOLK_SCALE_12;        break;
-            case 9: sequenceArray[selectedChannel].quantizeMode = AEOLIAN_SCALE_12;     break;
-            case 10: sequenceArray[selectedChannel].quantizeMode = DORIAN_SCALE_12;      break;
-            case 11: sequenceArray[selectedChannel].quantizeMode = MIXOLYDIAN_SCALE_12;  break;
-            case 12: sequenceArray[selectedChannel].quantizeMode = PHRYGIAN_SCALE_12;    break;
-            case 13: sequenceArray[selectedChannel].quantizeMode = LYDIAN_SCALE_12;      break;
-            case 14: sequenceArray[selectedChannel].quantizeMode = LOCRIAN_SCALE_12;     break;
-            case 15: sequenceArray[selectedChannel].quantizeMode = GAMELAN_SCALE_12;     break;
-            case 16: sequenceArray[selectedChannel].quantizeMode = JAPANESE_SCALE_12;    break;
-            case 17: sequenceArray[selectedChannel].quantizeMode = GYPSY_SCALE_12;       break;
-            case 18: sequenceArray[selectedChannel].quantizeMode = ARABIAN_SCALE_12;     break;
-            case 19: sequenceArray[selectedChannel].quantizeMode = FLAMENCO_SCALE_12;    break;
-            case 20: sequenceArray[selectedChannel].quantizeMode = WHOLETONE_SCALE_12;   break;
+          sequenceArray[globalObj->selectedChannel].quantizeModeIndex = positive_modulo(sequenceArray[globalObj->selectedChannel].quantizeModeIndex + knobChange, 19);
+          switch(sequenceArray[globalObj->selectedChannel].quantizeModeIndex){
+            case 0: sequenceArray[globalObj->selectedChannel].quantizeMode = SEMITONE_SCALE_12;    break;
+            case 1: sequenceArray[globalObj->selectedChannel].quantizeMode = MAJOR_SCALE_12;       break;
+            case 2: sequenceArray[globalObj->selectedChannel].quantizeMode = MINOR_SCALE_12;       break;
+            case 3: sequenceArray[globalObj->selectedChannel].quantizeMode = MAJORMINOR_SCALE_12;  break;
+            case 4: sequenceArray[globalObj->selectedChannel].quantizeMode = BLUESMAJOR_SCALE_12;  break;
+            case 5: sequenceArray[globalObj->selectedChannel].quantizeMode = BLUESMINOR_SCALE_12;  break;
+            case 6: sequenceArray[globalObj->selectedChannel].quantizeMode = PENT_MAJOR_SCALE_12;  break;
+            case 7: sequenceArray[globalObj->selectedChannel].quantizeMode = PENT_MINOR_SCALE_12;  break;
+            case 8: sequenceArray[globalObj->selectedChannel].quantizeMode = FOLK_SCALE_12;        break;
+            case 9: sequenceArray[globalObj->selectedChannel].quantizeMode = AEOLIAN_SCALE_12;     break;
+            case 10: sequenceArray[globalObj->selectedChannel].quantizeMode = DORIAN_SCALE_12;      break;
+            case 11: sequenceArray[globalObj->selectedChannel].quantizeMode = MIXOLYDIAN_SCALE_12;  break;
+            case 12: sequenceArray[globalObj->selectedChannel].quantizeMode = PHRYGIAN_SCALE_12;    break;
+            case 13: sequenceArray[globalObj->selectedChannel].quantizeMode = LYDIAN_SCALE_12;      break;
+            case 14: sequenceArray[globalObj->selectedChannel].quantizeMode = LOCRIAN_SCALE_12;     break;
+            case 15: sequenceArray[globalObj->selectedChannel].quantizeMode = GAMELAN_SCALE_12;     break;
+            case 16: sequenceArray[globalObj->selectedChannel].quantizeMode = JAPANESE_SCALE_12;    break;
+            case 17: sequenceArray[globalObj->selectedChannel].quantizeMode = GYPSY_SCALE_12;       break;
+            case 18: sequenceArray[globalObj->selectedChannel].quantizeMode = ARABIAN_SCALE_12;     break;
+            case 19: sequenceArray[globalObj->selectedChannel].quantizeMode = FLAMENCO_SCALE_12;    break;
+            case 20: sequenceArray[globalObj->selectedChannel].quantizeMode = WHOLETONE_SCALE_12;   break;
           }
           break;
         case STATE_QUANTIZESCALE:
-          sequenceArray[selectedChannel].quantizeScale = positive_modulo(sequenceArray[selectedChannel].quantizeScale + knobChange, 3);
+          sequenceArray[globalObj->selectedChannel].quantizeScale = positive_modulo(sequenceArray[globalObj->selectedChannel].quantizeScale + knobChange, 3);
           break;
         case STATE_PLAYMODE:
-          sequenceArray[selectedChannel].playMode = positive_modulo(sequenceArray[selectedChannel].playMode + knobChange, 4);
+          sequenceArray[globalObj->selectedChannel].playMode = positive_modulo(sequenceArray[globalObj->selectedChannel].playMode + knobChange, 4);
           break;
         case STATE_RESETINPUT:
-          sequenceArray[selectedChannel].gpio_reset = min_max_skip(sequenceArray[selectedChannel].gpio_reset, knobChange, -9, 8, selectedChannel+5);
+          sequenceArray[globalObj->selectedChannel].gpio_reset = min_max_skip(sequenceArray[globalObj->selectedChannel].gpio_reset, knobChange, -9, 8, globalObj->selectedChannel+5);
         break;
 
 // mod menu 1
         case STATE_GLIDEMOD:
-          sequenceArray[selectedChannel].cv_glidemod = min_max(sequenceArray[selectedChannel].cv_glidemod + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_glidemod = min_max(sequenceArray[globalObj->selectedChannel].cv_glidemod + knobChange, 0, 12);
         break;
 
         case STATE_GATEMOD:
-          sequenceArray[selectedChannel].cv_gatemod = min_max(sequenceArray[selectedChannel].cv_gatemod + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_gatemod = min_max(sequenceArray[globalObj->selectedChannel].cv_gatemod + knobChange, 0, 12);
         break;
 
         case STATE_GATEMUTE:
-          sequenceArray[selectedChannel].gpio_gatemute = min_max_skip(sequenceArray[selectedChannel].gpio_gatemute, knobChange, -9, 8, selectedChannel+5);
+          sequenceArray[globalObj->selectedChannel].gpio_gatemute = min_max_skip(sequenceArray[globalObj->selectedChannel].gpio_gatemute, knobChange, -9, 8, globalObj->selectedChannel+5);
         break;
 
         case STATE_RANDOMPITCH:
-          sequenceArray[selectedChannel].gpio_randompitch = min_max_skip(sequenceArray[selectedChannel].gpio_randompitch, knobChange, -9, 8, selectedChannel+5);
+          sequenceArray[globalObj->selectedChannel].gpio_randompitch = min_max_skip(sequenceArray[globalObj->selectedChannel].gpio_randompitch, knobChange, -9, 8, globalObj->selectedChannel+5);
         break;
         case STATE_RANDOMHIGH:
-          sequenceArray[selectedChannel].randomHigh = min_max(sequenceArray[selectedChannel].randomHigh + knobChange, 0, 127);
+          sequenceArray[globalObj->selectedChannel].randomHigh = min_max(sequenceArray[globalObj->selectedChannel].randomHigh + knobChange, 0, 127);
         break;
         case STATE_RANDOMLOW:
-        sequenceArray[selectedChannel].randomLow = min_max(sequenceArray[selectedChannel].randomLow + knobChange, 0, 127);
+        sequenceArray[globalObj->selectedChannel].randomLow = min_max(sequenceArray[globalObj->selectedChannel].randomLow + knobChange, 0, 127);
         break;
 
         case STATE_PITCHMOD:
-          sequenceArray[selectedChannel].cv_pitchmod = min_max(sequenceArray[selectedChannel].cv_pitchmod + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_pitchmod = min_max(sequenceArray[globalObj->selectedChannel].cv_pitchmod + knobChange, 0, 12);
         break;
 // mod menu 2
         case STATE_ARPTYPEMOD:
-          sequenceArray[selectedChannel].cv_arptypemod = min_max(sequenceArray[selectedChannel].cv_arptypemod + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_arptypemod = min_max(sequenceArray[globalObj->selectedChannel].cv_arptypemod + knobChange, 0, 12);
         break;
 
         case STATE_ARPSPDMOD:
-          sequenceArray[selectedChannel].cv_arpspdmod = min_max(sequenceArray[selectedChannel].cv_arpspdmod + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_arpspdmod = min_max(sequenceArray[globalObj->selectedChannel].cv_arpspdmod + knobChange, 0, 12);
         break;
 
         case STATE_ARPOCTMOD:
-          sequenceArray[selectedChannel].cv_arpoctmod = min_max(sequenceArray[selectedChannel].cv_arpoctmod + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_arpoctmod = min_max(sequenceArray[globalObj->selectedChannel].cv_arpoctmod + knobChange, 0, 12);
         break;
 
         case STATE_ARPINTMOD:
-          sequenceArray[selectedChannel].cv_arpintmod = min_max(sequenceArray[selectedChannel].cv_arpintmod + knobChange,0, 12);
+          sequenceArray[globalObj->selectedChannel].cv_arpintmod = min_max(sequenceArray[globalObj->selectedChannel].cv_arpintmod + knobChange,0, 12);
         break;
 
         case STATE_SKIPSTEP:
-          sequenceArray[selectedChannel].gpio_skipstep = min_max_skip(sequenceArray[selectedChannel].gpio_skipstep, knobChange, -9, 8, selectedChannel+5);
+          sequenceArray[globalObj->selectedChannel].gpio_skipstep = min_max_skip(sequenceArray[globalObj->selectedChannel].gpio_skipstep, knobChange, -9, 8, globalObj->selectedChannel+5);
         break;
 
         case STATE_SKIPSTEPCOUNT:
-          sequenceArray[selectedChannel].skipStepCount = min_max(sequenceArray[selectedChannel].skipStepCount + knobChange, 0, 63);
+          sequenceArray[globalObj->selectedChannel].skipStepCount = min_max(sequenceArray[globalObj->selectedChannel].skipStepCount + knobChange, 0, 63);
         break;
 
         case STATE_SWING:
-          sequenceArray[selectedChannel].swingX100 = min_max(sequenceArray[selectedChannel].swingX100 + knobChange, 1,99);
+          sequenceArray[globalObj->selectedChannel].swingX100 = min_max(sequenceArray[globalObj->selectedChannel].swingX100 + knobChange, 1,99);
         break;
       }
     }
@@ -961,8 +1024,8 @@ void InputModule::patternChainInputHandler(){
 
 
 void InputModule::channelButtonShiftHandler(uint8_t channel){
-  if (selectedChannel != channel){
-    selectedChannel = channel;
+  if (globalObj->selectedChannel != channel){
+    globalObj->selectedChannel = channel;
   }
   changeState(STATE_TUNER);
 };
@@ -993,8 +1056,8 @@ void InputModule::channelButtonHandler(uint8_t channel){
   //uint8_t previous = globalObj->patternChannelSelector;
 
   // resetKnobValues();
-  // if (selectedChannel != channel){
-  //   selectedChannel = channel;
+  // if (globalObj->selectedChannel != channel){
+  //   globalObj->selectedChannel = channel;
   //   return;
   // }
 //  changeState(min_max_cycle(++stepMode,STATE_PITCH0, STATE_CV2_OFFSET));
@@ -1003,7 +1066,7 @@ void InputModule::channelButtonHandler(uint8_t channel){
 
 void InputModule::altButtonChannelHandler(uint8_t switchIndex){
 
-           switch(currentMenu){
+           switch(globalObj->currentMenu){
              case PATTERN_SELECT:
              case SAVE_MENU:
               globalObj->multiSelectSwitch = false;
@@ -1024,9 +1087,9 @@ void InputModule::altButtonChannelHandler(uint8_t switchIndex){
                  } else {
                    channelButtonShiftHandler(getChannelFromSw(switchIndex));
                  }
-               } else if (selectedChannel == getChannelFromSw(switchIndex) ) {
+               } else if (globalObj->selectedChannel == getChannelFromSw(switchIndex) ) {
                  channelButtonOperationInProgress = true;
-                 switch(currentMenu){
+                 switch(globalObj->currentMenu){
                    case SEQUENCE_MENU:
                       changeState(STATE_QUANTIZESCALE);
                    break;
@@ -1045,8 +1108,8 @@ void InputModule::altButtonChannelHandler(uint8_t switchIndex){
                    break;
                  }
                } else {
-                 if (selectedChannel != getChannelFromSw(switchIndex)){
-                   selectedChannel = getChannelFromSw(switchIndex);
+                 if (globalObj->selectedChannel != getChannelFromSw(switchIndex)){
+                   globalObj->selectedChannel = getChannelFromSw(switchIndex);
                    channelButtonOperationInProgress = true;
                  }
                }
@@ -1069,6 +1132,26 @@ void InputModule::altButtonPlayHandler(){
       goto PLAYEND;
     }
   }
+
+  if(midplaneGPIO->pressed(SW_PGUP)){
+    skipPgUpRise = true;
+    globalObj->copiedChannel = globalObj->selectedChannel;
+    globalObj->copiedPage = notePage;
+    // Serial.println("PAGEUP COPY pg:" + String(globalObj->copiedPage) + " ch:" + String(globalObj->copiedChannel));
+    display->displayModal(750, MODAL_COPY_PAGE);
+
+    goto PLAYEND;
+  }
+  if(midplaneGPIO->pressed(SW_PGDN)){
+    skipPgDnRise = true;
+    globalObj->copiedChannel = globalObj->selectedChannel;
+    globalObj->copiedPage = notePage;
+    // Serial.println("PAGEDN COPY pg:" + String(notePage) + " ch:" + String(globalObj->selectedChannel));
+    display->displayModal(750, MODAL_COPY_PAGE);
+
+    goto PLAYEND;
+  }
+
   globalObj->playing = !globalObj->playing;
   PLAYEND: ;
 }
@@ -1078,7 +1161,7 @@ void InputModule::altButtonRecHandler(){
     for(int sw=0; sw<16; sw++){
       if(midplaneGPIO->pressed(sw)){
         display->displayModal(750, MODAL_PASTE_STEP);
-        sequenceArray[selectedChannel].stepData[getNote(sw)] = sequenceArray[selectedChannel].stepData[globalObj->stepCopyIndex];
+        sequenceArray[globalObj->selectedChannel].stepData[getNote(sw)] = sequenceArray[globalObj->selectedChannel].stepData[globalObj->stepCopyIndex];
       }
     }
   }
@@ -1091,11 +1174,27 @@ void InputModule::altButtonRecHandler(){
       }
     }
   }
+
+  if(midplaneGPIO->pressed(SW_PGDN)||midplaneGPIO->pressed(SW_PGUP)){
+      if(midplaneGPIO->pressed(SW_PGDN)){
+        skipPgDnRise = true;
+      }
+      if (midplaneGPIO->pressed(SW_PGUP)){
+        skipPgUpRise = true;
+      }
+    for(int index = 0; index<16; index++){
+      sequenceArray[globalObj->selectedChannel].stepData[16*notePage+index] = sequenceArray[globalObj->copiedChannel].stepData[16*globalObj->copiedPage+index];
+      // Serial.println("Pasting step " + String(16*globalObj->copiedPage+index) + " to step: " +  String(16*notePage+index) );
+    }
+    // Serial.println("Pasting channel " + String(globalObj->copiedChannel) + " pg " + String(globalObj->copiedPage) + " to ch " + String(globalObj->selectedChannel) + " pg " + String(notePage) + "skipPgDnRise:" + String(skipPgDnRise));
+    display->displayModal(750, MODAL_PASTE_PAGE);
+
+  }
 }
 void InputModule::altButtonStopHandler(){
   for(int sw=0; sw<16; sw++){
     if(midplaneGPIO->pressed(sw)){
-      sequenceArray[selectedChannel].initializeStep(sw);
+      sequenceArray[globalObj->selectedChannel].initializeStep(sw);
       display->displayModal(750, MODAL_CLEAR_STEP);
       goto STOPEND;
     }
@@ -1121,13 +1220,29 @@ void InputModule::altButtonStopHandler(){
     }
 
   }
+
+  if(midplaneGPIO->pressed(SW_PGDN)||midplaneGPIO->pressed(SW_PGUP)){
+      if(midplaneGPIO->pressed(SW_PGDN)){
+        skipPgDnRise = true;
+      }
+      if (midplaneGPIO->pressed(SW_PGUP)){
+        skipPgUpRise = true;
+      }
+    for(int index = 0; index<16; index++){
+      sequenceArray[globalObj->selectedChannel].stepData[16*notePage+index] = sequenceArray[globalObj->copiedChannel].stepData[16*globalObj->copiedPage+index];
+      Serial.println("Pasting step " + String(16*globalObj->copiedPage+index) + " to step: " +  String(16*notePage+index) );
+    }
+    Serial.println("Pasting channel " + String(globalObj->copiedChannel) + " pg " + String(globalObj->copiedPage) + " to ch " + String(globalObj->selectedChannel) + " pg " + String(notePage) + "skipPgDnRise:" + String(skipPgDnRise));
+  }
+
+
   STOPEND: ;
 }
 
 void InputModule::altButtonPatternHandler(){
     globalObj->multiSelectSwitch = false;
 
-    if(currentMenu == SYSEX_MENU){  //shift-pattern shortcut is used to export and import sysex data
+    if(globalObj->currentMenu == SYSEX_MENU){  //shift-pattern shortcut is used to export and import sysex data
       if (midplaneGPIO->pressed(SW_SHIFT)){
         switch (stepMode){
           case STATE_SYSEX_EXPORT:
@@ -1162,7 +1277,7 @@ void InputModule::altButtonPatternHandler(){
 
     if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) return;
 
-    switch(currentMenu){
+    switch(globalObj->currentMenu){
       case PATTERN_SELECT:
         changeState(STATE_PITCH0);
       break;
@@ -1185,20 +1300,20 @@ void InputModule::altButtonPatternHandler(){
 
 void InputModule::altButtonTempoHandler(){
   if (midplaneGPIO->pressed(SW_SHIFT)){
-    if(currentMenu == GLOBAL_MENU_1){
+    if(globalObj->currentMenu == GLOBAL_MENU_1){
       changeState(STATE_CH1_VOLT_RANGE);
-    } else if(currentMenu == GLOBAL_MENU_2)  {
+    } else if(globalObj->currentMenu == GLOBAL_MENU_2)  {
       changeState(STATE_PITCH0);
     } else {
       changeState(STATE_PG_BTN_SWITCH);
     }
   } else {
-   //  if (currentMenu == SEQUENCE_MENU || currentMenu == INPUT_MENU || currentMenu == MOD_MENU_1 || currentMenu == MOD_MENU_2){
+   //  if (globalObj->currentMenu == SEQUENCE_MENU || globalObj->currentMenu == INPUT_MENU || globalObj->currentMenu == MOD_MENU_1 || globalObj->currentMenu == MOD_MENU_2){
    //    changeState(min_max_cycle(stepMode+1, STATE_STEPCOUNT , STATE_SKIPSTEP));
    //  } else {
    //    changeState(STATE_STEPCOUNT);
    //  }
-   if (currentMenu == TEMPO_MENU){
+   if (globalObj->currentMenu == TEMPO_MENU){
      changeState(min_max_cycle(stepMode+1, STATE_TEMPO , STATE_SKIPSTEP));
    } else {
      changeState(STATE_TEMPO);
@@ -1206,13 +1321,17 @@ void InputModule::altButtonTempoHandler(){
   }
 }
 void InputModule::altButtonShiftHandler(){
-  if (currentMenu == SAVE_MENU){
+  if (globalObj->currentMenu == SAVE_MENU){
     Serial.println("change menu");
     changeState(STATE_PITCH0);
   }
 
 };
 void InputModule::altButtonPgupHandler(){
+  if(skipPgUpRise){
+    skipPgUpRise = false;
+    return;
+  }
   if (midplaneGPIO->pressed(SW_SHIFT)){
     changeState(STATE_PATTERN_CHAIN);
   } else {
@@ -1225,6 +1344,10 @@ void InputModule::altButtonPgupHandler(){
 
 };
 void InputModule::altButtonPgdnHandler(){
+  if(skipPgDnRise){
+    skipPgDnRise = false;
+    return;
+  }
   if (midplaneGPIO->pressed(SW_SHIFT)){
     if(globalObj->multiSelectSwitch){
       globalObj->multiSelectSwitch = false;
@@ -1245,7 +1368,7 @@ void InputModule::altButtonPgdnHandler(){
 
 
 bool InputModule::altButtonHandler(){
-  if(currentMenu == MENU_PATTERN_CHAIN){
+  if(globalObj->currentMenu == MENU_PATTERN_CHAIN){
     return false;
   }
   chPressedSelector = 0;
@@ -1319,10 +1442,10 @@ uint8_t chanSwIndex;
                 }
             break;
             case SW_03:
-              display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_FILL);
             break;
             case SW_04:
-              display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_CLKDIV);
             break;
             case SW_05:
               sequenceArray[chan].clockReset(true);
@@ -1343,10 +1466,10 @@ uint8_t chanSwIndex;
               display->displayModal(300, MODAL_SHORTCUT_REVERSE);
             break;
             case SW_07:
-              display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_SKIP);
             break;
             case SW_08:// shortcut_random
-              switch(currentMenu){
+              switch(globalObj->currentMenu){
                 case MENU_RANDOM:
                   sequenceArray[chan].randomize(globalObj->randomizeParamSelect, globalObj->randomizeLow, globalObj->randomizeSpan);
                   changeState(STATE_PITCH0);
@@ -1356,26 +1479,26 @@ uint8_t chanSwIndex;
                 changeState(STATE_SHORTCUT_RANDOM_PARAM);
               }
             break;
-            case SW_09:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+            case SW_09: // shortcut transpose
+              changeState(STATE_SHORTCUT_TRANSPOSE);
             break;
             case SW_10:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_TUNER);
             break;
             case SW_11:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_PAGE);
             break;
             case SW_12:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_FN1);
             break;
             case SW_13:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_FN2);
             break;
             case SW_14:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_FN3);
             break;
             case SW_15:
-                display->displayModal(300, MODAL_TOBEIMPLEMENTED);
+              changeState(STATE_SHORTCUT_FN4);
             break;
             }
             return 1;
@@ -1399,14 +1522,15 @@ uint8_t chanSwIndex;
         case SW_PATTERN: this->altButtonPatternHandler();  break;
         case SW_MENU:    this->altButtonTempoHandler();    break;
         case SW_SHIFT:   this->altButtonShiftHandler();    break;
-        case SW_PGDN:    this->altButtonPgdnHandler();     break;
-        case SW_PGUP:    this->altButtonPgupHandler();     break;
         }
       }
       if (midplaneGPIO->rose(i) ){
         //this section controls the behavior of the channel buttons on press
-        if(currentMenu == PATTERN_SELECT || currentMenu == SAVE_MENU) break;
+        if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
         switch (i){
+          case SW_PGDN:    this->altButtonPgdnHandler();     break;
+          case SW_PGUP:    this->altButtonPgupHandler();     break;
+
           // left row bottom up
           case SW_CH0:
           case SW_CH1:
@@ -1448,7 +1572,7 @@ uint8_t chanSwIndex;
             if (midplaneGPIO->pressed(n)){
               buttonMode = BUTTON_MODE_PLAYRANGE;
               if(lastselectedStep == globalObj->selectedStep && selectedStepTimer < DOUBLECLICKMS){
-                sequenceArray[selectedChannel].setPlayRange(n,i);
+                sequenceArray[globalObj->selectedChannel].setPlayRange(n,i);
                 break;
               }
             }
@@ -1457,13 +1581,13 @@ uint8_t chanSwIndex;
         }
 
         if(!globalObj->playing){
-          sequenceArray[selectedChannel].stoppedTrig(globalObj->selectedStep, true, true);
+          sequenceArray[globalObj->selectedChannel].stoppedTrig(globalObj->selectedStep, true, true);
         }
 
 
       } else if (midplaneGPIO->rose(i)){
         if (!globalObj->playing){
-          sequenceArray[selectedChannel].stoppedTrig(getNote(i), false, false);
+          sequenceArray[globalObj->selectedChannel].stoppedTrig(getNote(i), false, false);
         }
 
         if(buttonMode == BUTTON_MODE_XOX ){
@@ -1471,12 +1595,12 @@ uint8_t chanSwIndex;
           // skip turning step on or of it was just copied
           globalObj->selectedStep = getNote(i);
           if(lastselectedStep == globalObj->selectedStep && selectedStepTimer < DOUBLECLICKMS){
-            sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_REST;
+            sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_REST;
           } else {
-            if (sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST){
-              sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_STEP ;
+            if (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST){
+              sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_STEP ;
             }
-  //            sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
+  //            sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
           }
         }
 
@@ -1487,10 +1611,10 @@ uint8_t chanSwIndex;
     }
     if (knobChange){
 
-      if( (currentMenu == PITCH_GATE_MENU) || (currentMenu == ARPEGGIO_MENU) || (currentMenu == VELOCITY_MENU) ){
+      if( (globalObj->currentMenu == PITCH_GATE_MENU) || (globalObj->currentMenu == ARPEGGIO_MENU) || (globalObj->currentMenu == VELOCITY_MENU) ){
         for (int i=0; i < 16; i++){
           if (midplaneGPIO->pressed(i)){
-            sequenceArray[selectedChannel].setStepPitch(getNote(i), min_max(sequenceArray[selectedChannel].getStepPitch(getNote(i), 0) + knobChange, 0,120), 0);
+            sequenceArray[globalObj->selectedChannel].setStepPitch(getNote(i), min_max(sequenceArray[globalObj->selectedChannel].getStepPitch(getNote(i), 0) + knobChange, 0,120), 0);
             skipStepDataChangeSwitch = true;
           }
         }
@@ -1502,7 +1626,7 @@ uint8_t chanSwIndex;
       if ( globalObj->parameterSelect ) {// Encoder Switch
         changeState(min_max_cycle(stepMode + knobChange,  STATE_PITCH0,  STATE_CV2_OFFSET));
       } else {
-        changeStepData(selectedChannel, globalObj->selectedStep, knobChange);
+        changeStepData(globalObj->selectedChannel, globalObj->selectedStep, knobChange);
       }
        SKIPSTEPDATACHANGE: ;
 
@@ -1521,10 +1645,10 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
         case STATE_PITCH0:
       // just change the note
 
-        //  if(sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST){
+        //  if(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST){
         //    // if a note is not active, turn it on and give it a length.
-        //    sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_STEP;
-        //    sequenceArray[selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
+        //    sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType = GATETYPE_STEP;
+        //    sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
         //  }
           // and finally set the new step value!
           // monophonic so pitch[0] only
@@ -1614,6 +1738,22 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
       }
 }
 
+void InputModule::transposeShortcutHandler(){
+  if(knobChange){
+    if ( globalObj->parameterSelect ) {// Encoder Switch
+      changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_SPAN));
+    } else {
+      switch(stepMode){
+        case STATE_SHORTCUT_TRANSPOSE:
+//        globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].transpose = min_max(sequenceArray[globalObj->selectedChannel].transpose + knobChange, -64, 64);
+        break;
+      }
+    }
+  }
+}
+
+
 void InputModule::randomShortcutHandler(){
   if(knobChange){
     if ( globalObj->parameterSelect ) {// Encoder Switch
@@ -1635,6 +1775,41 @@ void InputModule::randomShortcutHandler(){
   }
   midplaneGPIO->clearBuffers();
 }
+
+void InputModule::tunerShortcutHandler(){
+
+};
+void InputModule::fillShortcutHandler(){
+
+};
+void InputModule::skipShortcutHandler(){
+
+  if(knobChange){
+    if ( globalObj->parameterSelect ) {// Encoder Switch
+      changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_SKIP,  STATE_SHORTCUT_SKIP_TRIGGER));
+    } else {
+      switch(stepMode){
+        case STATE_SHORTCUT_SKIP:
+//        globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
+          sequenceArray[globalObj->selectedChannel].skipStepCount = min_max(sequenceArray[globalObj->selectedChannel].skipStepCount + knobChange, 0, 63);
+        break;
+        case STATE_SHORTCUT_SKIP_TRIGGER:
+          sequenceArray[globalObj->selectedChannel].gpio_skipstep = min_max(sequenceArray[globalObj->selectedChannel].gpio_skipstep + knobChange, -9, 8);
+        break;
+      }
+    }
+  }
+  midplaneGPIO->clearBuffers();
+};
+void InputModule::clkdivShortcutHandler(){
+
+};
+void InputModule::resetShortcutHandler(){
+
+};
+void InputModule::reverseShortcutHandler(){
+
+};
 
 void InputModule::saveMenuInputHandler(){
   uint8_t chButtonMask = 0;
@@ -1864,8 +2039,8 @@ void InputModule::calibrationMenuHandler(){
               globalObj->dacCalibrationNeg[dacMap[n]] = (5*calibLow - 3*calibHigh)/2;
 
 
-              int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/115;  // kickstarter input impedance
-              //int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/500;    // post kickstarter input impedance
+              //int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/115;  // kickstarter input impedance
+              int compensation = (globalObj->dacCalibrationPos[dacMap[n]] - globalObj->dacCalibrationNeg[dacMap[n]] )/500;    // post kickstarter input impedance
             //  int compensation = 0 ;
               globalObj->dacCalibrationPos[dacMap[n]] = globalObj->dacCalibrationPos[dacMap[n]] - compensation;
               globalObj->dacCalibrationNeg[dacMap[n]] = globalObj->dacCalibrationNeg[dacMap[n]] + compensation;

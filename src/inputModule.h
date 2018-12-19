@@ -64,6 +64,13 @@ public:
   void multiSelectInputHandler();
 
   void randomShortcutHandler();
+  void transposeShortcutHandler();
+  void tunerShortcutHandler();
+  void fillShortcutHandler();
+  void skipShortcutHandler();
+  void clkdivShortcutHandler();
+  void resetShortcutHandler();
+  void reverseShortcutHandler();
 
   void saveMenuInputHandler();
   void patternChainInputHandler();
@@ -105,10 +112,12 @@ public:
   int8_t instBuffer;
 
   uint8_t shortcutRandomOctaveSpan;
-  elapsedMillis shortcutRandomSwitch;
 
   int16_t stepModeBuffer;
   uint8_t previousMenu;
+
+  bool skipPgUpRise;
+  bool skipPgDnRise;
 
   unsigned long encoderLoopTime;
   unsigned long smallButtonLoopTime;

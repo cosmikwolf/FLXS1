@@ -130,6 +130,7 @@ class Sequencer
 		uint8_t		cv_pitchmod;
 		uint8_t		cv_gatemod;
 		uint8_t		cv_glidemod;
+		int8_t 	transpose;
 		bool 			muteGate;
 		bool 			muteCV1;
 		bool 			muteCV2;
@@ -137,6 +138,9 @@ class Sequencer
     bool      skipNextNoteTrigger;
     bool      channelPlaying;
     bool      tieFlag;
+		bool			fillActive;
+		uint8_t		fillSpeed;
+
 		uint8_t   arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
 		uint8_t   arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
 		int8_t    arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];

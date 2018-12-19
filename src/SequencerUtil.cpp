@@ -50,6 +50,7 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch){
   this->fill              = 0;
   this->skipNextNoteTrigger = 0;
   this->tieFlag           = 0;
+	this->transpose 				= 0;
 	for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
 		this->initializeStep(stepNum);
 	}
@@ -305,6 +306,8 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate){
   //	}
 
 	//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
+		stepData[stepNum].notePlaying += this->transpose;
+
     outputControl->noteOn(channel,stepNum,stepData[stepNum].notePlaying,stepData[stepNum].velocity,stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, stepData[stepNum].glide, gate, 0, quantizeScale, quantizeMode, quantizeKey, muteCV1, stepData[stepNum].stepStartFrame, true);
 
     stepData[stepNum].noteStatus == CURRENTLY_PLAYING;
@@ -425,6 +428,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	}
 
 	stepData[stepNum].notePlaying += outputControl->cvInputCheck(cv_pitchmod);
+	stepData[stepNum].notePlaying += this->transpose;
 	uint8_t glideVal = min_max(stepData[stepNum].glide + outputControl->cvInputCheck(cv_glidemod), 0, 255);
 
 	//if(gateInputRaw[gpio_gatemute]){

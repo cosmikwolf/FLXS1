@@ -8,9 +8,6 @@
 uint8_t stepMode = 0;
 uint8_t currentPattern = 0;
 uint8_t notePage;
-uint8_t	currentMenu = STATE_PITCH0;       // Display module + LED module
-uint8_t previousState = 0;      // Display module + LED moduleextern
-uint8_t selectedChannel = 0;
 float   probability;
 float   frequency;
 

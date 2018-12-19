@@ -158,6 +158,14 @@ void Zetaohm_MAX7301::update(){
 	}
 };
 
+bool Zetaohm_MAX7301::activityCheck(){
+  if (fellBuffer || roseBuffer){
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 void Zetaohm_MAX7301::clearBuffers(){
   // fellBuffer = 0x0;
   // roseBuffer = 0x0;

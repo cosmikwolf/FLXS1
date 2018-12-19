@@ -32,7 +32,7 @@
 #define kLedClockInterval 30000
 #define kSequenceTimerInterval 600
 #define kPeripheralLoopTimer 15000
-#define kMidiClockInterval  1000 
+#define kMidiClockInterval  1000
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
@@ -77,7 +77,10 @@
 #define MODAL_UNMUTE_CVB        MODAL_UNMUTE_CVA + 1
 #define MODAL_UNMUTE_CH4        MODAL_UNMUTE_CVB + 1
 #define MODAL_SAVE              MODAL_UNMUTE_CH4 + 1
-#define MODAL_COPY_STEP         MODAL_SAVE + 1
+#define MODAL_COPY_PAGE         MODAL_SAVE + 1
+#define MODAL_PASTE_PAGE        MODAL_COPY_PAGE + 1
+#define MODAL_CLEAR_PAGE        MODAL_PASTE_PAGE + 1
+#define MODAL_COPY_STEP         MODAL_CLEAR_PAGE + 1
 #define MODAL_PASTE_STEP        MODAL_COPY_STEP + 1
 #define MODAL_CLEAR_STEP        MODAL_PASTE_STEP + 1
 #define MODAL_COPY_CHANNEL      MODAL_CLEAR_STEP + 1
@@ -218,11 +221,6 @@
 
 extern uint8_t stepMode;
 extern uint8_t notePage;
-extern uint8_t currentMenu;       // Display module + LED module
-extern uint8_t previousState;      // Display module + LED moduleextern
-
-
-extern uint8_t selectedChannel;
 //extern uint8_t clockMode;
 // FlashMemory
 extern uint8_t currentPattern;
@@ -249,7 +247,7 @@ extern uint8_t dacMap[8];
 extern uint8_t selectedText;
 extern uint8_t prevSelectedText;
 
-// multi selectedChannel
+// multi globalObj->selectedChannel
 
 
 //void//Serial.println(String text);

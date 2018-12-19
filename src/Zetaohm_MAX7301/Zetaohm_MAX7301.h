@@ -30,6 +30,7 @@ public:
 	bool 			cacheCheck(uint8_t index);
   void 			clearBuffers();
   void 			skipNextRises(uint8_t count);
+	bool 			activityCheck();
 
   uint8_t     skipRiseCount;
 	uint32_t		inputBuffer;

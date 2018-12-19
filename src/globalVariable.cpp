@@ -37,6 +37,8 @@ void GlobalVariable::initialize(ADC *adc){
       this->randomizeParamSelect = 0;
       this->randomizeLow = 36;
       this->randomizeSpan = 3;
+      this->currentMenu = STATE_PITCH0;       // Display module + LED module
+      this->selectedChannel = 0;
 
       this->tempoX100 = 12000;
       this->selectedStep = 0;
@@ -51,6 +53,7 @@ void GlobalVariable::initialize(ADC *adc){
       }
       this->waitingToResetAfterPatternLoad = false;
       this->patternLoadOperationInProgress = false;
+      this->screenSaverTimeout = 0;
 
       this->patternChangeTrigger = PATTERN_CHANGE_IMMEDIATE;
       for(int pattern=0; pattern<16; pattern++){
@@ -76,6 +79,9 @@ void GlobalVariable::initialize(ADC *adc){
       this->calibrationBuffer = 0;
       this->stepCopyIndex = 255;
       this->chCopyIndex = 255;
+      this->copiedChannel = 0;
+      this->copiedPage = 0;
+
 
        for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
        for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };
@@ -140,9 +146,9 @@ bool GlobalVariable::clockPortDirection(){
 void GlobalVariable::setClockPortDirection(bool direction){
   if(direction == CLOCK_PORT_OUTPUT){
     pinMode(CLOCK_PIN, OUTPUT);
-    digitalWriteFast(CLOCK_PIN, HIGH);
+    digitalWriteFast(CLOCK_PIN, LOW);
   } else {
-    digitalWriteFast(CLOCK_PIN, HIGH);
+    digitalWriteFast(CLOCK_PIN, LOW);
     pinMode(CLOCK_PIN, INPUT);
   }
 }
