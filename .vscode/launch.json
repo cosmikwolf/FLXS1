@@ -1,0 +1,35 @@
+// AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
+
+// PIO Unified Debugger
+//
+// Documentation: https://docs.platformio.org/page/plus/debugging.html
+// Configuration: https://docs.platformio.org/page/projectconf/section_env_debug.html
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug",
+            "executable": "/Users/tenkai/Desktop/Projects/FLXS1/.pioenvs/teensy31/firmware.elf",
+            "toolchainBinDir": "/Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi@1.50401.0/bin",
+            "svdPath": "/Users/tenkai/.platformio/platforms/teensy/misc/svd/MK20D5.svd",
+            "preLaunchTask": {
+                "type": "PlatformIO",
+                "task": "Pre-Debug"
+            },
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (skip Pre-Debug)",
+            "executable": "/Users/tenkai/Desktop/Projects/FLXS1/.pioenvs/teensy31/firmware.elf",
+            "toolchainBinDir": "/Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi@1.50401.0/bin",
+            "svdPath": "/Users/tenkai/.platformio/platforms/teensy/misc/svd/MK20D5.svd",
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}

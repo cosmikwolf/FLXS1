@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.env.osx": {
+        "PATH": "/Users/tenkai/.platformio/penv/bin:/Users/tenkai/.platformio/penv:/Users/tenkai/.rvm/gems/ruby-2.3.0/bin:/Users/tenkai/.rvm/gems/ruby-2.3.0@global/bin:/Users/tenkai/.rvm/rubies/ruby-2.3.0/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Users/tenkai/.rvm/bin",
+        "PLATFORMIO_CALLER": "vscode"
+    }
+}
