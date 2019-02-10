@@ -92,9 +92,20 @@ class GlobalVariable {
     uint8_t   copiedChannel;
     uint8_t   copiedPage;
     uint8_t   chCopyIndex;
+    
     uint8_t   randomizeParamSelect;
     uint8_t   randomizeLow;
     uint8_t   randomizeSpan;
+    uint8_t   randomize_cv2_sync;
+    uint8_t   randomize_cv2_type;
+    uint8_t   randomize_cv2_speedmin;
+    uint8_t   randomize_cv2_speedmax;
+    uint8_t   randomize_cv2_speedsync;
+    bool      randomize_cv2_type_include_skip;
+    int8_t   randomize_cv2_amplitude_min;
+    int8_t   randomize_cv2_amplitude_max;
+    int8_t   randomize_cv2_offset_min;
+    int8_t   randomize_cv2_offset_max;
     uint8_t   importExportDisplaySwitch;
     uint8_t   patternChannelSelector;
     uint8_t   prevPtrnChannelSelector;
@@ -130,9 +141,14 @@ class GlobalVariable {
     uint8_t previousChainSelectedPattern;
     bool midiSetClockOut;
     bool gateTestComplete;
+    
+    uint8_t pattern_page;
+
     elapsedMillis testTimer;
     elapsedMillis screenSaverTimeout;
     int generateRandomNumber(int minVal, int maxVal);
+    int generateRandomNumberIncludeZero(int minVal, int maxVal);
+    
     bool extClock();
     bool clockPortDirection();
     void setClockPortDirection(bool direction);

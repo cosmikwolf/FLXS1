@@ -559,8 +559,9 @@ void InputModule::changeState(uint8_t targetState){
     //  globalObj->currentMenu = MENU_MULTISELECT;
       break;
     case STATE_SHORTCUT_RANDOM_PARAM:
-    case STATE_SHORTCUT_RANDOM_LOW:
-    case STATE_SHORTCUT_RANDOM_SPAN:
+    case STATE_SHORTCUT_RANDOM_VAR1:
+    case STATE_SHORTCUT_RANDOM_VAR2:
+    case STATE_SHORTCUT_RANDOM_VAR3:
       globalObj->currentMenu = MENU_RANDOM;
     break;
     case STATE_SHORTCUT_TRANSPOSE:
@@ -1471,7 +1472,7 @@ uint8_t chanSwIndex;
             case SW_08:// shortcut_random
               switch(globalObj->currentMenu){
                 case MENU_RANDOM:
-                  sequenceArray[chan].randomize(globalObj->randomizeParamSelect, globalObj->randomizeLow, globalObj->randomizeSpan);
+                  this->executeRandomization(chan);
                   changeState(STATE_PITCH0);
                   display->displayModal(300, MODAL_RANDOM_PITCH_GATE);
                 break;
@@ -1741,7 +1742,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
 void InputModule::transposeShortcutHandler(){
   if(knobChange){
     if ( globalObj->parameterSelect ) {// Encoder Switch
-      changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_SPAN));
+      changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_VAR2));
     } else {
       switch(stepMode){
         case STATE_SHORTCUT_TRANSPOSE:
@@ -1754,23 +1755,137 @@ void InputModule::transposeShortcutHandler(){
 }
 
 
+void InputModule::executeRandomization(uint8_t channel){
+  sequenceArray[channel].randomize(globalObj->randomizeParamSelect);
+}
+                  
 void InputModule::randomShortcutHandler(){
   if(knobChange){
     if ( globalObj->parameterSelect ) {// Encoder Switch
-      changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_SPAN));
-    } else {
-      switch(stepMode){
-        case STATE_SHORTCUT_RANDOM_PARAM:
-//        globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
-          globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 2);
-        break;
-        case STATE_SHORTCUT_RANDOM_LOW:
-          globalObj->randomizeLow = min_max(globalObj->randomizeLow + knobChange, 0, 120);
-        break;
-        case STATE_SHORTCUT_RANDOM_SPAN:
-          globalObj->randomizeSpan = min_max(globalObj->randomizeSpan + knobChange, 1, 8);
-        break;
+      switch(globalObj->randomizeParamSelect){
+         case RANDOMIZE_PARAM_CV2_SPEED:
+           changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_VAR3));
+         break;
+        
+        default: 
+          changeState(min_max_cycle(stepMode + knobChange,  STATE_SHORTCUT_RANDOM_PARAM,  STATE_SHORTCUT_RANDOM_VAR2));
+          break;
       }
+    } else {
+
+      if(stepMode == STATE_SHORTCUT_RANDOM_PARAM){
+        globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, RANDOMIZE_PARAM_PITCHGATE, RANDOMIZE_PARAM_CV2_OFFSET);
+      } else{
+        switch(globalObj->randomizeParamSelect){
+          case RANDOMIZE_PARAM_PITCHGATE:
+          case RANDOMIZE_PARAM_PITCH:    
+          case RANDOMIZE_PARAM_GATE: 
+              switch(stepMode){
+                case STATE_SHORTCUT_RANDOM_VAR1:
+                  globalObj->randomizeLow = min_max(globalObj->randomizeLow + knobChange, 0, 120);
+                break;
+                case STATE_SHORTCUT_RANDOM_VAR2:
+                  globalObj->randomizeSpan = min_max(globalObj->randomizeSpan + knobChange, 1, 8);
+                break;
+                case STATE_SHORTCUT_RANDOM_VAR3:
+                break;
+              }
+
+            break;
+          case RANDOMIZE_PARAM_CV2_TYPE:
+              switch(stepMode){
+                case STATE_SHORTCUT_RANDOM_VAR1:
+                  globalObj->randomize_cv2_type = min_max(globalObj->randomize_cv2_type + knobChange, 0,1);
+                break;
+                case STATE_SHORTCUT_RANDOM_VAR2:
+                  globalObj->randomize_cv2_type_include_skip = min_max(globalObj->randomize_cv2_type_include_skip + knobChange, 0, 1);
+                break;
+                case STATE_SHORTCUT_RANDOM_VAR3:
+                break;
+              }           
+              break;
+
+          case RANDOMIZE_PARAM_CV2_SPEED:
+              switch(stepMode){
+                case STATE_SHORTCUT_RANDOM_VAR1:
+                  globalObj->randomize_cv2_speedmin = min_max(globalObj->randomize_cv2_speedmin + knobChange, 1, globalObj->randomize_cv2_speedmax);
+                break;
+                case STATE_SHORTCUT_RANDOM_VAR2:
+                  globalObj->randomize_cv2_speedmax = min_max(globalObj->randomize_cv2_speedmax + knobChange, globalObj->randomize_cv2_speedmin, 255);
+                break;
+                case STATE_SHORTCUT_RANDOM_VAR3:
+                  globalObj->randomize_cv2_speedsync = min_max(globalObj->randomize_cv2_speedsync + knobChange, 1, 8);
+                break;
+              }
+              break;
+          case RANDOMIZE_PARAM_CV2_AMPLITUDE:
+            switch(stepMode){
+              case STATE_SHORTCUT_RANDOM_VAR1:
+                globalObj->randomize_cv2_amplitude_min = min_max(globalObj->randomize_cv2_amplitude_min + knobChange, -127, globalObj->randomize_cv2_amplitude_max);
+              break;
+              case STATE_SHORTCUT_RANDOM_VAR2:
+                globalObj->randomize_cv2_amplitude_max = min_max(globalObj->randomize_cv2_amplitude_max + knobChange, globalObj->randomize_cv2_amplitude_min, 127);
+              break;
+              case STATE_SHORTCUT_RANDOM_VAR3:
+              break;
+            }
+          break;
+          case RANDOMIZE_PARAM_CV2_OFFSET:
+            switch(stepMode){
+              case STATE_SHORTCUT_RANDOM_VAR1:
+                globalObj->randomize_cv2_offset_min = min_max(globalObj->randomize_cv2_offset_min + knobChange, -127, globalObj->randomize_cv2_offset_max);
+              break;
+              case STATE_SHORTCUT_RANDOM_VAR2:
+                globalObj->randomize_cv2_offset_max = min_max(globalObj->randomize_cv2_offset_max + knobChange, globalObj->randomize_cv2_offset_min, 127);
+              break;
+              case STATE_SHORTCUT_RANDOM_VAR3:
+              break;
+            }
+          break;
+        }
+      }
+//       switch(stepMode){
+//         case STATE_SHORTCUT_RANDOM_PARAM:
+// //        globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, 0, 12);
+//           globalObj->randomizeParamSelect = min_max(globalObj->randomizeParamSelect + knobChange, RANDOMIZE_PARAM_PITCHGATE, RANDOMIZE_PARAM_CV2_SPEED);
+//         break;
+//         case STATE_SHORTCUT_RANDOM_VAR1:
+//           switch(globalObj->randomizeParamSelect){
+//             case RANDOMIZE_PARAM_PITCHGATE:
+//             case RANDOMIZE_PARAM_PITCH:    
+//             case RANDOMIZE_PARAM_GATE: 
+//               globalObj->randomizeLow = min_max(globalObj->randomizeLow + knobChange, 0, 120);
+//               break;
+
+//             case RANDOMIZE_PARAM_CV2_TYPE:
+//               globalObj->randomize_cv2_type = min_max(globalObj->randomize_cv2_type + knobChange, 0,1);
+//               break;
+
+//             case RANDOMIZE_PARAM_CV2_SPEED:
+//               globalObj->randomize_cv2_speedmin = min_max(globalObj->randomize_cv2_speedmin + knobChange, 1, 127);
+//               break;
+ 
+//           }
+//         break;
+//         case STATE_SHORTCUT_RANDOM_VAR2:
+//           switch(globalObj->randomizeParamSelect){
+//             case RANDOMIZE_PARAM_PITCHGATE:
+//             case RANDOMIZE_PARAM_PITCH:    
+//             case RANDOMIZE_PARAM_GATE: 
+//               globalObj->randomizeSpan = min_max(globalObj->randomizeSpan + knobChange, 1, 8);
+//               break;
+//             case RANDOMIZE_PARAM_CV2_SPEED:
+//               globalObj->randomize_cv2_speedmax = min_max(globalObj->randomize_cv2_speedmax + knobChange, 1, 127);
+//               break;
+//             case RANDOMIZE_PARAM_CV2_TYPE:
+//               globalObj->randomize_cv2_type_include_skip = min_max(globalObj->randomize_cv2_type_include_skip + knobChange, 0, 1);
+//               break;
+//           }
+//         break;
+//         case STATE_SHORTCUT_RANDOM_VAR2:
+
+//         break;
+//       }
     }
   }
   midplaneGPIO->clearBuffers();

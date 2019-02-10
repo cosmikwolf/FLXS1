@@ -214,14 +214,15 @@ void Sequencer::gateInputTrigger(uint8_t inputNum){
   }
 };
 
-void Sequencer::randomize(uint8_t parameter, uint8_t lowval, uint8_t spanval){
+void Sequencer::randomize(uint8_t parameter){
 	uint8_t highval;
+
 	switch(parameter){
 		case RANDOMIZE_PARAM_PITCHGATE:
-			highval = min_max(lowval+12*spanval, 0, 127);
+			highval = min_max(globalObj->randomizeLow+12*globalObj->randomizeSpan, 0, 127);
 
 			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
-				this->stepData[stepNum].pitch[0]     = globalObj->generateRandomNumber(lowval, highval);
+				this->stepData[stepNum].pitch[0]     = globalObj->generateRandomNumber(globalObj->randomizeLow, highval);
 				this->stepData[stepNum].gateType		 = globalObj->generateRandomNumber(0,2);
 				this->stepData[stepNum].gateLength	 = globalObj->generateRandomNumber(1,10);;
 				//Serial.print(String(stepData[stepNum].pitch[0]) + " ");
@@ -230,9 +231,9 @@ void Sequencer::randomize(uint8_t parameter, uint8_t lowval, uint8_t spanval){
 			//Serial.println(" ");
 		break;
 		case RANDOMIZE_PARAM_PITCH:
-			highval = min_max(lowval+12*spanval, 0, 127);
+			highval = min_max(globalObj->randomizeLow+12*globalObj->randomizeSpan, 0, 127);
 			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
-				this->stepData[stepNum].pitch[0]     = globalObj->generateRandomNumber(lowval, highval);
+				this->stepData[stepNum].pitch[0]     = globalObj->generateRandomNumber(globalObj->randomizeLow, highval);
 			}
 		break;
 		case RANDOMIZE_PARAM_GATE:
@@ -240,6 +241,48 @@ void Sequencer::randomize(uint8_t parameter, uint8_t lowval, uint8_t spanval){
 			this->stepData[stepNum].gateType		 = globalObj->generateRandomNumber(0,2);
 			this->stepData[stepNum].gateLength	 = globalObj->generateRandomNumber(1,10);;
 		}
+		break;
+		case RANDOMIZE_PARAM_CV2_TYPE:
+			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+				if(globalObj->randomize_cv2_type == 0){
+					if(globalObj->randomize_cv2_type_include_skip){
+						this->stepData[stepNum].velocityType = globalObj->generateRandomNumberIncludeZero(4,7);
+					} else {
+						this->stepData[stepNum].velocityType = globalObj->generateRandomNumber(4,7);
+					}
+				} else {
+					if(globalObj->randomize_cv2_type_include_skip){
+						this->stepData[stepNum].velocityType = globalObj->generateRandomNumberIncludeZero(8,14);
+					} else {
+						this->stepData[stepNum].velocityType = globalObj->generateRandomNumber(8,14);
+					}
+				}
+				
+			}
+			// CV2 type values are based on the velTypeArray listed below
+			//  velTypeArray[] = { "skip","trigger","quantized", "voltage","Env Decay","Env Attack","Env AR","Env ASR","LFO Sine","LFO Tri","LFO Square", "LFO RndSq", "LFO SawUp","LFO SawDn","LFO S+H" };
+		break;
+		case RANDOMIZE_PARAM_CV2_SPEED:
+			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+				uint8_t randomNum = globalObj->generateRandomNumber(globalObj->randomize_cv2_speedmin,globalObj->randomize_cv2_speedmax);
+				if( globalObj->randomize_cv2_speedsync ){
+					this->stepData[stepNum].cv2speed = randomNum - (randomNum % (64/globalObj->randomize_cv2_speedsync));
+				} else {
+					this->stepData[stepNum].cv2speed = randomNum;
+				}
+			}
+		break;
+
+		case RANDOMIZE_PARAM_CV2_AMPLITUDE:
+			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+					this->stepData[stepNum].velocity = globalObj->generateRandomNumber(globalObj->randomize_cv2_amplitude_min,globalObj->randomize_cv2_amplitude_max);
+			}
+		break;
+
+		case RANDOMIZE_PARAM_CV2_OFFSET:
+			for(int stepNum=0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+					this->stepData[stepNum].cv2offset = globalObj->generateRandomNumber(globalObj->randomize_cv2_offset_min,globalObj->randomize_cv2_offset_max);
+			}
 		break;
 	}
 }

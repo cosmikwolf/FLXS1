@@ -39,6 +39,17 @@ void GlobalVariable::initialize(ADC *adc){
       this->randomizeSpan = 3;
       this->currentMenu = STATE_PITCH0;       // Display module + LED module
       this->selectedChannel = 0;
+      this->pattern_page = 0;
+      this->randomize_cv2_type = 1;
+      this->randomize_cv2_speedmin = 32;
+      this->randomize_cv2_speedmax = 96;
+      this->randomize_cv2_amplitude_min = 16;
+      this->randomize_cv2_amplitude_max = 64;
+      this->randomize_cv2_offset_min = -32;
+      this->randomize_cv2_offset_max = 32;
+      this->randomize_cv2_speedsync = 0;
+      this->randomize_cv2_type_include_skip = 1;
+      this->randomize_cv2_sync = 0;
 
       this->tempoX100 = 12000;
       this->selectedStep = 0;
@@ -179,6 +190,15 @@ int GlobalVariable::generateRandomNumber(int minVal, int maxVal){
     randomNum = (rand()%(maxVal-minVal))+minVal;
 
   return randomNum;
+}
+
+int GlobalVariable::generateRandomNumberIncludeZero(int minVal, int maxVal){
+  uint32_t randomNumber = this->generateRandomNumber(minVal, maxVal);
+  if(randomNumber > (minVal+maxVal)/2){
+    return 0;
+  } else {
+    return randomNumber;
+  }
 }
 
 int16_t GlobalVariable::quantizeSemitonePitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction){

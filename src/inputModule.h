@@ -64,6 +64,8 @@ public:
   void multiSelectInputHandler();
 
   void randomShortcutHandler();
+  void executeRandomization(uint8_t channel);
+
   void transposeShortcutHandler();
   void tunerShortcutHandler();
   void fillShortcutHandler();

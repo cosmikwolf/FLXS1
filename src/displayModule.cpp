@@ -63,7 +63,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setTextScale(1);
   oled.setTextColor(WHITE);
   oled.setCursor(100,110);
-  oled.println("firmware18d");
+  oled.println("TESTfirmware18d");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -1428,8 +1428,8 @@ void DisplayModule::inputMenuDisplay(){
 
    displayElement[3] = strdup("gate lngth:");
 
-  cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_gatemod);
-  displayElement[4] = strdup(buf);
+cvMappingText(buf, sequenceArray[globalObj->selectedChannel].cv_gatemod);
+displayElement[4] = strdup(buf);
 
  //  displayElement[3] = strdup("gatemute:");
  // gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_gatemute);
@@ -1438,8 +1438,6 @@ void DisplayModule::inputMenuDisplay(){
  displayElement[5] = strdup("rndm pch");
  gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_randompitch);
  displayElement[6] = strdup(buf);
-
-
  sprintf(buf, "add:%d", sequenceArray[globalObj->selectedChannel].randomHigh);
  displayElement[11] = strdup(buf);
  sprintf(buf, "sub:%d", sequenceArray[globalObj->selectedChannel].randomLow);
@@ -1547,8 +1545,11 @@ if (sequenceArray[globalObj->selectedChannel].cv_glidemod < 4){
   highlight = currentPattern;
 
   uint8_t dispSelector;
+  uint8_t pattern = 0;
 
-  for(int pattern=0; pattern<16; pattern++){
+  for(int pattern_iter=0; pattern_iter<16; pattern_iter++){
+    pattern = pattern_iter + globalObj->pattern_page*16;
+
     if(globalObj->fastChainModePatternCount > 1){
       if(globalObj->fastChainModePatternCount > pattern){
         sprintf(buf, "pt%d >", globalObj->fastChainPatternSelect[pattern]+1);
@@ -1653,10 +1654,7 @@ if (sequenceArray[globalObj->selectedChannel].cv_glidemod < 4){
   renderStringBox(13, DISPLAY_LABEL, x+1*xoffset, y+3*yoffset, 31 , 13, false, REGULARSPECIAL, BLACK, ORANGE);
   renderStringBox(14, DISPLAY_LABEL, x+2*xoffset, y+3*yoffset, 31 , 13, false, REGULARSPECIAL, BLACK, ORANGE);
   renderStringBox(15, DISPLAY_LABEL, x+3*xoffset, y+3*yoffset, 31 , 13, false, REGULARSPECIAL, BLACK, ORANGE);
-
-
-
- }
+}
 
 void DisplayModule::saveMenuDisplayHandler(){
   if(globalObj->prevPtrnChannelSelector != globalObj->patternChannelSelector){
@@ -2381,27 +2379,92 @@ void DisplayModule::shortcutTransposeMenu(){
   renderStringBox(5,  STATE_SHORTCUT_TRANSPOSE, 0, 37 , 127, 27, false, BOLD4X, background , foreground);     //  digitalWriteFast(PIN_EXT_RX, HIGH);
 
   // renderStringBox(5,  STATE_SHORTCUT_TRANSPOSE,   47, 20,80,17, false, STYLE1X, background , foreground);
-  // renderStringBox(6,  STATE_SHORTCUT_RANDOM_LOW,       47, 37,80,17, false, STYLE1X, background , foreground);
-  // renderStringBox(7,  STATE_SHORTCUT_RANDOM_SPAN,       47, 54,80,17, false, STYLE1X, background , foreground);
+  // renderStringBox(6,  STATE_SHORTCUT_RANDOM_VAR1,       47, 37,80,17, false, STYLE1X, background , foreground);
+  // renderStringBox(7,  STATE_SHORTCUT_RANDOM_VAR2,       47, 54,80,17, false, STYLE1X, background , foreground);
 
 
 }
 void DisplayModule::shortcutRandomMenu(){
 
-  const char * const paramsArray[] = {"pitch/gate", "pitch", "gate", "tie", "arp all", "arpalgo", "arpspeed", "arpoctave", "arpintv", "cv2type", "cv2amp", "cv2speed", "cv2offset"};
+  const char * const paramsArray[] = {"ptch+gate", "pitch only", "gate only", "CV2 Type", "CV2 Speed", "CV2 Ampl", "CV2 Offset"};
+  const char * const cv2typesArray[] = {"envelope", "LFO"};
+
+//  const char * const paramsArray[] = {"pitch/gate", "pitch", "gate", "arp all", "arpalgo", "arpspeed", "arpoctave", "arpintv", "cv2type", "cv2amp", "cv2speed", "cv2offset"};
   displayElement[0] = strdup("Random");
 
   displayElement[11] = strdup("press ch+rndm");
   displayElement[12] = strdup("to execute");
 
   displayElement[1] = strdup("param:");
-  displayElement[2] = strdup("min:");
-  displayElement[3] = strdup("span:");
-
   displayElement[5] = strdup(paramsArray[globalObj->randomizeParamSelect]);
-  displayElement[6] = strdup(midiNotes[globalObj->randomizeLow]);
-  sprintf(buf, "%d octave", globalObj->randomizeSpan);
-  displayElement[7] = strdup(buf);
+
+  switch(globalObj->randomizeParamSelect){
+    case RANDOMIZE_PARAM_PITCHGATE:
+    case RANDOMIZE_PARAM_PITCH:    
+    case RANDOMIZE_PARAM_GATE:     
+      displayElement[2] = strdup("min:");
+      displayElement[3] = strdup("span:");
+
+      displayElement[6] = strdup(midiNotes[globalObj->randomizeLow]);
+      sprintf(buf, "%d octave", globalObj->randomizeSpan);
+      displayElement[7] = strdup(buf);
+      displayElement[4] = strdup("");
+      displayElement[8] = strdup("");
+    break;
+
+    case RANDOMIZE_PARAM_CV2_TYPE:
+      displayElement[2] = strdup("type:");
+      displayElement[6] = strdup(cv2typesArray[globalObj->randomize_cv2_type]);
+      displayElement[3] = strdup("skip");
+      if(globalObj->randomize_cv2_type_include_skip){
+        displayElement[7] = strdup("include");
+      } else {
+        displayElement[7] = strdup("exclude");
+      }
+      displayElement[4] = strdup("");
+      displayElement[8] = strdup("");
+    break;
+
+    case RANDOMIZE_PARAM_CV2_SPEED:
+      displayElement[2] = strdup("min:");
+      sprintf(buf, "%d", globalObj->randomize_cv2_speedmin);
+      displayElement[6] = strdup(buf);
+      displayElement[3] = strdup("max:");
+      sprintf(buf, "%d", globalObj->randomize_cv2_speedmax);
+      displayElement[7] = strdup(buf);
+      displayElement[4] = strdup("sync:");
+
+      if(globalObj->randomize_cv2_speedsync){
+        sprintf(buf, "1/%d", globalObj->randomize_cv2_speedsync);
+      } else {
+        sprintf(buf, "off");
+      }
+      displayElement[8] = strdup(buf);
+    break;
+    case RANDOMIZE_PARAM_CV2_AMPLITUDE:
+      displayElement[2] = strdup("min:");
+      voltageToText(buf, globalObj->randomize_cv2_amplitude_min);
+      displayElement[6] = strdup(buf);
+      displayElement[3] = strdup("max:");
+      voltageToText(buf, globalObj->randomize_cv2_amplitude_max);
+      displayElement[7] = strdup(buf);
+      displayElement[4] = strdup("");
+      displayElement[8] = strdup("");
+    break;     
+    case RANDOMIZE_PARAM_CV2_OFFSET:
+      displayElement[2] = strdup("min:");
+      voltageToText(buf, globalObj->randomize_cv2_offset_min);
+      displayElement[6] = strdup(buf);
+      displayElement[3] = strdup("max:");
+      voltageToText(buf, globalObj->randomize_cv2_offset_max);
+      displayElement[7] = strdup(buf);
+      displayElement[4] = strdup("");
+      displayElement[8] = strdup("");
+    break;        
+  }
+//LFO parameters
+// TYPE, AMPLITUDE, SPEED, OFFSET
+
 
   if(globalObj->multiSelectSwitch){
     renderStringBox(0,  DISPLAY_LABEL,  0,  0, 86, 16, false, STYLE1X, contrastColor, background ); //  digitalWriteFast(PIN_EXT_RX, LOW);
@@ -2415,12 +2478,14 @@ void DisplayModule::shortcutRandomMenu(){
   renderStringBox(1,  DISPLAY_LABEL,        0, 20,46,17, false, STYLE1X, background , foreground);
   renderStringBox(2,  DISPLAY_LABEL,        0, 37,46,17, false, STYLE1X, background , foreground);
   renderStringBox(3,  DISPLAY_LABEL,        0, 54,46,17, false, STYLE1X, background , foreground);
+  renderStringBox(4,  DISPLAY_LABEL,        0, 71,46,17, false, STYLE1X, background , foreground);
     //renderStringBox(10,  DISPLAY_LABEL,       0, 71,46,17, false, STYLE1X, background , foreground);
   //  renderStringBox(11,  DISPLAY_LABEL,       0, 88,46,17, false, STYLE1X, background , foreground);
 
     renderStringBox(5,  STATE_SHORTCUT_RANDOM_PARAM,   47, 20,80,17, false, STYLE1X, background , foreground);
-    renderStringBox(6,  STATE_SHORTCUT_RANDOM_LOW,       47, 37,80,17, false, STYLE1X, background , foreground);
-    renderStringBox(7,  STATE_SHORTCUT_RANDOM_SPAN,       47, 54,80,17, false, STYLE1X, background , foreground);
+    renderStringBox(6,  STATE_SHORTCUT_RANDOM_VAR1,       47, 37,80,17, false, STYLE1X, background , foreground);
+    renderStringBox(7,  STATE_SHORTCUT_RANDOM_VAR2,       47, 54,80,17, false, STYLE1X, background , foreground);
+    renderStringBox(8,  STATE_SHORTCUT_RANDOM_VAR3,       47, 71,80,17, false, STYLE1X, background , foreground);
 
     //renderStringBox(11,  STATE_CV2_OFFSET,         64, 71,63,17, false, STYLE1X, background , foreground);
 
