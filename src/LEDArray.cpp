@@ -120,8 +120,12 @@ void LEDArray::patternSelectSaveHandler(){
     i = n + globalObj->pattern_page*16;
     if(globalObj->savedSequences[0][i] || globalObj->savedSequences[1][i] || globalObj->savedSequences[2][i] || globalObj->savedSequences[3][i] ){
       leds.setPixelColor(ledMainMatrix[n], wheel(int(millis()/5 + 18*n)%255));
-    } else {
+    } else{
       leds.setPixelColor(ledMainMatrix[n], 0,0,0,10);
+    }
+
+    if ( (i == globalObj->saveDestination[0] ) && (millis()%500 < 250  ) ) { 
+      leds.setPixelColor(ledMainMatrix[n], 100,100,100,10);
     }
   }
 

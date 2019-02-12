@@ -33,7 +33,7 @@ uint8_t selectedText = 0;
 uint8_t prevSelectedText = 255 ;
 
 //save file
-uint8_t saveDestination[4] = {0,0,0,0};
+// uint8_t saveDestination[4] = {0,0,0,0};
 
 uint8_t chordArray[27][3] = {
 {255,255,255},

@@ -235,7 +235,7 @@ extern boolean debugBoolean;
 
 
 //save file
-extern uint8_t saveDestination[4];
+// extern uint8_t saveDestination[4];
 
 //midi
 extern elapsedMillis modalTimer;

@@ -1273,7 +1273,7 @@ void InputModule::altButtonPatternHandler(){
     if (midplaneGPIO->pressed(SW_SHIFT)){
       for(int i=0; i<SEQUENCECOUNT; i++){
         //saveDestination[i] = sequenceArray[i].pattern;
-        saveDestination[i] = currentPattern;
+        globalObj->saveDestination[i] = currentPattern;
       }
       changeState(STATE_SAVE);
       return;
@@ -1286,7 +1286,7 @@ void InputModule::altButtonPatternHandler(){
         changeState(STATE_PITCH0);
       break;
       case SAVE_MENU:
-        saveFile->savePattern(globalObj->patternChannelSelector, saveDestination);
+        saveFile->savePattern(globalObj->patternChannelSelector, globalObj->saveDestination);
         midplaneGPIO->clearBuffers();
 
         changeState(STATE_PITCH0);
@@ -1979,10 +1979,10 @@ void InputModule::saveMenuInputHandler(){
       // };
       if (chButtonMask == 0){
         //if no ch buttons are pressed, matrix buttons sets save destination for all channels
-        saveDestination[0]=i;
-        saveDestination[1]=i;
-        saveDestination[2]=i;
-        saveDestination[3]=i;
+        globalObj->saveDestination[0]=i + globalObj->pattern_page*16;
+        globalObj->saveDestination[1]=i + globalObj->pattern_page*16;
+        globalObj->saveDestination[2]=i + globalObj->pattern_page*16;
+        globalObj->saveDestination[3]=i + globalObj->pattern_page*16;
       }
     }
   }

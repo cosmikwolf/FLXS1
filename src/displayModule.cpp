@@ -1673,25 +1673,25 @@ void DisplayModule::saveMenuDisplayHandler(){
   displayElement[2] = strdup("ch3");
   displayElement[3] = strdup("ch4");
   if(globalObj->patternChannelSelector & 0b0001){
-    sprintf(buf, "%02d", saveDestination[0]+1);
+    sprintf(buf, "%02d", globalObj->saveDestination[0]+1);
     displayElement[4] = strdup(buf);
   } else {
     displayElement[4] = strdup("--");
   }
   if(globalObj->patternChannelSelector & 0b0010){
-    sprintf(buf, "%02d", saveDestination[1]+1);
+    sprintf(buf, "%02d", globalObj->saveDestination[1]+1);
     displayElement[5] = strdup(buf);
   } else {
     displayElement[5] = strdup("--");
   }
   if(globalObj->patternChannelSelector & 0b0100){
-    sprintf(buf, "%02d", saveDestination[2]+1);
+    sprintf(buf, "%02d", globalObj->saveDestination[2]+1);
     displayElement[6] = strdup(buf);
   } else {
     displayElement[6] = strdup("--");
   }
   if(globalObj->patternChannelSelector & 0b1000){
-    sprintf(buf, "%02d", saveDestination[3]+1);
+    sprintf(buf, "%02d", globalObj->saveDestination[3]+1);
     displayElement[7] = strdup(buf);
   } else {
     displayElement[7] = strdup("--");

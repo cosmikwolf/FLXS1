@@ -116,6 +116,7 @@ class GlobalVariable {
     bool channelResetSwich[4];
     bool savedSequences[4][128]; //[channel][sequence]
     bool muteChannelSelect[4];
+    uint8_t saveDestination[4];
     bool parameterSelect;
     bool playing;
     bool wasPlaying;

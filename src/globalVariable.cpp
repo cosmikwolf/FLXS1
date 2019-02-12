@@ -61,6 +61,7 @@ void GlobalVariable::initialize(ADC *adc){
       for(int channel=0; channel<4; channel++){
         this->channelResetSwich[channel] = 0;
         this->midiChannel[channel] = channel+1;
+        this->saveDestination[channel] = 0;
       }
       this->waitingToResetAfterPatternLoad = false;
       this->patternLoadOperationInProgress = false;

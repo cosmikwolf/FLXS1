@@ -22,10 +22,7 @@ bool FlashMemory::doesSeqDataExist(){
   } else {
     return 0;
   }
-
 }
-
-
 
 void FlashMemory::initializeCache(){
   Serial.println("initializing save file cache... ");
