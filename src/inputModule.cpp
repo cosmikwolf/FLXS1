@@ -1270,15 +1270,6 @@ void InputModule::altButtonPatternHandler(){
       return;
     }
 
-    if (midplaneGPIO->pressed(SW_SHIFT)){
-      for(int i=0; i<SEQUENCECOUNT; i++){
-        //saveDestination[i] = sequenceArray[i].pattern;
-        globalObj->saveDestination[i] = currentPattern;
-      }
-      changeState(STATE_SAVE);
-      return;
-    }
-
     if(midplaneGPIO->pressed(SW_CH0) || midplaneGPIO->pressed(SW_CH1) || midplaneGPIO->pressed(SW_CH2) || midplaneGPIO->pressed(SW_CH3)) return;
 
     switch(globalObj->currentMenu){
@@ -1286,18 +1277,30 @@ void InputModule::altButtonPatternHandler(){
         changeState(STATE_PITCH0);
       break;
       case SAVE_MENU:
-        saveFile->savePattern(globalObj->patternChannelSelector, globalObj->saveDestination);
-        midplaneGPIO->clearBuffers();
-
+        if (midplaneGPIO->pressed(SW_SHIFT)){
+          saveFile->savePattern(globalObj->patternChannelSelector, globalObj->saveDestination);
+          midplaneGPIO->clearBuffers();
+          display->displayModal(750, MODAL_SAVE);           
+        } else {
+          midplaneGPIO->clearBuffers();
+          display->displayModal(750, MODAL_DIDDNTSAVE);           
+        }
         changeState(STATE_PITCH0);
-        display->displayModal(750, MODAL_SAVE);
 
       break;
       default:
-        globalObj->multiSelectSwitch = 0;
-        midplaneGPIO->clearBuffers();
-        changeState(STATE_PATTERNSELECT);
-        heldButton == 255;
+        if (midplaneGPIO->pressed(SW_SHIFT)){
+          for(int i=0; i<SEQUENCECOUNT; i++){
+            //saveDestination[i] = sequenceArray[i].pattern;
+            globalObj->saveDestination[i] = currentPattern;
+          }
+          changeState(STATE_SAVE);
+        } else {
+          globalObj->multiSelectSwitch = 0;
+          midplaneGPIO->clearBuffers();
+          changeState(STATE_PATTERNSELECT);
+          heldButton == 255;
+        }
       break;
     }
 }
@@ -1364,7 +1367,7 @@ void InputModule::altButtonPgdnHandler(){
   switch(globalObj->currentMenu){
     case PATTERN_SELECT:
     case SAVE_MENU:
-      globalObj->pattern_page = min_max(globalObj->pattern_page - 1, 0, 3);
+      globalObj->pattern_page = min_max(globalObj->pattern_page - 1, 0, 7);
     break;
     default:
       if (midplaneGPIO->pressed(SW_SHIFT)){

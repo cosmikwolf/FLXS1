@@ -243,6 +243,9 @@ int FlashMemory::getSaveAddress(int index){
   return index*SECTORSIZE;
 };
 
+int FlashMemory::getCacheSaveAddress(int index){
+  return index*SECTORSIZE;
+};
 
 void FlashMemory::saveCalibrationEEPROM(){
   uint16_t address = 0;
@@ -487,13 +490,11 @@ uint8_t FlashMemory::checkForSavedSequences(){
 
 bool FlashMemory::checkifSequenceHasBeenSaved(char* json){
   StaticJsonBuffer<16384> jsonBuffer;
-
    JsonObject& jsonReader = jsonBuffer.parseObject(json);
-
    JsonArray& stepDataArray = jsonReader["data"];
 
-    for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
-     StepDatum stepDataBuf;
+  for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
+    StepDatum stepDataBuf;
 
     if(stepDataArray[i][7] != 0) { // if there are any gate types that are not zero, that means that sequence has been saved
       return true;
@@ -504,9 +505,22 @@ bool FlashMemory::checkifSequenceHasBeenSaved(char* json){
     };
   }
  return false;
-
 }
 
+bool FlashMemory::checkIfActiveChannelHasSaveData(uint8_t channel){
+  for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
+    if (sequenceArray[channel].stepData[i].gateType != 0){
+      Serial.println("gate step " + String(i) + " on ch " + String(channel) + " is " + String(sequenceArray[channel].stepData[i].gateType));
+      return true;
+    }
+    if (sequenceArray[channel].stepData[i].pitch[0] != 24){
+      Serial.println("pitch step " + String(i) + " on ch " + String(channel) + " is " + String(sequenceArray[channel].stepData[i].pitch[0]));
+      return true;
+    }
+  } 
+  Serial.println("returning false for ch " + String(channel));
+  return false;
+}
 
 
 bool FlashMemory::deserializePattern(uint8_t channel, char* json){
@@ -833,7 +847,9 @@ int FlashMemory::readGlobalData(){
 
 void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
-  globalObj->savedSequences[channel][pattern] = true;
+
+  globalObj->savedSequences[channel][pattern] = this->checkIfActiveChannelHasSaveData(channel);
+
   int cacheIndex = getCacheIndex(channel, pattern);
   //Serial.println("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
   while (cacheStatus[cacheIndex] != 0){
@@ -852,7 +868,7 @@ void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
   }
   file = spiFlash->open(cacheFileName);
   if (file){
-    file.seek(getSaveAddress(cacheIndex));
+    file.seek(getCacheSaveAddress(cacheIndex));
     file.write(fileBuffer,SECTORSIZE);
     file.close();
     setCacheStatus(cacheIndex, SAVING_TO_CACHE_SECTOR);
@@ -904,7 +920,7 @@ int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
         char* cacheFileName = (char *) malloc(sizeof(char) * 12);
         cacheFileName = strdup( "seqCache");
         file = spiFlash->open(cacheFileName);
-        file.seek(getSaveAddress(getCacheIndex(channel, pattern)));
+        file.seek(getCacheSaveAddress(getCacheIndex(channel, pattern)));
         file.read(fileBuffer, SECTORSIZE);
         if(this->deserializePattern(channel, fileBuffer) == false ){
           Serial.println(fileBuffer);

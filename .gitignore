@@ -3,3 +3,5 @@
 .gcc-flags.json
 .piolibdeps
 /src/flxs1.ino.cpp
+/.vscode/.browse.c_cpp.db-wal
+/.vscode/.browse.c_cpp.db

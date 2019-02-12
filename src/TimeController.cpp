@@ -61,7 +61,7 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 		Serial.println("WARNING! SAVE FILE NOT FOUND");
 	} else {
 		Serial.println("SAVE FILE FOUND");
-		delay(5);
+		// delay(5);
 	}
 	//
 	// char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
@@ -71,8 +71,8 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	// 	free(fileBuffer);
 	// 	fileBuffer = NULL;
 	// }
-	saveFile.checkForSavedSequences();
 	Serial.println("================ checking to see which sequences have been saved ================");
+	saveFile.checkForSavedSequences();
 	for(int pattern=0; pattern<16; pattern++){
 		for(int channel=0; channel<4; channel++){
 			Serial.print(String(globalObj->savedSequences[channel][pattern]));

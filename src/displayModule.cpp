@@ -504,6 +504,10 @@ void DisplayModule::modalDisplay(){
     case MODAL_SAVE:
       displayElement[0] = strdup("SAVED");
       goto singleTextDisplay;
+    case MODAL_DIDDNTSAVE:
+      displayElement[0] = strdup("NOT SAVED");
+      displayElement[1] = strdup("HOLD SHIFT");
+      goto singleTextDisplay;
     case MODAL_COPY_STEP:
     sprintf(buf, "STEP %d COPY", globalObj->stepCopyIndex+1 );
       displayElement[0] = strdup(buf);
@@ -1660,7 +1664,7 @@ if (sequenceArray[globalObj->selectedChannel].cv_glidemod < 4){
 
 void DisplayModule::saveMenuDisplayHandler(){
   if(globalObj->prevPtrnChannelSelector != globalObj->patternChannelSelector){
-    for (int i=0; i<8; i++){
+    for (int i=0; i<MAX_DISPLAY_ELEMENTS; i++){
       free(displayCache[i]);
       displayCache[i] = nullptr;
     }
@@ -1673,85 +1677,94 @@ void DisplayModule::saveMenuDisplayHandler(){
   displayElement[2] = strdup("ch3");
   displayElement[3] = strdup("ch4");
   if(globalObj->patternChannelSelector & 0b0001){
-    sprintf(buf, "%02d", globalObj->saveDestination[0]+1);
+    sprintf(buf, "%03d", globalObj->saveDestination[0]+1);
     displayElement[4] = strdup(buf);
   } else {
     displayElement[4] = strdup("--");
   }
   if(globalObj->patternChannelSelector & 0b0010){
-    sprintf(buf, "%02d", globalObj->saveDestination[1]+1);
+    sprintf(buf, "%03d", globalObj->saveDestination[1]+1);
     displayElement[5] = strdup(buf);
   } else {
     displayElement[5] = strdup("--");
   }
   if(globalObj->patternChannelSelector & 0b0100){
-    sprintf(buf, "%02d", globalObj->saveDestination[2]+1);
+    sprintf(buf, "%03d", globalObj->saveDestination[2]+1);
     displayElement[6] = strdup(buf);
   } else {
     displayElement[6] = strdup("--");
   }
   if(globalObj->patternChannelSelector & 0b1000){
-    sprintf(buf, "%02d", globalObj->saveDestination[3]+1);
+    sprintf(buf, "%03d", globalObj->saveDestination[3]+1);
     displayElement[7] = strdup(buf);
   } else {
     displayElement[7] = strdup("--");
   }
 
-  sprintf(buf, "SAVE PAGE %d", globalObj->pattern_page + 1);
+  sprintf(buf, "Pattern save %d", globalObj->pattern_page + 1);
 
   displayElement[16] = strdup(buf);
-  displayElement[17] = strdup("---");
-  displayElement[19] = strdup("shift - help");
+  displayElement[20] = strdup("shift - help");
+  
   // displayElement[21] = strdup("CH + MATRIX -> SET CH INDEX");
   
   // displayElement[17] = strdup("CH BUTTONS -> MASK SAVE");
   // displayElement[19] = strdup("4x4 MATRIX -> SET ALL INDEXES");
   // displayElement[21] = strdup("CH + MATRIX -> SET CH INDEX");
 
-  displayElement[18] = strdup("CHANNEL");
+  displayElement[17] = strdup("CHANNEL");
 
-  displayElement[22] = strdup("SAVE DESTINATION INDEX");
+  displayElement[18] = strdup("SAVE DESTINATION INDEX");
 
-  displayElement[20] = strdup("PATTERN->SAVE  SHIFT->EXIT ");
+  displayElement[19] = strdup("press shift+pattern to save ");
 
   renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 16, false, STYLE1X, RED, BLACK);
-  renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, RED, BLACK);
-  renderStringBox(19, DISPLAY_LABEL, 0, 24, 128 , 8, false, REGULAR1X, RED, BLACK);
-  // renderStringBox(21, DISPLAY_LABEL, 0, 32, 128 , 8, false, REGULAR1X, RED, BLACK);
 
-  renderStringBox(18, DISPLAY_LABEL, 0, 40, 128 , 8, false, REGULAR1X, BLACK, PINK);
+  renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, BLACK, YELLOW);
 
   if(globalObj->patternChannelSelector & 0b0001){
-    renderStringBox( 0, DISPLAY_LABEL,  0, 48, 32 , 16, false, STYLE1X, BLACK, RED);
+    renderStringBox( 0, DISPLAY_LABEL,  0, 24, 32 , 16, false, STYLE1X, BLACK, RED);
   } else {
-    renderStringBox( 0, DISPLAY_LABEL,  0, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+    renderStringBox( 0, DISPLAY_LABEL,  0, 24, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
   }
   if(globalObj->patternChannelSelector & 0b0010){
-    renderStringBox( 1, DISPLAY_LABEL, 32, 48, 32 , 16, false, STYLE1X, BLACK, GREEN);
+    renderStringBox( 1, DISPLAY_LABEL, 32, 24, 32 , 16, false, STYLE1X, BLACK, GREEN);
   } else {
-    renderStringBox( 1, DISPLAY_LABEL, 32, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+    renderStringBox( 1, DISPLAY_LABEL, 32, 24, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
   }
   if(globalObj->patternChannelSelector & 0b0100){
-    renderStringBox( 2, DISPLAY_LABEL, 64, 48, 32 , 16, false, STYLE1X, BLACK, BLUE);
+    renderStringBox( 2, DISPLAY_LABEL, 64, 24, 32 , 16, false, STYLE1X, BLACK, BLUE);
   } else {
-    renderStringBox( 2, DISPLAY_LABEL, 64, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+    renderStringBox( 2, DISPLAY_LABEL, 64, 24, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
   }
   if(globalObj->patternChannelSelector & 0b1000){
-    renderStringBox( 3, DISPLAY_LABEL, 96, 48, 32 , 16, false, STYLE1X, BLACK, PURPLE);
+    renderStringBox( 3, DISPLAY_LABEL, 96, 24, 32 , 16, false, STYLE1X, BLACK, PURPLE);
   } else {
-    renderStringBox( 3, DISPLAY_LABEL, 96, 48, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
+    renderStringBox( 3, DISPLAY_LABEL, 96, 24, 32 , 16, false, STYLE1X, BLACK, DARK_GREY);
   }
 
-  renderStringBox(22, DISPLAY_LABEL, 0, 64, 128 , 8, false, REGULAR1X, BLACK, PINK);
+  renderStringBox(18, DISPLAY_LABEL, 0, 40, 128 , 8, false, REGULAR1X, BLACK, YELLOW);
 
 
-  renderStringBox( 4, DISPLAY_LABEL,  0, 72, 32 , 16, false, STYLE1X, BLACK, RED);
-  renderStringBox( 5, DISPLAY_LABEL, 32, 72, 32 , 16, false, STYLE1X, BLACK, GREEN);
-  renderStringBox( 6, DISPLAY_LABEL, 64, 72, 32 , 16, false, STYLE1X, BLACK, BLUE);
-  renderStringBox( 7, DISPLAY_LABEL, 96, 72, 32 , 16, false, STYLE1X, BLACK, PURPLE);
+  renderStringBox( 4, DISPLAY_LABEL,  0, 48, 32 , 16, false, STYLE1X, BLACK, RED);
+  renderStringBox( 5, DISPLAY_LABEL, 32, 48, 32 , 16, false, STYLE1X, BLACK, GREEN);
+  renderStringBox( 6, DISPLAY_LABEL, 64, 48, 32 , 16, false, STYLE1X, BLACK, BLUE);
+  renderStringBox( 7, DISPLAY_LABEL, 96, 48, 32 , 16, false, STYLE1X, BLACK, PURPLE);
 
-  renderStringBox(20, DISPLAY_LABEL, 0, 88, 128 , 8, false, REGULAR1X, BLACK, PINK);
 
+  for(int chan = 0; chan < 4; chan++){
+    if(globalObj->savedSequences[chan][globalObj->saveDestination[chan]]){
+      displayElement[21+chan] = strdup("DATA");
+      renderStringBox(21+chan, DISPLAY_LABEL, chan*32, 64, 32 , 8, false, REGULAR1X, BLACK, DARK_GREY);
+    } else {
+      displayElement[21+chan] = strdup("EMPTY");
+      renderStringBox(21+chan, DISPLAY_LABEL, chan*32, 64, 32 , 8, false, REGULAR1X, BLACK, GREENYELLOW);
+    }
+  }
+
+
+  renderStringBox(19, DISPLAY_LABEL, 0, 80, 128 , 8, false, REGULAR1X, BLACK, YELLOW);
+  renderStringBox(20, DISPLAY_LABEL, 0, 88, 128 , 8, false, REGULAR1X, RED, BLACK);
 
 }
  void DisplayModule::noteDisplayHandler(){

@@ -24,6 +24,15 @@ bool FlashMemory::doesSeqDataExist(){
   }
 }
 
+bool FlashMemory::is_erased(char *data, unsigned int len)
+{
+	while (len > 0) {
+		if (*data++ != 255) return false;
+		len = len - 1;
+	}
+	return true;
+}
+
 void FlashMemory::initializeCache(){
   Serial.println("initializing save file cache... ");
   char* fileName = (char *) malloc(sizeof(char) * 12);
@@ -33,13 +42,20 @@ void FlashMemory::initializeCache(){
     Serial.println("Creating Cache File: " + String(fileName) );
     spiFlash->createErasable(fileName, FLASHFILESIZE);
   } else {
-    // file = spiFlash->open(fileName);   //open cache file
-    // file.seek(getSaveAddress(cacheIndex)
-    Serial.println("Cache File exists... erasing..");
+        Serial.println("Cache File exists, erasing nonzero sectors...");
     file = spiFlash->open(fileName);   //open cache file
-    if(file){
-      file.seek(0);
-      file.erase();
+    
+    for(int location = 0; location < FLASHFILESIZE; location += SECTORSIZE){
+      file.seek(location);
+      while (!spiFlash->ready()){ Serial.println("waiting for spiflash"); delay(25);}
+      char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+      file.read(fileBuffer, SECTORSIZE); // fill buffer with cache file
+      if ( !is_erased(fileBuffer,4096) ){
+        Serial.println("erasing sector " + String(location));
+        file.erase4k();
+      }
+      free(fileBuffer);
+      fileBuffer = NULL;
     }
     file.close();
   }
@@ -90,7 +106,7 @@ int FlashMemory::cacheWriteLoop(){
 
       if (spiFlash->ready()){
         char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
-
+        
         switch (cacheStatus[cacheIndex]){
 
         /*
@@ -100,9 +116,9 @@ int FlashMemory::cacheWriteLoop(){
         erase cache sector
         */
           case SAVING_TO_CACHE_SECTOR:
-           Serial.println(")))))) ____ ===== > > > erasing save sector ch:"  + String(channel) + "\tPT:" + String(pattern) + "\tCacheIndex: " + String(cacheIndex) );
+           Serial.println(")))))) ____ ===== > > > erasing save sector ch:"  + String(channel) + "\tPT:" + String(pattern) + "\tCacheIndex: " + String(cacheIndex) + "\tsaveaddress: " + String(getSaveAddress(cacheIndex)) );
             //next step is to erase the save sector
-            file = spiFlash->open(fileName);   //open cache file
+            file = spiFlash->open(fileName);   //open save file for erasing
             if(file){
               file.seek(getSaveAddress(cacheIndex));
               file.erase4k();
@@ -122,7 +138,7 @@ int FlashMemory::cacheWriteLoop(){
             //next step is to copy cache sector to save sector
             file = spiFlash->open(cacheFileName); // open cache file
             if(file){
-              file.seek(getSaveAddress(cacheIndex));
+              file.seek(getCacheSaveAddress(cacheIndex));
               file.read(fileBuffer, SECTORSIZE); // fill buffer with cache file0
               file.close();    // close cache file
 
@@ -155,7 +171,7 @@ int FlashMemory::cacheWriteLoop(){
             // next step is to erase the cache sector.
             file = spiFlash->open(cacheFileName); // open cache file
             if (file) {
-              file.seek(getSaveAddress(cacheIndex));
+              file.seek(getCacheSaveAddress(cacheIndex));
               file.erase4k();
               cacheWriteTimer = 0;
               setCacheStatus(cacheIndex, ERASING_CACHE_SECTOR);

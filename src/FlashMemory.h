@@ -57,6 +57,7 @@ public:
   void initializeCache();
   void fileSizeTest();
   void deleteTest();
+  bool is_erased(char *data, unsigned int len);
 
   void saveCalibrationEEPROM();
   bool readCalibrationEEPROM();
@@ -78,11 +79,13 @@ public:
   void listFiles();
 
   int getSaveAddress(int index);
+  int getCacheSaveAddress(int index);
   void serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern);
   bool deserializePattern(uint8_t channel, char* json);
 
   uint8_t checkForSavedSequences();
   bool checkifSequenceHasBeenSaved(char* json);
+  bool checkIfActiveChannelHasSaveData(uint8_t channel);
 
   void serializeGlobalSettings(char* fileBuffer);
   bool deserializeGlobalSettings(char* json);

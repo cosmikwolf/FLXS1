@@ -214,7 +214,7 @@ void setup() {
   // for(int i =0; i<20; i++){
   //   serialMidi.sendNoteOn(64+i, 127, 1);                                   // send midi note out
   //   delay(200);
-  //   serialMidi.sendNoteOff(64+i,127, 1);
+  //   serialMid  i.sendNoteOff(64+i,127, 1);
   //   delay(100);
   // }
 
