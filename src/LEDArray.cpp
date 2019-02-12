@@ -115,12 +115,13 @@ void LEDArray::patternChainLEDHandler(){
 
 void LEDArray::patternSelectSaveHandler(){
   this->playPauseHandler();
-
-  for (int i=0; i < 16; i++){
+  int i;
+  for (int n=0; n < 16; n++){
+    i = n + globalObj->pattern_page*16;
     if(globalObj->savedSequences[0][i] || globalObj->savedSequences[1][i] || globalObj->savedSequences[2][i] || globalObj->savedSequences[3][i] ){
-      leds.setPixelColor(ledMainMatrix[i], wheel(int(millis()/5 + 18*i)%255));
+      leds.setPixelColor(ledMainMatrix[n], wheel(int(millis()/5 + 18*n)%255));
     } else {
-      leds.setPixelColor(ledMainMatrix[i], 0,0,0,10);
+      leds.setPixelColor(ledMainMatrix[n], 0,0,0,10);
     }
   }
 

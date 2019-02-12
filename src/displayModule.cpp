@@ -1548,7 +1548,8 @@ if (sequenceArray[globalObj->selectedChannel].cv_glidemod < 4){
   uint8_t pattern = 0;
 
   for(int pattern_iter=0; pattern_iter<16; pattern_iter++){
-    pattern = pattern_iter + globalObj->pattern_page*16;
+    // pattern = pattern_iter + globalObj->pattern_page*16;
+    pattern = pattern_iter;
 
     if(globalObj->fastChainModePatternCount > 1){
       if(globalObj->fastChainModePatternCount > pattern){
@@ -1586,7 +1587,8 @@ if (sequenceArray[globalObj->selectedChannel].cv_glidemod < 4){
    if(globalObj->fastChainModePatternCount > 1){
      displayElement[16] = strdup("CHAIN MODE");
    } else {
-     displayElement[16] = strdup("PATTERN SELECT");
+    sprintf(buf, "PATTERN PAGE %d", globalObj->pattern_page + 1);
+     displayElement[16] = strdup(buf);
    }
   sprintf(buf, "current: %02d", currentPattern );
   sprintf(buf, "ch1:%02d ch2:%02d ch3:%02d ch4:%02d ", sequenceArray[0].pattern+1,sequenceArray[1].pattern+1, sequenceArray[2].pattern+1, sequenceArray[3].pattern+1 );
@@ -1695,10 +1697,16 @@ void DisplayModule::saveMenuDisplayHandler(){
     displayElement[7] = strdup("--");
   }
 
-  displayElement[16] = strdup("PATTERN SAVE");
-  displayElement[17] = strdup("CH BUTTONS -> MASK SAVE");
-  displayElement[19] = strdup("4x4 MATRIX -> SET ALL INDEXES");
-  displayElement[21] = strdup("CH + MATRIX -> SET CH INDEX");
+  sprintf(buf, "SAVE PAGE %d", globalObj->pattern_page + 1);
+
+  displayElement[16] = strdup(buf);
+  displayElement[17] = strdup("---");
+  displayElement[19] = strdup("shift - help");
+  // displayElement[21] = strdup("CH + MATRIX -> SET CH INDEX");
+  
+  // displayElement[17] = strdup("CH BUTTONS -> MASK SAVE");
+  // displayElement[19] = strdup("4x4 MATRIX -> SET ALL INDEXES");
+  // displayElement[21] = strdup("CH + MATRIX -> SET CH INDEX");
 
   displayElement[18] = strdup("CHANNEL");
 
@@ -1709,7 +1717,7 @@ void DisplayModule::saveMenuDisplayHandler(){
   renderStringBox(16, DISPLAY_LABEL, 0, 0, 128 , 16, false, STYLE1X, RED, BLACK);
   renderStringBox(17, DISPLAY_LABEL, 0, 16, 128 , 8, false, REGULAR1X, RED, BLACK);
   renderStringBox(19, DISPLAY_LABEL, 0, 24, 128 , 8, false, REGULAR1X, RED, BLACK);
-  renderStringBox(21, DISPLAY_LABEL, 0, 32, 128 , 8, false, REGULAR1X, RED, BLACK);
+  // renderStringBox(21, DISPLAY_LABEL, 0, 32, 128 , 8, false, REGULAR1X, RED, BLACK);
 
   renderStringBox(18, DISPLAY_LABEL, 0, 40, 128 , 8, false, REGULAR1X, BLACK, PINK);
 

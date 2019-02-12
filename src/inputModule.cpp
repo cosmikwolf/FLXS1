@@ -626,10 +626,12 @@ void InputModule::patternSelectHandler(){
   if(knobChange){
     globalObj->patternChangeTrigger = min_max(globalObj->patternChangeTrigger + knobChange, 0, 4);
   }
-  for (int i=0; i < 16; i++){
-    if (midplaneGPIO->fell(i)){
+  int i = 0;
+  for (int n=0; n < 16; n++){
+    i = n + globalObj->pattern_page * 16;
+    if (midplaneGPIO->fell(n)){
       if(heldButton == 255){
-        heldButton = i;
+        heldButton = n;
         globalObj->fastChainModePatternCount = 0;
         globalObj->fastChainModeCurrentIndex = 0;
       }
@@ -645,14 +647,15 @@ void InputModule::patternSelectHandler(){
 
     }
   }
-  for (int i=0; i < 16; i++){
-    if (midplaneGPIO->rose(i)){
-      if(heldButton == i){
+  for (int n=0; n < 16; n++){
+    i = n + globalObj->pattern_page * 16;
+    if (midplaneGPIO->rose(n)){
+      if(heldButton == n){
         heldButton = 255;
         if( globalObj->fastChainModePatternCount > 0 ){
-          for(int n =0; n<16; n++){
-            if (midplaneGPIO->pressed(n)){
-              heldButton = n;
+          for(int j =0; j<16; j++){
+            if (midplaneGPIO->pressed(j)){
+              heldButton = j;
             }
           }
         }
@@ -1333,14 +1336,22 @@ void InputModule::altButtonPgupHandler(){
     skipPgUpRise = false;
     return;
   }
-  if (midplaneGPIO->pressed(SW_SHIFT)){
-    changeState(STATE_PATTERN_CHAIN);
-  } else {
-    if(globalObj->pageButtonStyle){
-      notePage = positive_modulo(notePage + 1, 4);
-    } else {
-      notePage = positive_modulo(notePage - 1, 4);
-    }
+  switch(globalObj->currentMenu){
+    case PATTERN_SELECT:
+    case SAVE_MENU:
+      globalObj->pattern_page = min_max(globalObj->pattern_page + 1, 0, 7);
+      break;
+    default:
+      if (midplaneGPIO->pressed(SW_SHIFT)){
+        changeState(STATE_PATTERN_CHAIN);
+      } else {
+        if(globalObj->pageButtonStyle){
+          notePage = positive_modulo(notePage + 1, 4);
+        } else {
+          notePage = positive_modulo(notePage - 1, 4);
+        }
+      }
+    break;
   }
 
 };
@@ -1349,20 +1360,29 @@ void InputModule::altButtonPgdnHandler(){
     skipPgDnRise = false;
     return;
   }
-  if (midplaneGPIO->pressed(SW_SHIFT)){
-    if(globalObj->multiSelectSwitch){
-      globalObj->multiSelectSwitch = false;
-      changeState(STATE_PITCH0);
-    } else {
-      globalObj->multiSelectSwitch = true;
-      changeState(STATE_PITCH0);
-    }
-  } else {
-    if(!globalObj->pageButtonStyle){
-      notePage = positive_modulo(notePage + 1, 4);
-    } else {
-      notePage = positive_modulo(notePage - 1, 4);
-    }
+
+  switch(globalObj->currentMenu){
+    case PATTERN_SELECT:
+    case SAVE_MENU:
+      globalObj->pattern_page = min_max(globalObj->pattern_page - 1, 0, 3);
+    break;
+    default:
+      if (midplaneGPIO->pressed(SW_SHIFT)){
+        if(globalObj->multiSelectSwitch){
+          globalObj->multiSelectSwitch = false;
+          changeState(STATE_PITCH0);
+        } else {
+          globalObj->multiSelectSwitch = true;
+          changeState(STATE_PITCH0);
+        }
+      } else {
+        if(!globalObj->pageButtonStyle){
+          notePage = positive_modulo(notePage + 1, 4);
+        } else {
+          notePage = positive_modulo(notePage - 1, 4);
+        }
+      }
+      break;
   }
 
 };
@@ -1527,7 +1547,7 @@ uint8_t chanSwIndex;
       }
       if (midplaneGPIO->rose(i) ){
         //this section controls the behavior of the channel buttons on press
-        if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
+        // if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
         switch (i){
           case SW_PGDN:    this->altButtonPgdnHandler();     break;
           case SW_PGUP:    this->altButtonPgupHandler();     break;
@@ -1945,18 +1965,18 @@ void InputModule::saveMenuInputHandler(){
       }
 
       // if channel buttons are pressed, matrix buttons sets individual channel destinations
-      if (chButtonMask & 0b0001) {
-        saveDestination[0]=i;
-      };
-      if (chButtonMask & 0b0010) {
-        saveDestination[1]=i;
-      };
-      if (chButtonMask & 0b0100) {
-        saveDestination[2]=i;
-      };
-      if (chButtonMask & 0b1000) {
-        saveDestination[3]=i;
-      };
+      // if (chButtonMask & 0b0001) {
+      //   saveDestination[0]=i;
+      // };
+      // if (chButtonMask & 0b0010) {
+      //   saveDestination[1]=i;
+      // };
+      // if (chButtonMask & 0b0100) {
+      //   saveDestination[2]=i;
+      // };
+      // if (chButtonMask & 0b1000) {
+      //   saveDestination[3]=i;
+      // };
       if (chButtonMask == 0){
         //if no ch buttons are pressed, matrix buttons sets save destination for all channels
         saveDestination[0]=i;

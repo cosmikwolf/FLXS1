@@ -2,15 +2,15 @@
 #include "FlashMemory.h"
 
 
-void FlashMemory::setCacheStatus(uint8_t index, uint8_t status){
+void FlashMemory::setCacheStatus(int index, int status){
   cacheStatus[index] = status;
 }
 
-int FlashMemory::getCacheIndex(uint8_t channel,uint8_t pattern){
+int FlashMemory::getCacheIndex(int channel,int pattern){
   return pattern*4+channel;
 };
 
-int  FlashMemory::getCacheStatus(uint8_t index){
+int  FlashMemory::getCacheStatus(int index){
   return cacheStatus[index];
 };
 
@@ -31,12 +31,13 @@ void FlashMemory::initializeCache(){
   Serial.println("initializing save file cache... ");
   char* fileName = (char *) malloc(sizeof(char) * 12);
 
-
   fileName = strdup( "seqCache");
   if (!spiFlash->exists(fileName)) {
     Serial.println("Creating Cache File: " + String(fileName) );
     spiFlash->createErasable(fileName, FLASHFILESIZE);
   } else {
+    // file = spiFlash->open(fileName);   //open cache file
+    // file.seek(getSaveAddress(cacheIndex)
     Serial.println("Cache File exists... erasing..");
     file = spiFlash->open(fileName);   //open cache file
     if(file){
@@ -62,10 +63,10 @@ void FlashMemory::initializeCache(){
 };
 
 int FlashMemory::cacheWriteLoop(){
-  uint8_t channel;
-  uint8_t pattern;
-  uint8_t cacheStat;
-  uint8_t cacheIndex;
+  int channel = 0;
+  int pattern = 0;
+  int cacheStat = 0;
+  int cacheIndex = 0;
   if(saveSequenceBusy){
     return 3;
   }
@@ -73,7 +74,6 @@ int FlashMemory::cacheWriteLoop(){
   for(int ci=0; ci< CACHE_COUNT; ci++){
     cacheStat = cacheStatus[ci];
     cacheIndex = ci;
-    //Serial.println("Running CacheWriteLoop for " + String(channel) + "\tp: " + String(pattern));
     if (cacheStat != 0){
       break;
     }
@@ -81,6 +81,7 @@ int FlashMemory::cacheWriteLoop(){
 
   pattern = cacheIndex / 4;
   channel = cacheIndex % 4;
+  // Serial.println("Running CacheWriteLoop for " + String(channel) + "\tp: " + String(pattern)+ "\tCacheIndex: " + String(cacheIndex));
 
   if( cacheWriteTimer > CACHE_WRITE_DELAY ){
 
@@ -102,7 +103,7 @@ int FlashMemory::cacheWriteLoop(){
         erase cache sector
         */
           case SAVING_TO_CACHE_SECTOR:
-          //  Serial.println(")))))) ____ ===== > > > erasing save sector ch:"  + String(channel) + "\tPT:" + String(pattern) );
+           Serial.println(")))))) ____ ===== > > > erasing save sector ch:"  + String(channel) + "\tPT:" + String(pattern) + "\tCacheIndex: " + String(cacheIndex) );
             //next step is to erase the save sector
             file = spiFlash->open(fileName);   //open cache file
             if(file){

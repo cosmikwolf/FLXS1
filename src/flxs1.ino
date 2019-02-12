@@ -221,6 +221,9 @@ void setup() {
 
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
+Serial.println(sizeof(sequence[0]));
+
+Serial.println(sizeof(sequence[0].stepData));
 //  Serial.println("TEST EQUATIONS");
 
 //  for (int x=0; x < 16; x++){

@@ -17,14 +17,15 @@
 #define READ_JSON_ERROR          2
 #define WINBOND_CS_PIN           22
 #define USE_SPI_FLASH            1
-#define FLASHFILESIZE            262144
+// #define FLASHFILESIZE            262144  
+#define FLASHFILESIZE            2097152
 #define GLOBALFILESIZE           65536
 #define SONGFILESIZE             65536
 #define SECTORSIZE               4096
 #define CACHE_WRITE_DELAY        50000
 #define AWAITING_FILE_ERASURE    0
 
-#define CACHE_COUNT              64
+#define CACHE_COUNT              512
 #define CACHE_READY              0
 #define SAVING_TO_CACHE_SECTOR      1
 #define ERASING_SAVE_SECTOR         2
@@ -60,11 +61,11 @@ public:
   void saveCalibrationEEPROM();
   bool readCalibrationEEPROM();
   bool doesSeqDataExist();
-  void setCacheStatus(uint8_t index, uint8_t status);
-  int  getCacheStatus(uint8_t index);
-  int  getCacheIndex(uint8_t channel,uint8_t pattern);
+  void setCacheStatus(int index, int status);
+  int  getCacheStatus(int index);
+  int  getCacheIndex(int channel,int pattern);
 
-  int  checkCacheStatus(uint8_t address);
+  // int  checkCacheStatus(int address);
   uint16_t EEPROMRead16(int address);
   void EEPROMWrite16(int address, uint16_t value);
   void wipeEEPROM();
@@ -76,7 +77,7 @@ public:
 
   void listFiles();
 
-  int getSaveAddress(uint8_t index);
+  int getSaveAddress(int index);
   void serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern);
   bool deserializePattern(uint8_t channel, char* json);
 
