@@ -42,7 +42,7 @@ public:
   void patternSelectHandler();
   //void channelMenuHandler();
   void channelButtonHandler(uint8_t channel);
-  void channelButtonShortcutHandler(uint8_t channel);
+  bool channelButtonShortcutHandler();
   void channelButtonChannelSelectorHandler(uint8_t channel);
   void channelButtonShiftHandler(uint8_t channel);
   void channelButtonShiftMenuHandler(uint8_t channel);
@@ -96,7 +96,8 @@ public:
 
   uint8_t getChannelButtonSw(uint8_t channel);
   int getChannelFromSw(int switchNum);
-  elapsedMillis chRecEraseTimer;
+  elapsedMillis channel_erase_timer;
+  elapsedMillis pattern_paste_clear_timer;
   bool chRecEraseSwitch;
   uint8_t chPressedSelector;
   uint8_t buttonMode;

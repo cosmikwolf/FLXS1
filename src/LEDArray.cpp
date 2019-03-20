@@ -124,8 +124,10 @@ void LEDArray::patternSelectSaveHandler(){
       leds.setPixelColor(ledMainMatrix[n], 0,0,0,10);
     }
 
-    if ( (i == globalObj->saveDestination[0] ) && (millis()%500 < 250  ) ) { 
-      leds.setPixelColor(ledMainMatrix[n], 100,100,100,10);
+    if(globalObj->currentMenu == SAVE_MENU){
+      if ( (i == globalObj->saveDestination[0] ) && (millis()%500 < 250  ) ) { 
+        leds.setPixelColor(ledMainMatrix[n], 100,100,100,10);
+      }
     }
   }
 

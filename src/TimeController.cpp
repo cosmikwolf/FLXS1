@@ -119,7 +119,7 @@ void TimeController::runLoopHandler() {
 
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
-  if (clockMaster.displayRunSwitch){
+  if (clockMaster.displayRunSwitch && (globalObj->sysex_status != SYSEX_IMPORTING)){
     display.displayLoop(DISPLAY_INTERVAL);
     //clockMaster.displayRunSwitch = false;
   }
@@ -163,14 +163,20 @@ void TimeController::sequencerHandler(){
 	clockMaster.sequencerFunc();
 }
 
-void TimeController::displayClockHandler(){
+void TimeController::runDisplayLoop(){
 //  if (clockMaster.displayRunSwitch){
     display.displayLoop(0);
   //  clockMaster.displayRunSwitch = false;
   //}
 }
 
+void TimeController::sysexMessageHandler(char* sysex_message){
+	outputControl.sysexMessageHandler(sysex_message);
+}
 
+int TimeController::flashMemoryControl(int value){
+	return outputControl.flashMemoryControl(value);
+};
 
 void TimeController::midiClockHandler(){
 	midiControl->midiClockSyncFunc(serialMidi);

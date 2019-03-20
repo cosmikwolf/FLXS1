@@ -173,6 +173,15 @@ void OutputController::flashMemoryLoadPattern(uint8_t pattern, uint8_t channelSe
    saveFile->loadPattern(pattern, channelSelector);
 };
 
+void OutputController::sysexMessageHandler(char* sysex_message){
+  saveFile->handleSysexData(sysex_message);
+}
+
+int OutputController::flashMemoryControl(int value){
+  return saveFile->flashMemoryControl(value);
+}
+
+
 void OutputController::setDacVoltage( uint8_t dac, uint16_t output ){
   ad5676.setVoltage(dac, output);
   ad5676.setVoltage(dac, output);

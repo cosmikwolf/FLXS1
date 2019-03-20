@@ -66,14 +66,14 @@ void FlashMemory::formatAndInitialize(){
     for(int pattern=0; pattern < 128; pattern++){
       Serial.println("***----###$$$###---*** *^~^* INITIALIZING PATTERN " + String(pattern) + " *^~^* ***----###$$$###---***");
 
+      // for (int channel=0; channel < SEQUENCECOUNT; channel++){
+      //   sequenceArray[channel].initNewSequence(pattern, channel);
+      // }
+      // Serial.println("Patterns initialized");
       for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        sequenceArray[channel].initNewSequence(pattern, channel);
+        this->saveSequenceData(channel, pattern, true);
       }
-      Serial.println("Patterns initialized");
-      for (int channel=0; channel < SEQUENCECOUNT; channel++){
-        this->saveSequenceData(channel, pattern);
-      }
-      Serial.println("json sequence saved");
+      // Serial.println("json sequence saved");
       while(this->cacheWriteSwitch){
         this->cacheWriteLoop();
       };
@@ -181,7 +181,7 @@ uint8_t FlashMemory::exportSysexData(){
     Serial.println("SPIFLASH NOT READY");
   } ; // wait
 
-  for(uint8_t pattern = 0;pattern<16; pattern++){
+  for(uint8_t pattern = 0;pattern<MAX_SAVED_PATTERNS; pattern++){
     for(uint8_t channel = 0; channel < 4; channel++){
        Serial.println("Sending channel " + String(channel) + " pattern " + String(pattern));
 
@@ -390,69 +390,81 @@ bool FlashMemory::deserializeGlobalSettings(char* json){
   Serial.println("Reading In Global Settings: " + String(globalObj->dataInputStyle) + "\t" + String(globalObj->pageButtonStyle) + "\t" + String(globalObj->outputNegOffset[0]) + "\t" + String(globalObj->outputNegOffset[1]) + "\t" + String(globalObj->outputNegOffset[2]) + "\t" + String(globalObj->outputNegOffset[3]) + "\t" );
   return 1;
 }
-void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern){
+
+
+
+void FlashMemory::serializePattern(char* fileBuffer, uint8_t channel, uint8_t pattern, bool erase_data){
   StaticJsonBuffer<16384> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["version"] = 20;
-  root["header"] = 0xDEADBEEF;
-  //version 19 adds transpose
-  //version 20 adds data integrity header and footer
-  JsonArray& seqSettingsArray = root.createNestedArray("settings"); {}
 
-  seqSettingsArray.add(sequenceArray[channel].stepCount);           // array index: 0
-  seqSettingsArray.add(sequenceArray[channel].beatCount);           // array index: 1
-  seqSettingsArray.add(sequenceArray[channel].quantizeKey);         // array index: 2
-  seqSettingsArray.add(sequenceArray[channel].quantizeMode);        // array index: 3
-  seqSettingsArray.add(channel);                                    // array index: 4
-  seqSettingsArray.add(pattern);                                    // array index: 5
-  seqSettingsArray.add(sequenceArray[channel].clockDivision);       // array index: 6
-  seqSettingsArray.add(sequenceArray[channel].gpio_reset);          // array index: 7
-  seqSettingsArray.add(sequenceArray[channel].gpio_skipstep);       // array index: 8
-  seqSettingsArray.add(sequenceArray[channel].gpio_gatemute);       // array index: 9
-  seqSettingsArray.add(sequenceArray[channel].gpio_randompitch);    // array index: 10
-  seqSettingsArray.add(sequenceArray[channel].cv_arptypemod);       // array index: 11
-  seqSettingsArray.add(sequenceArray[channel].cv_arpspdmod);        // array index: 12
-  seqSettingsArray.add(sequenceArray[channel].cv_arpoctmod);        // array index: 13
-  seqSettingsArray.add(sequenceArray[channel].cv_arpintmod);        // array index: 14
-  seqSettingsArray.add(sequenceArray[channel].cv_pitchmod);         // array index: 15
-  seqSettingsArray.add(sequenceArray[channel].cv_gatemod);          // array index: 16
-  seqSettingsArray.add(sequenceArray[channel].cv_glidemod);         // array index: 17
-  seqSettingsArray.add(sequenceArray[channel].firstStep);           // array index: 18
-  seqSettingsArray.add(sequenceArray[channel].swingX100);           // array index: 19
-  seqSettingsArray.add(sequenceArray[channel].playMode);            // array index: 20
-  seqSettingsArray.add(sequenceArray[channel].skipStepCount);       // array index: 21
-  seqSettingsArray.add(sequenceArray[channel].randomLow);           // array index: 22
-  seqSettingsArray.add(sequenceArray[channel].randomHigh);          // array index: 23
-  seqSettingsArray.add(sequenceArray[channel].quantizeScale);       // array index: 24
-  seqSettingsArray.add(sequenceArray[channel].transpose);           // array index: 25
-
-  JsonArray& stepDataArray = root.createNestedArray("data");
-
-  //for (int i=0; i< root["stepCount"]; i++){
-  for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
-    JsonArray& stepDataElement = stepDataArray.createNestedArray();
-    stepDataElement.add(i);
-    stepDataElement.add(sequenceArray[channel].stepData[i].pitch[0]);
-    stepDataElement.add(sequenceArray[channel].stepData[i].pitch[1]);
-    stepDataElement.add(sequenceArray[channel].stepData[i].pitch[2]);
-    stepDataElement.add(sequenceArray[channel].stepData[i].pitch[3]);
-    stepDataElement.add(sequenceArray[channel].stepData[i].chord);
-    stepDataElement.add(sequenceArray[channel].stepData[i].beatDiv);
-    stepDataElement.add(sequenceArray[channel].stepData[i].gateType);
-    stepDataElement.add(sequenceArray[channel].stepData[i].gateLength);
-    stepDataElement.add(sequenceArray[channel].stepData[i].arpType);
-    stepDataElement.add(sequenceArray[channel].stepData[i].arpOctave);
-    stepDataElement.add(sequenceArray[channel].stepData[i].arpSpdNum);
-    stepDataElement.add(sequenceArray[channel].stepData[i].arpSpdDen);
-    stepDataElement.add(sequenceArray[channel].stepData[i].velocity);
-    stepDataElement.add(sequenceArray[channel].stepData[i].velocityType);
-    stepDataElement.add(sequenceArray[channel].stepData[i].cv2speed);
-    stepDataElement.add(sequenceArray[channel].stepData[i].glide);
+  if(!erase_data && !sequenceArray[channel].hasData() ){
+    erase_data = true;
+    Serial.println("Pattern " + String(pattern) + " channel " + String(channel) + " is empty, saving empty pattern flag");
   }
 
-  root["footer"] = 0xDEADBEEF;
+  if(erase_data){
+    root["status"] = 0xBEBEBEBE; // empty pattern flag
+    root.printTo(fileBuffer,4096);
+  } else {
+    root["status"] = 0xDA4ADA4A;
+    //version 19 adds transpose
+    //version 20 adds data integrity status header
+    JsonArray& seqSettingsArray = root.createNestedArray("settings"); {}
 
-  root.printTo(fileBuffer,4096);
+    seqSettingsArray.add(sequenceArray[channel].stepCount);           // array index: 0
+    seqSettingsArray.add(sequenceArray[channel].beatCount);           // array index: 1
+    seqSettingsArray.add(sequenceArray[channel].quantizeKey);         // array index: 2
+    seqSettingsArray.add(sequenceArray[channel].quantizeMode);        // array index: 3
+    seqSettingsArray.add(channel);                                    // array index: 4
+    seqSettingsArray.add(pattern);                                    // array index: 5
+    seqSettingsArray.add(sequenceArray[channel].clockDivision);       // array index: 6
+    seqSettingsArray.add(sequenceArray[channel].gpio_reset);          // array index: 7
+    seqSettingsArray.add(sequenceArray[channel].gpio_skipstep);       // array index: 8
+    seqSettingsArray.add(sequenceArray[channel].gpio_gatemute);       // array index: 9
+    seqSettingsArray.add(sequenceArray[channel].gpio_randompitch);    // array index: 10
+    seqSettingsArray.add(sequenceArray[channel].cv_arptypemod);       // array index: 11
+    seqSettingsArray.add(sequenceArray[channel].cv_arpspdmod);        // array index: 12
+    seqSettingsArray.add(sequenceArray[channel].cv_arpoctmod);        // array index: 13
+    seqSettingsArray.add(sequenceArray[channel].cv_arpintmod);        // array index: 14
+    seqSettingsArray.add(sequenceArray[channel].cv_pitchmod);         // array index: 15
+    seqSettingsArray.add(sequenceArray[channel].cv_gatemod);          // array index: 16
+    seqSettingsArray.add(sequenceArray[channel].cv_glidemod);         // array index: 17
+    seqSettingsArray.add(sequenceArray[channel].firstStep);           // array index: 18
+    seqSettingsArray.add(sequenceArray[channel].swingX100);           // array index: 19
+    seqSettingsArray.add(sequenceArray[channel].playMode);            // array index: 20
+    seqSettingsArray.add(sequenceArray[channel].skipStepCount);       // array index: 21
+    seqSettingsArray.add(sequenceArray[channel].randomLow);           // array index: 22
+    seqSettingsArray.add(sequenceArray[channel].randomHigh);          // array index: 23
+    seqSettingsArray.add(sequenceArray[channel].quantizeScale);       // array index: 24
+    seqSettingsArray.add(sequenceArray[channel].transpose);           // array index: 25
+
+    JsonArray& stepDataArray = root.createNestedArray("data");
+
+    //for (int i=0; i< root["stepCount"]; i++){
+    for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
+      JsonArray& stepDataElement = stepDataArray.createNestedArray();
+      stepDataElement.add(i);
+      stepDataElement.add(sequenceArray[channel].stepData[i].pitch[0]);
+      stepDataElement.add(sequenceArray[channel].stepData[i].pitch[1]);
+      stepDataElement.add(sequenceArray[channel].stepData[i].pitch[2]);
+      stepDataElement.add(sequenceArray[channel].stepData[i].pitch[3]);
+      stepDataElement.add(sequenceArray[channel].stepData[i].chord);
+      stepDataElement.add(sequenceArray[channel].stepData[i].beatDiv);
+      stepDataElement.add(sequenceArray[channel].stepData[i].gateType);
+      stepDataElement.add(sequenceArray[channel].stepData[i].gateLength);
+      stepDataElement.add(sequenceArray[channel].stepData[i].arpType);
+      stepDataElement.add(sequenceArray[channel].stepData[i].arpOctave);
+      stepDataElement.add(sequenceArray[channel].stepData[i].arpSpdNum);
+      stepDataElement.add(sequenceArray[channel].stepData[i].arpSpdDen);
+      stepDataElement.add(sequenceArray[channel].stepData[i].velocity);
+      stepDataElement.add(sequenceArray[channel].stepData[i].velocityType);
+      stepDataElement.add(sequenceArray[channel].stepData[i].cv2speed);
+      stepDataElement.add(sequenceArray[channel].stepData[i].glide);
+    }
+    root.printTo(fileBuffer,4096);
+  }
+
 }
 
 uint8_t FlashMemory::checkForSavedSequences(){
@@ -492,19 +504,15 @@ bool FlashMemory::checkifSequenceHasBeenSaved(char* json){
   StaticJsonBuffer<16384> jsonBuffer;
    JsonObject& jsonReader = jsonBuffer.parseObject(json);
    JsonArray& stepDataArray = jsonReader["data"];
-
-  for (int i=0; i< MAX_STEPS_PER_SEQUENCE; i++){
-    StepDatum stepDataBuf;
-
-    if(stepDataArray[i][7] != 0) { // if there are any gate types that are not zero, that means that sequence has been saved
+    
+   switch(jsonReader["status"].as<unsigned int>() ){
+    case 0xBEBEBEBE: // empty pattern flag
+      return false;
+    case 0xDA4ADA4A:
       return true;
-    };
-
-    if(stepDataArray[i][1] != 24) { // if there are any pitches that are nto the default 24, that means that sequence has been saved
+    default:
       return true;
-    };
-  }
- return false;
+   } 
 }
 
 bool FlashMemory::checkIfActiveChannelHasSaveData(uint8_t channel){
@@ -522,21 +530,79 @@ bool FlashMemory::checkIfActiveChannelHasSaveData(uint8_t channel){
   return false;
 }
 
+int FlashMemory::flashMemoryControl(int value){
+  switch(value){
+    case 1: // print cache indexes that are in use
+      for(int cacheIndex = 0; cacheIndex < CACHE_COUNT; cacheIndex++){
+        // if (cacheStatus[cacheIndex] != 0){
+        //   Serial.print(String(cacheIndex) + "-");
+        // }
+      }
+      return 0;
+    break;
+  }
+}
 
-bool FlashMemory::deserializePattern(uint8_t channel, char* json){
+void FlashMemory::handleSysexData(char* json){
+  // StaticJsonBuffer<16384> jsonBuffer;
+  // JsonObject& jsonReader = jsonBuffer.parseObject(json);
+  // uint8_t channel = jsonReader["settings"][4];
+  // uint8_t pattern = jsonReader["settings"][5];
+  // Serial.println("sysex data version: " + jsonReader["version"].as<String>() );
+  // Serial.println("importing data --- pattern: " + String(pattern) + " channel: " + String(channel));
+  // sequenceArray[channel].initNewSequence(pattern, channel);
+  // Serial.println("sysex Timer: " + String(cacheWriteSysexTimer));
+  cacheWriteSysexTimer = 0;
+  this->deserializePattern(globalObj->sysex_channel, json, true);
+  // Serial.println("Saving ");
+  // Serial.println("Cache index to be used: " + String(getCacheIndex(globalObj->sysex_channel,globalObj->sysex_pattern)));
+  this->saveSequenceData(globalObj->sysex_channel,globalObj->sysex_pattern, false);
+  globalObj->sysex_channel = (globalObj->sysex_channel +1)%4;
+  if(globalObj->sysex_channel == 0){
+    globalObj->sysex_pattern += 1;
+  }
+  // Serial.println("Save complete " + String(cacheWriteSysexTimer));
+}
+
+
+int FlashMemory::deserializePattern(uint8_t channel, char* json, bool sysex_import){
   StaticJsonBuffer<16384> jsonBuffer;
-
   //Serial.println("jsonBuffer allocated");
    JsonObject& jsonReader = jsonBuffer.parseObject(json);
    //Serial.println("Json Reader Success: " + String(jsonReader.success())) ;
-   uint8_t backoutPattern = sequenceArray[channel].pattern;
+  //  uint8_t backoutPattern = sequenceArray[channel].pattern;
    //Serial.println("JSON object Parsed");
-   if ((jsonReader["header"] != 0xDEADBEEF) ||  (jsonReader["footer"] != 0xDEADBEEF)){
+
+  if (sysex_import){ 
+    //when importing sysex, ignore channel arguemnt and determine channel from json.
+    //initialize sequence before loading data
+    // globalObj->sysex_channel = jsonReader["settings"][4];
+    // globalObj->sysex_pattern = jsonReader["settings"][5];
+    channel = globalObj->sysex_channel;
+    currentPattern = globalObj->sysex_pattern;
+    sequenceArray[channel].initNewSequence(globalObj->sysex_pattern, globalObj->sysex_channel);
+    globalObj->selectedChannel = channel;
+    Serial.println("Importing sysex pattern: " + String(globalObj->sysex_pattern) + " channel: " + String(globalObj->sysex_channel) + " data version: " + jsonReader["version"].as<String>());
+  }
+
+  if(jsonReader["version"] >= 20){
+   switch(jsonReader["status"].as<unsigned int>()){
+    case 0xDA4ADA4A:
+      //data exists! continue loading...
+    break;
+    case 0xBEBEBEBE:
+      //file is empty, return so it can initialize! 
+      return DESERIALIZE_FILE_EMPTY; 
+    break;
+    default: // what to do if header does not have any data in it? 
      Serial.println("DATA INTEGRITY HEADER OR FOOTER DID NOT CLEAR - INITIALIZING PATTERN AND NOT LOADING");
-     sequenceArray[channel].initNewSequence(backoutPattern, channel);
-     return 0;
+     Serial.println(jsonReader["status"].as<String>());
+     return DESERIALIZE_FILE_CORRUPT;
+     break;
    }
-  int num = jsonReader["version"];
+  }
+
+   int num = jsonReader["version"];
 
    sequenceArray[channel].stepCount        = jsonReader["settings"][0];
    sequenceArray[channel].beatCount        = jsonReader["settings"][1];
@@ -565,10 +631,10 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
    sequenceArray[channel].quantizeScale    = jsonReader["settings"][24];
    if(jsonReader["version"] < 19){
      sequenceArray[channel].transpose = 0;
-     Serial.println("not loading transpose");
+    //  Serial.println("not loading transpose");
    } else {
      sequenceArray[channel].transpose        = jsonReader["settings"][25];
-     Serial.println("loading transpose");
+    //  Serial.println("loading transpose");
    }
     //.as<uint8_t>();
    //Serial.println("READING IN PATTERN: " + String(sequenceArray[channel].pattern) + " array: "); Serial.println((const char *)jsonReader["pattern"]);
@@ -612,12 +678,11 @@ bool FlashMemory::deserializePattern(uint8_t channel, char* json){
      sequenceArray[channel].stepData[index] = stepDataBuf;
   }
 
-  bool returnVal = jsonReader.success();
-
-  if(returnVal == false){
-    sequenceArray[channel].initNewSequence(backoutPattern, channel);
-  }
-  return returnVal;
+  if (jsonReader.success() ){
+    return DESERIALIZE_FILE_LOADED;
+  } else {
+    return DESERIALIZE_LOAD_PROBLEM;
+  };
 }
 
 
@@ -642,13 +707,12 @@ void FlashMemory::serializeSongData(char* fileBuffer){
       songDataElement.add(globalObj->chainChannelMute[1][chainNum]);
       songDataElement.add(globalObj->chainChannelMute[2][chainNum]);
       songDataElement.add(globalObj->chainChannelMute[3][chainNum]);
-
-
       // Serial.println("Saving song data - chainNum: " +String(chainNum) + "\tpattern: " + String(globalObj->chainPatternSelect[chainNum]));
     }
   }
   root.printTo(fileBuffer,4096);
 }
+
 
 bool FlashMemory::deserializeSongData(char* json){
   StaticJsonBuffer<16384> jsonBuffer;
@@ -845,24 +909,33 @@ int FlashMemory::readGlobalData(){
   free(fileName);
 }
 
-void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
+
+void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern, bool erase_data){
   //http://stackoverflow.com/questions/15179996/how-should-i-allocate-memory-for-c-string-char-array
 
-  globalObj->savedSequences[channel][pattern] = this->checkIfActiveChannelHasSaveData(channel);
+  if(erase_data){ //erase data over a saved sequence
+    globalObj->savedSequences[channel][pattern] = false;
+  } else {
+    globalObj->savedSequences[channel][pattern] = sequenceArray[channel].hasData();
+  }
 
   int cacheIndex = getCacheIndex(channel, pattern);
   //Serial.println("Saving channel: " + String(channel) + "\tpattern: " + String(pattern) + "\tchannelIndex:" + String(cacheIndex) + "\tsaveAddress: " + String(getSaveAddress(cacheIndex)) );
   while (cacheStatus[cacheIndex] != 0){
+    if(globalObj->sysex_status == SYSEX_IMPORTING){
+      Serial.println("={}={}={}={}={}={}={}={}={}={}={}={}={}={}={}={}={}={}={}={}");
+      Serial.println ("went into cache write loop - cache status for cache Index" + String(cacheIndex) + " is " + String(cacheStatus[cacheIndex]));
+      globalObj->sysex_status = SYSEX_ERROR;
+      return;
+    }
     int tempint = cacheWriteLoop();
-    //Serial.println("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
+    Serial.println("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
   }
   saveSequenceBusy = 1;
-  cacheWriteTotalTimer = 0;
-
   char* cacheFileName = (char *) malloc(sizeof(char) * 12);
   cacheFileName = strdup("seqCache");
-  char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
-  serializePattern(fileBuffer, channel, pattern);
+    char * fileBuffer = (char*)calloc(SECTORSIZE, sizeof(char) );
+  serializePattern(fileBuffer, channel, pattern, erase_data);
   while( !(spiFlash->ready()) ){
     //delay(1);
   }
@@ -884,6 +957,80 @@ void FlashMemory::saveSequenceData(uint8_t channel, uint8_t pattern){
   saveSequenceBusy = 0;
   cacheWriteSwitch = 1;
 }
+
+
+void FlashMemory::copySequenceData(uint8_t source_channel, uint8_t source_pattern, uint8_t dest_channel, uint8_t dest_pattern){
+  Serial.println("attempting to copy pattern " + String(source_pattern) + " ch " + String(source_channel) + " to pattern " + String(dest_pattern) + " ch " + String(dest_channel));
+  char* fileName = (char *) malloc(sizeof(char) * 12);
+  fileName = strdup("seqData");
+  char* cacheFileName = (char *) malloc(sizeof(char) * 12);
+  cacheFileName = strdup("seqCache");
+  char* fileBuffer = (char*)malloc(SECTORSIZE);  // Allocate memory for the file and a terminating null char.
+  int source_index = getCacheIndex(source_channel, source_pattern);
+  int destination_index = getCacheIndex(dest_channel, dest_pattern);
+  
+  while ((cacheStatus[source_index] != 0) || (cacheStatus[destination_index] != 0)) {
+      int tempint = cacheWriteLoop();
+      //Serial.println("Cache is unavailable upon save attempt...  \tindex:" + String(cacheIndex) + "\tstatus: " + String(cacheStatus[cacheIndex] + " \tcacheWriteReturn: " + String(tempint)));
+    }
+    saveSequenceBusy = 1;
+
+
+  Serial.println("source index: " + String(source_index) + " dest index: " + String(destination_index));
+  Serial.println("source address: " + String(this->getSaveAddress(source_index)) + " dest address: " + String(this->getCacheSaveAddress(destination_index)));
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY1");
+  } ; // wait
+  if (spiFlash->exists(fileName)){
+    //Serial.println("Save file exists... attempting load");
+    file = spiFlash->open(fileName);
+    if (file){
+      file.seek(this->getSaveAddress(source_index));
+      file.read(fileBuffer, SECTORSIZE);
+      file.close();
+      Serial.println(String(fileBuffer));
+    } else {
+      Serial.println("unable to open save data file");
+    }
+  } else {
+    Serial.println("save data file does not exist!");
+  }
+  while (!spiFlash->ready()){
+    Serial.println("SPIFLASH NOT READY2");
+  } ; // wait
+  if (spiFlash->exists(cacheFileName)){
+    file = spiFlash->open(cacheFileName);
+    if(file){
+      file.seek(this->getCacheSaveAddress(destination_index));
+      file.write(fileBuffer, SECTORSIZE);
+      
+      Serial.println(String(fileBuffer));
+      file.close();
+      this->setCacheStatus(destination_index, SAVING_TO_CACHE_SECTOR);
+      globalObj->savedSequences[dest_channel][dest_pattern] = this->checkifSequenceHasBeenSaved(fileBuffer);
+      Serial.println("wrote save data");
+    } else {
+      Serial.println("unable to open cache file");
+    }
+  } else {
+    Serial.println("cache file does not exist!");
+  }
+
+  for(int cacheIndex = 0; cacheIndex<64; cacheIndex++){
+    Serial.print(cacheStatus[cacheIndex]);
+  }
+  Serial.println("-----");
+  free(cacheFileName);
+  free(fileName);
+  free(fileBuffer);
+  fileBuffer = NULL;
+
+  saveSequenceBusy = 0;
+  cacheWriteSwitch = 1;
+
+}
+
+
 
 int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
   char* fileName = (char *) malloc(sizeof(char) * 12);
@@ -912,23 +1059,24 @@ int FlashMemory::readSequenceData(uint8_t channel, uint8_t pattern){
       //Serial.println("file read");
     //  fileBuffer[SECTORSIZE] = '\0';               // Add the terminating null char.
       //Serial.println(fileBuffer);                // Print the file to the //Serial monitor.
-      if(this->deserializePattern(channel, fileBuffer) == false ){
-        Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. attempting to read cache...");
-
-        file.close();
-        free(fileBuffer);
-        char* cacheFileName = (char *) malloc(sizeof(char) * 12);
-        cacheFileName = strdup( "seqCache");
-        file = spiFlash->open(cacheFileName);
-        file.seek(getCacheSaveAddress(getCacheIndex(channel, pattern)));
-        file.read(fileBuffer, SECTORSIZE);
-        if(this->deserializePattern(channel, fileBuffer) == false ){
-          Serial.println(fileBuffer);
-          Serial.println("?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*? FILE LOADED BUT DATA CANNOT BE READ. no more reattempts. data corrupt");
-        };
-        free(cacheFileName);
-
-      };
+      switch(this->deserializePattern(channel, fileBuffer, false)){
+        case DESERIALIZE_FILE_LOADED:
+          // file loaded successfully. break and continue.
+        break;
+        case DESERIALIZE_FILE_EMPTY:
+          sequenceArray[channel].initNewSequence(pattern, channel);
+        break;
+        case DESERIALIZE_FILE_CORRUPT:
+          Serial.println("*&*&*&*&*&*&*& FILE CORRUPTION DETECTED, NOT LOADING, INITIALIZING PATTERN &*&*&*&*&*&*&*");
+          Serial.println(String(fileBuffer));
+          sequenceArray[channel].initNewSequence(pattern, channel);
+        break;
+        case DESERIALIZE_LOAD_PROBLEM:
+          Serial.println("*&*&*&*&*&*&*& LOAD NOT SUCCESSFULL, NOT LOADING, INITIALIZING PATTERN &*&*&*&*&*&*&*");
+          Serial.println("either the memory allocation failed (StaticJsonBuffer was too small) or the JSON parsing failed");
+          sequenceArray[channel].initNewSequence(pattern, channel);
+        break;
+      }
       file.close();
       free(fileBuffer);
     } else {
@@ -1013,7 +1161,7 @@ void FlashMemory::loadPattern(uint8_t pattern, uint8_t channelSelector) {
 void FlashMemory::savePattern(uint8_t channelSelector,uint8_t *destinationArray){
   for(int i=0; i < SEQUENCECOUNT; i++){
     if( globalObj->patternChannelSelector & (1<<i) ){    //skip the sequences that are masked out
-      saveSequenceData(i, destinationArray[i]);
+      saveSequenceData(i, destinationArray[i], false);
     }
   }
 }

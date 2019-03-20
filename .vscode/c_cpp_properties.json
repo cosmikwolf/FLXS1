@@ -265,7 +265,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=30603",
+                "PLATFORMIO=30605",
                 "__MK20DX256__",
                 "TEENSY31",
                 "USB_MIDI_SERIAL",

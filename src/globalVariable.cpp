@@ -90,10 +90,15 @@ void GlobalVariable::initialize(ADC *adc){
       this->midiSetClockOut = false;
       this->calibrationBuffer = 0;
       this->stepCopyIndex = 255;
+      this->patternCopyIndex = 255;
+      this->patternPasteIndex = 255;
       this->chCopyIndex = 255;
       this->copiedChannel = 0;
       this->copiedPage = 0;
-
+      this->sysex_pattern = 0;
+      this->sysex_channel = 0;
+      this->sysex_status = false;
+      this->sysex_return_value = 255;
 
        for(int i=0; i<8; i++){ this->dacCalibrationNeg[i]= 0; };
        for(int i=0; i<8; i++){ this->dacCalibrationPos[i]= 65535; };

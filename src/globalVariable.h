@@ -27,6 +27,14 @@
 #define CLOCK_PORT_OUTPUT 1
 #define CLOCK_PORT_INPUT  0
 
+#define SYSEX_IDLE            0
+#define SYSEX_PREPARING       1
+#define SYSEX_READYFORDATA    2
+#define SYSEX_IMPORTING       3
+#define SYSEX_PROCESSING      4
+#define SYSEX_IMPORTCOMPLETE  5 
+#define SYSEX_ERROR           6
+
 class GlobalVariable {
   public:
     bool      multiSelection[64];
@@ -89,6 +97,12 @@ class GlobalVariable {
     uint8_t   activeGate;
     uint8_t   rheoTestLevel;
     uint8_t   stepCopyIndex;
+    uint8_t   patternCopyIndex;
+    uint8_t   patternPasteIndex;
+    uint8_t   sysex_pattern;
+    uint8_t   sysex_channel;
+    uint8_t   sysex_status; 
+    uint8_t   sysex_return_value; 
     uint8_t   copiedChannel;
     uint8_t   copiedPage;
     uint8_t   chCopyIndex;

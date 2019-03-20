@@ -4,6 +4,7 @@
 
 void FlashMemory::setCacheStatus(int index, int status){
   cacheStatus[index] = status;
+  // Serial.println("cache index " + String(index) + " set to " + String(status)  );
 }
 
 int FlashMemory::getCacheIndex(int channel,int pattern){
@@ -13,6 +14,15 @@ int FlashMemory::getCacheIndex(int channel,int pattern){
 int  FlashMemory::getCacheStatus(int index){
   return cacheStatus[index];
 };
+
+bool FlashMemory::are_all_cache_statuses_zeroed(){
+  for(int cacheIndex =0; cacheIndex < CACHE_COUNT; cacheIndex++){
+    if(cacheStatus[cacheIndex] != 0){
+      return false; // there was a cache status that was not zero
+    };
+  }
+  return true;
+}
 
 bool FlashMemory::doesSeqDataExist(){
   char* fileName = (char *) malloc(sizeof(char) * 12);
@@ -81,9 +91,18 @@ int FlashMemory::cacheWriteLoop(){
   int cacheStat = 0;
   int cacheIndex = 0;
   if(saveSequenceBusy){
-    return 3;
+    return SAVE_OPERATION_IN_PROGRESS;
+  }
+  if((globalObj->sysex_status == SYSEX_IMPORTING) && (cacheWriteSysexTimer < 5000000)){
+    return SYSEX_OPERATION_IN_PROGRESS; //if a sysex message has recently been received, return as not to clog up the import
+  } else {
+    if(globalObj->sysex_status == SYSEX_IMPORTING){
+      this->cacheWriteSwitch = true;
+      globalObj->sysex_status = SYSEX_PROCESSING;
+    }
   }
 
+    
   for(int ci=0; ci< CACHE_COUNT; ci++){
     cacheStat = cacheStatus[ci];
     cacheIndex = ci;
@@ -212,16 +231,12 @@ int FlashMemory::cacheWriteLoop(){
       free(cacheFileName);
       cacheFileName = NULL;
 
-      uint8_t count = 0;
-      for(int ci=0; ci< CACHE_COUNT; ci++){
-        cacheStat = cacheStatus[ci];
-        if (cacheStat != 0){
-          count++;
+      if(cacheWriteSwitch && are_all_cache_statuses_zeroed()){
+        // Serial.println("SAVE OPERATION COMPLETE " + String(cacheWriteTotalTimer));
+        if(globalObj->sysex_status == SYSEX_PROCESSING) {
+          globalObj->sysex_status = SYSEX_IMPORTCOMPLETE;
+          Serial.println("All caches have been written to memory, import complete");
         }
-      }
-
-      if(cacheWriteSwitch && count == 0){
-        Serial.println("SAVE OPERATION COMPLETE " + String(cacheWriteTotalTimer));
         cacheWriteSwitch = 0;
       }
 

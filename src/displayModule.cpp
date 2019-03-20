@@ -46,9 +46,9 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.fillScreen(BLUE, GREEN);      delay(50);
   oled.fillScreen(PURPLE, NAVY);       delay(50);
   oled.fillScreen(LIGHTPINK,LIGHTGREEN);  delay(50);
-  oled.fillScreen(MAROON);
+  oled.fillScreen(NAVY);
   oled.setCursor(CENTER,8);
-  oled.setTextColor(WHITE);
+  oled.setTextColor(LIGHTGREEN);
   oled.setFont(&LadyRadical_16);//this will load the font
   oled.setTextScale(2);
   oled.println("Zetaohm");
@@ -56,14 +56,14 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock* clockMaste
   oled.setFont(&NeueHaasXBlack_28);//this will load the font
 
   oled.setCursor(CENTER,35);
-  oled.setTextColor(WHITE);
+  oled.setTextColor(LIGHTGREEN);
   oled.setTextScale(1);
   oled.println("FLXS1");
   oled.setFont(&flxs1_menu);//this will load the font
   oled.setTextScale(1);
-  oled.setTextColor(WHITE);
+  oled.setTextColor(LIGHTGREEN);
   oled.setCursor(100,110);
-  oled.println("TESTfirmware18d");
+  oled.println("BETA v19a");
   this->midiControl = midiControl;
   //  delay(1000);
   Serial.println("Display Initialization Complete");
@@ -312,6 +312,10 @@ void DisplayModule::displayLoop(uint16_t frequency) {
           sysexMenuHandler();
           break;
 
+        case SYSEX_IMPORT_INPROGRESS:
+          sysexImportHandler();
+          break;
+
         case MENU_PATTERN_CHAIN:
           patternChainMenuHandler();
         break;
@@ -512,6 +516,31 @@ void DisplayModule::modalDisplay(){
     sprintf(buf, "STEP %d COPY", globalObj->stepCopyIndex+1 );
       displayElement[0] = strdup(buf);
       goto singleTextDisplay;
+    case MODAL_COPY_PATTERN:
+      sprintf(buf, "PATTERN %d", globalObj->patternCopyIndex +1 );
+      displayElement[0] = strdup(buf);
+      displayElement[1] = strdup("COPY");
+      goto singleTextDisplay;
+
+
+    case MODAL_PASTE_PATTERN_CONFIRMED:
+      sprintf(buf, "PATTERN %d", globalObj->patternCopyIndex +1 );
+      displayElement[0] = strdup(buf);
+      sprintf(buf, "PASTED TO %d", globalObj->patternPasteIndex +1 );
+      displayElement[1] = strdup(buf);
+      goto singleTextDisplay;
+    case MODAL_PASTE_PATTERN_ARMED:
+      displayElement[0] = strdup("PRESS AGAIN");
+      displayElement[1] = strdup("TO PASTE");
+      goto singleTextDisplay;
+    case MODAL_CLEAR_PATTERN_CONFIRMED:
+      displayElement[0] = strdup("PATTERN");
+      displayElement[1] = strdup("ERASED");
+      goto singleTextDisplay;
+    case MODAL_CLEAR_PATTERN_ARMED:
+      displayElement[0] = strdup("PRESS AGAIN");
+      displayElement[1] = strdup("TO ERASE");
+      goto singleTextDisplay;
     case MODAL_PASTE_STEP:
       displayElement[0] = strdup("STEP PASTE");
       goto singleTextDisplay;
@@ -592,9 +621,9 @@ void DisplayModule::modalDisplay(){
       goto singleTextDisplay;
     break;
 
-    case MODAL_IMPORTING:
-      displayElement[0] = strdup("SYSEX IMPORT");
-      displayElement[1] = strdup("coming soon...");
+    case MODAL_PREPARING_SYSEX:
+      displayElement[0] = strdup("PREPARING");
+      displayElement[1] = strdup("TO IMPORT");
       goto singleTextDisplay;
     break;
 
@@ -1701,7 +1730,7 @@ void DisplayModule::saveMenuDisplayHandler(){
     displayElement[7] = strdup("--");
   }
 
-  sprintf(buf, "Pattern save %d", globalObj->pattern_page + 1);
+  sprintf(buf, "Save Slots page %d", globalObj->pattern_page + 1);
 
   displayElement[16] = strdup(buf);
   displayElement[20] = strdup("shift - help");
@@ -2207,6 +2236,44 @@ void DisplayModule::cvOutputRangeText(uint8_t dispElement, uint8_t outputRangeVa
 
 }
 
+void DisplayModule::sysexImportHandler(){
+    displayElement[0] = strdup("sysex import");
+
+    switch(globalObj->sysex_status){
+      case SYSEX_PREPARING:
+      displayElement[1] = strdup("preparing...");  
+      displayElement[2] = strdup("");  
+      break;
+      case SYSEX_READYFORDATA:
+      displayElement[1] = strdup("ready to receive");
+      displayElement[2] = strdup("");  
+      break;
+      case SYSEX_IMPORTING:      
+      displayElement[1] = strdup("in progress...");
+      // sprintf(buf, "pt:%03d ch:%01d",currentPattern+1, globalObj->selectedChannel+1);
+      displayElement[2] = strdup("");  
+      break;
+      case SYSEX_PROCESSING:     
+      displayElement[1] = strdup("processing...");
+
+      displayElement[2] = strdup("");  
+      break;
+      case SYSEX_IMPORTCOMPLETE: 
+      displayElement[1] = strdup("complete");
+      displayElement[2] = strdup("please reboot");  
+      break;
+      case SYSEX_ERROR:          
+      displayElement[1] = strdup("error");
+      displayElement[2] = strdup("");  
+      break;
+    }
+  
+  renderStringBox(0,  DISPLAY_LABEL,   0,  0, 128,15, false, STYLE1X, background , contrastColor);
+  renderStringBox(1,  DISPLAY_LABEL,   0, 15, 127,16, false, STYLE1X, background , RED);
+  renderStringBox(2,  DISPLAY_LABEL,   0, 30, 127,16, false, STYLE1X, background , RED);
+
+}
+
 void DisplayModule::sysexMenuHandler(){
   displayElement[0] = strdup("data Backup");
 
@@ -2225,10 +2292,10 @@ void DisplayModule::sysexMenuHandler(){
   displayElement[3] = strdup("seq data to usb midi");
 
   displayElement[4] = strdup("sysex import");
-   displayElement[5] = strdup("coming soon... ");
-   displayElement[6] = strdup("");
-   displayElement[7] = strdup("");
-   displayElement[8] = strdup("");
+  displayElement[5] = strdup("press shift+pattern to");
+  displayElement[6] = strdup("begin import process");
+  displayElement[7] = strdup("a reboot is required");
+  displayElement[8] = strdup("after import");
 
   // displayElement[5] = strdup("press shift+pattern to import");
   // displayElement[6] = strdup("and replace all seq data");

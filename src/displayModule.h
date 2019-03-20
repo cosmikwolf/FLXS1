@@ -138,6 +138,7 @@ class DisplayModule
     void globalMenuDisplay2();
     void globalMenuDisplay3();
     void sysexMenuHandler();
+    void sysexImportHandler();
     void patternChainMenuHandler();
     void patternChainHelpHandler();
 

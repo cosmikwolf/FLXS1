@@ -239,191 +239,211 @@ void InputModule::multiSelectInputHandler(){
 };
 
 void InputModule::loop(uint16_t frequency){
-  if (inputTimer > frequency){
-    inputTimer = 0;
-    knobPrevious = knobRead;
-    knobRead = 1 * knob.read()/4  ;
-    //knobRead = -1 * knob.read()/2  ;
-    knobChange = knobRead - knobPrevious;
-    midplaneGPIO->update();
+  if (inputTimer < frequency){
+    return;
+  }
+  inputTimer = 0;
+  knobPrevious = knobRead;
+  knobRead = 1 * knob.read()/4  ;
+  //knobRead = -1 * knob.read()/2  ;
+  knobChange = knobRead - knobPrevious;
+  midplaneGPIO->update();
 
-    if(midplaneGPIO->activityCheck() || knobChange){
-      globalObj->screenSaverTimeout = 0;
+  if(midplaneGPIO->activityCheck() || knobChange){
+    globalObj->screenSaverTimeout = 0;
+  }
+
+  if(midplaneGPIO->roseCheck()){ // if any buttons are pressed during sysex import, either exit import, or ignore
+    switch(globalObj->sysex_status){
+      case SYSEX_IDLE:
+        break;
+      case SYSEX_PREPARING:
+      case SYSEX_READYFORDATA:
+        globalObj->sysex_status = SYSEX_IDLE;
+        changeState(STATE_PITCH0);
+        break;
+      case SYSEX_IMPORTING:
+      case SYSEX_PROCESSING:
+      case SYSEX_IMPORTCOMPLETE: 
+      case SYSEX_ERROR:
+        return;
+        break;
     }
+  }
 
-     if(globalObj->dataInputStyle){
-      if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
-        globalObj->parameterSelect = !globalObj->parameterSelect;
-      }
+
+  if(globalObj->dataInputStyle){
+    if(backplaneGPIO->fell(SW_ENCODER_BACKPLANE)){
+      globalObj->parameterSelect = !globalObj->parameterSelect;
+    }
+  } else {
+    if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT)){
+      globalObj->parameterSelect = true;
     } else {
-      if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT)){
-        globalObj->parameterSelect = true;
-      } else {
-        globalObj->parameterSelect = false;
-      }
+      globalObj->parameterSelect = false;
     }
+  }
 
-    // if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT) ){ //encoder knob
-    //   globalObj->parameterSelect = true;
-    // } else {
-    //   globalObj->parameterSelect = false;
-    // }
+  // if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT) ){ //encoder knob
+  //   globalObj->parameterSelect = true;
+  // } else {
+  //   globalObj->parameterSelect = false;
+  // }
 
-    if (midplaneGPIO->fell(SW_SHIFT)){
-      //tap tempo
-      if((globalObj->clockMode == INTERNAL_CLOCK) && (globalObj->currentMenu == TEMPO_MENU)){
+  if (midplaneGPIO->fell(SW_SHIFT)){
+    //tap tempo
+    if((globalObj->clockMode == INTERNAL_CLOCK) && (globalObj->currentMenu == TEMPO_MENU)){
 
-        if (globalObj->tapTempoCount == 0){
-          globalObj->tapTempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
-          for(int i = 0; i<4; i++){
-            globalObj->tapTempoClockValues[i] = 0;
-          }
-        } else {
-          globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tapTempoMasterClkCounter;
-          globalObj->tapTempoMasterClkCounter = 0;
-        };
-        globalObj->tapTempoCount++;
-
-        if(globalObj->tapTempoCount > 4){
-          uint32_t tempTempo = 0;
-          for(int i = 0; i<4; i++){
-            tempTempo += globalObj->tapTempoClockValues[i] * kMasterClockInterval;
-          }
-
-          globalObj->tempoX100 = 6000000000/(tempTempo/4);
-          // clockMaster->changeTempo(globalObj->tempoX100);
-          Serial.println("Setting tap tempo to: " + String(globalObj->tempoX100) + "\ttempTempo: " + String(tempTempo));
+      if (globalObj->tapTempoCount == 0){
+        globalObj->tapTempoMasterClkCounter = 0;  // if its the first tap, reset the tempo counter
+        for(int i = 0; i<4; i++){
+          globalObj->tapTempoClockValues[i] = 0;
         }
       } else {
-        if(globalObj->tapTempoCount){
-          if (globalObj->tapTempoMasterClkCounter > 1000000/kMasterClockInterval){
-            Serial.println("Resetting tap tempo : prev count: " + String(globalObj->tapTempoCount));
-            globalObj->tapTempoCount = 0;
-          }
+        globalObj->tapTempoClockValues[(globalObj->tapTempoCount-1)%4] = globalObj->tapTempoMasterClkCounter;
+        globalObj->tapTempoMasterClkCounter = 0;
+      };
+      globalObj->tapTempoCount++;
+
+      if(globalObj->tapTempoCount > 4){
+        uint32_t tempTempo = 0;
+        for(int i = 0; i<4; i++){
+          tempTempo += globalObj->tapTempoClockValues[i] * kMasterClockInterval;
+        }
+
+        globalObj->tempoX100 = 6000000000/(tempTempo/4);
+        // clockMaster->changeTempo(globalObj->tempoX100);
+        Serial.println("Setting tap tempo to: " + String(globalObj->tempoX100) + "\ttempTempo: " + String(tempTempo));
+      }
+    } else {
+      if(globalObj->tapTempoCount){
+        if (globalObj->tapTempoMasterClkCounter > 1000000/kMasterClockInterval){
+          Serial.println("Resetting tap tempo : prev count: " + String(globalObj->tapTempoCount));
+          globalObj->tapTempoCount = 0;
         }
       }
     }
+  }
 
-    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) && midplaneGPIO->pressed(SW_MENU) ){
-      changeState(STATE_CALIBRATION);
+  if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) && midplaneGPIO->pressed(SW_MENU) ){
+    changeState(STATE_CALIBRATION);
+  }
+
+  if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_REC) ){
+    changeState(STATE_INPUTDEBUG);
+  }
+  if (knobChange){
+    switch (globalObj->currentMenu) {
+      case SEQUENCE_MENU:
+      case MOD_MENU_1:
+      case MOD_MENU_2:
+      case QUANTIZE_MENU:
+        if(globalObj->parameterSelect){
+          changeState(min_max_cycle(stepMode+knobChange, STATE_FIRSTSTEP , STATE_ARPINTMOD ));
+        }
+        break;
     }
+  }
+  //we always want the alt (non matrix) buttons to behave the same way
 
-    if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_REC) ){
-      changeState(STATE_INPUTDEBUG);
+  // now to handle the rest of the buttons.
+  bool didAltButtonsFire = altButtonHandler();
+
+  if (didAltButtonsFire == false){
+    switch (globalObj->currentMenu) {
+      case PITCH_GATE_MENU:
+      case ARPEGGIO_MENU:
+      case VELOCITY_MENU:
+        if(globalObj->multiSelectSwitch){
+          multiSelectInputHandler();
+        } else{
+          channelPitchModeInputHandler();
+        }
+      break;
+      case SEQUENCE_MENU:
+      case MOD_MENU_1:
+      case MOD_MENU_2:
+      case QUANTIZE_MENU:
+        sequenceMenuHandler();
+      break;
+      case INPUT_MENU:
+        inputMenuHandler();
+      break;
+
+      case SYSEX_MENU:
+      case GLOBAL_MENU_1:
+      case GLOBAL_MENU_2:
+      case GLOBAL_MENU_3:
+        globalMenuHandler();
+      break;
+
+      case INPUT_DEBUG_MENU:
+        if (knobChange){
+          selectedText = positive_modulo(selectedText+knobChange, 5);
+        }
+      break;
+
+      case PATTERN_SELECT:
+        patternSelectHandler();
+      break;
+
+      case TEMPO_MENU:
+        tempoMenuHandler();
+      break;
+
+      case CALIBRATION_MENU:
+        calibrationMenuHandler();
+      break;
+
+      case MENU_MODAL:
+        if (modalTimer > 1000){
+          changeState(STATE_PITCH0);
+        }
+      break;
+
+      case SAVE_MENU:
+        saveMenuInputHandler();
+      break;
+
+      case MENU_RANDOM:
+        randomShortcutHandler();
+      break;
+
+      case MENU_TRANSPOSE:
+        transposeShortcutHandler();
+      break;
+
+      case MENU_TUNER:
+        tunerShortcutHandler();
+      break;
+
+      case MENU_FILL:
+        fillShortcutHandler();
+      break;
+
+      case MENU_SKIP:
+        skipShortcutHandler();
+      break;
+
+      case MENU_CLKDIV:
+        clkdivShortcutHandler();
+      break;
+
+      case MENU_RESET:
+        resetShortcutHandler();
+      break;
+
+      case MENU_REVERSE:
+        reverseShortcutHandler();
+      break;
+
+      case MENU_PATTERN_CHAIN:
+      case MENU_CHAIN_HELP:
+        patternChainInputHandler();
+      break;
     }
-    if (knobChange){
-      switch (globalObj->currentMenu) {
-        case SEQUENCE_MENU:
-        case MOD_MENU_1:
-        case MOD_MENU_2:
-        case QUANTIZE_MENU:
-          if(globalObj->parameterSelect){
-            changeState(min_max_cycle(stepMode+knobChange, STATE_FIRSTSTEP , STATE_ARPINTMOD ));
-          }
-          break;
-      }
-    }
-    //we always want the alt (non matrix) buttons to behave the same way
-
-    // now to handle the rest of the buttons.
-    bool didAltButtonsFire = altButtonHandler();
-
-    if (didAltButtonsFire == false){
-      switch (globalObj->currentMenu) {
-        case PITCH_GATE_MENU:
-        case ARPEGGIO_MENU:
-        case VELOCITY_MENU:
-          if(globalObj->multiSelectSwitch){
-            multiSelectInputHandler();
-          } else{
-            channelPitchModeInputHandler();
-          }
-        break;
-        case SEQUENCE_MENU:
-        case MOD_MENU_1:
-        case MOD_MENU_2:
-        case QUANTIZE_MENU:
-          sequenceMenuHandler();
-        break;
-        case INPUT_MENU:
-          inputMenuHandler();
-        break;
-
-        case SYSEX_MENU:
-        case GLOBAL_MENU_1:
-        case GLOBAL_MENU_2:
-        case GLOBAL_MENU_3:
-          globalMenuHandler();
-        break;
-
-        case INPUT_DEBUG_MENU:
-          if (knobChange){
-            selectedText = positive_modulo(selectedText+knobChange, 5);
-          }
-        break;
-
-        case PATTERN_SELECT:
-          patternSelectHandler();
-        break;
-
-        case TEMPO_MENU:
-          tempoMenuHandler();
-        break;
-
-        case CALIBRATION_MENU:
-          calibrationMenuHandler();
-        break;
-
-        case MENU_MODAL:
-          if (modalTimer > 1000){
-            changeState(STATE_PITCH0);
-          }
-        break;
-
-        case SAVE_MENU:
-          saveMenuInputHandler();
-        break;
-
-        case MENU_RANDOM:
-          randomShortcutHandler();
-        break;
-
-        case MENU_TRANSPOSE:
-          transposeShortcutHandler();
-        break;
-
-        case MENU_TUNER:
-          tunerShortcutHandler();
-        break;
-
-        case MENU_FILL:
-          fillShortcutHandler();
-        break;
-
-        case MENU_SKIP:
-          skipShortcutHandler();
-        break;
-
-        case MENU_CLKDIV:
-          clkdivShortcutHandler();
-        break;
-
-        case MENU_RESET:
-          resetShortcutHandler();
-        break;
-
-        case MENU_REVERSE:
-          reverseShortcutHandler();
-        break;
-
-        case MENU_PATTERN_CHAIN:
-        case MENU_CHAIN_HELP:
-          patternChainInputHandler();
-        break;
-      }
-    } else {
-    //  Serial.println("AltButton: " + String(didAltButtonsFire));
-    }
+  } else {
+  //  Serial.println("AltButton: " + String(didAltButtonsFire));
   }
 }
 
@@ -526,6 +546,9 @@ void InputModule::changeState(uint8_t targetState){
     case STATE_SYSEX_EXPORT:
     case STATE_SYSEX_IMPORT:
       globalObj->currentMenu = SYSEX_MENU;
+      break;
+    case STATE_SYSEX_IMPORTINPROGRESS:
+      globalObj->currentMenu = SYSEX_IMPORT_INPROGRESS;
       break;
     case STATE_CALIB_INPUT0_OFFSET:
     case STATE_CALIB_INPUT0_LOW:
@@ -732,7 +755,7 @@ void InputModule::sequenceMenuHandler(){
         if (sequenceArray[globalObj->selectedChannel].quantizeMode == 0){
           sequenceArray[globalObj->selectedChannel].quantizeMode = previousQuantizeMode;
         }
-        midplaneGPIO->clearBuffers();
+        // midplaneGPIO->clearBuffers();
 
       } else {
         changeState(STATE_PITCH0);
@@ -1121,108 +1144,152 @@ void InputModule::altButtonChannelHandler(uint8_t switchIndex){
 }
 
 void InputModule::altButtonPlayHandler(){
-  for(int sw=0; sw<16; sw++){
-    if(midplaneGPIO->pressed(sw)){
-      globalObj->stepCopyIndex = getNote(sw);
-      display->displayModal(750, MODAL_COPY_STEP);
-      goto PLAYEND;
+  if(globalObj->currentMenu == SAVE_MENU) {
+    for(int sw=0; sw<16; sw++){
+      if(midplaneGPIO->pressed(sw)){
+        globalObj->patternCopyIndex = sw + globalObj->pattern_page*16 ;
+        display->displayModal(750, MODAL_COPY_PATTERN);
+        return;
+      }
     }
-  }
-
-  for(int ch=0; ch<4; ch++){
-    if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
-      globalObj->chCopyIndex = ch;
-      display->displayModal(750, MODAL_COPY_CHANNEL);
-      goto PLAYEND;
+  } else if(globalObj->currentMenu != PATTERN_SELECT){
+    for(int sw=0; sw<16; sw++){
+      if(midplaneGPIO->pressed(sw)){
+        globalObj->stepCopyIndex = getNote(sw);
+        display->displayModal(750, MODAL_COPY_STEP);
+        return;
+      }
     }
-  }
 
-  if(midplaneGPIO->pressed(SW_PGUP)){
-    skipPgUpRise = true;
-    globalObj->copiedChannel = globalObj->selectedChannel;
-    globalObj->copiedPage = notePage;
-    // Serial.println("PAGEUP COPY pg:" + String(globalObj->copiedPage) + " ch:" + String(globalObj->copiedChannel));
-    display->displayModal(750, MODAL_COPY_PAGE);
+    for(int ch=0; ch<4; ch++){
+      if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
+        globalObj->chCopyIndex = ch;
+        display->displayModal(750, MODAL_COPY_CHANNEL);
+        return;
+      }
+    }
 
-    goto PLAYEND;
-  }
-  if(midplaneGPIO->pressed(SW_PGDN)){
-    skipPgDnRise = true;
-    globalObj->copiedChannel = globalObj->selectedChannel;
-    globalObj->copiedPage = notePage;
-    // Serial.println("PAGEDN COPY pg:" + String(notePage) + " ch:" + String(globalObj->selectedChannel));
-    display->displayModal(750, MODAL_COPY_PAGE);
+    if(midplaneGPIO->pressed(SW_PGUP)){
+      skipPgUpRise = true;
+      globalObj->copiedChannel = globalObj->selectedChannel;
+      globalObj->copiedPage = notePage;
+      // Serial.println("PAGEUP COPY pg:" + String(globalObj->copiedPage) + " ch:" + String(globalObj->copiedChannel));
+      display->displayModal(750, MODAL_COPY_PAGE);
 
-    goto PLAYEND;
+      return;
+    }
+    if(midplaneGPIO->pressed(SW_PGDN)){
+      skipPgDnRise = true;
+      globalObj->copiedChannel = globalObj->selectedChannel;
+      globalObj->copiedPage = notePage;
+      // Serial.println("PAGEDN COPY pg:" + String(notePage) + " ch:" + String(globalObj->selectedChannel));
+      display->displayModal(750, MODAL_COPY_PAGE);
+
+      return;
+    }
   }
 
   globalObj->playing = !globalObj->playing;
-  PLAYEND: ;
 }
 
 void InputModule::altButtonRecHandler(){
-  if(globalObj->stepCopyIndex < 64){
-    for(int sw=0; sw<16; sw++){
-      if(midplaneGPIO->pressed(sw)){
-        display->displayModal(750, MODAL_PASTE_STEP);
-        sequenceArray[globalObj->selectedChannel].stepData[getNote(sw)] = sequenceArray[globalObj->selectedChannel].stepData[globalObj->stepCopyIndex];
+  if(globalObj->currentMenu == SAVE_MENU) {
+    if(globalObj->patternCopyIndex < 128){
+      for(int sw=0; sw<16; sw++){
+        if(midplaneGPIO->pressed(sw)){
+          globalObj->patternPasteIndex = sw + globalObj->pattern_page*16;
+          if (pattern_paste_clear_timer < 750){
+            for(int channel = 0; channel <4; channel++){
+              saveFile->copySequenceData(channel, globalObj->patternCopyIndex, channel, globalObj->patternPasteIndex);
+            }
+            display->displayModal(750, MODAL_PASTE_PATTERN_CONFIRMED);
+          } else {
+            display->displayModal(750, MODAL_PASTE_PATTERN_ARMED);
+            pattern_paste_clear_timer = 0;
+          }
+        }
       }
     }
-  }
-  if(globalObj->chCopyIndex < 4){
-    for(int ch=0; ch<4; ch++){
-      if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
-        sequenceArray[ch] = sequenceArray[globalObj->chCopyIndex];
-        sequenceArray[ch].channel = ch;
-        display->displayModal(750, MODAL_PASTE_CHANNEL);
+  }else{
+    if(globalObj->stepCopyIndex < 64){
+      for(int sw=0; sw<16; sw++){
+        if(midplaneGPIO->pressed(sw)){
+          display->displayModal(750, MODAL_PASTE_STEP);
+          sequenceArray[globalObj->selectedChannel].stepData[getNote(sw)] = sequenceArray[globalObj->selectedChannel].stepData[globalObj->stepCopyIndex];
+        }
       }
     }
-  }
+    if(globalObj->chCopyIndex < 4){
+      for(int ch=0; ch<4; ch++){
+        if(midplaneGPIO->pressed(getChannelButtonSw(ch))){
+          sequenceArray[ch] = sequenceArray[globalObj->chCopyIndex];
+          sequenceArray[ch].channel = ch;
+          display->displayModal(750, MODAL_PASTE_CHANNEL);
+        }
+      }
+    }
 
-  if(midplaneGPIO->pressed(SW_PGDN)||midplaneGPIO->pressed(SW_PGUP)){
-      if(midplaneGPIO->pressed(SW_PGDN)){
-        skipPgDnRise = true;
+    if(midplaneGPIO->pressed(SW_PGDN)||midplaneGPIO->pressed(SW_PGUP)){
+        if(midplaneGPIO->pressed(SW_PGDN)){
+          skipPgDnRise = true;
+        }
+        if (midplaneGPIO->pressed(SW_PGUP)){
+          skipPgUpRise = true;
+        }
+      for(int index = 0; index<16; index++){
+        sequenceArray[globalObj->selectedChannel].stepData[16*notePage+index] = sequenceArray[globalObj->copiedChannel].stepData[16*globalObj->copiedPage+index];
+        // Serial.println("Pasting step " + String(16*globalObj->copiedPage+index) + " to step: " +  String(16*notePage+index) );
       }
-      if (midplaneGPIO->pressed(SW_PGUP)){
-        skipPgUpRise = true;
-      }
-    for(int index = 0; index<16; index++){
-      sequenceArray[globalObj->selectedChannel].stepData[16*notePage+index] = sequenceArray[globalObj->copiedChannel].stepData[16*globalObj->copiedPage+index];
-      // Serial.println("Pasting step " + String(16*globalObj->copiedPage+index) + " to step: " +  String(16*notePage+index) );
-    }
-    // Serial.println("Pasting channel " + String(globalObj->copiedChannel) + " pg " + String(globalObj->copiedPage) + " to ch " + String(globalObj->selectedChannel) + " pg " + String(notePage) + "skipPgDnRise:" + String(skipPgDnRise));
-    display->displayModal(750, MODAL_PASTE_PAGE);
+      // Serial.println("Pasting channel " + String(globalObj->copiedChannel) + " pg " + String(globalObj->copiedPage) + " to ch " + String(globalObj->selectedChannel) + " pg " + String(notePage) + "skipPgDnRise:" + String(skipPgDnRise));
+      display->displayModal(750, MODAL_PASTE_PAGE);
 
+    }
   }
 }
 void InputModule::altButtonStopHandler(){
-  for(int sw=0; sw<16; sw++){
-    if(midplaneGPIO->pressed(sw)){
-      sequenceArray[globalObj->selectedChannel].initializeStep(sw);
-      display->displayModal(750, MODAL_CLEAR_STEP);
-      goto STOPEND;
-    }
-  }
 
-  if (chPressedSelector && chRecEraseTimer > 750){
-      chRecEraseTimer = 0;
-      display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
-  } else if (chPressedSelector && chRecEraseTimer < 750) {
-      for(int i=0; i<4; i++){
-        if ((0b001 << i) & chPressedSelector){
-          sequenceArray[i].initNewSequence(currentPattern, i);
+  if(globalObj->currentMenu == SAVE_MENU) {
+      for(int sw=0; sw<16; sw++){
+        if(midplaneGPIO->pressed(sw)){
+          if (pattern_paste_clear_timer < 750){
+            for(int channel = 0; channel <4; channel++){
+              saveFile->saveSequenceData(channel, sw+globalObj->pattern_page*16, true);
+            }
+            display->displayModal(750, MODAL_CLEAR_PATTERN_CONFIRMED);
+          } else {
+            display->displayModal(750, MODAL_CLEAR_PATTERN_ARMED);
+            pattern_paste_clear_timer = 0;
+          }
         }
       }
-      display->displayModal(750, MODAL_ERASED, chPressedSelector);
-  } else {
-    if(globalObj->playing == false ){
-      globalObj->chainModeActive = false;
-    }
-    globalObj->playing = false;
-    for(int s = 0; s < SEQUENCECOUNT; s++){
-      sequenceArray[s].clockReset(true);
+  }else{
+    for(int sw=0; sw<16; sw++){
+      if(midplaneGPIO->pressed(sw)){
+        sequenceArray[globalObj->selectedChannel].initializeStep(sw);
+        display->displayModal(750, MODAL_CLEAR_STEP);
+        goto STOPEND;
+      }
     }
 
+    if (chPressedSelector && channel_erase_timer > 750){
+        channel_erase_timer = 0;
+        display->displayModal(750, MODAL_ERASEARMED, chPressedSelector);
+    } else if (chPressedSelector && channel_erase_timer < 750) {
+        for(int i=0; i<4; i++){
+          if ((0b001 << i) & chPressedSelector){
+            sequenceArray[i].initNewSequence(currentPattern, i);
+          }
+        }
+        display->displayModal(750, MODAL_ERASED, chPressedSelector);
+    } else {
+      if(globalObj->playing == false ){
+        globalObj->chainModeActive = false;
+      }
+      globalObj->playing = false;
+      for(int s = 0; s < SEQUENCECOUNT; s++){
+        sequenceArray[s].clockReset(true);
+      }
+    }
   }
 
   if(midplaneGPIO->pressed(SW_PGDN)||midplaneGPIO->pressed(SW_PGUP)){
@@ -1259,12 +1326,24 @@ void InputModule::altButtonPatternHandler(){
             // globalObj->importExportDisplaySwitch = 2;
           break;
           case STATE_SYSEX_IMPORT:
+          Serial.println("import button");
             globalObj->playing = 0;
-            display->displayModal(1000, MODAL_IMPORTING);
+            // display->displayModal(250, MODAL_PREPARING_SYSEX);
+            globalObj->sysex_status = SYSEX_PREPARING;
+            
+            changeState(STATE_SYSEX_IMPORTINPROGRESS);
+            display->displayLoop(0);
+            saveFile->cacheWriteSwitch = true;
+            while(!saveFile->are_all_cache_statuses_zeroed()){
+              saveFile->cacheWriteLoop();
+              // Serial.println("running cache write loop...");
+            }
+            delay(2000);
+            midplaneGPIO->clearBuffers();
+            changeState(STATE_SYSEX_IMPORTINPROGRESS);
+            globalObj->sysex_status = SYSEX_READYFORDATA;
 
-//                  saveFile->importSysexData();
-
-          break;
+           break;
         }
       }
       return;
@@ -1279,10 +1358,10 @@ void InputModule::altButtonPatternHandler(){
       case SAVE_MENU:
         if (midplaneGPIO->pressed(SW_SHIFT)){
           saveFile->savePattern(globalObj->patternChannelSelector, globalObj->saveDestination);
-          midplaneGPIO->clearBuffers();
+          // midplaneGPIO->clearBuffers();
           display->displayModal(750, MODAL_SAVE);           
         } else {
-          midplaneGPIO->clearBuffers();
+          // midplaneGPIO->clearBuffers();
           display->displayModal(750, MODAL_DIDDNTSAVE);           
         }
         changeState(STATE_PITCH0);
@@ -1297,7 +1376,7 @@ void InputModule::altButtonPatternHandler(){
           changeState(STATE_SAVE);
         } else {
           globalObj->multiSelectSwitch = 0;
-          midplaneGPIO->clearBuffers();
+          // midplaneGPIO->clearBuffers();
           changeState(STATE_PATTERNSELECT);
           heldButton == 255;
         }
@@ -1390,33 +1469,7 @@ void InputModule::altButtonPgdnHandler(){
 
 };
 
-
-bool InputModule::altButtonHandler(){
-  if(globalObj->currentMenu == MENU_PATTERN_CHAIN){
-    return false;
-  }
-  chPressedSelector = 0;
-  if (midplaneGPIO->pressed(SW_CH0)){
-    chPressedSelector = chPressedSelector | 0b0001;
-  } else {
-    chPressedSelector = chPressedSelector & ~0b0001;
-  }
-  if (midplaneGPIO->pressed(SW_CH1)){
-    chPressedSelector = chPressedSelector | 0b0010;
-  } else {
-    chPressedSelector = chPressedSelector & ~0b0010;
-  }
-  if (midplaneGPIO->pressed(SW_CH2)){
-    chPressedSelector = chPressedSelector | 0b0100;
-  } else {
-    chPressedSelector = chPressedSelector & ~0b0100;
-  }
-  if (midplaneGPIO->pressed(SW_CH3)){
-    chPressedSelector = chPressedSelector | 0b1000;
-  } else {
-    chPressedSelector = chPressedSelector & ~0b1000;
-  }
-
+bool InputModule::channelButtonShortcutHandler(){
 // shortcut button loop
 uint8_t chanSwIndex;
   for(int chan=0; chan<4; chan++){
@@ -1435,7 +1488,6 @@ uint8_t chanSwIndex;
         break;
     }
     if(midplaneGPIO->pressed(chanSwIndex)){
-
       for (int i=0; i <16; i++){
         if (midplaneGPIO->fell(i) ){
           globalObj->muteChannelSelect[0] = chPressedSelector & 0b0001;
@@ -1530,8 +1582,43 @@ uint8_t chanSwIndex;
       }
     }
   }
+}
 
-// non matrix button loop
+bool InputModule::altButtonHandler(){
+  if(globalObj->currentMenu == MENU_PATTERN_CHAIN){
+    return false;
+  }
+
+  chPressedSelector = 0;
+  if (midplaneGPIO->pressed(SW_CH0)){
+    chPressedSelector = chPressedSelector | 0b0001;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b0001;
+  }
+  if (midplaneGPIO->pressed(SW_CH1)){
+    chPressedSelector = chPressedSelector | 0b0010;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b0010;
+  }
+  if (midplaneGPIO->pressed(SW_CH2)){
+    chPressedSelector = chPressedSelector | 0b0100;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b0100;
+  }
+  if (midplaneGPIO->pressed(SW_CH3)){
+    chPressedSelector = chPressedSelector | 0b1000;
+  } else {
+    chPressedSelector = chPressedSelector & ~0b1000;
+  }
+
+  if(globalObj->currentMenu != PATTERN_SELECT && globalObj->currentMenu != SAVE_MENU) {
+    // don't do channel shortcuts for pattern select or save menu
+    if ( this->channelButtonShortcutHandler() ){
+      return true;
+    };
+  }
+
+  // non matrix button loop
   for (uint8_t i=16; i <28; i++){
     if (midplaneGPIO->fell(i) ){
       switch (i){
@@ -1546,33 +1633,33 @@ uint8_t chanSwIndex;
         case SW_PATTERN: this->altButtonPatternHandler();  break;
         case SW_MENU:    this->altButtonTempoHandler();    break;
         case SW_SHIFT:   this->altButtonShiftHandler();    break;
-        }
-      }
-      if (midplaneGPIO->rose(i) ){
-        //this section controls the behavior of the channel buttons on press
-        // if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
-        switch (i){
-          case SW_PGDN:    this->altButtonPgdnHandler();     break;
-          case SW_PGUP:    this->altButtonPgupHandler();     break;
-
-          // left row bottom up
-          case SW_CH0:
-          case SW_CH1:
-          case SW_CH2:
-          case SW_CH3:
-            if(channelButtonOperationInProgress){
-                channelButtonOperationInProgress = false;
-            } else{
-              changeState(STATE_FIRSTSTEP);
-            }
-          break;
-         }
       }
     }
+    if (midplaneGPIO->rose(i) ){
+      //this section controls the behavior of the channel buttons on press
+      // if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
+      switch (i){
+        case SW_PGDN:    this->altButtonPgdnHandler();     break;
+        case SW_PGUP:    this->altButtonPgupHandler();     break;
+
+        // left row bottom up
+        case SW_CH0:
+        case SW_CH1:
+        case SW_CH2:
+        case SW_CH3:
+          if(channelButtonOperationInProgress){
+              channelButtonOperationInProgress = false;
+          } else{
+            changeState(STATE_FIRSTSTEP);
+          }
+        break;
+      }
+    }
+  }
     //Serial.println("Return at the end of alt");
 
-    return false;
-  }
+  return false;
+}
 
 
   void InputModule::channelPitchModeInputHandler(){
@@ -1911,7 +1998,7 @@ void InputModule::randomShortcutHandler(){
 //       }
     }
   }
-  midplaneGPIO->clearBuffers();
+  // midplaneGPIO->clearBuffers();
 }
 
 void InputModule::tunerShortcutHandler(){
@@ -1937,7 +2024,7 @@ void InputModule::skipShortcutHandler(){
       }
     }
   }
-  midplaneGPIO->clearBuffers();
+  // midplaneGPIO->clearBuffers();
 };
 void InputModule::clkdivShortcutHandler(){
 

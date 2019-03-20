@@ -62,12 +62,12 @@ void Sequencer::initializeStep(uint8_t stepNum){
 	if(stepNum > MAX_STEPS_PER_SEQUENCE){
 		return;
 	}
-	this->stepData[stepNum].pitch[0]   = 24;
+	this->stepData[stepNum].pitch[0]   = DEFAULT_PITCH0_VAL;
 	for (int i=1; i<4; i++){
 		this->stepData[stepNum].pitch[i] = 0;
 	}
 	this->stepData[stepNum].chord	   		 =	 0;
-	this->stepData[stepNum].gateType		 =	 0;
+	this->stepData[stepNum].gateType		 =	 DEFAULT_GATETYPE;
 	this->stepData[stepNum].gateLength	 =	 3;
 	this->stepData[stepNum].arpType			 =	 0;
 	this->stepData[stepNum].arpOctave		 =   1;
@@ -75,14 +75,26 @@ void Sequencer::initializeStep(uint8_t stepNum){
 	this->stepData[stepNum].arpSpdDen		 =   2;
 	this->stepData[stepNum].glide				 =   0;
 	this->stepData[stepNum].beatDiv			 =   4;
-	this->stepData[stepNum].velocity		 =  67;
-	this->stepData[stepNum].velocityType =   0;
-	this->stepData[stepNum].cv2speed		 =  64;
-	this->stepData[stepNum].cv2offset    =   0;
+	this->stepData[stepNum].velocity		 =  DEFAULT_VELOCITY;
+	this->stepData[stepNum].velocityType =   DEFAULT_VELTYPE;
+	this->stepData[stepNum].cv2speed		 =  DEFAULT_CV2SPEED;
+	this->stepData[stepNum].cv2offset    =   DEFAULT_CV2OFFSET;
 	this->stepData[stepNum].noteStatus   =  AWAITING_TRIGGER;
 	this->stepData[stepNum].arpStatus   =   0;
 	this->stepData[stepNum].notePlaying  =   0;
 	this->stepData[stepNum].framesRemaining = 0;
+}
+
+bool Sequencer::hasData(){
+	for(int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++){
+		if(this->stepData[stepNum].pitch[0] != DEFAULT_PITCH0_VAL	){return true;};
+		if(this->stepData[stepNum].gateType != DEFAULT_GATETYPE		){return true;};
+		if(this->stepData[stepNum].velocityType != DEFAULT_VELTYPE){return true;};
+		if(this->stepData[stepNum].velocity != DEFAULT_VELOCITY		){return true;};
+		if(this->stepData[stepNum].cv2speed != DEFAULT_CV2SPEED		){return true;};
+		if(this->stepData[stepNum].cv2offset != DEFAULT_CV2OFFSET	){return true;};
+	}
+	return false;
 }
 
 bool Sequencer::toggleMute(uint8_t index){

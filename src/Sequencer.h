@@ -8,6 +8,13 @@
 #ifndef _Sequencer_h_
 #define _Sequencer_h_
 
+#define DEFAULT_PITCH0_VAL		24
+#define DEFAULT_GATETYPE			0
+#define DEFAULT_VELTYPE				0
+#define DEFAULT_VELOCITY			67
+#define DEFAULT_CV2SPEED			64
+#define DEFAULT_CV2OFFSET			0
+
 class OutputController;
 
 class Sequencer
@@ -81,6 +88,7 @@ class Sequencer
       }
     }
 
+		bool 			hasData();
 		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
 		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
 		uint16_t  getArpCount(uint8_t stepNum);

@@ -158,6 +158,20 @@ void Zetaohm_MAX7301::update(){
 	}
 };
 
+bool Zetaohm_MAX7301::fellCheck(){
+	if(fellBuffer){
+		return 1;
+	} 
+	return 0;
+}
+
+bool Zetaohm_MAX7301::roseCheck(){
+	if(roseBuffer){
+		return 1;
+	} 
+	return 0;
+}
+
 bool Zetaohm_MAX7301::activityCheck(){
   if (fellBuffer || roseBuffer){
     return 1;
@@ -167,13 +181,18 @@ bool Zetaohm_MAX7301::activityCheck(){
 }
 
 void Zetaohm_MAX7301::clearBuffers(){
-  // fellBuffer = 0x0;
-  // roseBuffer = 0x0;
-  // inputBuffer = 0x0;
-  for(int i = 0; i<32; i++){
-    if(this->rose(i)){};
-    if(this->fell(i)){};
-  }
+  // for(int i = 0; i<32; i++){
+  //   if(this->rose(i)){};
+  //   if(this->fell(i)){};
+  // }
+  fellBuffer = 0x0;
+  roseBuffer = 0x0;
+  inputBuffer = 0x0;
+
+	Serial.println("fell buffers: " );
+	Serial.println(fellBuffer, BIN);
+	Serial.println("rose buffers:");
+	Serial.println(roseBuffer, BIN);
 }
 
 void Zetaohm_MAX7301::skipNextRises(uint8_t count){

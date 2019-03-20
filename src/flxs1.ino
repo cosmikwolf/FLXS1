@@ -20,8 +20,6 @@
                                        ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA; \
                                        ARM_DWT_CYCCNT = 0; } while(0)
 
-
-
 //#define NUMLEDS  23
 
 //DMAMEM int displayMemory[NUMLEDS*8];
@@ -50,12 +48,15 @@ ADC *adc = new ADC(); // adc object
 //AudioConnection               patchCord1(adc0 , notefreq);
 
 // unsigned long    cyclesLast;
- elapsedMicros   cyclesTimer;
- unsigned long clockCycles;
+elapsedMicros   cyclesTimer;
+unsigned long clockCycles;
 GlobalVariable globalObj;
 uint8_t cycleIntervalCount;
-uint16_t sysexCounter;
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
+char* sysexBuffer;
+uint8_t sysexCounter;
+bool sysexImportWriting = false;
+elapsedMicros sysexTimer;
 
 
 void setup() {
@@ -88,6 +89,7 @@ void setup() {
   serialMidi.turnThruOff();
   globalObj.initialize(adc);
 
+
   for(int i=0; i<1000; i++){
     // Serial.println(globalObj.generateRandomNumber(0, 65535));
   }
@@ -106,7 +108,8 @@ void setup() {
   usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
   usbMIDI.setHandleSongPosition( midiSongPositionPointerWrapper );
   usbMIDI.setHandleTimeCodeQuarterFrame(midiTimeCodePointerWrapper );
-  usbMIDI.setHandleSystemExclusive(midiSysexHandlerWrapper);
+  usbMIDI.setHandleSysEx(midiSysexHandlerWrapper);
+
   //usbMIDI.setHandleNoteOff(OnNoteOff)
   //usbMIDI.setHandleNoteOn(usbNoteOn);
   //usbMIDI.setHandleVelocityChange(OnVelocityChange)
@@ -319,12 +322,6 @@ void masterLoop(){
 void LEDLoop(){
   timeControl.ledClockHandler();
 }
-void displayLoop(){
-  timeControl.displayClockHandler();
-}
-
-void peripheralLoop(){
-}
 
 void midiTimerLoop(){
 //  usbMIDI.read();
@@ -339,18 +336,49 @@ void cacheLoop(){
 // global wrappers to create pointers to MidiModule member functions
 // https://isocpp.org/wiki/faq/pointers-to-members
 
-void midiSysexHandlerWrapper(const uint8_t *data, uint16_t length, bool complete){
-  //
-  // Serial.println(String(sysexCounter) + "\trecieving sysex L: " + String(length) + "\tcomplete: " + String(complete) + "\tdata: " + String((int)data));
-  // // void setHandleSystemExclusive(void (*fptr)(const uint8_t *data, uint16_t length, bool complete)) {
-	// // 	// type: 0xF0  SystemExclusive - multiple calls for message bigger than buffer
-	// // 	handleSysExPartial = (void (*)(const uint8_t *, uint16_t, uint8_t))fptr;
-	// // }
-	// // void setHandleSystemExclusive(void (*fptr)(uint8_t *data, unsigned int size)) {
-	// // 	// type: 0xF0  SystemExclusive - single call, message larger than buffer is truncated
-	// // 	handleSysExComplete = fptr;
-	// // }
-  // sysexCounter++;
+void midiSysexHandlerWrapper(const byte *data, uint16_t length, bool last) {
+  if( !((globalObj.sysex_status == SYSEX_IMPORTING) || (globalObj.sysex_status == SYSEX_READYFORDATA) ) ){
+    return;
+  }
+
+  if(globalObj.sysex_status == SYSEX_READYFORDATA){
+    globalObj.sysex_status = SYSEX_IMPORTING;
+    globalObj.sysex_channel = 0;
+    globalObj.sysex_pattern = 0;
+    timeControl.runDisplayLoop();
+  }
+
+  if(sysexImportWriting == true){ 
+    Serial.println("------ ----- ---  Sysex messages are arriving too fast! --- ---- --- ----");
+  }
+
+  if (millis() < 6000){ return; }
+  if (sysexCounter == 0){
+    sysexTimer = 0;
+    timeControl.flashMemoryControl(1);
+    // Serial.println(" -- ");
+    // Serial.print(String(millis() ) + "Sysex Message. Buffer Allocated - Part 1 ");
+    sysexBuffer = (char *)malloc(SECTORSIZE);
+    if(data[0] == 0xF0){ *data++; }
+    strcpy(sysexBuffer, (char *)data);    
+  } else {
+    // Serial.print(String(sysexCounter +1) + " -" + String(sysexTimer) + "- ");
+    strncat(sysexBuffer, (char *)data, length);
+  }
+
+  sysexCounter++;
+
+  if(last){
+    // Serial.println(sysexBuffer);
+    sysexTimer = 0;
+    sysexImportWriting = true;
+    timeControl.sysexMessageHandler(sysexBuffer);
+    sysexImportWriting = false;
+    sysexCounter = 0;
+    // Serial.println(" Sysex Message Complete -- freeing buffer. took " + String(sysexTimer) + "micros" );
+    free(sysexBuffer);
+    // sysexBuffer = NULL;
+  }
 }
 // void midiSysexHandlerWrapper(uint8_t *data, unsigned int size){
 //

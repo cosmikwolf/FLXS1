@@ -31,6 +31,8 @@ public:
   void 			clearBuffers();
   void 			skipNextRises(uint8_t count);
 	bool 			activityCheck();
+	bool			fellCheck();
+	bool			roseCheck();
 
   uint8_t     skipRiseCount;
 	uint32_t		inputBuffer;

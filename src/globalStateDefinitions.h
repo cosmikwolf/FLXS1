@@ -17,7 +17,8 @@
 #define GLOBAL_MENU_2     GLOBAL_MENU_1 + 1
 #define GLOBAL_MENU_3     GLOBAL_MENU_2 + 1
 #define SYSEX_MENU        GLOBAL_MENU_3 + 1
-#define MOD_MENU_1        SYSEX_MENU + 1
+#define SYSEX_IMPORT_INPROGRESS    SYSEX_MENU + 1      
+#define MOD_MENU_1        SYSEX_IMPORT_INPROGRESS + 1
 #define MOD_MENU_2        MOD_MENU_1 + 1
 #define MENU_MODAL        MOD_MENU_2 +1
 #define NOTE_DISPLAY      MENU_MODAL +1
@@ -130,11 +131,11 @@
 
 #define STATE_SYSEX_EXPORT           STATE_MIDI_CHANNEL_4 + 1
 #define STATE_SYSEX_IMPORT           STATE_SYSEX_EXPORT + 1
-
-#define STATE_PITCH1            STATE_SYSEX_IMPORT + 1
-#define STATE_PITCH2            STATE_PITCH1 +1
-#define STATE_PITCH3            STATE_PITCH2 +1
-#define STATE_TUNER             STATE_PITCH3 +1
+#define STATE_SYSEX_IMPORTINPROGRESS STATE_SYSEX_IMPORT + 1
+#define STATE_PITCH1                 STATE_SYSEX_IMPORTINPROGRESS + 1
+#define STATE_PITCH2                 STATE_PITCH1 +1
+#define STATE_PITCH3                 STATE_PITCH2 +1
+#define STATE_TUNER                  STATE_PITCH3 +1
 
 // PATTERN CHAIN MENU
 #define STATE_PATTERN_CHAIN  STATE_TUNER +1

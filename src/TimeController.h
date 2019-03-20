@@ -25,10 +25,11 @@ class TimeController {
     void masterClockHandler();
     void sequencerHandler();
     void ledClockHandler();
-    void displayClockHandler();
     void midiClockHandler();
     void cacheWriteHandler();
-
+    void sysexMessageHandler(char* sysex_message);
+    int flashMemoryControl(int value);
+    void runDisplayLoop();
     uint8_t midiTestValue;
 
   private:

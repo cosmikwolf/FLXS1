@@ -296,7 +296,7 @@ void FlashMemory::deleteTest() {
 
    char* fileBuffer = ( char*)malloc(16384);
 
-    serializePattern(fileBuffer, 0, 1);
+    serializePattern(fileBuffer, 0, 1, false);
     file.seek(0);
 
     file.write(fileBuffer,4096);
