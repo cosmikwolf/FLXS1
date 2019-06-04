@@ -1,6 +1,8 @@
 {
-    "!!! WARNING !!!": "PLEASE DO NOT MODIFY THIS FILE! USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags",
     "configurations": [
+        {
+            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
+        },
         {
             "name": "Mac",
             "macFrameworkPath": [],
@@ -18,10 +20,10 @@
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/ADC",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Audio",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Audio/utility",
-                "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD",
-                "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD/utility",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Wire",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Wire/utility",
+                "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD",
+                "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD/utility",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/EEPROM",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Entropy",
                 "/Users/tenkai/Desktop/Projects/FLXS1/lib/Adafruit-MCP23017",
@@ -128,7 +130,6 @@
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/ssd1351",
                 "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/x10",
                 "/Users/tenkai/.platformio/packages/tool-unity",
-                "/Users/tenkai/Desktop/Projects/FLXS1/include",
                 "/Users/tenkai/Desktop/Projects/FLXS1/src",
                 ""
             ],
@@ -149,10 +150,10 @@
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/ADC",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Audio",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Audio/utility",
-                    "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD",
-                    "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD/utility",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Wire",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Wire/utility",
+                    "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD",
+                    "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/SD/utility",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/EEPROM",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/Entropy",
                     "/Users/tenkai/Desktop/Projects/FLXS1/lib/Adafruit-MCP23017",
@@ -259,13 +260,12 @@
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/ssd1351",
                     "/Users/tenkai/.platformio/packages/framework-arduinoteensy/libraries/x10",
                     "/Users/tenkai/.platformio/packages/tool-unity",
-                    "/Users/tenkai/Desktop/Projects/FLXS1/include",
                     "/Users/tenkai/Desktop/Projects/FLXS1/src",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=30605",
+                "PLATFORMIO=30607",
                 "__MK20DX256__",
                 "TEENSY31",
                 "USB_MIDI_SERIAL",
@@ -277,8 +277,7 @@
             ],
             "intelliSenseMode": "clang-x64",
             "cppStandard": "c++14",
-            "compilerPath": "/Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi@1.50401.0/bin/arm-none-eabi-gcc -mthumb -mcpu=cortex-m4",
-            "cStandard": "c11"
+            "compilerPath": "\"/Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi@1.50401.0/bin/arm-none-eabi-gcc\" -mthumb -mcpu=cortex-m4"
         }
     ],
     "version": 4

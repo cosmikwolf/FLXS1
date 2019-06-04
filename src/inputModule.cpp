@@ -819,7 +819,7 @@ void InputModule::sequenceMenuHandler(){
           }
           break;
         case STATE_QUANTIZESCALE:
-          sequenceArray[globalObj->selectedChannel].quantizeScale = positive_modulo(sequenceArray[globalObj->selectedChannel].quantizeScale + knobChange, 3);
+          sequenceArray[globalObj->selectedChannel].quantizeScale = positive_modulo(sequenceArray[globalObj->selectedChannel].quantizeScale + knobChange, 4);
           break;
         case STATE_PLAYMODE:
           sequenceArray[globalObj->selectedChannel].playMode = positive_modulo(sequenceArray[globalObj->selectedChannel].playMode + knobChange, 4);
