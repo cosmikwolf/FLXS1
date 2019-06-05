@@ -782,7 +782,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
   switch (sequenceArray[channel].quantizeScale)
   {
   case SEMITONE:
-    quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+    quantNote = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
     if (pitchValue)
     {
       quantNote = map(quantNote, 0, 120, calibrationLow, calibrationHigh);
@@ -793,7 +793,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
     }
     break;
   case PYTHAGOREAN:
-    quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+    quantNote = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
     cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount;
     quantNote = map(cents, 0, 120000, calibrationLow, calibrationHigh);
     break;
@@ -801,7 +801,7 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
     quantNote = map(colundiArrayX100[note], 0, 1012, calibrationLow, calibrationHigh);
     break;
   case TET_17:
-    quantNote = globalObj->quantizeSemitonePitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+    quantNote = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
     quantNote = map(quantNote, 0, 190, calibrationLow, calibrationHigh);
     break;
   }
@@ -1103,7 +1103,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
   //add offset amount:
   if (channel == 0 && currentFrame > debugFrameCount)
   {
-    // Serial.print("q:" + String(globalObj->quantizeSemitonePitch(cv2amplitude[channel], sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0)));
+    // Serial.print("q:" + String(globalObj->quantize_semitone_pitch(cv2amplitude[channel], sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0)));
   }
   voltageLevel += cv2offset[channel] * 128;
 

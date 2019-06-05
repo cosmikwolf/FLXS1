@@ -8,177 +8,182 @@
 #ifndef _Sequencer_h_
 #define _Sequencer_h_
 
-#define DEFAULT_PITCH0_VAL		24
-#define DEFAULT_GATETYPE			0
-#define DEFAULT_VELTYPE				0
-#define DEFAULT_VELOCITY			67
-#define DEFAULT_CV2SPEED			64
-#define DEFAULT_CV2OFFSET			0
+#define DEFAULT_PITCH0_VAL 24
+#define DEFAULT_GATETYPE 0
+#define DEFAULT_VELTYPE 0
+#define DEFAULT_VELOCITY 67
+#define DEFAULT_CV2SPEED 64
+#define DEFAULT_CV2OFFSET 0
 
 class OutputController;
 
 class Sequencer
 {
-	public:
-		//Sequencer();
+public:
+	//Sequencer();
 
 	//	void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, uint32_t globalObj->tempoX100);
-		void 		initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, OutputController* outputControl, GlobalVariable *globalObj);
-		void 		runSequence();
-		// Sequencing Modes
-		void 		sequenceModeStandardStep();
-		// Note Trigger Utilities
-		//void  	clearNoteData(NoteDatum *noteData);
-		void    noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
-		void    noteShutOff(uint8_t stepNum, bool gateOff);
+	void initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, OutputController *outputControl, GlobalVariable *globalObj);
+	void runSequence();
+	// Sequencing Modes
+	void sequenceModeStandardStep();
+	// Note Trigger Utilities
+	//void  	clearNoteData(NoteDatum *noteData);
+	void noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
+	void noteShutOff(uint8_t stepNum, bool gateOff);
 
-    void    stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
+	void stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
 
-		uint32_t  framesPerSequence();
-		uint32_t	getCurrentFrame();
-		void   	calculateActiveStep();
+	uint32_t framesPerSequence();
+	uint32_t getCurrentFrame();
+	void calculateActiveStep();
 
-		void 		clockStart();
-		void 		clockReset(bool activeStepReset);
-		void 		updateClockDivision(int8_t clockDiv);
-		void 		ppqPulse(uint8_t pulsesPerBeat);
-		bool 		toggleMute(uint8_t index);  //returns true if target was muted
+	void clockStart();
+	void clockReset(bool activeStepReset);
+	void updateClockDivision(int8_t clockDiv);
+	void ppqPulse(uint8_t pulsesPerBeat);
+	bool toggleMute(uint8_t index); //returns true if target was muted
 
-		void 		skipStep(uint8_t count);
-    void    jumpToStep(uint8_t stepNum);
+	void skipStep(uint8_t count);
+	void jumpToStep(uint8_t stepNum);
 
-		void    masterClockPulse();
+	void masterClockPulse();
 
-    bool    isFrameSwinging(uint32_t frame);
+	bool isFrameSwinging(uint32_t frame);
 
-    int     getActivePage();
+	int getActivePage();
 
-		int  		positive_modulo(int i, int n);
-		void 		initNewSequence(uint8_t pattern, uint8_t ch);
-		void 		initializeStep(uint8_t stepNum);
-		void 		setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
-		void 		setGateLength(uint8_t step, uint8_t length);
-		void 		setGateType(uint8_t step, uint8_t gate);
-		void 		setStepVelocity(uint8_t step, uint8_t velocity);
-		void 		setStepGlide(uint8_t step, uint8_t glideTime);
-    void    setPlayRange(uint8_t first, uint8_t last);
-		void 		setBeatCount(uint16_t beatCountNew);
+	int positive_modulo(int i, int n);
+	void initNewSequence(uint8_t pattern, uint8_t ch);
+	void initializeStep(uint8_t stepNum);
+	void setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
+	void setGateLength(uint8_t step, uint8_t length);
+	void setGateType(uint8_t step, uint8_t gate);
+	void setStepVelocity(uint8_t step, uint8_t velocity);
+	void setStepGlide(uint8_t step, uint8_t glideTime);
+	void setPlayRange(uint8_t first, uint8_t last);
+	void setBeatCount(uint16_t beatCountNew);
 
-		void 		setStepCount(uint8_t newStepCount);
+	void setStepCount(uint8_t newStepCount);
 
-		void 		gateInputTrigger(uint8_t inputNum);
+	void gateInputTrigger(uint8_t inputNum);
 
-		void 		randomize(uint8_t parameter);
+	void randomize(uint8_t parameter);
 
-		uint32_t framesPerBeat(int tempoX100);
+	uint32_t framesPerBeat(int tempoX100);
 
-    uint8_t clockDivisionNum(){
-      if (clockDivision > 0){
-        return 1;
-      } else {
-        return abs(clockDivision) + 2;
-      }
-    }
+	uint8_t clockDivisionNum()
+	{
+		if (clockDivision > 0)
+		{
+			return 1;
+		}
+		else
+		{
+			return abs(clockDivision) + 2;
+		}
+	}
 
-    uint8_t clockDivisionDen(){
-      if (clockDivision < 1){
-        return 1;
-      } else {
-        return clockDivision;
-      }
-    }
+	uint8_t clockDivisionDen()
+	{
+		if (clockDivision < 1)
+		{
+			return 1;
+		}
+		else
+		{
+			return clockDivision;
+		}
+	}
 
-		bool 			hasData();
-		uint8_t   quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
-		uint8_t  	getStepPitch(uint8_t step, uint8_t index);
-		uint16_t  getArpCount(uint8_t stepNum);
-    uint32_t  getArpStartFrame(uint8_t stepNum, uint16_t arpNum);
-		uint32_t getArpLastFrame(uint8_t stepNum, uint16_t arpNum);
-		uint8_t  getArpSpeedNumerator(uint8_t stepNum);
-		uint8_t  getArpSpeedDenominator(uint8_t stepNum);
+	bool hasData();
+	uint8_t quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
+	uint8_t getStepPitch(uint8_t step, uint8_t index);
+	uint16_t getArpCount(uint8_t stepNum);
+	uint32_t getArpStartFrame(uint8_t stepNum, uint16_t arpNum);
+	uint32_t getArpLastFrame(uint8_t stepNum, uint16_t arpNum);
+	uint8_t getArpSpeedNumerator(uint8_t stepNum);
+	uint8_t getArpSpeedDenominator(uint8_t stepNum);
 
-		uint32_t  getStepLength();
-		//uint32_t  ppqSequenceTime();
+	uint32_t getStepLength();
+	//uint32_t  ppqSequenceTime();
 
-		StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
-		bool 			suspendNotesUntilReset;
-    bool      swingSwitch;
-    bool      swinging;
-		bool			receivedFirstExtClock;
-		bool 			pendulumSwitch;
-		uint8_t previousActiveStepSeqMode; // debug variable
-    uint8_t 	swingCount;
-		uint8_t	 	activeStep;
-    uint8_t   firstStep; //first step to be played
-		uint8_t 	stepCount;
-		uint8_t 	stepsPlayed;
+	StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
+	bool suspendNotesUntilReset;
+	bool swingSwitch;
+	bool swinging;
+	bool receivedFirstExtClock;
+	bool pendulumSwitch;
+	uint8_t previousActiveStepSeqMode; // debug variable
+	uint8_t swingCount;
+	uint8_t activeStep;
+	uint8_t firstStep; //first step to be played
+	uint8_t stepCount;
+	uint8_t stepsPlayed;
 
-    uint8_t   swingX100;
-    uint8_t   playMode; //forward, backward, pendulum
-    uint8_t   skipStepCount;
-    uint8_t		randomLow;
-    uint8_t		randomHigh;
+	uint8_t swingX100;
+	uint8_t playMode; //forward, backward, pendulum
+	uint8_t skipStepCount;
+	uint8_t randomLow;
+	uint8_t randomHigh;
 
+	uint8_t quantizeKey;
+	int quantizeMode;
+	unsigned long long int testtest; //quantizeMode data placeholder
+	uint8_t quantizeModeIndex;
+	uint8_t quantizeScale;
+	uint8_t pattern;
+	uint8_t channel;
+	uint8_t beatCount;
+	int8_t gpio_reset;
+	int8_t gpio_skipstep;
+	int8_t gpio_gatemute;
+	int8_t gpio_randompitch;
+	uint8_t cv_arptypemod;
+	uint8_t cv_arpspdmod;
+	uint8_t cv_arpoctmod;
+	uint8_t cv_arpintmod;
+	uint8_t cv_pitchmod;
+	uint8_t cv_gatemod;
+	uint8_t cv_glidemod;
+	int8_t transpose;
+	bool muteGate;
+	bool muteCV1;
+	bool muteCV2;
+	bool fill;
+	bool skipNextNoteTrigger;
+	bool channelPlaying;
+	bool tieFlag;
+	bool fillActive;
+	uint8_t fillSpeed;
 
-		uint8_t		quantizeKey;
-		uint16_t	quantizeMode;
-		uint8_t		quantizeModeIndex;
-    uint8_t		quantizeScale;
-		uint8_t 	pattern;
-		uint8_t		channel;
-		uint8_t   beatCount;
-		int8_t	  gpio_reset;
-		int8_t		gpio_skipstep;
-		int8_t		gpio_gatemute;
-		int8_t		gpio_randompitch;
-		uint8_t		cv_arptypemod;
-		uint8_t		cv_arpspdmod;
-		uint8_t		cv_arpoctmod;
-		uint8_t		cv_arpintmod;
-		uint8_t		cv_pitchmod;
-		uint8_t		cv_gatemod;
-		uint8_t		cv_glidemod;
-		int8_t 	transpose;
-		bool 			muteGate;
-		bool 			muteCV1;
-		bool 			muteCV2;
-		bool			fill;
-    bool      skipNextNoteTrigger;
-    bool      channelPlaying;
-    bool      tieFlag;
-		bool			fillActive;
-		uint8_t		fillSpeed;
+	uint8_t arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
+	uint8_t arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
+	int8_t arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];
 
-		uint8_t   arpTypeModulated[MAX_STEPS_PER_SEQUENCE];
-		uint8_t   arpOctaveModulated[MAX_STEPS_PER_SEQUENCE];
-		int8_t    arpSpeedModulation[MAX_STEPS_PER_SEQUENCE];
+	int8_t clockDivision;
+	uint32_t currentFrame;
+	uint16_t pulsesRemaining;
 
-		int8_t 	  clockDivision;
-		uint32_t  currentFrame;
-		uint16_t	pulsesRemaining;
+private:
+	boolean monophonic;
+	boolean beatPulseResyncFlag;
+	boolean firstPulse; // this signal is sent when midi clock starts.
 
-	private:
+	uint8_t lastActiveStep;
+	uint8_t lastStepIndex;
+	uint8_t pulsesPerBeat;
+	uint16_t ppqPulseIndex;
 
-		boolean  	monophonic;
-		boolean  	beatPulseResyncFlag;
-		boolean	 	firstPulse;		// this signal is sent when midi clock starts.
+	uint32_t lastStepFrame;
+	uint32_t framesPerPulse;
+	uint32_t avgClocksPerPulse;
+	uint32_t lastPulseClockCount;
+	uint32_t lastMasterClockCycleCount;
 
-		uint8_t	 	lastActiveStep;
-		uint8_t	 	lastStepIndex;
-		uint8_t 	pulsesPerBeat;
-		uint16_t	ppqPulseIndex;
-
-		uint32_t  lastStepFrame;
-		uint32_t	framesPerPulse;
-		uint32_t 	avgClocksPerPulse;
-		uint32_t 	lastPulseClockCount;
-		uint32_t  lastMasterClockCycleCount;
-
-		OutputController* outputControl;
-		GlobalVariable *globalObj;
-
+	OutputController *outputControl;
+	GlobalVariable *globalObj;
 };
-
 
 #endif
 
@@ -249,9 +254,7 @@ There are some post processing functions that can modify the sequence at runtime
 
 */
 
-
-
-		/*
+/*
 
 		other notes:
 
