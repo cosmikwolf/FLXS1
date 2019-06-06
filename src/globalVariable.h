@@ -1,4 +1,4 @@
-#include <Arduino.h>
+// #include <Arduino.h>
 #include "global.h"
 #include <ADC.h>
 
@@ -171,7 +171,8 @@ public:
 
   int16_t quantize_semitone_pitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction);
 
-  uint16_t quantize_edo_pitch(uint16_t note, uint16_t quantizeKey, uint64_t quantizeMode, uint8_t divisions, bool direction);
+  uint16_t quantize_edo_pitch(uint16_t note, uint16_t quantizeKey, uint32_t quantize_mode, uint8_t scale_divisions, bool direction);
+
   uint16_t quantize_pitch_to_dac_code(uint16_t pitch, uint16_t quantize_scale);
   uint16_t quantize_dac_code_to_pitch(uint16_t dac_code);
   uint16_t quantize_dac_code(uint16_t dac_code);

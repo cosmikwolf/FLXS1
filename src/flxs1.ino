@@ -16,9 +16,13 @@
 #include "DisplayModule.h"
 #include "globalVariable.h"
 
-#define CPU_RESET_CYCLECOUNTER    do { ARM_DEMCR |= ARM_DEMCR_TRCENA;          \
-                                       ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA; \
-                                       ARM_DWT_CYCCNT = 0; } while(0)
+#define CPU_RESET_CYCLECOUNTER              \
+  do                                        \
+  {                                         \
+    ARM_DEMCR |= ARM_DEMCR_TRCENA;          \
+    ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA; \
+    ARM_DWT_CYCCNT = 0;                     \
+  } while (0)
 
 //#define NUMLEDS  23
 
@@ -48,21 +52,21 @@ ADC *adc = new ADC(); // adc object
 //AudioConnection               patchCord1(adc0 , notefreq);
 
 // unsigned long    cyclesLast;
-elapsedMicros   cyclesTimer;
+elapsedMicros cyclesTimer;
 unsigned long clockCycles;
 GlobalVariable globalObj;
 uint8_t cycleIntervalCount;
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial3, serialMidi);
-char* sysexBuffer;
+char *sysexBuffer;
 uint8_t sysexCounter;
 bool sysexImportWriting = false;
 elapsedMicros sysexTimer;
 
-
-void setup() {
+void setup()
+{
   Serial.begin(kSerialSpeed);
   //waiting for serial to begin
-//  while (!Serial) ; // wait for serial monitor window to open
+  //  while (!Serial) ; // wait for serial monitor window to open
   //AudioMemory(24);
   //notefreq.begin(.15);
   // begin cycle counter
@@ -75,8 +79,8 @@ void setup() {
   Serial.println("Sizeof Sequencer object: " + String(sizeof(sequence[0])));
 
   SPI.begin();
-	SPI.setMOSI(kMosiPin);
-	SPI.setSCK(kSpiClockPin);
+  SPI.setMOSI(kMosiPin);
+  SPI.setSCK(kSpiClockPin);
 
   pinMode(7, INPUT);  //MIDI SERIAL PIN CONFIG
   pinMode(8, OUTPUT); //MIDI SERIAL PIN CONFIG
@@ -87,27 +91,27 @@ void setup() {
   delay(500);
   serialMidi.begin(MIDI_CHANNEL_OMNI);
   serialMidi.turnThruOff();
-  globalObj.initialize(adc);
+  // globalObj.initialize(adc);
 
-
-  for(int i=0; i<1000; i++){
+  for (int i = 0; i < 1000; i++)
+  {
     // Serial.println(globalObj.generateRandomNumber(0, 65535));
   }
 
   midiControl.midiSetup(sequence, &globalObj);
 
-	serialMidi.setHandleClock( midiClockPulseHandlerWrapper );
-  serialMidi.setHandleNoteOn( midiNoteOnHandlerWrapper );
-  serialMidi.setHandleNoteOff( midiNoteOffHandlerWrapper );
-  serialMidi.setHandleStart( midiStartContinueHandlerWrapper );
-  serialMidi.setHandleContinue( midiStartContinueHandlerWrapper );
-  serialMidi.setHandleStop( midiStopHandlerWrapper );
+  serialMidi.setHandleClock(midiClockPulseHandlerWrapper);
+  serialMidi.setHandleNoteOn(midiNoteOnHandlerWrapper);
+  serialMidi.setHandleNoteOff(midiNoteOffHandlerWrapper);
+  serialMidi.setHandleStart(midiStartContinueHandlerWrapper);
+  serialMidi.setHandleContinue(midiStartContinueHandlerWrapper);
+  serialMidi.setHandleStop(midiStopHandlerWrapper);
 
-  usbMIDI.setHandleRealTimeSystem( usbMidiRealTimeMessageHandler );
-  usbMIDI.setHandleNoteOn( midiNoteOnHandlerWrapper );
-  usbMIDI.setHandleNoteOff( midiNoteOffHandlerWrapper );
-  usbMIDI.setHandleSongPosition( midiSongPositionPointerWrapper );
-  usbMIDI.setHandleTimeCodeQuarterFrame(midiTimeCodePointerWrapper );
+  usbMIDI.setHandleRealTimeSystem(usbMidiRealTimeMessageHandler);
+  usbMIDI.setHandleNoteOn(midiNoteOnHandlerWrapper);
+  usbMIDI.setHandleNoteOff(midiNoteOffHandlerWrapper);
+  usbMIDI.setHandleSongPosition(midiSongPositionPointerWrapper);
+  usbMIDI.setHandleTimeCodeQuarterFrame(midiTimeCodePointerWrapper);
   usbMIDI.setHandleSysEx(midiSysexHandlerWrapper);
 
   //usbMIDI.setHandleNoteOff(OnNoteOff)
@@ -124,24 +128,23 @@ void setup() {
   //PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
   //PeripheralLoopTimer.priority(64);
 
-
-  LEDClockTimer.begin(LEDLoop,kLedClockInterval);
+  LEDClockTimer.begin(LEDLoop, kLedClockInterval);
   LEDClockTimer.priority(2);
 
-  MasterClockTimer.begin(masterLoop,kMasterClockInterval);
+  MasterClockTimer.begin(masterLoop, kMasterClockInterval);
   MasterClockTimer.priority(0);
 
-//  DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
-//  DisplayLoopTimer.priority(3);
+  //  DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
+  //  DisplayLoopTimer.priority(3);
 
-  SequencerTimer.begin(sequencerLoop,kSequenceTimerInterval);
+  SequencerTimer.begin(sequencerLoop, kSequenceTimerInterval);
   SequencerTimer.priority(4);
 
   //SPI.usingInterrupt(PeripheralLoopTimer);
   SPI.usingInterrupt(SequencerTimer);
   //SPI.usingInterrupt(LEDClockTimer);
 
-   midiClockTimer.begin(midiTimerLoop,kMidiClockInterval);
+  midiClockTimer.begin(midiTimerLoop, kMidiClockInterval);
   //  MIDITimer.priority(0);
 
   //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
@@ -160,14 +163,14 @@ void setup() {
   pinMode(PIN_EXT_RX, OUTPUT);
 
   pinMode(3, OUTPUT);
-  pinMode(24,OUTPUT);
+  pinMode(24, OUTPUT);
   //digitalWrite(3, HIGH);  //INPUT 1 for HIHG HIGH
   //digitalWrite(24, HIGH);
   //pinMode(1,OUTPUT);
   //digitalWrite(1, LOW);
 
   //adc->enableInterrupts(ADC_1);
-  adc->setAveraging(4, ADC_1); // set number of averages
+  adc->setAveraging(4, ADC_1);   // set number of averages
   adc->setResolution(16, ADC_1); // set bits of resolution
   //adc->setAveraging(8, ADC_0); // set number of averages
   //adc->setResolution(16, ADC_0); // set bits of resolution
@@ -188,7 +191,7 @@ void setup() {
   pinMode(A13, INPUT);
   pinMode(A14, INPUT);
   pinMode(A10, INPUT);
-/* OctoSK6812 testing stuff
+  /* OctoSK6812 testing stuff
   pinMode(2, OUTPUT);  // strip #1
   pinMode(14, OUTPUT);  // strip #2
   pinMode(7, OUTPUT);  // strip #3
@@ -204,7 +207,7 @@ void setup() {
   colorWipe(0x0000FF00, 5);delay(1000);
   colorWipe(0x000000FF, 5);delay(1000);
   */
-//  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
+  //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
   //
@@ -221,18 +224,16 @@ void setup() {
   //   delay(100);
   // }
 
-
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
 
-Serial.println(sizeof(sequence[0]));
+  Serial.println(sizeof(sequence[0]));
 
-Serial.println(sizeof(sequence[0].stepData));
-//  Serial.println("TEST EQUATIONS");
+  Serial.println(sizeof(sequence[0].stepData));
+  //  Serial.println("TEST EQUATIONS");
 
-//  for (int x=0; x < 16; x++){
-//    Serial.println("X: " + String(x) + "\t x * 24 mod 5: " + String((x*24)%(5)));
-//  }
-
+  //  for (int x=0; x < 16; x++){
+  //    Serial.println("X: " + String(x) + "\t x * 24 mod 5: " + String((x*24)%(5)));
+  //  }
 }
 
 /*
@@ -255,9 +256,10 @@ void loop() {
 //  timeControl.runLoopHandler();
 }*/
 
-void loop() {
+void loop()
+{
   timeControl.runLoopHandler();
-/*  if(cyclesTimer > 20000000){
+  /*  if(cyclesTimer > 20000000){
     CPU_RESET_CYCLECOUNTER;
     cyclesTimer = 0;
   }
@@ -270,40 +272,41 @@ void loop() {
   //   Serial.printf("Note: %d | Probability: %d", note, prob);
   //   Serial.println("");
   // }
-
 };
 
-
-
-void usbNoteOff(){
-//  Serial.println("note off!:\t" + String(note));
+void usbNoteOff()
+{
+  //  Serial.println("note off!:\t" + String(note));
 }
 
-void usbNoteOn(byte channel, byte note, byte velocity){
+void usbNoteOn(byte channel, byte note, byte velocity)
+{
   //Serial3.println("note on!:\t" + String(note));
   globalObj.playing = !globalObj.playing;
 }
 
 // global wrapper to create pointer to ClockMaster member function
 // https://isocpp.org/wiki/faq/pointers-to-members
-void sequencerLoop(){
-//  #ifdef LEDSBUSY
-//    return;
-//  #endif
+void sequencerLoop()
+{
+  //  #ifdef LEDSBUSY
+  //    return;
+  //  #endif
 
   usbMIDI.read();
   // timeControl.midiClockHandler();
   timeControl.sequencerHandler();
   // if (Serial3.available() > 0) {
-	// 	int incomingByte = Serial3.read();
-	// 	Serial.print("UART received: ");
-	// 	Serial.println(incomingByte, DEC);
+  // 	int incomingByte = Serial3.read();
+  // 	Serial.print("UART received: ");
+  // 	Serial.println(incomingByte, DEC);
   //    incomingByte = Serial3.read();
   //   Serial.println(incomingByte, DEC);
-	// }
+  // }
 }
 
-void masterLoop(){
+void masterLoop()
+{
   timeControl.masterClockHandler();
   //  unsigned long    cycles = ARM_DWT_CYCCNT;
   //  if(cycles > cycleIntervalCount * 10000 ){
@@ -319,56 +322,74 @@ void masterLoop(){
   //  cyclesLast = cycles;
 }
 
-void LEDLoop(){
+void LEDLoop()
+{
   timeControl.ledClockHandler();
 }
 
-void midiTimerLoop(){
-//  usbMIDI.read();
-  while(Serial3.available()){
+void midiTimerLoop()
+{
+  //  usbMIDI.read();
+  while (Serial3.available())
+  {
     timeControl.midiClockHandler();
   }
 }
 
-void cacheLoop(){
+void cacheLoop()
+{
   timeControl.cacheWriteHandler();
 }
 // global wrappers to create pointers to MidiModule member functions
 // https://isocpp.org/wiki/faq/pointers-to-members
 
-void midiSysexHandlerWrapper(const byte *data, uint16_t length, bool last) {
-  if( !((globalObj.sysex_status == SYSEX_IMPORTING) || (globalObj.sysex_status == SYSEX_READYFORDATA) ) ){
+void midiSysexHandlerWrapper(const byte *data, uint16_t length, bool last)
+{
+  if (!((globalObj.sysex_status == SYSEX_IMPORTING) || (globalObj.sysex_status == SYSEX_READYFORDATA)))
+  {
     return;
   }
 
-  if(globalObj.sysex_status == SYSEX_READYFORDATA){
+  if (globalObj.sysex_status == SYSEX_READYFORDATA)
+  {
     globalObj.sysex_status = SYSEX_IMPORTING;
     globalObj.sysex_channel = 0;
     globalObj.sysex_pattern = 0;
     timeControl.runDisplayLoop();
   }
 
-  if(sysexImportWriting == true){ 
+  if (sysexImportWriting == true)
+  {
     Serial.println("------ ----- ---  Sysex messages are arriving too fast! --- ---- --- ----");
   }
 
-  if (millis() < 6000){ return; }
-  if (sysexCounter == 0){
+  if (millis() < 6000)
+  {
+    return;
+  }
+  if (sysexCounter == 0)
+  {
     sysexTimer = 0;
     timeControl.flashMemoryControl(1);
     // Serial.println(" -- ");
     // Serial.print(String(millis() ) + "Sysex Message. Buffer Allocated - Part 1 ");
     sysexBuffer = (char *)malloc(SECTORSIZE);
-    if(data[0] == 0xF0){ *data++; }
-    strcpy(sysexBuffer, (char *)data);    
-  } else {
+    if (data[0] == 0xF0)
+    {
+      *data++;
+    }
+    strcpy(sysexBuffer, (char *)data);
+  }
+  else
+  {
     // Serial.print(String(sysexCounter +1) + " -" + String(sysexTimer) + "- ");
     strncat(sysexBuffer, (char *)data, length);
   }
 
   sysexCounter++;
 
-  if(last){
+  if (last)
+  {
     // Serial.println(sysexBuffer);
     sysexTimer = 0;
     sysexImportWriting = true;
@@ -384,60 +405,73 @@ void midiSysexHandlerWrapper(const byte *data, uint16_t length, bool last) {
 //
 // }
 
-void midiClockPulseHandlerWrapper(){
-//  timeControl.setDebugPin(3, HIGH);
-  if(globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK) return;
+void midiClockPulseHandlerWrapper()
+{
+  //  timeControl.setDebugPin(3, HIGH);
+  if (globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK)
+    return;
   midiControl.midiClockPulseHandler();
-//  timeControl.setDebugPin(3, LOW);
+  //  timeControl.setDebugPin(3, LOW);
 }
 
-void midiNoteOnHandlerWrapper(byte channel, byte note, byte velocity){
+void midiNoteOnHandlerWrapper(byte channel, byte note, byte velocity)
+{
   midiControl.midiNoteOnHandler(channel, note, velocity);
 }
 
-void midiNoteOffHandlerWrapper(byte channel, byte note, byte velocity){
+void midiNoteOffHandlerWrapper(byte channel, byte note, byte velocity)
+{
   midiControl.midiNoteOffHandler(channel, note, velocity);
 }
 
-void midiStartContinueHandlerWrapper(){
-  if(globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK) return;
+void midiStartContinueHandlerWrapper()
+{
+  if (globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK)
+    return;
   midiControl.midiStartContinueHandler();
 }
 
-void midiStopHandlerWrapper(){
-  if(globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK) return;
+void midiStopHandlerWrapper()
+{
+  if (globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK)
+    return;
   midiControl.midiStopHandler();
 }
 
-void midiTimeCodePointerWrapper(uint8_t data){
+void midiTimeCodePointerWrapper(uint8_t data)
+{
   //Serial.println("MIDI TIME CODE: " + String(data));
 }
 
-void midiSongPositionPointerWrapper(uint16_t songPosition){
+void midiSongPositionPointerWrapper(uint16_t songPosition)
+{
   //Serial.println("Song position Pointer: " + String(songPosition));
   midiControl.midiSongPosition(songPosition);
 }
 
-void usbMidiRealTimeMessageHandler(byte realtimebyte) {
+void usbMidiRealTimeMessageHandler(byte realtimebyte)
+{
   //Serial.println("realTimeMessage!:\t" + String(realtimebyte));
-  if(globalObj.clockMode != EXTERNAL_MIDI_USB_CLOCK) return;
-  switch(realtimebyte){
-    case 248:
+  if (globalObj.clockMode != EXTERNAL_MIDI_USB_CLOCK)
+    return;
+  switch (realtimebyte)
+  {
+  case 248:
     midiControl.midiClockPulseHandler();
     break;
-    case 250:
+  case 250:
     midiControl.midiStartContinueHandler();
     break;
-    case 251:
+  case 251:
     midiControl.midiStartContinueHandler();
     break;
-    case 252:
+  case 252:
     midiControl.midiStopHandler();
     break;
   }
 
-
-  if (realtimebyte == 248) {
+  if (realtimebyte == 248)
+  {
   };
   //switch(realtimebyte){
   //  case MIDI_CLOCK:

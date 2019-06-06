@@ -1,9 +1,9 @@
-#include <Arduino.h>
 #include "globalVariable.h"
 
-void GlobalVariable::initialize(ADC *adc)
+// void GlobalVariable::initialize(ADC *adc)
+void GlobalVariable::initialize()
 {
-  this->adc = adc;
+  // this->adc = adc;
 
   this->clockMode = INTERNAL_CLOCK;
   this->multi_pitch_switch = 0;
@@ -262,7 +262,7 @@ uint16_t GlobalVariable::quantize_edo_pitch(uint16_t note, uint16_t quantizeKey,
   for (int i = 0; i < quantizeKey; i++)
   {
     //bitwise rotation - 11 bits rotate to the right. Do it once for each scale degree
-    quantize_mode = (quantize_mode << 1) | ((0b01 << scale_divisions) & quantize_mode) >> scaleDivisions;
+    quantize_mode = (quantize_mode << 1) | ((0b01 << scale_divisions) & quantize_mode) >> scale_divisions;
   }
 
   while ((1 << (note % 12)) & ~quantize_mode)
