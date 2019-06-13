@@ -26,8 +26,9 @@ void Sequencer::initNewSequence(uint8_t pattern, uint8_t ch)
 	this->beatCount = 4;
 	this->swingX100 = 50;
 	this->quantizeKey = 0;
-	this->quantizeMode = 0b111111111111;
-	this->quantizeScale = 0;
+	this->quantizeMode = 0b1111111111111111;
+	this->quantizeScale = 12;
+	this->quantize_is_edo_scale = true;
 	this->pattern = pattern;
 	this->channel = ch;
 	this->clockDivision = 4;
@@ -158,10 +159,17 @@ bool Sequencer::toggleMute(uint8_t index)
 	}
 };
 
-void Sequencer::setStepPitch(uint8_t step, uint8_t pitch, uint8_t index)
-{
-	stepData[step].pitch[index] = pitch;
-	//Serial.println("step: " + String(step) + " pitch: " + String(pitch) + " index: " + String(index) + " set pitch: " + String(stepData[step].pitch[index]));
+uint16_t Sequencer::getStepPitch(uint8_t step, uint8_t index)
+{ //read step pitch, which is stored as dac_code, and present it as an EDO pitch based on current scale quantization
+	uint16_t test = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[step].pitch[index], this->quantizeScale);
+	// Serial.printf("%d    %d\n", test, stepData[step].pitch[index]);
+	return test;
+};
+
+void Sequencer::setStepPitch(uint8_t step, uint16_t pitch, uint8_t index)
+{ //read in scale degree and save step data as dac_code, so it can be remapped to any other EDO
+	stepData[step].pitch[index] = globalObj->quantize_edo_scale_degree_to_dac_code(pitch, quantizeScale);
+	Serial.println("step: " + String(step) + " pitch: " + String(pitch) + " index: " + String(index) + " set pitch: " + String(stepData[step].pitch[index]));
 };
 
 void Sequencer::setGateLength(uint8_t step, uint8_t length)
@@ -240,11 +248,6 @@ uint8_t Sequencer::quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool 
 	}
 	return note;
 }
-
-uint8_t Sequencer::getStepPitch(uint8_t step, uint8_t index)
-{
-	return stepData[step].pitch[index];
-};
 
 int Sequencer::positive_modulo(int i, int n)
 {
@@ -436,8 +439,9 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate)
 		// if (quantizeMode > 0){
 		// 	stepData[stepNum].notePlaying = quantizePitch(stepData[stepNum].pitch[0], quantizeKey, quantizeMode, 1);
 		// } else {
-		stepData[stepNum].notePlaying = stepData[stepNum].pitch[0];
-		//	}
+
+		stepData[stepNum].notePlaying = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0], quantizeScale);
+		stepData[stepNum].notePlaying = globalObj->quantize_edo_scale_degree_to_key(stepData[stepNum].notePlaying, this->quantizeKey, this->quantizeMode, this->quantizeScale, 0);
 
 		//	outputControl->noteOff(channel, stepData[stepNum].notePlaying, false );
 		stepData[stepNum].notePlaying += this->transpose;
@@ -457,11 +461,13 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate)
 
 void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig)
 {
-	uint8_t pitchArray[22];
-	pitchArray[0] = stepData[stepNum].pitch[0];
-	pitchArray[1] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[1];
-	pitchArray[2] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2];
-	pitchArray[3] = stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3];
+	uint16_t pitchArray[22];
+	pitchArray[0] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0], quantizeScale);
+
+	// Serial.printf("-%d-\n", pitchArray[0]);
+	pitchArray[1] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[1], quantizeScale);
+	pitchArray[2] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2], quantizeScale);
+	pitchArray[3] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3], quantizeScale);
 
 	if (skipNextNoteTrigger)
 	{ // so that when first step is changed, it doesn't constantly retrigger
@@ -495,9 +501,9 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		arpSteps = arpOctaveTrig * arpSteps;
 	}
 
-	uint8_t index;
+	uint16_t index;
 
-	int8_t playPitch; //pitch that will be triggered in this loop
+	uint16_t playPitch; //pitch that will be triggered in this loop
 
 	switch (arpTypeTrig)
 	{
@@ -565,6 +571,8 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	stepData[stepNum].notePlaying = playPitch;
 	//	}
 	//Serial.println("noteOn"); delay(10);
+	// Serial.printf("-%d-\
+	n", stepData[stepNum].notePlaying);
 
 	//BEGIN INPUT MAPPING SECTION
 	//	if (gateInputRaw[gpio_randompitch]){
@@ -678,7 +686,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 	if (!globalObj->waitingToResetAfterPatternLoad)
 	{
-
+		// Serial.printf("Triggering note on: %04d\t%04d\n", stepData[stepNum].notePlaying, stepData[stepNum].pitch[0]);
 		outputControl->noteOn(channel, stepNum, stepData[stepNum].notePlaying, stepData[stepNum].velocity, stepData[stepNum].velocityType, stepData[stepNum].cv2speed, stepData[stepNum].cv2offset, glideVal, gateTrig, tieFlag, quantizeScale, quantizeMode, quantizeKey, muteCV1, stepData[stepNum].stepStartFrame, stepData[stepNum].arpStatus);
 		tieFlag = (stepData[stepNum].gateType == GATETYPE_TIE && gateTrig == true);
 

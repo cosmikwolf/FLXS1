@@ -819,7 +819,7 @@ void InputModule::sequenceMenuHandler(){
           }
           break;
         case STATE_QUANTIZESCALE:
-          sequenceArray[globalObj->selectedChannel].quantizeScale = positive_modulo(sequenceArray[globalObj->selectedChannel].quantizeScale + knobChange, 4);
+          sequenceArray[globalObj->selectedChannel].quantizeScale = min_max(sequenceArray[globalObj->selectedChannel].quantizeScale + knobChange,1,64);
           break;
         case STATE_PLAYMODE:
           sequenceArray[globalObj->selectedChannel].playMode = positive_modulo(sequenceArray[globalObj->selectedChannel].playMode + knobChange, 4);
@@ -1763,7 +1763,7 @@ void InputModule::changeStepData(uint8_t channel, uint8_t stepNum, int change){
         //  }
           // and finally set the new step value!
           // monophonic so pitch[0] only
-          sequenceArray[channel].setStepPitch(stepNum, min_max(sequenceArray[channel].getStepPitch(stepNum, 0) + change, 0,120), 0);
+          sequenceArray[channel].setStepPitch(stepNum, min_max(sequenceArray[channel].getStepPitch(stepNum, 0) + change, 0,  globalObj->get_maximum_note_count(sequenceArray[channel].quantize_is_edo_scale, sequenceArray[channel].quantizeScale)), 0);
           if(!globalObj->playing){
             sequenceArray[channel].stoppedTrig(stepNum, true, false);
           }

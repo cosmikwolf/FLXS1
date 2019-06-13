@@ -12,7 +12,7 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/Users/tenkai/Desktop/Projects/FLXS1/.pioenvs/teensy31/firmware.elf",
+            "executable": "/Users/tenkai/Desktop/Projects/FLXS1/.pio/build/teensy31/firmware.elf",
             "toolchainBinDir": "/Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi@1.50401.0/bin",
             "svdPath": "/Users/tenkai/.platformio/platforms/teensy/misc/svd/MK20D5.svd",
             "preLaunchTask": {
@@ -25,7 +25,7 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/Users/tenkai/Desktop/Projects/FLXS1/.pioenvs/teensy31/firmware.elf",
+            "executable": "/Users/tenkai/Desktop/Projects/FLXS1/.pio/build/teensy31/firmware.elf",
             "toolchainBinDir": "/Users/tenkai/.platformio/packages/toolchain-gccarmnoneeabi@1.50401.0/bin",
             "svdPath": "/Users/tenkai/.platformio/platforms/teensy/misc/svd/MK20D5.svd",
             "internalConsoleOptions": "openOnSessionStart"

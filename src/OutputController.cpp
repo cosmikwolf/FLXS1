@@ -673,7 +673,7 @@ bool OutputController::gpioCheck(int8_t mapValue)
 void OutputController::noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, uint8_t velocity, uint8_t velocityType, uint8_t cv2speedSetting, uint8_t cv2offsetSetting, uint8_t glide, bool gate, bool tieFlag, uint8_t quantizeScale, uint16_t quantizeMode, uint8_t quantizeKey, bool cvMute, uint32_t startFrame, bool notFirstArp)
 {
   // proto 6 calibration numbers: 0v: 22180   5v: 43340
-  //  Serial.println("    OutputController -- on ch:"  + String(channel) + " nt: " + String(note) );
+  // Serial.println("    OutputController -- on ch:" + String(channel) + " nt: " + String(note));
   /*  proto 8 basic calibration
 10v - 64240
 5v - 48570
@@ -745,11 +745,11 @@ void OutputController::noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, u
   //  ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel],0)) );    // set CV voltage
   if (!cvMute)
   {
-    ad5676.setVoltage(dacCvMap[channel], getQuantizedVoltage(channel, note, globalObj->outputNegOffset[channel], 1)); // set CV voltage
-                                                                                                                      //delayMicroseconds(5);
+    ad5676.setVoltage(dacCvMap[channel], scale_degree_to_quantized_dac_output(channel, note, globalObj->outputNegOffset[channel], 1)); // set CV voltage
+                                                                                                                                       //delayMicroseconds(5);
     //ad5676.setVoltage(dacCvMap[channel], map( (note+offset), 0,120,calibLow(channel, dacCvMap[channel], 0), calibHigh(channel, dacCvMap[channel], 0)));    // set CV voltage
-    ad5676.setVoltage(dacCvMap[channel], getQuantizedVoltage(channel, note, globalObj->outputNegOffset[channel], 1)); // set CV voltage
-                                                                                                                      //  delayMicroseconds(5);
+    ad5676.setVoltage(dacCvMap[channel], scale_degree_to_quantized_dac_output(channel, note, globalObj->outputNegOffset[channel], 1)); // set CV voltage
+                                                                                                                                       //  delayMicroseconds(5);
     //Serial.println("Ch " + String(channel) + "\t offset:" + String(offset) + "\traw: " + String(globalObj->cvInputRaw[channel]));
     serialMidi->sendNoteOn(note, velocity, globalObj->midiChannel[channel]); // send midi note out
     usbMIDI.sendNoteOn(note, velocity, globalObj->midiChannel[channel]);     // send midi note out
@@ -761,10 +761,10 @@ void OutputController::noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, u
   }
 };
 
-int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uint8_t negOffset, bool pitchValue)
+uint16_t OutputController::scale_degree_to_quantized_dac_output(uint8_t channel, uint16_t note, uint8_t negOffset, bool pitchValue)
 {
   uint32_t cents = 0;
-  int16_t quantNote = 0;
+  uint16_t quantized_dac_code = 0;
   uint16_t calibrationLow = 0;
   uint16_t calibrationHigh = 0;
 
@@ -778,34 +778,54 @@ int16_t OutputController::getQuantizedVoltage(uint8_t channel, int16_t note, uin
     calibrationLow = -16384;
     calibrationHigh = 16384;
   }
-
-  switch (sequenceArray[channel].quantizeScale)
+  if (sequenceArray[channel].quantize_is_edo_scale)
   {
-  case SEMITONE:
-    quantNote = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+    quantized_dac_code = globalObj->quantize_edo_scale_degree_to_key(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, sequenceArray[channel].quantizeScale, 0);
+    // quantized_dac_code = globalObj->quantize_edo_scale_degree_to_key(note, sequenceArray[channel].quantizeKey, 0, sequenceArray[channel].quantizeScale, 0);
+    // Serial.printf("%04d ", quantized_dac_code);
+    quantized_dac_code = globalObj->quantize_edo_scale_degree_to_dac_code(quantized_dac_code, sequenceArray[channel].quantizeScale);
+    // Serial.printf("%04d ", quantized_dac_code);
     if (pitchValue)
     {
-      quantNote = map(quantNote, 0, 120, calibrationLow, calibrationHigh);
+      quantized_dac_code = map(quantized_dac_code, 0, 65536, calibrationLow, calibrationHigh);
     }
     else
     {
-      quantNote = map(quantNote, -120, 120, calibrationLow, calibrationHigh);
+      quantized_dac_code = map(quantized_dac_code, sequenceArray[channel].quantizeScale * -10, sequenceArray[channel].quantizeScale * 10, calibrationLow, calibrationHigh);
     }
-    break;
-  case PYTHAGOREAN:
-    quantNote = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
-    cents = pythagorean10thCent[quantNote % pythagoreanNoteCount] + 12000 * quantNote / pythagoreanNoteCount;
-    quantNote = map(cents, 0, 120000, calibrationLow, calibrationHigh);
-    break;
-  case COLUNDI:
-    quantNote = map(colundiArrayX100[note], 0, 1012, calibrationLow, calibrationHigh);
-    break;
-  case TET_17:
-    quantNote = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
-    quantNote = map(quantNote, 0, 190, calibrationLow, calibrationHigh);
-    break;
+    // Serial.printf("scale: %04d key: %03d mode: %04d note: %03d \tdac_code: %04d\n", sequenceArray[channel].quantizeScale, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, note, quantized_dac_code);
   }
-  return quantNote;
+  else
+  {
+    switch (sequenceArray[channel].quantizeScale)
+    {
+    case SEMITONE:
+      quantized_dac_code = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      if (pitchValue)
+      {
+        quantized_dac_code = map(quantized_dac_code, 0, 120, calibrationLow, calibrationHigh);
+      }
+      else
+      {
+        quantized_dac_code = map(quantized_dac_code, -120, 120, calibrationLow, calibrationHigh);
+      }
+      break;
+    case PYTHAGOREAN:
+      quantized_dac_code = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      cents = pythagorean10thCent[quantized_dac_code % pythagoreanNoteCount] + 12000 * quantized_dac_code / pythagoreanNoteCount;
+      quantized_dac_code = map(cents, 0, 120000, calibrationLow, calibrationHigh);
+      break;
+    case COLUNDI:
+      quantized_dac_code = map(colundiArrayX100[note], 0, 1012, calibrationLow, calibrationHigh);
+      break;
+    case TET_17:
+      quantized_dac_code = globalObj->quantize_semitone_pitch(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, 0);
+      quantized_dac_code = map(quantized_dac_code, 0, 190, calibrationLow, calibrationHigh);
+      break;
+    }
+  }
+
+  return quantized_dac_code;
 }
 
 uint16_t OutputController::voltageOffset(uint8_t volts, uint8_t mapAddress)
@@ -916,7 +936,7 @@ void OutputController::cv2update(uint8_t channel, uint32_t currentFrame, uint32_
     break;
 
   case LFO_QUANTIZED:
-    voltageLevel = this->getQuantizedVoltage(channel, cv2amplitude[channel], 0, 0);
+    voltageLevel = this->scale_degree_to_quantized_dac_output(channel, cv2amplitude[channel], 0, 0);
     slewLevel = 0;
     break;
 

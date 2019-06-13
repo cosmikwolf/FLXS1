@@ -841,19 +841,10 @@ void DisplayModule::stateDisplay_pitch(char*buf){
     sprintf(buf, "Multiselect");
       displayElement[0] = strdup(buf);
     if(globalObj->multi_pitch_switch){
-      switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
-        case COLUNDI:
-          displayElement[1] = strdup(colundiNotes[min_max(globalObj->multi_pitch, 0, COLUNDINOTECOUNT)] );
-        break;
-        case SEMITONE:
-          displayElement[1] = strdup(midiNotes[min_max(globalObj->multi_pitch, 0, 127)]);
-        break;
-        case TET_17:
-          displayElement[1] = strdup(midiNotes[min_max(globalObj->multi_pitch, 0, 127)]);
-        break;
-        default:
-        displayElement[1] = strdup(String(globalObj->multi_pitch).c_str());
-      }
+
+      sprintf(buf, "%d-%d",
+       globalObj->multi_pitch/sequenceArray[globalObj->selectedChannel].quantizeScale, globalObj->multi_pitch%sequenceArray[globalObj->selectedChannel].quantizeScale );
+       displayElement[1] =   strdup(buf);
     } else {
       displayElement[1] = strdup("--");
     }
@@ -901,20 +892,25 @@ void DisplayModule::stateDisplay_pitch(char*buf){
     }
     displayElement[10] = strdup(buf);
 
-    switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
-      case COLUNDI:
-        displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
-      break;
-      case SEMITONE:
-        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantize_semitone_pitch(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[globalObj->selectedChannel].quantizeKey, sequenceArray[globalObj->selectedChannel].quantizeMode, 0)]);
-        //displayElement[1] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
-      break;
-      case TET_17:
-        displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
-      break;
-      default:
-      displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
-    }
+    sprintf(buf, "%d-%d",
+    
+      sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0)/sequenceArray[globalObj->selectedChannel].quantizeScale,
+      sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0)%sequenceArray[globalObj->selectedChannel].quantizeScale );
+    displayElement[1] =   strdup(buf);
+    // switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
+    //   case COLUNDI:
+    //     displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
+    //   break;
+    //   case SEMITONE:
+    //     displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantize_semitone_pitch(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[globalObj->selectedChannel].quantizeKey, sequenceArray[globalObj->selectedChannel].quantizeMode, 0)]);
+    //     //displayElement[1] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
+    //   break;
+    //   case TET_17:
+    //     displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
+    //   break;
+    //   default:
+    //   displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
+    // }
 
     if ( sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST ){
       displayElement[5] = strdup("rest");
@@ -1292,10 +1288,11 @@ void DisplayModule::scaleMenuDisplay(){
      displayElement[0] = strdup(buf);
 
      displayElement[3] = strdup("scale:");
-     const char * const scaleArray[] = {"semitone", "pythagorean", "colundi", "17tet"};
+    //  const char * const scaleArray[] = {"semitone", "pythagorean", "colundi", "17tet"};
 
-      displayElement[4] = strdup(scaleArray[sequenceArray[globalObj->selectedChannel].quantizeScale]);
-
+      // displayElement[4] = strdup(scaleArray[sequenceArray[globalObj->selectedChannel].quantizeScale]);
+      sprintf(buf, "%d", sequenceArray[globalObj->selectedChannel].quantizeScale);
+    displayElement[4] = strdup(buf);
      displayElement[5] = strdup("key:");
      const char * const keyArray[] = { "c","c#","d","d#","e","f","f#","g","g#","a","a#","b" };
      displayElement[6] = strdup(keyArray[sequenceArray[globalObj->selectedChannel].quantizeKey]);
@@ -1461,7 +1458,7 @@ void DisplayModule::inputMenuDisplay(){
    }
 
    displayElement[1] = strdup(buf);
-
+ 
     gateMappingText(buf, sequenceArray[globalObj->selectedChannel].gpio_skipstep);
     displayElement[2] = strdup(buf);
 

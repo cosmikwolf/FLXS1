@@ -56,7 +56,7 @@ public:
 	int positive_modulo(int i, int n);
 	void initNewSequence(uint8_t pattern, uint8_t ch);
 	void initializeStep(uint8_t stepNum);
-	void setStepPitch(uint8_t step, uint8_t pitch, uint8_t index);
+	void setStepPitch(uint8_t step, uint16_t pitch, uint8_t index);
 	void setGateLength(uint8_t step, uint8_t length);
 	void setGateType(uint8_t step, uint8_t gate);
 	void setStepVelocity(uint8_t step, uint8_t velocity);
@@ -98,7 +98,7 @@ public:
 
 	bool hasData();
 	uint8_t quantizePitch(uint8_t note, uint8_t key, uint8_t scale, bool direction);
-	uint8_t getStepPitch(uint8_t step, uint8_t index);
+	uint16_t getStepPitch(uint8_t step, uint8_t index);
 	uint16_t getArpCount(uint8_t stepNum);
 	uint32_t getArpStartFrame(uint8_t stepNum, uint16_t arpNum);
 	uint32_t getArpLastFrame(uint8_t stepNum, uint16_t arpNum);
@@ -128,10 +128,12 @@ public:
 	uint8_t randomHigh;
 
 	uint8_t quantizeKey;
-	int quantizeMode;
-	unsigned long long int testtest; //quantizeMode data placeholder
+	uint32_t quantizeMode;
+	uint32_t quantizeMode_64bit;
+	// unsigned long long int testtest; //quantizeMode data placeholder
 	uint8_t quantizeModeIndex;
 	uint8_t quantizeScale;
+	bool quantize_is_edo_scale;
 	uint8_t pattern;
 	uint8_t channel;
 	uint8_t beatCount;

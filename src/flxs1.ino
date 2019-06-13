@@ -91,7 +91,7 @@ void setup()
   delay(500);
   serialMidi.begin(MIDI_CHANNEL_OMNI);
   serialMidi.turnThruOff();
-  // globalObj.initialize(adc);
+  globalObj.initialize(adc);
 
   for (int i = 0; i < 1000; i++)
   {
@@ -136,7 +136,6 @@ void setup()
 
   //  DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
   //  DisplayLoopTimer.priority(3);
-
   SequencerTimer.begin(sequencerLoop, kSequenceTimerInterval);
   SequencerTimer.priority(4);
 
