@@ -16,38 +16,38 @@
 #include "Sequencer.h"
 #include "global.h"
 
-class TimeController {
-  public:
-    TimeController();
-    void initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, Sequencer* sequencerArray, ADC *adc,  GlobalVariable *globalObj);
+class TimeController
+{
+public:
+  TimeController();
+  void initialize(midi::MidiInterface<HardwareSerial> *serialMidi, MidiModule *midiControl, Sequencer *sequencerArray, ADC *adc, GlobalVariable *globalObj);
 
-    void runLoopHandler();
-    void masterClockHandler();
-    void sequencerHandler();
-    void ledClockHandler();
-    void midiClockHandler();
-    void cacheWriteHandler();
-    void sysexMessageHandler(char* sysex_message);
-    int flashMemoryControl(int value);
-    void runDisplayLoop();
-    uint8_t midiTestValue;
+  void runLoopHandler();
+  void masterClockHandler();
+  void sequencerHandler();
+  void ledClockHandler();
+  void midiClockHandler();
+  void cacheWriteHandler();
+  void sysexMessageHandler(char *sysex_message);
+  int flashMemoryControl(int value);
+  void runDisplayLoop();
+  uint8_t midiTestValue;
 
-  private:
-    GlobalVariable *globalObj;
-    MasterClock clockMaster;
-    OutputController outputControl;
-    InputModule buttonIo;
-    DisplayModule display;
-    LEDArray ledArray;
-    FlashMemory saveFile;
-    Zetaohm_MAX7301 midplaneGPIO;
-    Zetaohm_MAX7301 backplaneGPIO;
-    MidiModule *midiControl;
-    midi::MidiInterface<HardwareSerial>* serialMidi;
-    Sequencer *sequencerArray;
-    ADC *adc;
-    elapsedMicros cacheWriteTimer;
-
+private:
+  GlobalVariable *globalObj;
+  MasterClock clockMaster;
+  OutputController outputControl;
+  InputModule buttonIo;
+  DisplayModule display;
+  LEDArray ledArray;
+  FlashMemory saveFile;
+  Zetaohm_MAX7301 midplaneGPIO;
+  Zetaohm_MAX7301 backplaneGPIO;
+  MidiModule *midiControl;
+  midi::MidiInterface<HardwareSerial> *serialMidi;
+  Sequencer *sequencerArray;
+  ADC *adc;
+  elapsedMicros cacheWriteTimer;
 };
 //extern Sequencer sequence[4];
 

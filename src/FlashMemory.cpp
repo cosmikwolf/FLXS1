@@ -14,7 +14,7 @@ FlashMemory::FlashMemory(){
 };
 
 void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequenceArray, SerialFlashChip *spiFlash, ADC *adc, GlobalVariable *globalObj){
-  Serial.println("<</~*^*~\>>Initializing Flash Memory<</~*^*~\>>");
+  Serial.println("<<~*^*~>>Initializing Flash Memory<<~*^*~>>");
   this->outputControl = outputControl;
   this->sequenceArray = sequenceArray;
   this->spiFlash = spiFlash;
@@ -49,7 +49,7 @@ void FlashMemory::initialize(OutputController * outputControl, Sequencer *sequen
   }
 
 
-  Serial.println("<</~*^*~\>> Flash Memory Initialization Complete <</~*^*~\>>");
+  Serial.println("<<~*^*~>> Flash Memory Initialization Complete <<~*^*~>>");
 }
 
 void FlashMemory::formatAndInitialize(){

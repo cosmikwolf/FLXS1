@@ -2,24 +2,24 @@
 #include "TimeController.h"
 #include "midiModule.h"
 
+TimeController::TimeController(){};
 
-TimeController::TimeController(){ };
-
-void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi, MidiModule *midiControl, Sequencer* sequencerArray, ADC *adc, GlobalVariable *globalObj) {
+void TimeController::initialize(midi::MidiInterface<HardwareSerial> *serialMidi, MidiModule *midiControl, Sequencer *sequencerArray, ADC *adc, GlobalVariable *globalObj)
+{
 
 	Serial.println("Initializing TimeController");
 
 	this->serialMidi = serialMidi;
-  this->sequencerArray = sequencerArray;
+	this->sequencerArray = sequencerArray;
 	this->adc = adc;
 	this->globalObj = globalObj;
 
 	outputControl.initialize(&backplaneGPIO, serialMidi, adc, globalObj, sequencerArray, &saveFile);
 
 	sequencerArray[0].initialize(0, 16, 4, &outputControl, globalObj);
-  sequencerArray[1].initialize(1, 16, 4, &outputControl, globalObj);
-  sequencerArray[2].initialize(2, 16, 4, &outputControl, globalObj);
-  sequencerArray[3].initialize(3, 16, 4, &outputControl, globalObj);
+	sequencerArray[1].initialize(1, 16, 4, &outputControl, globalObj);
+	sequencerArray[2].initialize(2, 16, 4, &outputControl, globalObj);
+	sequencerArray[3].initialize(3, 16, 4, &outputControl, globalObj);
 
 	display.initialize(sequencerArray, &clockMaster, globalObj, midiControl);
 
@@ -31,35 +31,42 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 
 	saveFile.initialize(&outputControl, sequencerArray, &SerialFlash, adc, globalObj);
 
-	if(eraseAllFlag){
-    Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
+	if (eraseAllFlag)
+	{
+		Serial.println("*&*&*&&**&&&*&*&*& erase all flag set, erasing everything... *&*&*&*&*&*&*&&*");
 		//saveFile.wipeEEPROM();
 		saveFile.formatAndInitialize();
 		Serial.println("*&*&*&&**&&&*&*&*& erasing complete!... *&*&*&*&*&*&*&&*");
+	}
 
-  }
-
-//	saveFile.fileSizeTest();
-//	saveFile.deleteSaveFile();
+	//	saveFile.fileSizeTest();
+	//	saveFile.deleteSaveFile();
 	//saveFile.wipeEEPROM();
 	//saveFile.deleteTest();
 	saveFile.initializeCache();
 	//saveFile.loadPattern(0, 0b1111);
-  currentPattern = 0;
-  for(int i=0; i<SEQUENCECOUNT; i++){
-    sequencerArray[i].initNewSequence(currentPattern, i);
-  }
+	currentPattern = 0;
+	for (int i = 0; i < SEQUENCECOUNT; i++)
+	{
+		sequencerArray[i].initNewSequence(currentPattern, i);
+	}
 
-	if( saveFile.readCalibrationEEPROM() == true ){
+	if (saveFile.readCalibrationEEPROM() == true)
+	{
 		display.calibrationWarning();
-	} else {
+	}
+	else
+	{
 		Serial.println("Calibration Data Found");
 	};
 
-	if (!saveFile.doesSeqDataExist()){
+	if (!saveFile.doesSeqDataExist())
+	{
 		display.saveFileWarning();
 		Serial.println("WARNING! SAVE FILE NOT FOUND");
-	} else {
+	}
+	else
+	{
 		Serial.println("SAVE FILE FOUND");
 		// delay(5);
 	}
@@ -73,8 +80,10 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	// }
 	Serial.println("================ checking to see which sequences have been saved ================");
 	saveFile.checkForSavedSequences();
-	for(int pattern=0; pattern<16; pattern++){
-		for(int channel=0; channel<4; channel++){
+	for (int pattern = 0; pattern < 16; pattern++)
+	{
+		for (int channel = 0; channel < 4; channel++)
+		{
 			Serial.print(String(globalObj->savedSequences[channel][pattern]));
 		}
 	}
@@ -83,16 +92,16 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
 	buttonIo.changeState(STATE_PITCH0);
 	midiTestValue = 0;
 
-//
+	//
 
-//	saveFile.listFiles();
-//
+	//	saveFile.listFiles();
+	//
 	//saveFile.deleteSaveFile();
 	//saveFile.wipeEEPROM();
 	//saveFile.initializeCache();
 
-//	saveFile.deleteSaveFile();
-/*
+	//	saveFile.deleteSaveFile();
+	/*
 	saveFile.saveSequenceData(sequence[0], 0, 0 );
 	delay(200);
 	saveFile.readSequenceData(sequence[0], 0, 0);
@@ -100,88 +109,97 @@ void TimeController::initialize(midi::MidiInterface<HardwareSerial>* serialMidi,
   saveFile.printDirectory(root, 2);
 	*/
 	Serial.println("===== TIMECONTROLLER INITIALIZATION COMPLETE =====");
-
 }
 
-void TimeController::runLoopHandler() {
+void TimeController::runLoopHandler()
+{
 	// digitalWriteFast(PIN_EXT_RX, HIGH);
 
- 	buttonIo.loop(INPUT_INTERVAL);
+	buttonIo.loop(INPUT_INTERVAL);
 
 	// saveFile.staggeredLoadLoop();
 
-	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch){
+	if (cacheWriteTimer > 10000 && saveFile.cacheWriteSwitch)
+	{
 		// digitalWriteFast(PIN_EXT_TX, HIGH);
 		saveFile.cacheWriteLoop();
 		// digitalWriteFast(PIN_EXT_TX, LOW);
-		cacheWriteTimer=0;
+		cacheWriteTimer = 0;
 	}
 
 	// digitalWriteFast(PIN_EXT_RX, LOW);
 
-  if (clockMaster.displayRunSwitch && (globalObj->sysex_status != SYSEX_IMPORTING)){
-    display.displayLoop(DISPLAY_INTERVAL);
-    //clockMaster.displayRunSwitch = false;
-  }
+	if (clockMaster.displayRunSwitch && (globalObj->sysex_status != SYSEX_IMPORTING))
+	{
+		display.displayLoop(DISPLAY_INTERVAL);
+		//clockMaster.displayRunSwitch = false;
+	}
 
-  if(midiTestActive && stepMode == STATE_TEST_MIDI){
-//for(int i=0; i<128; i++){
-        Serial.println("SENDING MIDI TEST NOTES " + String(midiTestValue));
-        serialMidi->sendNoteOn(midiTestValue, 127, 1);
-//        delay(100);
-				serialMidi->sendNoteOff(midiTestValue, 0,  1);
-	//			delay(100);
-				serialMidi->read();
-				//display.displayLoop(DISPLAY_INTERVAL);
-				midiTestValue = (midiTestValue+1)%128;
-      //}
-  }
+	if (midiTestActive && stepMode == STATE_TEST_MIDI)
+	{
+		//for(int i=0; i<128; i++){
+		Serial.println("SENDING MIDI TEST NOTES " + String(midiTestValue));
+		serialMidi->sendNoteOn(midiTestValue, 127, 1);
+		//        delay(100);
+		serialMidi->sendNoteOff(midiTestValue, 0, 1);
+		//			delay(100);
+		serialMidi->read();
+		//display.displayLoop(DISPLAY_INTERVAL);
+		midiTestValue = (midiTestValue + 1) % 128;
+		//}
+	}
 
-
-//    Serial.println("Sending Midi Test Notes");
-//    delay(1000);
-  //  for(int i=1; i<10; i++){
-      //serialMidi->sendNoteOn(i, 127, 1);
-  //    serialMidi->sendNoteOff(i, 0,  1);
-      //delay(10);
-    //}
-//
-//
-  //  serialMidi->read();
+	//    Serial.println("Sending Midi Test Notes");
+	//    delay(1000);
+	//  for(int i=1; i<10; i++){
+	//serialMidi->sendNoteOn(i, 127, 1);
+	//    serialMidi->sendNoteOff(i, 0,  1);
+	//delay(10);
+	//}
+	//
+	//
+	//  serialMidi->read();
 }
 
-void TimeController::ledClockHandler(){
-  ledArray.loop(0);
+void TimeController::ledClockHandler()
+{
+	ledArray.loop(0);
 }
 
-
-void TimeController::masterClockHandler(){
+void TimeController::masterClockHandler()
+{
 	clockMaster.masterClockFunc();
 }
 
-void TimeController::sequencerHandler(){
+void TimeController::sequencerHandler()
+{
 	clockMaster.sequencerFunc();
 }
 
-void TimeController::runDisplayLoop(){
-//  if (clockMaster.displayRunSwitch){
-    display.displayLoop(0);
-  //  clockMaster.displayRunSwitch = false;
-  //}
+void TimeController::runDisplayLoop()
+{
+	//  if (clockMaster.displayRunSwitch){
+	display.displayLoop(0);
+	//  clockMaster.displayRunSwitch = false;
+	//}
 }
 
-void TimeController::sysexMessageHandler(char* sysex_message){
+void TimeController::sysexMessageHandler(char *sysex_message)
+{
 	outputControl.sysexMessageHandler(sysex_message);
 }
 
-int TimeController::flashMemoryControl(int value){
+int TimeController::flashMemoryControl(int value)
+{
 	return outputControl.flashMemoryControl(value);
 };
 
-void TimeController::midiClockHandler(){
+void TimeController::midiClockHandler()
+{
 	midiControl->midiClockSyncFunc(serialMidi);
 }
 
-void TimeController::cacheWriteHandler(){
-//	saveFile.cacheWriteLoop();
+void TimeController::cacheWriteHandler()
+{
+	//	saveFile.cacheWriteLoop();
 }

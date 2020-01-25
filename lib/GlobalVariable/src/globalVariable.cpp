@@ -33,7 +33,10 @@ void GlobalVariable::initialize(ADC *adc)
   this->multi_velocityType = 0;
   this->multi_cv2speed = 0;
   this->multi_cv2offset = 0;
-  this->muteChannelSelect[4] = {false};
+  this->muteChannelSelect[0] = {false};
+  this->muteChannelSelect[1] = {false};
+  this->muteChannelSelect[2] = {false};
+  this->muteChannelSelect[3] = {false};
   this->randomizeParamSelect = 0;
   this->randomizeLow = 36;
   this->randomizeSpan = 3;
