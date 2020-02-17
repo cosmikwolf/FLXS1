@@ -88,6 +88,7 @@ public:
   elapsedMicros displayTimer;
   void initialize(Sequencer *sequenceArray, MasterClock *clockMaster, GlobalVariable *globalObj, MidiModule *midiControl);
   void displayLoop(uint16_t frequency);
+  void screenSaver();
   void calibrationWarning();
   void saveFileWarning();
   void clearDisplay();

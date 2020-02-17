@@ -174,9 +174,23 @@ void DisplayModule::cleanupTextBuffers()
     displayElement[i] = nullptr;
   };
 };
-
-void DisplayModule::displayLoop(uint16_t frequency)
+void DisplayModule::screenSaver()
 {
+  oled.fillScreen(BLACK);
+  delay(10);
+  oled.fillScreen(RED);
+  delay(10);
+  oled.fillScreen(ORANGE);
+  delay(10);
+  oled.fillScreen(YELLOW);
+  delay(10);
+  oled.fillScreen(GREEN);
+  delay(10);
+  oled.fillScreen(BLUE);
+  delay(10);
+}
+void DisplayModule::displayLoop(uint16_t frequency)
+{ 
 
   if (displayTimer > frequency)
   {

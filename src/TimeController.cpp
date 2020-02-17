@@ -128,11 +128,18 @@ void TimeController::runLoopHandler()
 	}
 
 	// digitalWriteFast(PIN_EXT_RX, LOW);
-
-	if (clockMaster.displayRunSwitch && (globalObj->sysex_status != SYSEX_IMPORTING))
+	if (globalObj->screenSaverTimeout < 100)
 	{
-		display.displayLoop(DISPLAY_INTERVAL);
-		//clockMaster.displayRunSwitch = false;
+		if (clockMaster.displayRunSwitch && (globalObj->sysex_status != SYSEX_IMPORTING))
+		{
+			display.displayLoop(DISPLAY_INTERVAL);
+			//clockMaster.displayRunSwitch = false;
+		}
+	}
+	else
+	{
+		display.screenSaver();
+		delay(100);
 	}
 
 	if (midiTestActive && stepMode == STATE_TEST_MIDI)
@@ -144,7 +151,7 @@ void TimeController::runLoopHandler()
 		serialMidi->sendNoteOff(midiTestValue, 0, 1);
 		//			delay(100);
 		serialMidi->read();
-		//display.displayLoop(DISPLAY_INTERVAL);
+		//display.displayLoop(DISPLAY_INTERVAL);z
 		midiTestValue = (midiTestValue + 1) % 128;
 		//}
 	}
