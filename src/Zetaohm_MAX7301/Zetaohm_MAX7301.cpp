@@ -17,12 +17,13 @@ void Zetaohm_MAX7301::begin(uint8_t csPin) {
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);
-
+	
 	pinMode(_cs, OUTPUT);
 	digitalWrite(_cs, HIGH);
 	delay(100);
-	fellBuffer = 0x0;
-	roseBuffer = 0x0;
+	this->inputBuffer = 0;
+	this->fellBuffer = 0x0;
+	this->roseBuffer = 0x0;
 	// disable shutdown so chip works!
 	writeByte(0x04, 0x01);
 }
@@ -141,6 +142,7 @@ uint16_t Zetaohm_MAX7301::writeByte(byte addr, byte data){
 void Zetaohm_MAX7301::update(){
 	// load the 32 bit integer with the status of all buttons.
 	uint32_t previousState = inputBuffer;
+	this->activityLastUpdate = false;
 
 	if (debounceTimer > DEBOUNCE_THRESHOLD){
 		inputBuffer =
@@ -154,6 +156,7 @@ void Zetaohm_MAX7301::update(){
 		if (previousState != inputBuffer){
 		//	Serial.println("debounce timer: " + String(debounceTimer) );
 			debounceTimer = 0;
+			this->activityLastUpdate = true;
 		}
 	}
 };
@@ -173,11 +176,12 @@ bool Zetaohm_MAX7301::roseCheck(){
 }
 
 bool Zetaohm_MAX7301::activityCheck(){
-  if (fellBuffer || roseBuffer){
-    return 1;
-  } else {
-    return 0;
-  }
+//   if ((fellBuffer) || roseBuffer){
+//     return 1;
+//   } else {
+//     return 0;
+//   }
+	return activityLastUpdate;
 }
 
 void Zetaohm_MAX7301::clearBuffers(){
@@ -223,7 +227,7 @@ uint16_t Zetaohm_MAX7301::digitalRead(uint8_t index){
 bool Zetaohm_MAX7301::fell(uint8_t index){
 	if ( fellBuffer & (1 << indexMap[index]) ) {
 		fellBuffer = fellBuffer & ~(1 << indexMap[index]) ;
-  //  Serial.println("Button Press index: " + String(index) + "\tindexMap: " + String(indexMap[index]));
+//    Serial.println("Button Press index: " + String(index) + "\tindexMap: " + String(indexMap[index]));
 		return true;
 	} else {
 		return false;

@@ -128,18 +128,19 @@ void TimeController::runLoopHandler()
 	}
 
 	// digitalWriteFast(PIN_EXT_RX, LOW);
-	if (globalObj->screenSaverTimeout < 100)
+	if (globalObj->screenSaverTimeout < 1000 * 10)
 	{
 		if (clockMaster.displayRunSwitch && (globalObj->sysex_status != SYSEX_IMPORTING))
 		{
 			display.displayLoop(DISPLAY_INTERVAL);
+			// display.screenSaver();
+
 			//clockMaster.displayRunSwitch = false;
 		}
 	}
 	else
 	{
-		display.screenSaver();
-		delay(100);
+		display.screenSaver(DISPLAY_INTERVAL);
 	}
 
 	if (midiTestActive && stepMode == STATE_TEST_MIDI)

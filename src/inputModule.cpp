@@ -252,7 +252,7 @@ void InputModule::loop(uint16_t frequency){
   if(midplaneGPIO->activityCheck() || knobChange){
     globalObj->screenSaverTimeout = 0;
   }
-
+  
   if(midplaneGPIO->roseCheck()){ // if any buttons are pressed during sysex import, either exit import, or ignore
     switch(globalObj->sysex_status){
       case SYSEX_IDLE:

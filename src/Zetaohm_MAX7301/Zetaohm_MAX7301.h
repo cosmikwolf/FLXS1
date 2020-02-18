@@ -39,8 +39,9 @@ public:
 	uint32_t		fellBuffer;
 	uint32_t		roseBuffer;
 	uint8_t			indexMap[32];
-	bool				indexCache[32];
+	bool			indexCache[32];
 	uint8_t			portConfig[7];
+	bool		activityLastUpdate;
 
 	elapsedMicros 	debounceTimer;
 protected:

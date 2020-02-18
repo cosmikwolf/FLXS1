@@ -90,6 +90,8 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock *clockMaste
   oled.setCursor(100, 110);
   oled.println("BETA v19a");
   this->midiControl = midiControl;
+  this->freeDisplayCache();
+
   //  delay(1000);
   Serial.println("Display Initialization Complete");
 }
@@ -174,20 +176,23 @@ void DisplayModule::cleanupTextBuffers()
     displayElement[i] = nullptr;
   };
 };
-void DisplayModule::screenSaver()
+void DisplayModule::screenSaver(uint16_t frequency)
 {
-  oled.fillScreen(BLACK);
-  delay(10);
-  oled.fillScreen(RED);
-  delay(10);
-  oled.fillScreen(ORANGE);
-  delay(10);
-  oled.fillScreen(YELLOW);
-  delay(10);
-  oled.fillScreen(GREEN);
-  delay(10);
-  oled.fillScreen(BLUE);
-  delay(10);
+  if (displayTimer > frequency*10)
+  {
+    displayTimer = 0;
+    modalRefreshSwitch = true;
+    uint32_t time = micros();
+    uint16_t x = time % 128;
+    uint16_t y = time % 96;
+    uint16_t color = time;
+
+    // oled.fillScreen(rand()%0xffff);
+    // void	drawPolygon(int16_t x, int16_t y, uint8_t sides, int16_t diameter, float rot, uint16_t color);
+
+    oled.drawPolygon(x, y, time%9, time%128, x/y, color);
+    this->freeDisplayCache();
+  }
 }
 void DisplayModule::displayLoop(uint16_t frequency)
 { 
