@@ -931,7 +931,6 @@ void InputModule::sequenceMenuHandler()
         {
           sequenceArray[globalObj->selectedChannel].quantizeMode = previousQuantizeMode;
         }
-        // midplaneGPIO->clearBuffers();
       }
       else
       {
@@ -1190,7 +1189,7 @@ void InputModule::patternChainInputHandler()
 
   if (midplaneGPIO->fell(SW_PATTERN))
   {
-    this->altButtonPatternHandler();
+    // this->altButtonPatternHandler();
   }
   if (midplaneGPIO->fell(SW_MENU))
   {
@@ -1697,7 +1696,7 @@ void InputModule::altButtonPatternHandler()
           // Serial.println("running cache write loop...");
         }
         delay(2000);
-        midplaneGPIO->clearBuffers();
+        
         changeState(STATE_SYSEX_IMPORTINPROGRESS);
         globalObj->sysex_status = SYSEX_READYFORDATA;
 
@@ -1719,23 +1718,20 @@ void InputModule::altButtonPatternHandler()
     if (midplaneGPIO->pressed(SW_SHIFT))
     {
       saveFile->savePattern(globalObj->patternChannelSelector, globalObj->saveDestination);
-      // midplaneGPIO->clearBuffers();
       display->displayModal(750, MODAL_SAVE);
     }
     else
     {
-      // midplaneGPIO->clearBuffers();
-      display->displayModal(750, MODAL_DIDDNTSAVE);
+      display->displayModal(1000, MODAL_DIDDNTSAVE);
     }
     changeState(STATE_PITCH0);
-
     break;
+
   default:
     if (midplaneGPIO->pressed(SW_SHIFT))
     {
       for (int i = 0; i < SEQUENCECOUNT; i++)
       {
-        //saveDestination[i] = sequenceArray[i].pattern;
         globalObj->saveDestination[i] = currentPattern;
       }
       changeState(STATE_SAVE);
@@ -1743,7 +1739,6 @@ void InputModule::altButtonPatternHandler()
     else
     {
       globalObj->multiSelectSwitch = 0;
-      // midplaneGPIO->clearBuffers();
       changeState(STATE_PATTERNSELECT);
       heldButton == 255;
     }
@@ -2113,6 +2108,7 @@ bool InputModule::altButtonHandler()
         }
         break;
       }
+      return true;
     }
   }
   //Serial.println("Return at the end of alt");
@@ -2499,7 +2495,6 @@ void InputModule::randomShortcutHandler()
       //       }
     }
   }
-  // midplaneGPIO->clearBuffers();
 }
 
 void InputModule::tunerShortcutHandler(){
@@ -2531,8 +2526,8 @@ void InputModule::skipShortcutHandler()
       }
     }
   }
-  // midplaneGPIO->clearBuffers();
 };
+
 void InputModule::clkdivShortcutHandler(){
 
 };

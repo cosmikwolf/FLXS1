@@ -184,20 +184,7 @@ bool Zetaohm_MAX7301::activityCheck(){
 	return activityLastUpdate;
 }
 
-void Zetaohm_MAX7301::clearBuffers(){
-  // for(int i = 0; i<32; i++){
-  //   if(this->rose(i)){};
-  //   if(this->fell(i)){};
-  // }
-  fellBuffer = 0x0;
-  roseBuffer = 0x0;
-  inputBuffer = 0x0;
 
-	Serial.println("fell buffers: " );
-	Serial.println(fellBuffer, BIN);
-	Serial.println("rose buffers:");
-	Serial.println(roseBuffer, BIN);
-}
 
 void Zetaohm_MAX7301::skipNextRises(uint8_t count){
   skipRiseCount += count;
