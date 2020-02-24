@@ -1,26 +1,7 @@
 #include "Arduino.h"
 #include "Sequencer.h"
 
-void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig)
-{
-	uint16_t pitchArray[22];
-	pitchArray[0] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0], quantizeScale);
-
-	// Serial.printf("-%d-\n", pitchArray[0]);
-	pitchArray[1] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[1], quantizeScale);
-	pitchArray[2] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2], quantizeScale);
-	pitchArray[3] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3], quantizeScale);
-
-	if (skipNextNoteTrigger)
-	{ // so that when first step is changed, it doesn't constantly retrigger
-		skipNextNoteTrigger = false;
-		return;
-	}
-
-	if (globalObj->extClock() && !receivedFirstExtClock)
-	{
-		return;
-	}
+uint16_t Sequencer::get_play_pitch(uint8_t stepNum, uint16_t *pitchArray,  uint8_t arpTypeTrig, uint8_t arpOctaveTrig){
 
 	//figure out how many steps are nil (255)
 	uint8_t arpSteps = 4;
@@ -105,12 +86,37 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		break;
 	}
 
+    return playPitch;
+}
+
+void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig)
+{
+	uint16_t pitchArray[22];
+	pitchArray[0] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0], quantizeScale);
+
+	// Serial.printf("-%d-\n", pitchArray[0]);
+	pitchArray[1] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[1], quantizeScale);
+	pitchArray[2] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[2], quantizeScale);
+	pitchArray[3] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0] + stepData[stepNum].pitch[3], quantizeScale);
+
+	if (skipNextNoteTrigger)
+	{ // so that when first step is changed, it doesn't constantly retrigger
+		skipNextNoteTrigger = false;
+		return;
+	}
+
+	if (globalObj->extClock() && !receivedFirstExtClock)
+	{
+		return;
+	}
+
+
 	//if (quantizeKey == 1){
 	//	stepData[stepNum].notePlaying = quantizePitch(playPitch, aminor, 1);
 	//if (quantizeMode > 0){
 	//		stepData[stepNum].notePlaying = quantizePitch(playPitch, quantizeKey, quantizeMode, 1);
 	//	} else {
-	stepData[stepNum].notePlaying = playPitch;
+	stepData[stepNum].notePlaying = this->get_play_pitch(stepNum, pitchArray,  arpTypeTrig, arpOctaveTrig);
 	//	}
 	//Serial.println("noteOn"); delay(10);
 	// Serial.printf("-%d-\

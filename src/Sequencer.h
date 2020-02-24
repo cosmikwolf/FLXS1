@@ -30,6 +30,7 @@ public:
 	// Note Trigger Utilities
 	//void  	clearNoteData(NoteDatum *noteData);
 	void noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
+	uint16_t get_play_pitch(uint8_t stepNum, uint16_t *pitchArray,  uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
 	void noteShutOff(uint8_t stepNum, bool gateOff);
 
 	void stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
