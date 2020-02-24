@@ -110,17 +110,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		return;
 	}
 
-
-	//if (quantizeKey == 1){
-	//	stepData[stepNum].notePlaying = quantizePitch(playPitch, aminor, 1);
-	//if (quantizeMode > 0){
-	//		stepData[stepNum].notePlaying = quantizePitch(playPitch, quantizeKey, quantizeMode, 1);
-	//	} else {
 	stepData[stepNum].notePlaying = this->get_play_pitch(stepNum, pitchArray,  arpTypeTrig, arpOctaveTrig);
-	//	}
-	//Serial.println("noteOn"); delay(10);
-	// Serial.printf("-%d-\
-	n", stepData[stepNum].notePlaying);
 
 	//BEGIN INPUT MAPPING SECTION
 	//	if (gateInputRaw[gpio_randompitch]){
@@ -134,13 +124,12 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	stepData[stepNum].notePlaying += this->transpose;
 	uint8_t glideVal = min_max(stepData[stepNum].glide + outputControl->cvInputCheck(cv_glidemod), 0, 255);
 
-	//if(gateInputRaw[gpio_gatemute]){
 	if (outputControl->gpioCheck(gpio_gatemute))
 	{
 		gateTrig = false;
 	}
 	if (stepData[stepNum].arpStatus == 0)
-	{
+	{	
 		stepData[stepNum].framesRemaining = 0;
 		stepData[stepNum].stepStartFrame = currentFrame;
 	}
@@ -149,9 +138,9 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-		stepData[stepNum].framesRemaining += (2 * stepData[stepNum].gateLength + 2 + outputControl->cvInputCheck(cv_gatemod)) * framesPerBeat(globalObj->tempoX100) * clockDivisionNum() / (8 * clockDivisionDen());
+		stepData[stepNum].framesRemaining += (3 * stepData[stepNum].gateLength + 2 + outputControl->cvInputCheck(cv_gatemod)) * framesPerBeat(globalObj->tempoX100) * clockDivisionNum() / (8 * clockDivisionDen());
 
-		if (swingX100 != 50)
+		if (swingX100 != 50) 
 		{
 			if (!swinging)
 			{
@@ -184,7 +173,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	}
 	else
 	{
-
 		stepData[stepNum].framesRemaining += framesPerBeat(globalObj->tempoX100) * clockDivisionNum();
 		stepData[stepNum].framesRemaining *= getArpSpeedNumerator(stepNum);
 		stepData[stepNum].framesRemaining /= getArpSpeedDenominator(stepNum);
@@ -192,7 +180,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 		if (swingX100 != 50)
 		{
-			//if ((stepNum + swingSwitch + (stepData[stepNum].arpStatus * getArpSpeedNumerator(stepNum)) / getArpSpeedDenominator(stepNum)) % 2){
+			// if ((stepNum + swingSwitch + (stepData[stepNum].arpStatus * getArpSpeedNumerator(stepNum)) / getArpSpeedDenominator(stepNum)) % 2){
 			if (!swinging)
 			{
 				stepData[stepNum].framesRemaining *= 200 - 2 * swingX100;
@@ -205,28 +193,30 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			}
 		}
 
-		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 4;
-		if (stepData[stepNum].arpLastFrame < getStepLength() / 16)
+		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 64;
+		if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
 		{
-			stepData[stepNum].arpLastFrame = getStepLength() / 16;
+			stepData[stepNum].arpLastFrame = getStepLength() / 64;
 		}
+
 	}
 
-	/*
-	Serial.println(
-	"millis: " + String(millis()) +
-	"\tstepNum: " + String(stepNum) +
-	"\tchannel: " + String(channel) +
-	"\tpattern: " + String(pattern) +
-  //"\tgateLength: " + String(stepData[stepNum].gateLength) +
-  //"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-  //"\tcurrentFrame: "  + String(currentFrame) +
-  //"\tswinging: " + String(swingCount % 2) +
-  //"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-  //"\tgetStepLength: " + String(getStepLength()) +
- 	"\tarptype: "  + String(stepData[stepNum].arpType)
-);
-*/
+
+	// Serial.println(
+	// "millis: " + String(millis()) +
+	// "\tstepNum: " + String(stepNum) +
+	// "\tchannel: " + String(channel) +
+	// "\tpattern: " + String(pattern) +
+	// "\tgateLength: " + String(stepData[stepNum].gateLength) +
+	// //"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+	// //"\tcurrentFrame: "  + String(currentFrame) +
+	// //"\tswinging: " + String(swingCount % 2) +
+	// //"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+	// "\tgetStepLength: " + String(getStepLength()) +
+	// "\tarpStatus: "  + String(stepData[stepNum].arpStatus) +
+	// "\tarptype: "  + String(stepData[stepNum].arpType)
+	// );
+
 
 	//DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) );
 

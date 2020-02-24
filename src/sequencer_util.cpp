@@ -459,11 +459,6 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate)
 	}
 };
 
-
-uint32_t Sequencer::getArpLastFrame(uint8_t stepNum, uint16_t arpNum)
-{
-}
-
 uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint16_t arpNum)
 {
 	uint32_t stepFrames = stepData[stepNum].stepStartFrame;
@@ -520,7 +515,7 @@ uint16_t Sequencer::getArpCount(uint8_t stepNum)
 	}
 	else
 	{
-		arpCount = (stepData[stepNum].gateLength * getArpSpeedDenominator(stepNum) / getArpSpeedNumerator(stepNum)) / 4;
+		arpCount = ((stepData[stepNum].gateLength+1) * getArpSpeedDenominator(stepNum) / getArpSpeedNumerator(stepNum)) / 4 -1;
 	}
 
 	return arpCount;
