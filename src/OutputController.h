@@ -44,7 +44,7 @@ public:
   bool gpioCheck(int8_t mapValue);
 
   void clearVelocityOutput(uint8_t channel);
-  uint16_t cvInputCheck(uint8_t mapValue);
+  int16_t cvInputCheck(uint8_t mapValue);
   uint8_t analogInputTranspose(uint8_t note);
 
   void flashMemoryLoadPattern(uint8_t pattern, uint8_t channelSelector);

@@ -109,12 +109,10 @@ public:
 	//uint32_t  ppqSequenceTime();
 
 	StepDatum stepData[MAX_STEPS_PER_SEQUENCE];
-	bool suspendNotesUntilReset;
 	bool swingSwitch;
 	bool swinging;
 	bool receivedFirstExtClock;
 	bool pendulumSwitch;
-	uint8_t previousActiveStepSeqMode; // debug variable
 	uint8_t swingCount;
 	uint8_t activeStep;
 	uint8_t firstStep; //first step to be played

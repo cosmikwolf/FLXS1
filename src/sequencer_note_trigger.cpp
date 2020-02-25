@@ -92,6 +92,8 @@ uint16_t Sequencer::get_play_pitch(uint8_t stepNum, uint16_t *pitchArray,  uint8
 void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig)
 {
 	uint16_t pitchArray[22];
+	
+	
 	pitchArray[0] = globalObj->quantize_edo_dac_code_to_scale_degree(stepData[stepNum].pitch[0], quantizeScale);
 
 	// Serial.printf("-%d-\n", pitchArray[0]);
@@ -138,7 +140,7 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-		stepData[stepNum].framesRemaining += (3 * stepData[stepNum].gateLength + 2 + outputControl->cvInputCheck(cv_gatemod)) * framesPerBeat(globalObj->tempoX100) * clockDivisionNum() / (8 * clockDivisionDen());
+		stepData[stepNum].framesRemaining += (2 * stepData[stepNum].gateLength + 2 + outputControl->cvInputCheck(cv_gatemod)) * framesPerBeat(globalObj->tempoX100) * clockDivisionNum() / (8 * clockDivisionDen());
 
 		if (swingX100 != 50) 
 		{
@@ -171,8 +173,9 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// "\tarptype: "  + String(stepData[stepNum].arpType)
 		//    );
 	}
-	else
+	else  // if it IS an arp weeeee!
 	{
+
 		stepData[stepNum].framesRemaining += framesPerBeat(globalObj->tempoX100) * clockDivisionNum();
 		stepData[stepNum].framesRemaining *= getArpSpeedNumerator(stepNum);
 		stepData[stepNum].framesRemaining /= getArpSpeedDenominator(stepNum);
@@ -193,6 +196,14 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			}
 		}
 
+		stepData[stepNum].framesRemaining += ((int32_t)stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod)) / 64 ;
+		Serial.println(
+		"cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +
+		"\tframes: " + String(stepData[stepNum].framesRemaining) +
+		"\t\taddval: " + String((stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod))/64  )  +
+		"\t\tarpstaus: " + String(stepData[stepNum].arpStatus)
+		);
+
 		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 64;
 		if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
 		{
@@ -208,10 +219,10 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	// "\tchannel: " + String(channel) +
 	// "\tpattern: " + String(pattern) +
 	// "\tgateLength: " + String(stepData[stepNum].gateLength) +
-	// //"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-	// //"\tcurrentFrame: "  + String(currentFrame) +
-	// //"\tswinging: " + String(swingCount % 2) +
-	// //"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
+	//"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
+	//"\tcurrentFrame: "  + String(currentFrame) +
+	//"\tswinging: " + String(swingCount % 2) +
+	//"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
 	// "\tgetStepLength: " + String(getStepLength()) +
 	// "\tarpStatus: "  + String(stepData[stepNum].arpStatus) +
 	// "\tarptype: "  + String(stepData[stepNum].arpType)
@@ -243,4 +254,8 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 	// 		break;
 	// 	}
 	// }
+
+	// keeping track of the last triggered step 
+	// so the framesRemaining can be reset when
+	// a different step is triggered.
 }

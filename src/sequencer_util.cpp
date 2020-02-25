@@ -495,14 +495,15 @@ uint8_t Sequencer::getArpSpeedNumerator(uint8_t stepNum)
 };
 uint8_t Sequencer::getArpSpeedDenominator(uint8_t stepNum)
 {
-	if (arpSpeedModulation[stepNum] > 0)
-	{
-		return stepData[stepNum].arpSpdDen * arpSpeedModulation[stepNum];
-	}
-	else
-	{
-		return stepData[stepNum].arpSpdDen;
-	}
+	return stepData[stepNum].arpSpdDen;
+	// if (arpSpeedModulation[stepNum] > 0)
+	// {
+	// 	return stepData[stepNum].arpSpdDen * arpSpeedModulation[stepNum];
+	// }
+	// else
+	// {
+	// 	return stepData[stepNum].arpSpdDen;
+	// }
 };
 
 uint16_t Sequencer::getArpCount(uint8_t stepNum)

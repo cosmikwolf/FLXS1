@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.osx": {
+			"PATH": "/Users/tenkai/.platformio/penv/bin:/Users/tenkai/.platformio/penv:/Users/tenkai/.rvm/gems/ruby-2.3.0/bin:/Users/tenkai/.rvm/gems/ruby-2.3.0@global/bin:/Users/tenkai/.rvm/rubies/ruby-2.3.0/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Users/tenkai/.rvm/bin",
+			"PLATFORMIO_CALLER": "vscode"
+		},
+		"workbench.colorCustomizations": {
+			"activityBar.background": "#491A4B",
+			"titleBar.activeBackground": "#66256A",
+			"titleBar.activeForeground": "#FDF9FD"
+		}
+	}
+}

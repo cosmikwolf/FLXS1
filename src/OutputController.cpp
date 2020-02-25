@@ -590,7 +590,7 @@ void OutputController::inputRead()
   backplaneGPIO->digitalWrite(8, 0);
 }
 
-uint16_t OutputController::cvInputCheck(uint8_t mapValue)
+int16_t OutputController::cvInputCheck(uint8_t mapValue)
 {
   if (mapValue == 0)
   {

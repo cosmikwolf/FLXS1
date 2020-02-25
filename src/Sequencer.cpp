@@ -14,7 +14,6 @@
 
 void Sequencer::clockReset(bool activeStepReset)
 {
-  this->suspendNotesUntilReset = false;
   globalObj->channelResetSwich[channel] = true;
 
   if (globalObj->chainModeMasterChannel[globalObj->chainModeIndex] == channel)
@@ -242,7 +241,7 @@ BEGINCURRENTFRAME:
 
 void Sequencer::calculateActiveStep()
 {
-  uint8_t lastActiveStep = activeStep;
+  lastActiveStep = activeStep;
   currentFrame = this->getCurrentFrame();
 
   if (currentFrame >= framesPerSequence())
@@ -315,14 +314,7 @@ void Sequencer::calculateActiveStep()
   if (activeStep != lastActiveStep)
   {
     swingCount += 1;
-    /*
-    Serial.println(String(millis()) +" ch:" + String(channel) + " activeStep "  + String( activeStep ) + "\tlastActiveStep:" + String(lastActiveStep) + "\tcurrentFrame: " + String(currentFrame) );
-    if( (channel == globalObj->chainModeMasterChannel) && globalObj->waitingToResetAfterPatternLoad){
-  //    this->clockReset(true);
-      return;
-    }
-    */
-  }
+  } 
 }
 
 bool Sequencer::isFrameSwinging(uint32_t frame)
@@ -409,6 +401,18 @@ void Sequencer::sequenceModeStandardStep()
   }
   calculateActiveStep();
 
+  if(lastActiveStep != activeStep){
+    if (stepData[activeStep].noteStatus == CURRENTLY_PLAYING || stepData[activeStep].noteStatus == BETWEEN_APEGGIATIONS)
+      {
+        Serial.println("resetting arpeggio " + String(activeStep));
+        noteShutOff(activeStep, stepData[activeStep].gateOff());
+        stepData[activeStep].framesRemaining = 0;
+        stepData[activeStep].noteStatus = AWAITING_TRIGGER;
+        stepData[activeStep].arpStatus = 0;
+      }
+  }
+
+
   //if(stepData[activeStep].noteStatus == CURRENTLY_PLAYING
 
   for (int stepNum = 0; stepNum <= (firstStep + stepCount); stepNum++)
@@ -456,19 +460,18 @@ void Sequencer::sequenceModeStandardStep()
       break;
     }
   }
-
+  // I might be able to combine the between arpeggiations part above
+  // and the awaiting trigger part below, to just be triggered entirely by getArpStartFrame
+  // 
   if (stepData[activeStep].noteStatus == AWAITING_TRIGGER)
   {
     if (stepData[activeStep].gateType != GATETYPE_REST)
     {
-      if (stepData[activeStep].noteStatus == CURRENTLY_PLAYING)
-      {
-        noteShutOff(activeStep, stepData[activeStep].gateOff()); // this can probably be deleted, right?
-      }
+      
       stepData[activeStep].arpStatus = 0;
       arpTypeModulated[activeStep] = min_max(stepData[activeStep].arpType + outputControl->cvInputCheck(cv_arptypemod) / 20, 0, 5);
       arpOctaveModulated[activeStep] = min_max(stepData[activeStep].arpOctave + outputControl->cvInputCheck(cv_arpoctmod) / 20, 1, 5);
-      arpSpeedModulation[activeStep] = outputControl->cvInputCheck(cv_arpspdmod) / 15;
+      arpSpeedModulation[activeStep] = outputControl->cvInputCheck(cv_arpspdmod);// / 15;
       noteTrigger(activeStep, stepData[activeStep].gateTrig(), arpTypeModulated[activeStep], arpOctaveModulated[activeStep]);
       stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
       //Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));
@@ -492,5 +495,4 @@ void Sequencer::sequenceModeStandardStep()
   //   }
   //   Serial.println(" ");
   // }
-  previousActiveStepSeqMode = activeStep;
 }

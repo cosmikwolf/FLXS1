@@ -86,7 +86,7 @@ public:
   uint16_t adcCalibrationPos[4];
   uint16_t adcCalibrationNeg[4];
   uint16_t adcCalibrationOffset[4];
-  uint16_t cvInputRaw[12];
+  int16_t cvInputRaw[12];
   uint8_t gateInputRose[9];
   uint8_t gateInputRaw[9];
 
