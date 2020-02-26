@@ -29,7 +29,6 @@ class InputModule
 public:
   InputModule();
   Encoder knob;
-  //Encoder knob;
   Zetaohm_MAX7301* midplaneGPIO;
   Zetaohm_MAX7301* backplaneGPIO;
   OutputController* outputControl;
