@@ -15,55 +15,10 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock *clockMaste
   delay(100);
   oled.setBrightness(16);
   oled.setTextWrap(false);
-  //oled.setFont(&Font);//this will load the font
-  oled.fillScreen(BLACK);
-  delay(10);
-  oled.fillScreen(RED);
-  delay(10);
-  oled.fillScreen(ORANGE);
-  delay(10);
-  oled.fillScreen(YELLOW);
-  delay(10);
-  oled.fillScreen(GREEN);
-  delay(10);
-  oled.fillScreen(BLUE);
-  delay(10);
-  oled.fillScreen(NAVY);
-  delay(10);
-  oled.fillScreen(PURPLE);
-  delay(10);
-  oled.fillScreen(RED);
-  delay(10);
   oled.fillScreen(ORANGE, YELLOW);
   oled.setFont(&OrbitBold_14); //this will load the font
   oled.setTextScale(1);
   oled.setCursor(0, 0);
-  oled.println("MAKE MUSIC");
-  delay(10);
-  oled.println("MAKE MUSIC");
-  delay(10);
-  oled.println("MAKE MUSIC");
-  delay(10);
-  oled.println("MAKE MUSIC");
-  delay(10);
-  oled.println("MAKE MUSIC");
-  delay(10);
-  oled.println("MAKE MUSIC");
-  delay(100);
-  oled.fillScreen(GREEN, ORANGE);
-  oled.setCursor(0, 0);
-  oled.println("NOT WAR");
-  delay(15);
-  oled.println("NOT WAR");
-  delay(15);
-  oled.println("NOT WAR");
-  delay(15);
-  oled.println("NOT WAR");
-  delay(15);
-  oled.println("NOT WAR");
-  delay(15);
-  oled.println("NOT WAR");
-  delay(15);
   delay(100);
   oled.fillScreen(BLUE, GREEN);
   delay(50);
@@ -71,7 +26,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock *clockMaste
   delay(50);
   oled.fillScreen(LIGHTPINK, LIGHTGREEN);
   delay(50);
-  oled.fillScreen(NAVY);
+  oled.fillScreen(BLACK);
   oled.setCursor(CENTER, 8);
   oled.setTextColor(LIGHTGREEN);
   oled.setFont(&LadyRadical_16); //this will load the font
@@ -81,14 +36,14 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock *clockMaste
   oled.setFont(&NeueHaasXBlack_28); //this will load the font
 
   oled.setCursor(CENTER, 35);
-  oled.setTextColor(LIGHTGREEN);
+  oled.setTextColor(ORANGE);
   oled.setTextScale(1);
   oled.println("FLXS1");
   oled.setFont(&flxs1_menu); //this will load the font
   oled.setTextScale(1);
-  oled.setTextColor(LIGHTGREEN);
+  // oled.setTextColor(RED);
   oled.setCursor(100, 110);
-  oled.println("BETA v19a");
+  oled.println("beta v20b1");
   this->midiControl = midiControl;
   this->freeDisplayCache();
 

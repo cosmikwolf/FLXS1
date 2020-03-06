@@ -196,13 +196,14 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			}
 		}
 
-		stepData[stepNum].framesRemaining += ((int32_t)stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod)) / 64 ;
-		Serial.println(
-		"cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +
-		"\tframes: " + String(stepData[stepNum].framesRemaining) +
-		"\t\taddval: " + String((stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod))/64  )  +
-		"\t\tarpstaus: " + String(stepData[stepNum].arpStatus)
-		);
+		stepData[stepNum].framesRemaining += (int32_t)stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod) / 64 ;
+
+		// Serial.println(
+		// "cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +
+		// "\tframes: " + String(stepData[stepNum].framesRemaining) +
+		// "\t\taddval: " + String((stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod))/64  )  +
+		// "\t\tarpstaus: " + String(stepData[stepNum].arpStatus)
+		// );
 
 		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 64;
 		if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
