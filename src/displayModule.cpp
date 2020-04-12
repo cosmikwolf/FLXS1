@@ -928,10 +928,14 @@ void DisplayModule::stateDisplay_pitch(char *buf)
     displayElement[0] = strdup(buf);
     if (globalObj->multi_pitch_switch)
     {
-
-      sprintf(buf, "%d-%d",
-              globalObj->multi_pitch / sequenceArray[globalObj->selectedChannel].quantizeScale, globalObj->multi_pitch % sequenceArray[globalObj->selectedChannel].quantizeScale);
-      displayElement[1] = strdup(buf);
+      switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
+        case 12:
+          displayElement[1] = strdup(midiNotes[globalObj->multi_pitch % 128] );
+          break;
+        default:
+      sprintf(buf, "%d-%d", globalObj->multi_pitch / sequenceArray[globalObj->selectedChannel].quantizeScale, globalObj->multi_pitch % sequenceArray[globalObj->selectedChannel].quantizeScale);
+          displayElement[1] = strdup(buf);
+      }
     }
     else
     {
@@ -1003,25 +1007,14 @@ void DisplayModule::stateDisplay_pitch(char *buf)
     }
     displayElement[10] = strdup(buf);
 
-    sprintf(buf, "%d-%d",
-
-            sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0) / sequenceArray[globalObj->selectedChannel].quantizeScale,
-            sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0) % sequenceArray[globalObj->selectedChannel].quantizeScale);
-    displayElement[1] = strdup(buf);
-    // switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
-    //   case COLUNDI:
-    //     displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
-    //   break;
-    //   case SEMITONE:
-    //     displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantize_semitone_pitch(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[globalObj->selectedChannel].quantizeKey, sequenceArray[globalObj->selectedChannel].quantizeMode, 0)]);
-    //     //displayElement[1] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
-    //   break;
-    //   case TET_17:
-    //     displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
-    //   break;
-    //   default:
-    //   displayElement[1] = strdup(String(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]).c_str());
-    // }
+    switch(sequenceArray[globalObj->selectedChannel].quantizeScale){
+      case 12:
+        displayElement[1] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0) % 128] );
+        break;
+      default:
+        sprintf(buf, "%d-%d", sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0) / sequenceArray[globalObj->selectedChannel].quantizeScale, sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0) % sequenceArray[globalObj->selectedChannel].quantizeScale);
+        displayElement[1] = strdup(buf);
+    }
 
     if (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateType == GATETYPE_REST)
     {

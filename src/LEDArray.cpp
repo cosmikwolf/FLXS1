@@ -188,15 +188,25 @@ void LEDArray::patternSelectSaveHandler()
 
 void LEDArray::quantizeModeLEDHandler()
 {
+  
+  uint8_t current_note = sequenceArray[globalObj->selectedChannel].getStepPitch(sequenceArray[globalObj->selectedChannel].activeStep, 0) % sequenceArray[globalObj->selectedChannel].quantizeScale;
+  
+  current_note = globalObj->quantize_edo_scale_degree_to_key(current_note, sequenceArray[globalObj->selectedChannel].quantizeKey, sequenceArray[globalObj->selectedChannel].quantizeMode, sequenceArray[globalObj->selectedChannel].quantizeScale, 0);
+
   for (int i = 0; i < 16; i++)
   {
     if (sequenceArray[globalObj->selectedChannel].quantizeMode & (1 << i))
     {
-      leds.setPixelColor(ledMainMatrix[i], 0, 255, 0, 255);
+      leds.setPixelColor(ledMainMatrix[i], 128, 192, 128, 64);
     }
     else
     {
-      leds.setPixelColor(ledMainMatrix[i], 255, 0, 255, 0);
+      leds.setPixelColor(ledMainMatrix[i], 32, 16, 16, 0);
+    }
+
+    if (globalObj->playing && current_note < 16 && sequenceArray[globalObj->selectedChannel].stepData[sequenceArray[globalObj->selectedChannel].activeStep].gateType != GATETYPE_REST )
+    {
+      leds.setPixelColor(ledMainMatrix[current_note], 255,255,255 , 255);
     }
   }
   // for (int i = 12; i < 16; i++)
