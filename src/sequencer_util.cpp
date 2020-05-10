@@ -67,10 +67,10 @@ void Sequencer::initializeStep(uint8_t stepNum)
 	{
 		return;
 	}
-	this->stepData[stepNum].pitch[0] = DEFAULT_PITCH0_VAL;
-	for (int i = 1; i < 4; i++)
+
+	for (int i = 0; i < 4; i++)
 	{
-		this->stepData[stepNum].pitch[i] = 0;
+		this->setStepPitch(stepNum, DEFAULT_PITCH0_VAL, i);
 	}
 	this->stepData[stepNum].chord = 0;
 	this->stepData[stepNum].gateType = DEFAULT_GATETYPE;
@@ -89,6 +89,8 @@ void Sequencer::initializeStep(uint8_t stepNum)
 	this->stepData[stepNum].arpStatus = 0;
 	this->stepData[stepNum].notePlaying = 0;
 	this->stepData[stepNum].framesRemaining = 0;
+
+
 }
 
 bool Sequencer::hasData()
@@ -285,12 +287,9 @@ void Sequencer::randomize(uint8_t parameter)
 
 		for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++)
 		{
-			this->stepData[stepNum].pitch[0] = globalObj->generateRandomNumber(globalObj->randomizeLow, highval);
+			this->setStepPitch(stepNum, globalObj->generateRandomNumber(globalObj->randomizeLow, highval), 0);
 			this->stepData[stepNum].gateType = globalObj->generateRandomNumber(0, 2);
 			this->stepData[stepNum].gateLength = globalObj->generateRandomNumber(1, 10);
-			;
-			//Serial.print(String(stepData[stepNum].pitch[0]) + " ");
-			//if (stepNum % 16 == 0) 			Serial.println(" ");
 		}
 		//Serial.println(" ");
 		break;
@@ -298,7 +297,7 @@ void Sequencer::randomize(uint8_t parameter)
 		highval = min_max(globalObj->randomizeLow + 12 * globalObj->randomizeSpan, 0, 127);
 		for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++)
 		{
-			this->stepData[stepNum].pitch[0] = globalObj->generateRandomNumber(globalObj->randomizeLow, highval);
+			this->setStepPitch(stepNum, globalObj->generateRandomNumber(globalObj->randomizeLow, highval), 0);
 		}
 		break;
 	case RANDOMIZE_PARAM_GATE:
@@ -306,7 +305,6 @@ void Sequencer::randomize(uint8_t parameter)
 		{
 			this->stepData[stepNum].gateType = globalObj->generateRandomNumber(0, 2);
 			this->stepData[stepNum].gateLength = globalObj->generateRandomNumber(1, 10);
-			;
 		}
 		break;
 	case RANDOMIZE_PARAM_CV2_TYPE:
