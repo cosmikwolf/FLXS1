@@ -1,9 +1,0 @@
-<map id="src/FlashMemoryCache.cpp" name="src/FlashMemoryCache.cpp">
-<area shape="rect" id="node3" href="$_flash_memory_8h.html" title="FlashMemory.h" alt="" coords="762,79,874,104"/>
-<area shape="rect" id="node8" href="$serial_flash_print_8h.html" title="serialFlashPrint.h" alt="" coords="1221,152,1345,177"/>
-<area shape="rect" id="node10" href="$global_8h.html" title="global.h" alt="" coords="238,385,306,411"/>
-<area shape="rect" id="node11" href="$_sequencer_8h.html" title="Sequencer.h" alt="" coords="515,152,611,177"/>
-<area shape="rect" id="node12" href="$_output_controller_8h.html" title="OutputController.h" alt="" coords="754,225,884,251"/>
-<area shape="rect" id="node19" href="$_step_datum_8h.html" title="StepDatum.h" alt="" coords="93,385,193,411"/>
-<area shape="rect" id="node18" href="$midi_module_8h.html" title="midiModule.h" alt="" coords="310,305,411,331"/>
-</map>

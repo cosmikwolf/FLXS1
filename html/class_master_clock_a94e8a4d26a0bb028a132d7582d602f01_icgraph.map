@@ -1,5 +1,0 @@
-<map id="MasterClock::checkGateClock" name="MasterClock::checkGateClock">
-<area shape="rect" id="node2" href="$class_master_clock.html#ab64882eca80c7e2de0b9e57020661df9" title="MasterClock::externalClockTick" alt="" coords="253,12,461,37"/>
-<area shape="rect" id="node3" href="$class_master_clock.html#a6d2a014da8caf9c4f39917ce4c09b83d" title="MasterClock::masterClockFunc" alt="" coords="509,12,715,37"/>
-<area shape="rect" id="node4" href="$class_time_controller.html#af3df3fed28e3d6a6a23da80b7d9e579e" title="TimeController::masterClock\lHandler" alt="" coords="763,5,953,44"/>
-</map>

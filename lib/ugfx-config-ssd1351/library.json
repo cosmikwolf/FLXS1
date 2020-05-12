@@ -1,0 +1,12 @@
+{
+    "name" : "ugfx-config-ssd1351",
+    "version": "0.1",
+    "build": {
+        "srcDir" : "src",
+        "srcFilter" : [
+            "+<*.c>",
+            "+<*.h>"
+        ]
+    }
+
+}

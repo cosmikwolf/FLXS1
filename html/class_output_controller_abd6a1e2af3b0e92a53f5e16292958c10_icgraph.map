@@ -1,8 +1,0 @@
-<map id="OutputController::allNotesOff" name="OutputController::allNotesOff">
-<area shape="rect" id="node2" href="$class_input_module.html#a1f93d0b1fc3269147f4d03a888ddb631" title="InputModule::altButtonHandler" alt="" coords="247,7,448,32"/>
-<area shape="rect" id="node5" href="$class_master_clock.html#a96924e6693fee4ac2f9994583d0f33ba" title="MasterClock::internalClockTick" alt="" coords="246,57,449,83"/>
-<area shape="rect" id="node3" href="$class_input_module.html#ad481ab7241ffe3a168e063a5afd6d892" title="InputModule::loop" alt="" coords="537,7,664,32"/>
-<area shape="rect" id="node4" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="752,5,963,31"/>
-<area shape="rect" id="node6" href="$class_master_clock.html#a6d2a014da8caf9c4f39917ce4c09b83d" title="MasterClock::masterClockFunc" alt="" coords="497,59,704,84"/>
-<area shape="rect" id="node7" href="$class_time_controller.html#af3df3fed28e3d6a6a23da80b7d9e579e" title="TimeController::masterClock\lHandler" alt="" coords="763,55,953,93"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="InputModule::altButtonHandler" name="InputModule::altButtonHandler">
-<area shape="rect" id="node2" href="$class_input_module.html#a2e678e1a6f2d7b9f91a6e6f1e3125e89" title="InputModule::channelButton\lShiftHandler" alt="" coords="257,5,445,44"/>
-<area shape="rect" id="node3" href="$class_input_module.html#ac6242c4331441ba020d2fca7bff7a401" title="InputModule::changeState" alt="" coords="495,72,672,97"/>
-<area shape="rect" id="node5" href="$class_input_module.html#a62ad05f2e4880aeae014d99ecfcd494d" title="InputModule::channelButton\lHandler" alt="" coords="257,120,445,159"/>
-<area shape="rect" id="node6" href="$global_8cpp.html#aeddfefe61681b99486efc7774bb0cc46" title="positive_modulo" alt="" coords="292,183,410,208"/>
-<area shape="rect" id="node7" href="$class_output_controller.html#abd6a1e2af3b0e92a53f5e16292958c10" title="OutputController::allNotesOff" alt="" coords="255,232,447,257"/>
-<area shape="rect" id="node4" href="$class_input_module.html#a1bbac8d8d543c1adfdaa955f251db63a" title="InputModule::resetKnobValues" alt="" coords="720,99,923,124"/>
-</map>

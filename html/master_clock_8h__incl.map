@@ -1,9 +1,0 @@
-<map id="src/masterClock.h" name="src/masterClock.h">
-<area shape="rect" id="node3" href="$_output_controller_8h.html" title="OutputController.h" alt="" coords="943,79,1073,104"/>
-<area shape="rect" id="node16" href="$global_8h.html" title="global.h" alt="" coords="1047,312,1115,337"/>
-<area shape="rect" id="node17" href="$_sequencer_8h.html" title="Sequencer.h" alt="" coords="937,239,1034,264"/>
-<area shape="rect" id="node22" href="$midi_module_8h.html" title="midiModule.h" alt="" coords="1368,159,1469,184"/>
-<area shape="rect" id="node9" href="$_flash_memory_8h.html" title="FlashMemory.h" alt="" coords="325,159,438,184"/>
-<area shape="rect" id="node14" href="$serial_flash_print_8h.html" title="serialFlashPrint.h" alt="" coords="319,239,444,264"/>
-<area shape="rect" id="node18" href="$_step_datum_8h.html" title="StepDatum.h" alt="" coords="924,312,1023,337"/>
-</map>

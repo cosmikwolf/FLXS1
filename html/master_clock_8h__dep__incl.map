@@ -1,7 +1,0 @@
-<map id="src/masterClock.h" name="src/masterClock.h">
-<area shape="rect" id="node2" href="$input_module_8h.html" title="src/inputModule.h" alt="" coords="76,79,203,104"/>
-<area shape="rect" id="node4" href="$_time_controller_8h.html" title="src/TimeController.h" alt="" coords="170,152,310,177"/>
-<area shape="rect" id="node6" href="$master_clock_8cpp.html" title="src/masterClock.cpp" alt="" coords="277,79,419,104"/>
-<area shape="rect" id="node3" href="$input_module_8cpp.html" title="src/inputModule.cpp" alt="" coords="5,152,146,177"/>
-<area shape="rect" id="node5" href="$_time_controller_8cpp.html" title="src/TimeController.cpp" alt="" coords="163,225,317,251"/>
-</map>

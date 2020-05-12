@@ -1,6 +1,0 @@
-<map id="min_max" name="min_max">
-<area shape="rect" id="node2" href="$class_input_module.html#af8193a3e5f84adb8a139d624742b8c6a" title="InputModule::channelPitch\lModeInputHandler" alt="" coords="137,5,315,44"/>
-<area shape="rect" id="node5" href="$class_input_module.html#a30c140bcc298b2c7c382ef290e77071f" title="InputModule::channelVelocity\lModeInputHandler" alt="" coords="129,68,324,107"/>
-<area shape="rect" id="node3" href="$class_input_module.html#ad481ab7241ffe3a168e063a5afd6d892" title="InputModule::loop" alt="" coords="372,44,499,69"/>
-<area shape="rect" id="node4" href="$class_time_controller.html#ae1e9001e3739f3e077f4679b98650e91" title="TimeController::runLoopHandler" alt="" coords="547,44,758,69"/>
-</map>

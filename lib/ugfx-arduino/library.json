@@ -1,0 +1,11 @@
+{
+    "name" : "ugfx-arduino",
+    "version": "0.1",
+    "build" : {
+        "srcDir" : "src",
+        "srcFilter": [
+            "+<*.c>",
+            "+<*.h>"
+        ]
+    }
+}

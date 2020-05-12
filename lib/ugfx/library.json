@@ -1,0 +1,19 @@
+{
+	"name": "uGFX",
+	"description": "Portable graphics library",
+	"keywords": "library",
+	"version": "2.9",
+	"repository": {
+		"type": "git",
+		"url": "https://git.ugfx.io/uGFX/uGFX.git"
+	},
+	"build": {
+		"srcDir" : "",
+		"srcFilter": [
+			"+<*.c>",
+			"+<*.h>",
+			"+<src/*.c>",
+			"+<src/*.h>"
+		]
+	}
+}
