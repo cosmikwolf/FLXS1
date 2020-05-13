@@ -10,12 +10,10 @@
 	"build": {
 		"srcDir" : "",
         "srcFilter": [
-            "+<src/gfx.c>",
-			"+<src/gfx.h>",
-			"-<src/gfx_mk.c>",
+			"+<gfx.h>",
+			"+<src/gfx_mk.c>",
 			"+<src/gdisp/*.h",
 			"+<src/gdisp/*.c",
-            "-<src/*/*_mk.c>",
             "-<3rdparty/>",
             "-<boards/>",
             "-<demos/>",
