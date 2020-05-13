@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #include <ugfx-config-ssd1351.h>
 #include <SPI.h>
+#define kMosiPin 11
+#define kSpiClockPin 13
 
 void setup()
 {
@@ -16,7 +18,8 @@ void setup()
   coord_t   i, j;
 
   SPI.begin();
-
+  SPI.setMOSI(kMosiPin);
+  SPI.setSCK(kSpiClockPin);
   // Initialize and clear the display
   gfxInit();
 
