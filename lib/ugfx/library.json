@@ -9,11 +9,19 @@
 	},
 	"build": {
 		"srcDir" : "",
-		"srcFilter": [
-			"+<*.c>",
-			"+<*.h>",
-			"+<src/*.c>",
-			"+<src/*.h>"
-		]
-	}
+        "srcFilter": [
+            "+<src/gfx.c>",
+            "-<src/gfx_mk.c>",
+			"+<src/*/>",
+			"+<src/*/*/*.c>",
+			"+<src/gdisp/*",
+            "-<src/*/*_mk.c>",
+            "-<3rdparty/>",
+            "-<boards/>",
+            "-<demos/>",
+            "-<drivers/gdisp/QImage>",
+            "-<drivers/ginput/touch/Linux-Event>",
+            "-<drivers/>"
+        ] 
+    }
 }

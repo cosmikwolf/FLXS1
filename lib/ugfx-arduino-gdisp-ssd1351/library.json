@@ -1,6 +1,6 @@
 {
     "name" : "ugfx-arduino-gdisp-ssd1351",
-    "version": "0.1",
+    "version": "0.1`",
     "build" : {
         "srcDir" : "src",
         "srcFilter": [
