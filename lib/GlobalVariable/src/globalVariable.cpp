@@ -320,6 +320,7 @@ int16_t GlobalVariable::quantize_semitone_pitch(int16_t note, uint8_t quantize_k
   {
     scaleExpanded = 0xffff;
   }
+  
   uint8_t scaleDivisions = 12;
   scaleDivisions -= 1; //minus one for the octave. 11 notes in a 12-tet scale
   //Serial.print("note: " + String(note) + "\tquantizeMode: " + String(quantizeMode, BIN));

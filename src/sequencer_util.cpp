@@ -67,11 +67,10 @@ void Sequencer::initializeStep(uint8_t stepNum)
 	{
 		return;
 	}
-	this->stepData[stepNum].pitch[0] = DEFAULT_PITCH0_VAL;
-	for (int i = 1; i < 4; i++)
-	{
-		this->stepData[stepNum].pitch[i] = 0;
-	}
+	this->setStepPitch(stepNum, DEFAULT_PITCH0_VAL, 0);
+	this->stepData[stepNum].pitch[1] = 0;
+	this->stepData[stepNum].pitch[2] = 0;
+	this->stepData[stepNum].pitch[3] = 0;
 	this->stepData[stepNum].chord = 0;
 	this->stepData[stepNum].gateType = DEFAULT_GATETYPE;
 	this->stepData[stepNum].gateLength = 3;

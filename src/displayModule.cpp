@@ -1008,7 +1008,8 @@ void DisplayModule::stateDisplay_pitch(char *buf)
         displayElement[1] = strdup(colundiNotes[min_max(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0], 0, COLUNDINOTECOUNT)] );
       break;
       case 12:
-        displayElement[1] = strdup(midiNotes[(uint16_t)globalObj->quantize_semitone_pitch(sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0],  sequenceArray[globalObj->selectedChannel].quantizeKey, sequenceArray[globalObj->selectedChannel].quantizeMode, 0)]);
+        displayElement[1] = strdup(midiNotes[
+          sequenceArray[globalObj->selectedChannel].getStepPitch(globalObj->selectedStep, 0)  & 0xFF ]);
         // displayElement[1] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].pitch[0]]);
         //  displayElement[1] = '0x2';
       break;
