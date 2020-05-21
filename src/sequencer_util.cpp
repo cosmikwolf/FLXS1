@@ -11,7 +11,6 @@ void Sequencer::initialize(uint8_t ch, uint8_t stepCount, uint8_t beatCount, Out
 	this->beatCount = beatCount;
 	this->clockDivision = 4;
 	this->swingX100 = 50;
-	//this->beatLength = 60000000/(globalObj->tempoX100/100);
 	this->monophonic = true;
 	this->outputControl = outputControl;
 	this->globalObj = globalObj;
