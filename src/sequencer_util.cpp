@@ -283,20 +283,16 @@ void Sequencer::randomize(uint8_t parameter)
 
 		for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++)
 		{
-			this->stepData[stepNum].pitch[0] = globalObj->generateRandomNumber(globalObj->randomizeLow, highval);
+			this->setStepPitch(stepNum, globalObj->generateRandomNumber(globalObj->randomizeLow, highval), 0);
 			this->stepData[stepNum].gateType = globalObj->generateRandomNumber(0, 2);
 			this->stepData[stepNum].gateLength = globalObj->generateRandomNumber(1, 10);
-			;
-			//Serial.print(String(stepData[stepNum].pitch[0]) + " ");
-			//if (stepNum % 16 == 0) 			Serial.println(" ");
 		}
-		//Serial.println(" ");
 		break;
 	case RANDOMIZE_PARAM_PITCH:
 		highval = min_max(globalObj->randomizeLow + 12 * globalObj->randomizeSpan, 0, 127);
 		for (int stepNum = 0; stepNum < MAX_STEPS_PER_SEQUENCE; stepNum++)
 		{
-			this->stepData[stepNum].pitch[0] = globalObj->generateRandomNumber(globalObj->randomizeLow, highval);
+			this->setStepPitch(stepNum, globalObj->generateRandomNumber(globalObj->randomizeLow, highval), 0);
 		}
 		break;
 	case RANDOMIZE_PARAM_GATE:
