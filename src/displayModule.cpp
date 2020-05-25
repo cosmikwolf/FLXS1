@@ -395,7 +395,6 @@ void DisplayModule::displayModal(uint16_t ms, uint8_t select)
   modalMaxTime = ms;
   modalRefreshSwitch = true;
   this->modalSelect = select;
-  //  Serial.println("resetting modal timer");
 }
 
 void DisplayModule::createChList(char *buf)
@@ -1268,7 +1267,7 @@ void DisplayModule::stateDisplay_velocity(char *buf)
     displayElement[8] = strdup(buf);
     if ((sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocityType == 2) && (sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocity > 0))
     {
-      displayElement[2] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocity]);
+      displayElement[2] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].velocity & 0xFF]);
     }
     else
     {
@@ -2206,7 +2205,7 @@ void DisplayModule::noteDisplayHandler()
   uint8_t currentStep = sequenceArray[globalObj->selectedChannel].getActivePage() * 16;
   for (int i = 0; i < 16; i++)
   {
-    displayElement[i] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[currentStep + i].pitch[0]]);
+    displayElement[i] = strdup(midiNotes[sequenceArray[globalObj->selectedChannel].stepData[currentStep + i].pitch[0] & 0xFF]);
     renderStringBox(i, DISPLAY_LABEL, 32 * (i % 4), 16 * (i / 4 + 1), 32, 16, false, STYLE1X, BLACK, GREEN);
   }
 

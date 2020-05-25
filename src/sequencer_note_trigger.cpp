@@ -7,6 +7,7 @@ uint16_t Sequencer::get_play_pitch(uint8_t stepNum, uint16_t *pitchArray,  uint8
 	uint8_t arpSteps = 4;
 	for (int i = 1; i < 4; i++)
 	{
+		#warning this might be a bug? pitch is 16 bits now...
 		if (stepData[stepNum].pitch[i] == 255)
 		{
 			arpSteps = arpSteps - 1;
