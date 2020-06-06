@@ -251,9 +251,9 @@ int GlobalVariable::generateRandomNumberIncludeZero(int minVal, int maxVal)
   }
 }
 
-uint16_t GlobalVariable::quantize_edo_scale_degree_to_dac_code(uint16_t scale_degree, uint8_t scale_divisions)
+uint16_t GlobalVariable::convert_edo_scale_degree_to_dac_code(uint16_t scale_degree, uint8_t scale_divisions)
 {                                                                //take scale degree input and output a dac code, based on an EDO scale
-  int single_division_dac_code = 65536 / (scale_divisions * 10); //10 octaves
+  uint16_t single_division_dac_code = 65536 / (scale_divisions * 10); //10 octaves
   return scale_degree * single_division_dac_code;
 };
 
@@ -274,6 +274,7 @@ uint16_t GlobalVariable::quantize_edo_dac_code_to_scale_degree(uint16_t dac_code
 uint16_t GlobalVariable::quantize_edo_scale_degree_to_key(uint16_t note, uint8_t quantize_key, uint64_t quantize_mode, uint8_t edo_division_count, bool direction)
 {
   uint8_t count = 0;
+  // uint16_t temp_note = note;
   if (note == 0)
   {
     note = 1;
@@ -283,12 +284,13 @@ uint16_t GlobalVariable::quantize_edo_scale_degree_to_key(uint16_t note, uint8_t
     quantize_mode = ~quantize_mode;
   }
 
-  edo_division_count -= 1; //minus one for the octave. 11 notes in a 12-tet scale
+  // quantize_key += 2; //offset the note to align midi note to quantize key mapping
+  // edo_division_count -= 1; //minus one for the octave. 11 notes in a 12-tet scale
   //Serial.print("note: " + String(note) + "\tquantize_mode: " + String(quantize_mode, BIN));
-  for (int i = 0; i < quantize_key; i++)
+  for (uint8_t i = 0; i < quantize_key; i++)
   {
     //bitwise rotation - 11 bits rotate to the right. Do it once for each scale degree
-    quantize_mode = (quantize_mode << 1) | ((0b01 << edo_division_count) & quantize_mode) >> edo_division_count;
+    quantize_mode = (quantize_mode << 1) | ((0b01 << (edo_division_count-1)) & quantize_mode) >> (edo_division_count-1);
   }
 
   while ((1 << (note % edo_division_count)) & ~quantize_mode)
@@ -307,7 +309,7 @@ uint16_t GlobalVariable::quantize_edo_scale_degree_to_key(uint16_t note, uint8_t
       break; // emergency break if while loop goes OOC
     }
   }
-  //Serial.println("\tScaleExpanded: " + String(scaleExpanded, BIN) + "\tquantizedNote: " + String(note) + "\tcount: " + String(count));
+  // Serial.println("\edo_division_count: " + String(edo_division_count) + "\tquantizedNote: " + String(note) + "\toriginal: " + String(temp_note));
   return note;
 }
 

@@ -171,7 +171,7 @@ public:
 
   int16_t quantize_semitone_pitch(int16_t note, uint8_t quantizeKey, uint16_t quantizeMode, bool direction);
 
-  uint16_t quantize_edo_scale_degree_to_dac_code(uint16_t scale_degree, uint8_t scale_divisions);
+  uint16_t convert_edo_scale_degree_to_dac_code(uint16_t scale_degree, uint8_t scale_divisions);
   uint16_t quantize_edo_dac_code_to_scale_degree(uint16_t dac_code, uint8_t scale_divisions);
   uint16_t quantize_edo_scale_degree_to_key(uint16_t note, uint8_t quantize_key, uint64_t quantizeMode, uint8_t edo_division_count, bool direction);
 

@@ -783,7 +783,7 @@ uint16_t OutputController::scale_degree_to_quantized_dac_output(uint8_t channel,
     quantized_dac_code = globalObj->quantize_edo_scale_degree_to_key(note, sequenceArray[channel].quantizeKey, sequenceArray[channel].quantizeMode, sequenceArray[channel].quantizeScale, 0);
     // quantized_dac_code = globalObj->quantize_edo_scale_degree_to_key(note, sequenceArray[channel].quantizeKey, 0, sequenceArray[channel].quantizeScale, 0);
     // Serial.printf("%04d ", quantized_dac_code);
-    quantized_dac_code = globalObj->quantize_edo_scale_degree_to_dac_code(quantized_dac_code, sequenceArray[channel].quantizeScale);
+    quantized_dac_code = globalObj->convert_edo_scale_degree_to_dac_code(quantized_dac_code, sequenceArray[channel].quantizeScale);
     // Serial.printf("%04d ", quantized_dac_code);
     if (pitchValue)
     {

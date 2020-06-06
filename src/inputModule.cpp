@@ -12,13 +12,10 @@ InputModule::InputModule() : knob(ENCODER1LEFTPIN, ENCODER1RIGHTPIN)
   //pinMode(ENCODER1RIGHTPIN, INPUT);
 
   knobRead = 0;
-  ;
   knobBuffer = 0;
-  ;
   knobPrevious = 0;
-  ;
   knobChange = 0;
-  ;
+
 };
 
 void InputModule::initialize(OutputController *outputControl, Zetaohm_MAX7301 *midplaneGPIO, Zetaohm_MAX7301 *backplaneGPIO, FlashMemory *saveFile, Sequencer *sequenceArray, MasterClock *clockMaster, DisplayModule *display, GlobalVariable *globalObj)

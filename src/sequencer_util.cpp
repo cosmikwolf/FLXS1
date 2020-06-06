@@ -166,7 +166,7 @@ uint16_t Sequencer::getStepPitch(uint8_t step, uint8_t index)
 
 void Sequencer::setStepPitch(uint8_t step, uint16_t pitch, uint8_t index)
 { //read in scale degree and save step data as dac_code, so it can be remapped to any other EDO
-	stepData[step].pitch[index] = globalObj->quantize_edo_scale_degree_to_dac_code(pitch, quantizeScale);
+	stepData[step].pitch[index] = globalObj->convert_edo_scale_degree_to_dac_code(pitch, quantizeScale);
 	Serial.println("step: " + String(step) + " pitch: " + String(pitch) + " index: " + String(index) + " set pitch: " + String(stepData[step].pitch[index]));
 };
 
