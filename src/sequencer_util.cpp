@@ -455,28 +455,28 @@ void Sequencer::stoppedTrig(uint8_t stepNum, bool onOff, bool gate)
 
 uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint16_t arpNum)
 {
-	uint32_t stepFrames = stepData[stepNum].stepStartFrame;
+	uint32_t start_frame = stepData[stepNum].stepStartFrame;
 	uint16_t arpFullSteps = arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum);
 	uint16_t arpRemainder = arpNum - arpFullSteps * getArpSpeedDenominator(stepNum) / getArpSpeedNumerator(stepNum);
 
 	if (swingX100 == 50)
 	{
-		stepFrames += arpNum * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum); //unscaled arp frames
+		start_frame += arpNum * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum); //unscaled arp frames
 	}
 	else if ((stepNum + swingSwitch + (arpNum * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum)) % 2))
 	{
-		stepFrames += arpFullSteps * getStepLength();																									//full steps within the arpeggiation
-		stepFrames += (getStepLength() * 2 * swingX100) / 100 - getStepLength();																		// swing step offset
-		stepFrames += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum)) * (200 - 2 * swingX100) / 100; //scaled arp frames
-																																						//Serial.println("+ swing Arp " + String(arpNum) + "\t" + String(stepFrames) + "\tarpFullSteps: " + String(arpFullSteps) + "\tarpRemainder: " + String(arpRemainder) + "\tinitialStepFrames: " + String( (stepNum-firstStep)*getStepLength()) + "\tswingOffset: " + String( (getStepLength() * 2 * swingX100)/ 100 - getStepLength()) + "\tstepLength: " +  String(getStepLength()));
+		start_frame += arpFullSteps * getStepLength();																									//full steps within the arpeggiation
+		start_frame += (getStepLength() * 2 * swingX100) / 100 - getStepLength();																		// swing step offset
+		start_frame += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum)) * (200 - 2 * swingX100) / 100; //scaled arp frames
+																																						//Serial.println("+ swing Arp " + String(arpNum) + "\t" + String(start_frame) + "\tarpFullSteps: " + String(arpFullSteps) + "\tarpRemainder: " + String(arpRemainder) + "\tinitialstart_frame: " + String( (stepNum-firstStep)*getStepLength()) + "\tswingOffset: " + String( (getStepLength() * 2 * swingX100)/ 100 - getStepLength()) + "\tstepLength: " +  String(getStepLength()));
 	}
 	else
 	{
-		stepFrames += arpFullSteps * getStepLength();																							  //full steps within the arpeggiation
-		stepFrames += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum)) * (2 * swingX100) / 100; //scaled arp frames
-																																				  //Serial.println("- swing Arp " + String(arpNum) + "\t" + String(stepFrames) + "\tarpFullSteps: " + String(arpFullSteps) + "\tarpRemainder: " + String(arpRemainder) + "\tinitialStepFrames: " + String( (stepNum-firstStep)*getStepLength()) + "\tswingOffset: " + String((getStepLength() * (100 - 2 * swingX100) )/ 100));
+		start_frame += arpFullSteps * getStepLength();																							  //full steps within the arpeggiation
+		start_frame += (arpRemainder * getStepLength() * getArpSpeedNumerator(stepNum) / getArpSpeedDenominator(stepNum)) * (2 * swingX100) / 100; //scaled arp frames
+																																				  //Serial.println("- swing Arp " + String(arpNum) + "\t" + String(start_frame) + "\tarpFullSteps: " + String(arpFullSteps) + "\tarpRemainder: " + String(arpRemainder) + "\tinitialstart_frame: " + String( (stepNum-firstStep)*getStepLength()) + "\tswingOffset: " + String((getStepLength() * (100 - 2 * swingX100) )/ 100));
 	};
-	return stepFrames;
+	return start_frame;
 };
 
 uint8_t Sequencer::getArpSpeedNumerator(uint8_t stepNum)

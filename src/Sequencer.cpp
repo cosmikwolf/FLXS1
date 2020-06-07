@@ -441,6 +441,7 @@ void Sequencer::sequenceModeStandardStep()
       {
         noteShutOff(stepNum, stepData[stepNum].gateOff());
         stepData[stepNum].noteStatus = BETWEEN_APEGGIATIONS;
+        #warning this line is not correct, get arp count doesnt work if there is cv input on arp speed
         if (stepData[stepNum].arpStatus > getArpCount(stepNum))
         {
           stepData[stepNum].noteStatus = NOTE_HAS_BEEN_PLAYED_THIS_ITERATION;
@@ -450,10 +451,9 @@ void Sequencer::sequenceModeStandardStep()
 
     case BETWEEN_APEGGIATIONS:
       // Arpeggio retrigger
-      if (currentFrame > getArpStartFrame(stepNum, stepData[stepNum].arpStatus))
+      if (currentFrame > stepData[stepNum].arpLastFrame)
       {
         //if ( getFramesRemaining(stepNum) <= 0 ) {
-        // Serial.println("arpRetrigger: "  + String(stepNum));
         noteTrigger(stepNum, stepData[stepNum].gateTrig(), arpTypeModulated[stepNum], arpOctaveModulated[stepNum]);
         stepData[stepNum].noteStatus = CURRENTLY_PLAYING;
       }

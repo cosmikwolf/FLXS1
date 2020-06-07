@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include "Math.h"
 #include "Sequencer.h"
 
 uint16_t Sequencer::get_play_pitch(uint8_t stepNum, uint16_t *pitchArray,  uint8_t arpTypeTrig, uint8_t arpOctaveTrig){
@@ -197,51 +198,24 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			}
 		}
 
-		if (outputControl->cvInputCheck(cv_arpspdmod) > 0 ){
+		stepData[stepNum].framesRemaining *= expf((float)outputControl->cvInputCheck(cv_arpspdmod)/32.0);
 
-			stepData[stepNum].framesRemaining += stepData[stepNum].framesRemaining * abs(outputControl->cvInputCheck(cv_arpspdmod)) / 64 ;
-
-		} else {
-			stepData[stepNum].framesRemaining -= (int32_t)stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod) / 64 ;
-			// stepData[stepNum].framesRemaining += (int32_t)stepData[stepNum].framesRemaining / abs(outputControl->cvInputCheck(cv_arpspdmod)* 64) ;
-		}
-
-
-		// Serial.println(
-		// "cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +
-		// "\tframes: " + String(stepData[stepNum].framesRemaining) +
-		// "\t\taddval: " + String((stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod))/64  )  +
-		// "\t\tarpstaus: " + String(stepData[stepNum].arpStatus)
-		// );
+		Serial.println(
+		"cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +
+		"\texp: " + String( expf((float)outputControl->cvInputCheck(cv_arpspdmod)/64.0)) +
+		"\tframes: " + String(stepData[stepNum].framesRemaining) +
+		"\tstepStartFrame: " + String(stepData[stepNum].stepStartFrame) +
+		"\tarplast: " + String(stepData[stepNum].arpLastFrame) +
+		"\t\tarpstaus: " + String(stepData[stepNum].arpStatus)
+		);
 
 		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 64;
-		if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
-		{
-			stepData[stepNum].arpLastFrame = getStepLength() / 64;
-		}
+		// if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
+		// {
+		// 	stepData[stepNum].arpLastFrame = getStepLength() / 64;
+		// }
 
 	}
-
-
-	// Serial.println(
-	// "millis: " + String(millis()) +
-	// "\tstepNum: " + String(stepNum) +
-	// "\tchannel: " + String(channel) +
-	// "\tpattern: " + String(pattern) +
-	// "\tgateLength: " + String(stepData[stepNum].gateLength) +
-	//"\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-	//"\tcurrentFrame: "  + String(currentFrame) +
-	//"\tswinging: " + String(swingCount % 2) +
-	//"\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-	// "\tgetStepLength: " + String(getStepLength()) +
-	// "\tarpStatus: "  + String(stepData[stepNum].arpStatus) +
-	// "\tarptype: "  + String(stepData[stepNum].arpType)
-	// );
-
-
-	//DEBUG_PRINT("clockDivNum:" + String(clockDivisionNum()) + "clockDivDen:" + String(clockDivisionDen()) );
-
-	//END INPUT MAPPING SECTION
 
 	if (!globalObj->waitingToResetAfterPatternLoad)
 	{
@@ -251,21 +225,4 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 		stepData[stepNum].arpStatus++;
 	}
-	else
-	{
-		// Serial.println("Prevented note from playing ch:" + String(channel) + "\tstep: " + String(stepNum) + "\t"+ String(globalObj->chainModeMasterPulseToGo));
-	}
-
-	//ensuring that gate is turned off before next step:
-	// uint8_t nextStep = stepCount;
-	// for(int nxtStp = stepNum + 1; nxtStp < stepCount; nxtStp++){
-	// 	if (stepData[nxtStp].gateType != GATETYPE_REST){
-	// 		nextStep = nxtStp;
-	// 		break;
-	// 	}
-	// }
-
-	// keeping track of the last triggered step 
-	// so the framesRemaining can be reset when
-	// a different step is triggered.
 }
