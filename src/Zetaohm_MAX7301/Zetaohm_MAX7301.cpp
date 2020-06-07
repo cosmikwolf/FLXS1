@@ -175,6 +175,11 @@ bool Zetaohm_MAX7301::roseCheck(){
 	return 0;
 }
 
+void Zetaohm_MAX7301::clear_transition_buffers(){
+	roseBuffer = 0;
+	fellBuffer = 0;
+};
+
 bool Zetaohm_MAX7301::activityCheck(){
 //   if ((fellBuffer) || roseBuffer){
 //     return 1;

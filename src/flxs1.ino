@@ -190,88 +190,13 @@ void setup()
   pinMode(A13, INPUT);
   pinMode(A14, INPUT);
   pinMode(A10, INPUT);
-  /* OctoSK6812 testing stuff
-  pinMode(2, OUTPUT);  // strip #1
-  pinMode(14, OUTPUT);  // strip #2
-  pinMode(7, OUTPUT);  // strip #3
-  pinMode(8, OUTPUT);  // strip #4
-  pinMode(6, OUTPUT);  // strip #5
-  pinMode(20, OUTPUT);  // strip #6
-  pinMode(21, OUTPUT);  // strip #7
-
-
-  octoLeds.begin();
-  colorWipe(0xFF000000, 5);delay(1000);
-  colorWipe(0x00FF0000, 5);delay(1000);
-  colorWipe(0x0000FF00, 5);delay(1000);
-  colorWipe(0x000000FF, 5);delay(1000);
-  */
-  //  adc->setConversionSpeed(ADC_LOW_SPEED); // change the conversion speed
-  // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-  //adc->setSamplingSpeed(ADC_HIGH_SPEED); // change the sampling speed
-  //
-  // for(int i =0; i<20; i++){
-  //   serialMidi.sendNoteOn(64+i, 127, 0);                                   // send midi note out
-  //   delay(200);
-  //   serialMidi.sendNoteOff(64+i,127, 0);
-  //   delay(100);
-  // }
-  // for(int i =0; i<20; i++){
-  //   serialMidi.sendNoteOn(64+i, 127, 1);                                   // send midi note out
-  //   delay(200);
-  //   serialMid  i.sendNoteOff(64+i,127, 1);
-  //   delay(100);
-  // }
-
   Serial.println("<<<--||-->>> Setup Complete <<<--||-->>>");
-
-  Serial.println(sizeof(sequence[0]));
-
-  Serial.println(sizeof(sequence[0].stepData));
-  //  Serial.println("TEST EQUATIONS");
-
-  //  for (int x=0; x < 16; x++){
-  //    Serial.println("X: " + String(x) + "\t x * 24 mod 5: " + String((x*24)%(5)));
-  //  }
 }
-
-/*
-void colorWipe(int color, int wait)
-{
-  for (int i=0; i < octoLeds.numPixels(); i++) {
-    octoLeds.setPixel(i, color);
-    octoLeds.show();
-    Serial.println("setting pixel num: " + String(i));
-    delay(wait);
-  }
-}
-
-void loop() {
-  colorWipe(0xFF000000, 5);delay(1000);
-  colorWipe(0x00FF0000, 5);delay(1000);
-  colorWipe(0x0000FF00, 5);delay(1000);
-  colorWipe(0x000000FF, 5);delay(1000);
-
-//  timeControl.runLoopHandler();
-}*/
 
 void loop()
 {
   timeControl.runLoopHandler();
-  /*  if(cyclesTimer > 20000000){
-    CPU_RESET_CYCLECOUNTER;
-    cyclesTimer = 0;
-  }
-  clockCycles = ARM_DWT_CYCCNT;
-  Serial.println("micros: " + String(cyclesTimer) + "\t\tclockCycles: " + String(clockCycles)  + "\tclock/millis: " + String(clockCycles/120)  + "\t diff: " + String((int)cyclesTimer-(int)clockCycles/120 ));
-  */
-  //  if (notefreq.available() && millis()%100) {
-  //   int note = notefreq.read()*100;
-  //   int prob = notefreq.probability()*100;
-  //   Serial.printf("Note: %d | Probability: %d", note, prob);
-  //   Serial.println("");
-  // }
-};
+}
 
 void usbNoteOff()
 {
@@ -288,37 +213,13 @@ void usbNoteOn(byte channel, byte note, byte velocity)
 // https://isocpp.org/wiki/faq/pointers-to-members
 void sequencerLoop()
 {
-  //  #ifdef LEDSBUSY
-  //    return;
-  //  #endif
-
   usbMIDI.read();
-  // timeControl.midiClockHandler();
   timeControl.sequencerHandler();
-  // if (Serial3.available() > 0) {
-  // 	int incomingByte = Serial3.read();
-  // 	Serial.print("UART received: ");
-  // 	Serial.println(incomingByte, DEC);
-  //    incomingByte = Serial3.read();
-  //   Serial.println(incomingByte, DEC);
-  // }
 }
 
 void masterLoop()
 {
   timeControl.masterClockHandler();
-  //  unsigned long    cycles = ARM_DWT_CYCCNT;
-  //  if(cycles > cycleIntervalCount * 10000 ){
-  //    cycleIntervalCount++;
-  //    if(cycleIntervalCount%2){
-  //      digitalWriteFast(CLOCK_PIN, HIGH);
-  //    } else {
-  //      digitalWriteFast(CLOCK_PIN, LOW);
-  //    }
-  //  }
-  //  Serial.println("cycles: " + String(cycles/65535) + "\tsinceLast: " + String(cycles-cyclesLast) + "\tcyclesPerMicros: " + String((cycles-cyclesLast)/cyclesTimer) + "\ttimer: " + String(cyclesTimer));
-  //  cyclesTimer = 0;
-  //  cyclesLast = cycles;
 }
 
 void LEDLoop()

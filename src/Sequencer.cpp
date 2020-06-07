@@ -471,7 +471,6 @@ void Sequencer::sequenceModeStandardStep()
       stepData[activeStep].arpStatus = 0;
       arpTypeModulated[activeStep] = min_max(stepData[activeStep].arpType + outputControl->cvInputCheck(cv_arptypemod) / 20, 0, 5);
       arpOctaveModulated[activeStep] = min_max(stepData[activeStep].arpOctave + outputControl->cvInputCheck(cv_arpoctmod) / 20, 1, 5);
-      arpSpeedModulation[activeStep] = outputControl->cvInputCheck(cv_arpspdmod);// / 15;
       noteTrigger(activeStep, stepData[activeStep].gateTrig(), arpTypeModulated[activeStep], arpOctaveModulated[activeStep]);
       stepData[activeStep].noteStatus = CURRENTLY_PLAYING;
       //Serial.println("Triggering Step: " + String(activeStep) + "\tppqPulseIndex: " + String(ppqPulseIndex ) + "\tppqModulo: "+String(pulsesPerBeat*stepCount/clockDivision)  + "\tppB: " + String(pulsesPerBeat) + "\tstepCount: " + String(stepCount) + "\tclockdiv:" + String(clockDivision) + "\tnoteStatus: "+ String(stepData[activeStep].noteStatus));

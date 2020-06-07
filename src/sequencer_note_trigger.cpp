@@ -197,7 +197,15 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			}
 		}
 
-		stepData[stepNum].framesRemaining += (int32_t)stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod) / 64 ;
+		if (outputControl->cvInputCheck(cv_arpspdmod) > 0 ){
+
+			stepData[stepNum].framesRemaining += stepData[stepNum].framesRemaining * abs(outputControl->cvInputCheck(cv_arpspdmod)) / 64 ;
+
+		} else {
+			stepData[stepNum].framesRemaining -= (int32_t)stepData[stepNum].framesRemaining * outputControl->cvInputCheck(cv_arpspdmod) / 64 ;
+			// stepData[stepNum].framesRemaining += (int32_t)stepData[stepNum].framesRemaining / abs(outputControl->cvInputCheck(cv_arpspdmod)* 64) ;
+		}
+
 
 		// Serial.println(
 		// "cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +

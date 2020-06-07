@@ -481,11 +481,7 @@ uint32_t Sequencer::getArpStartFrame(uint8_t stepNum, uint16_t arpNum)
 
 uint8_t Sequencer::getArpSpeedNumerator(uint8_t stepNum)
 {
-	// if (arpSpeedModulation[stepNum] < 0){
-	// 	return min_max(stepData[stepNum].arpSpdNum - abs(arpSpeedModulation[stepNum]), 1, 64) ;
-	// } else {
 	return stepData[stepNum].arpSpdNum;
-	//}
 };
 uint8_t Sequencer::getArpSpeedDenominator(uint8_t stepNum)
 {

@@ -347,7 +347,6 @@ void InputModule::loop(uint16_t frequency)
   inputTimer = 0;
   knobPrevious = knobRead;
   knobRead = 1 * knob.read() / 4;
-  //knobRead = -1 * knob.read()/2  ;
   knobChange = knobRead - knobPrevious;
   midplaneGPIO->update();
 
@@ -366,6 +365,7 @@ void InputModule::loop(uint16_t frequency)
     case SYSEX_READYFORDATA:
       globalObj->sysex_status = SYSEX_IDLE;
       changeState(STATE_PITCH0);
+      return;
       break;
     case SYSEX_IMPORTING:
     case SYSEX_PROCESSING:
@@ -394,12 +394,6 @@ void InputModule::loop(uint16_t frequency)
       globalObj->parameterSelect = false;
     }
   }
-
-  // if(backplaneGPIO->pressed(SW_ENCODER_BACKPLANE) || midplaneGPIO->pressed(SW_SHIFT) ){ //encoder knob
-  //   globalObj->parameterSelect = true;
-  // } else {
-  //   globalObj->parameterSelect = false;
-  // }
 
   if (midplaneGPIO->fell(SW_SHIFT))
   {
@@ -431,7 +425,6 @@ void InputModule::loop(uint16_t frequency)
         }
 
         globalObj->tempoX100 = 6000000000 / (tempTempo / 4);
-        // clockMaster->changeTempo(globalObj->tempoX100);
         Serial.println("Setting tap tempo to: " + String(globalObj->tempoX100) + "\ttempTempo: " + String(tempTempo));
       }
     }
@@ -451,12 +444,15 @@ void InputModule::loop(uint16_t frequency)
   if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_PLAY) && midplaneGPIO->pressed(SW_MENU))
   {
     changeState(STATE_CALIBRATION);
+    return;
   }
 
   if (midplaneGPIO->pressed(SW_SHIFT) && midplaneGPIO->pressed(SW_REC))
   {
     changeState(STATE_INPUTDEBUG);
+    return;
   }
+
   if (knobChange)
   {
     switch (globalObj->currentMenu)
@@ -475,113 +471,109 @@ void InputModule::loop(uint16_t frequency)
   //we always want the alt (non matrix) buttons to behave the same way
 
   // now to handle the rest of the buttons.
-  bool didAltButtonsFire = altButtonHandler();
+  if(altButtonHandler()){
+    return;
+  }
 
-  if (didAltButtonsFire == false)
+  switch (globalObj->currentMenu)
   {
-    switch (globalObj->currentMenu)
+  case PITCH_GATE_MENU:
+  case ARPEGGIO_MENU:
+  case VELOCITY_MENU:
+    if (globalObj->multiSelectSwitch)
     {
-    case PITCH_GATE_MENU:
-    case ARPEGGIO_MENU:
-    case VELOCITY_MENU:
-      if (globalObj->multiSelectSwitch)
-      {
-        multiSelectInputHandler();
-      }
-      else
-      {
-        channelPitchModeInputHandler();
-      }
-      break;
-    case SEQUENCE_MENU:
-    case MOD_MENU_1:
-    case MOD_MENU_2:
-    case QUANTIZE_MENU:
-      sequenceMenuHandler();
-      break;
-    case INPUT_MENU:
-      inputMenuHandler();
-      break;
-
-    case SYSEX_MENU:
-    case GLOBAL_MENU_1:
-    case GLOBAL_MENU_2:
-    case GLOBAL_MENU_3:
-      globalMenuHandler();
-      break;
-
-    case INPUT_DEBUG_MENU:
-      if (knobChange)
-      {
-        selectedText = positive_modulo(selectedText + knobChange, 5);
-      }
-      break;
-
-    case PATTERN_SELECT:
-      patternSelectHandler();
-      break;
-
-    case TEMPO_MENU:
-      tempoMenuHandler();
-      break;
-
-    case CALIBRATION_MENU:
-      calibrationMenuHandler();
-      break;
-
-    case MENU_MODAL:
-      if (modalTimer > 1000)
-      {
-        changeState(STATE_PITCH0);
-      }
-      break;
-
-    case SAVE_MENU:
-      saveMenuInputHandler();
-      break;
-
-    case MENU_RANDOM:
-      randomShortcutHandler();
-      break;
-
-    case MENU_TRANSPOSE:
-      transposeShortcutHandler();
-      break;
-
-    case MENU_TUNER:
-      tunerShortcutHandler();
-      break;
-
-    case MENU_FILL:
-      fillShortcutHandler();
-      break;
-
-    case MENU_SKIP:
-      skipShortcutHandler();
-      break;
-
-    case MENU_CLKDIV:
-      clkdivShortcutHandler();
-      break;
-
-    case MENU_RESET:
-      resetShortcutHandler();
-      break;
-
-    case MENU_REVERSE:
-      reverseShortcutHandler();
-      break;
-
-    case MENU_PATTERN_CHAIN:
-    case MENU_CHAIN_HELP:
-      patternChainInputHandler();
-      break;
+      multiSelectInputHandler();
     }
+    else
+    {
+      channelPitchModeInputHandler();
+    }
+    break;
+  case SEQUENCE_MENU:
+  case MOD_MENU_1:
+  case MOD_MENU_2:
+  case QUANTIZE_MENU:
+    sequenceMenuHandler();
+    break;
+  case INPUT_MENU:
+    inputMenuHandler();
+    break;
+
+  case SYSEX_MENU:
+  case GLOBAL_MENU_1:
+  case GLOBAL_MENU_2:
+  case GLOBAL_MENU_3:
+    globalMenuHandler();
+    break;
+
+  case INPUT_DEBUG_MENU:
+    if (knobChange)
+    {
+      selectedText = positive_modulo(selectedText + knobChange, 5);
+    }
+    break;
+
+  case PATTERN_SELECT:
+    patternSelectHandler();
+    break;
+
+  case TEMPO_MENU:
+    tempoMenuHandler();
+    break;
+
+  case CALIBRATION_MENU:
+    calibrationMenuHandler();
+    break;
+
+  case MENU_MODAL:
+    if (modalTimer > 1000)
+    {
+      changeState(STATE_PITCH0);
+    }
+    break;
+
+  case SAVE_MENU:
+    saveMenuInputHandler();
+    break;
+
+  case MENU_RANDOM:
+    randomShortcutHandler();
+    break;
+
+  case MENU_TRANSPOSE:
+    transposeShortcutHandler();
+    break;
+
+  case MENU_TUNER:
+    tunerShortcutHandler();
+    break;
+
+  case MENU_FILL:
+    fillShortcutHandler();
+    break;
+
+  case MENU_SKIP:
+    skipShortcutHandler();
+    break;
+
+  case MENU_CLKDIV:
+    clkdivShortcutHandler();
+    break;
+
+  case MENU_RESET:
+    resetShortcutHandler();
+    break;
+
+  case MENU_REVERSE:
+    reverseShortcutHandler();
+    break;
+
+  case MENU_PATTERN_CHAIN:
+  case MENU_CHAIN_HELP:
+    patternChainInputHandler();
+    break;
   }
-  else
-  {
-    //  Serial.println("AltButton: " + String(didAltButtonsFire));
-  }
+  midplaneGPIO->clear_transition_buffers();
 }
 
 void InputModule::changeState(uint8_t targetState)
@@ -1722,6 +1714,7 @@ void InputModule::altButtonPatternHandler()
       display->displayModal(1000, MODAL_DIDDNTSAVE);
     }
     changeState(STATE_PITCH0);
+    return;
     break;
 
   default:
@@ -2040,7 +2033,7 @@ bool InputModule::altButtonHandler()
     if (this->channelButtonShortcutHandler())
     {
       return true;
-    };
+    }
   }
 
   // non matrix button loop
@@ -2063,6 +2056,8 @@ bool InputModule::altButtonHandler()
       case SW_REC:
         this->altButtonRecHandler();
         break;
+
+        
       case SW_STOP:
         this->altButtonStopHandler();
         break;
@@ -2076,6 +2071,7 @@ bool InputModule::altButtonHandler()
         this->altButtonShiftHandler();
         break;
       }
+      return true;
     }
     if (midplaneGPIO->rose(i))
     {
@@ -2147,10 +2143,7 @@ void InputModule::channelPitchModeInputHandler()
             }
           }
         }
-      }
-
-      if (!globalObj->playing)
-      {
+      } else {
         sequenceArray[globalObj->selectedChannel].stoppedTrig(globalObj->selectedStep, true, true);
       }
     }
@@ -2178,7 +2171,7 @@ void InputModule::channelPitchModeInputHandler()
           }
           //            sequenceArray[globalObj->selectedChannel].stepData[globalObj->selectedStep].gateLength = 1;
         }
-      }
+      } 
 
       lastselectedStep = globalObj->selectedStep;
       selectedStepTimer = 0;
@@ -2583,6 +2576,7 @@ void InputModule::saveMenuInputHandler()
       }
     }
   }
+  // midplaneGPIO->clear_transition_buffers();
 };
 
 void InputModule::debugScreenInputHandler()
