@@ -142,7 +142,10 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		// THIS INPUT MAPPING STILL NEEDS WORK.
 		// CUTS NOTES OFF WHEN GATE IS TOO LONG.
 		// NEED TO ADD WATCHDOG TO TURN NOTES OFF BEFORE A NEW ONE IS TRIGGERED
-		stepData[stepNum].framesRemaining += (2 * stepData[stepNum].gateLength + 2 + outputControl->cvInputCheck(cv_gatemod)) * framesPerBeat(globalObj->tempoX100) * clockDivisionNum() / (8 * clockDivisionDen());
+		#warning need to fix cv_gatemod input modulation
+		// stepData[stepNum].framesRemaining += ((uint32_t)stepData[stepNum].gateLength * getStepLength()) / 4 ;// + outputControl->cvInputCheck(cv_gatemod) * getStepLength();
+
+		stepData[stepNum].framesRemaining += (((uint32_t)stepData[stepNum].gateLength * FRAMES_PER_BEAT) / 4) * (uint32_t) clockDivisionNum() / (uint32_t)clockDivisionDen();
 
 		if (swingX100 != 50) 
 		{
@@ -158,30 +161,16 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 			}
 		}
 
-		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 5;
-
-		if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
-		{
-			stepData[stepNum].arpLastFrame = getStepLength() / 64;
-		}
-		//  Serial.println(
-		//  "stepNum: " + String(stepNum) +
-		//    "\tgateLength: " + String(stepData[stepNum].gateLength) +
-		//     "\tminmax: " + String(min_max(stepData[stepNum].framesRemaining, 1, 64 )) +
-		//  //"\tcurrentFrame: "  + String(currentFrame) +
-		//    "\tswinging: " + String(swingCount % 2) +
-		//  "\tFramesRem: " + String(stepData[stepNum].framesRemaining) +
-		//  "\tgetStepLength: " + String(getStepLength()) +
-		// "\tarptype: "  + String(stepData[stepNum].arpType)
-		//    );
+		// stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining - getStepLength()/8;
+		stepData[stepNum].arpLastFrame = 0;
 	}
 	else  // if it IS an arp weeeee!
 	{
 
-		stepData[stepNum].framesRemaining += framesPerBeat(globalObj->tempoX100) * clockDivisionNum();
+		stepData[stepNum].framesRemaining += FRAMES_PER_BEAT * clockDivisionNum();
+		stepData[stepNum].framesRemaining /= clockDivisionDen();
 		stepData[stepNum].framesRemaining *= getArpSpeedNumerator(stepNum);
 		stepData[stepNum].framesRemaining /= getArpSpeedDenominator(stepNum);
-		stepData[stepNum].framesRemaining /= clockDivisionDen();
 
 		if (swingX100 != 50)
 		{
@@ -200,22 +189,11 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 
 		stepData[stepNum].framesRemaining *= expf((float)outputControl->cvInputCheck(cv_arpspdmod)/32.0);
 
-		Serial.println(
-		"cv in: " + String(outputControl->cvInputCheck(cv_arpspdmod)) +
-		"\texp: " + String( expf((float)outputControl->cvInputCheck(cv_arpspdmod)/64.0)) +
-		"\tframes: " + String(stepData[stepNum].framesRemaining) +
-		"\tstepStartFrame: " + String(stepData[stepNum].stepStartFrame) +
-		"\tarplast: " + String(stepData[stepNum].arpLastFrame) +
-		"\t\tarpstaus: " + String(stepData[stepNum].arpStatus)
-		);
-
-		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining / 64;
-		// if (stepData[stepNum].arpLastFrame < getStepLength() / 64)
-		// {
-		// 	stepData[stepNum].arpLastFrame = getStepLength() / 64;
-		// }
+		stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining/2;
+		// stepData[stepNum].arpLastFrame = 0;
 
 	}
+
 
 	if (!globalObj->waitingToResetAfterPatternLoad)
 	{

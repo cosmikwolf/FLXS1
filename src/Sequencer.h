@@ -31,6 +31,7 @@ public:
 	//void  	clearNoteData(NoteDatum *noteData);
 	void noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
 	uint16_t get_play_pitch(uint8_t stepNum, uint16_t *pitchArray,  uint8_t arpTypeTrig, uint8_t arpOctaveTrig);
+	bool we_should_trigger_another_arpeggio(uint8_t stepNum);
 	void noteShutOff(uint8_t stepNum, bool gateOff);
 
 	void stoppedTrig(uint8_t stepNum, bool onOff, bool gate);
@@ -70,8 +71,6 @@ public:
 	void gateInputTrigger(uint8_t inputNum);
 
 	void randomize(uint8_t parameter);
-
-	uint32_t framesPerBeat(int tempoX100);
 
 	uint8_t clockDivisionNum()
 	{

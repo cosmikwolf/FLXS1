@@ -685,7 +685,7 @@ void OutputController::noteOn(uint8_t channel, uint8_t stepNum, uint16_t note, u
   globalObj->cvInputRaw[4 + 2 * channel] = note;
   //  globalObj->cvInputMapped[4+2*channel] = note;
 
-  //Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide) + "\tgate: " + String(gate));
+  // Serial.println("begin note on ch: " + String(channel) + "\tnote: " + String(note) + "\tvel: "+ String(velocity) + "\tglide: " + String(glide) + "\tgate: " + String(gate));
   if (gate)
   {
     if (backplaneGPIO->cacheCheck(channel) == 1 && tieFlag == 0)
@@ -1209,7 +1209,7 @@ uint8_t OutputController::outputMap(uint8_t channel, uint8_t mapType)
 
 void OutputController::noteOff(uint8_t channel, uint8_t note, bool gateOff)
 {
-  //Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note));
+  // Serial.println("    OutputController -- off ch:"  + String(channel) + " nt: " + String(note));
 
   if (gateOff)
   {

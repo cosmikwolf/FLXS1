@@ -200,6 +200,7 @@
 #define NOTE_HAS_BEEN_PLAYED_THIS_ITERATION 4 // 4 indicates that the note has been played this iteration
 #define CURRENTLY_ARPEGGIATING 5              // 4 indicates that the note has been played this iteration
 #define BETWEEN_APEGGIATIONS 6
+
 #define CURRENT_ARP_OFFSET 63 // difference between notestatus value and the current Arpeggiation note
 
 #define MAX_STEPS_PER_SEQUENCE 64

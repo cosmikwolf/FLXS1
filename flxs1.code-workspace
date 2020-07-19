@@ -10,7 +10,8 @@
 			"PLATFORMIO_CALLER": "vscode"
 		},
 		"workbench.colorCustomizations": {
-			"activityBar.background": "#491A4B",
+			"activityBar.background": "#3b3b3b",
+			"activityBar.foreground": "#ffffff",
 			"titleBar.activeBackground": "#66256A",
 			"titleBar.activeForeground": "#FDF9FD"
 		}
