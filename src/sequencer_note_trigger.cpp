@@ -162,7 +162,6 @@ void Sequencer::noteTrigger(uint8_t stepNum, bool gateTrig, uint8_t arpTypeTrig,
 		}
 
 		// stepData[stepNum].arpLastFrame = stepData[stepNum].framesRemaining - getStepLength()/8;
-		stepData[stepNum].arpLastFrame = 0;
 	}
 	else  // if it IS an arp weeeee!
 	{
