@@ -43,7 +43,7 @@ void DisplayModule::initialize(Sequencer *sequenceArray, MasterClock *clockMaste
   oled.setTextScale(1);
   // oled.setTextColor(RED);
   oled.setCursor(100, 110);
-  oled.println("beta v20b5");
+  oled.println(GIT_REV);
   this->midiControl = midiControl;
   this->freeDisplayCache();
 
