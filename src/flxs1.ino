@@ -169,18 +169,18 @@ void setup()
   //digitalWrite(1, LOW);
 
   //adc->enableInterrupts(ADC_1);
-  adc->setAveraging(4, ADC_1);   // set number of averages
-  adc->setResolution(16, ADC_1); // set bits of resolution
+  adc->adc1->setAveraging(4);   // set number of averages
+  adc->adc1->setResolution(16); // set bits of resolution
   //adc->setAveraging(8, ADC_0); // set number of averages
   //adc->setResolution(16, ADC_0); // set bits of resolution
-  adc->setReference(ADC_REFERENCE::REF_3V3, ADC_1);
+  adc->adc1->setReference(ADC_REFERENCE::REF_3V3);
   //adc->setReference(ADC_REF_3V3, ADC_1);
 
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED_16BITS, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
   // see the documentation for more information
-  adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED, ADC_1); // change the conversion speed
+  adc->adc1->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED); // change the conversion speed
   // it can be ADC_VERY_LOW_SPEED, ADC_LOW_SPEED, ADC_MED_SPEED, ADC_HIGH_SPEED or ADC_VERY_HIGH_SPEED
-  adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED, ADC_1); // change the sampling speed
+  adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED); // change the sampling speed
   // CLOCK PIN SETUP
 
   globalObj.setClockPortDirection(CLOCK_PORT_OUTPUT);

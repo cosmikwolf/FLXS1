@@ -12,3 +12,5 @@ FLXS1.srctrldb
 FLXS1.srctrlbm
 .Doxyfile.swp
 .travis.yml
+platforms
+packages
