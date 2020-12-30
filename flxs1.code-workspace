@@ -13,6 +13,7 @@
 			"activityBar.background": "#491A4B",
 			"titleBar.activeBackground": "#66256A",
 			"titleBar.activeForeground": "#FDF9FD"
-		}
+		},
+		"autoHide.autoHideSideBar": false
 	}
 }
