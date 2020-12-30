@@ -39,7 +39,7 @@
 
 #define SAVE_OPERATION_IN_PROGRESS  3
 #define SYSEX_OPERATION_IN_PROGRESS 2
-#define CACHE_UNAVAILABLE      255   // NO FREE CACHE AVAILABLE
+#define CACHE_UNAVAILABLE         255   // NO FREE CACHE AVAILABLE
 
 #ifndef _FlashMemory_h_
 #define _FlashMemory_h_
