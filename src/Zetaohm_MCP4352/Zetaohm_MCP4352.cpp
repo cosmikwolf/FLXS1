@@ -35,7 +35,7 @@ void Zetaohm_MCP4352::setResistance(uint8_t port, uint8_t value){
   writeByte(portAddress << 4, value);
 };
 
-uint8_t Zetaohm_MCP4352::readResistance(uint8_t port){
+uint16_t Zetaohm_MCP4352::readResistance(uint8_t port){
   uint8_t portAddress = 0x00;
   switch (port) {
     case 0:
@@ -52,7 +52,7 @@ uint8_t Zetaohm_MCP4352::readResistance(uint8_t port){
     break;
   }
 
-  readAddress((portAddress << 4) & 0x0C );
+  return readAddress((portAddress << 4) & 0x0C );
 };
 
 
