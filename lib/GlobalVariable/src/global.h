@@ -29,15 +29,14 @@
 #define kSerialSpeed 115200
 
 #define kMasterClockInterval 200
-#define kLedClockInterval 30000
+#define kLedClockInterval 50000
 #define kSequenceTimerInterval 600
-#define kPeripheralLoopTimer 15000
 #define kMidiClockInterval 1000
 #define kCacheClockInterval 10000
 #define kMosiPin 11
 #define kSpiClockPin 13
 
-#define DEBUG
+#define DEBUG 
 
 #ifdef DEBUG
 #define DEBUG_PRINT(x) Serial.println(x)

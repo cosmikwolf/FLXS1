@@ -1,6 +1,5 @@
 #ifndef _leds_h_
 #define _leds_h_
-#define FASTLED_ALLOW_INTERRUPTS 0
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>

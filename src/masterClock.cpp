@@ -30,7 +30,7 @@ void MasterClock::changeTempo(uint32_t newtempoX100){
 
 void MasterClock::masterClockFunc(){
 
-	digitalWriteFast(PIN_EXT_TX, HIGH);
+	// digitalWriteFast(PIN_EXT_TX, HIGH);
 
 	uint32_t clockPeriod = 120000000;
 	clockPeriod /= INTERNAL_PPQ_COUNT;
@@ -92,12 +92,12 @@ void MasterClock::internalMasterClockTick(uint32_t clockPeriod){
     if( extClockCounter >= EXTCLOCKDIV && globalObj->playing){
       outputControl->setClockOutput(HIGH);
       clearedToRunLoadOperation = true;
-      digitalWriteFast(PIN_EXT_AD_3, HIGH);
+    //   digitalWriteFast(PIN_EXT_AD_3, HIGH);
       serialMidi->sendRealTime(midi::Clock);
       extClockCounter = 0;
       //Serial.println("Clock Fire debugTimer: " + String(masterDebugTimer) + "\tclockPeriod: " + String(clockPeriod) + "\tclockCounter: " + String(clockCounter) + "\tinterval:" + String(kMasterClockInterval) + "\ttotalTimer: " + String(clockCounter * kMasterClockInterval) + "\ttotalClockCount: " + String(totalClockCount));
       //masterDebugTimer = 0;
-      digitalWriteFast(PIN_EXT_AD_3, LOW);
+    //   digitalWriteFast(PIN_EXT_AD_3, LOW);
     }
     //
     // totalClockCount++;
@@ -120,7 +120,7 @@ void MasterClock::internalMasterClockTick(uint32_t clockPeriod){
       outputControl->setClockOutput(LOW);
       displayRunSwitch = true;
       clearedToRunLoadOperation = true;
-      digitalWriteFast(PIN_EXT_AD_2, HIGH);
+    //   digitalWriteFast(PIN_EXT_AD_2, HIGH);
   }
 };
 
@@ -213,7 +213,7 @@ void MasterClock::midiMasterClockTick(uint32_t clockPeriod){
   if (outputControl->clockValue && !globalObj->midiSetClockOut) {
     outputControl->setClockOutput(LOW);
     displayRunSwitch = true;
-    digitalWriteFast(PIN_EXT_AD_2, HIGH);
+    // digitalWriteFast(PIN_EXT_AD_2, HIGH);
   }
 
   for (int i = 0; i < SEQUENCECOUNT; i++ ){

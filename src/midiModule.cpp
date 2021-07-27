@@ -22,7 +22,11 @@ void MidiModule::midiClockSyncFunc(midi::MidiInterface<HardwareSerial> *serialMi
   //  Serial.println("1: " + String(serialMidi->getData1()));
   //  Serial.println("2: " + String(serialMidi->getData2()));
   // }
-  serialMidi->read(1);
+  while(Serial3.available()){
+    // digitalWriteFast(PIN_EXT_AD_4, HIGH);
+    serialMidi->read();
+    // digitalWriteFast(PIN_EXT_AD_4, LOW);
+  }
   //interrupts();
 }
 

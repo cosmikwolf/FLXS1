@@ -3,7 +3,7 @@
 ********************************** */
 
 #include <Arduino.h>
-#include <Audio.h>
+// #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <malloc.h>
@@ -38,8 +38,6 @@ IntervalTimer MasterClockTimer;
 IntervalTimer LEDClockTimer;
 IntervalTimer SequencerTimer;
 IntervalTimer midiClockTimer;
-//IntervalTimer DisplayLoopTimer;
-//IntervalTimer PeripheralLoopTimer;
 
 MidiModule midiControl;
 
@@ -84,6 +82,7 @@ void setup()
 
   pinMode(7, INPUT);  //MIDI SERIAL PIN CONFIG
   pinMode(8, OUTPUT); //MIDI SERIAL PIN CONFIG
+
   Serial3.begin(31250);
   Serial3.clear();
   Serial3.setTX(8);
@@ -103,6 +102,7 @@ void setup()
   serialMidi.setHandleClock(midiClockPulseHandlerWrapper);
   serialMidi.setHandleNoteOn(midiNoteOnHandlerWrapper);
   serialMidi.setHandleNoteOff(midiNoteOffHandlerWrapper);
+  serialMidi.setHandleControlChange(midiControlChangeHandlerWrapper);
   serialMidi.setHandleStart(midiStartContinueHandlerWrapper);
   serialMidi.setHandleContinue(midiStartContinueHandlerWrapper);
   serialMidi.setHandleStop(midiStopHandlerWrapper);
@@ -128,27 +128,23 @@ void setup()
   //PeripheralLoopTimer.begin(peripheralLoop, kPeripheralLoopTimer);
   //PeripheralLoopTimer.priority(64);
 
-  LEDClockTimer.begin(LEDLoop, kLedClockInterval);
-  LEDClockTimer.priority(2);
-
-  MasterClockTimer.begin(masterLoop, kMasterClockInterval);
-  MasterClockTimer.priority(0);
-
   //  DisplayLoopTimer.begin(displayLoop,DISPLAY_INTERVAL);
   //  DisplayLoopTimer.priority(3);
-  SequencerTimer.begin(sequencerLoop, kSequenceTimerInterval);
-  SequencerTimer.priority(4);
-
-  //SPI.usingInterrupt(PeripheralLoopTimer);
-  SPI.usingInterrupt(SequencerTimer);
-  //SPI.usingInterrupt(LEDClockTimer);
 
   midiClockTimer.begin(midiTimerLoop, kMidiClockInterval);
-  //  MIDITimer.priority(0);
+  midiClockTimer.priority(10);
 
-  //  LEDTimer.begin(ledLoop, kLEDTimerInterval);
-  //  LEDTimer.priority(1);
+  MasterClockTimer.begin(masterLoop, kMasterClockInterval);
+  MasterClockTimer.priority(88);
 
+  LEDClockTimer.begin(LEDLoop, kLedClockInterval);
+  LEDClockTimer.priority(8);
+
+  SequencerTimer.begin(sequencerLoop, kSequenceTimerInterval);
+  SequencerTimer.priority(99);
+  SPI.usingInterrupt(SequencerTimer);
+
+  // SPI.usingInterrupt(LEDClockTimer);
   //CacheTimer.begin(cacheLoop,kCacheClockInterval);
   //CacheTimer.priority(2);
 
@@ -163,10 +159,6 @@ void setup()
 
   pinMode(3, OUTPUT);
   pinMode(24, OUTPUT);
-  //digitalWrite(3, HIGH);  //INPUT 1 for HIHG HIGH
-  //digitalWrite(24, HIGH);
-  //pinMode(1,OUTPUT);
-  //digitalWrite(1, LOW);
 
   //adc->enableInterrupts(ADC_1);
   adc->adc1->setAveraging(4);   // set number of averages
@@ -195,7 +187,9 @@ void setup()
 
 void loop()
 {
+  // digitalWriteFast(PIN_EXT_AD_3, HIGH);
   timeControl.runLoopHandler();
+  // digitalWriteFast(PIN_EXT_AD_3, LOW);
 }
 
 void usbNoteOff()
@@ -219,21 +213,26 @@ void sequencerLoop()
 
 void masterLoop()
 {
+  // digitalWriteFast(PIN_EXT_AD_2, HIGH);
   timeControl.masterClockHandler();
+  // digitalWriteFast(PIN_EXT_AD_2, LOW);
 }
 
 void LEDLoop()
 {
+  // digitalWriteFast(PIN_EXT_AD_1, HIGH);
   timeControl.ledClockHandler();
+  // digitalWriteFast(PIN_EXT_AD_1, LOW);
 }
 
 void midiTimerLoop()
 {
-  //  usbMIDI.read();
+  // digitalWriteFast(PIN_EXT_AD_4, HIGH);
   while (Serial3.available())
   {
-    timeControl.midiClockHandler();
+    serialMidi.read();
   }
+  // digitalWriteFast(PIN_EXT_AD_4, LOW);
 }
 
 void cacheLoop()
@@ -307,11 +306,34 @@ void midiSysexHandlerWrapper(const byte *data, uint16_t length, bool last)
 
 void midiClockPulseHandlerWrapper()
 {
-  //  timeControl.setDebugPin(3, HIGH);
   if (globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK)
     return;
+
+  // a bit of a hack here. The neopixel show() command sometimes keeps the midi input from receiving a clock signal.
+  // in order to compensate, we are checking the amount of time since the last clock pulse.
+  // if it is twice as long, it is very likely we skipped a clock, so trigger the clock pulse handler a second time.
+  static uint32_t last_clock_pulse_cyccnt = 0;
+  static uint32_t avg_cyccnt = 0;
+  uint32_t current_cyccnt = ARM_DWT_CYCCNT;
+
+  if (((current_cyccnt - last_clock_pulse_cyccnt) < 215 * avg_cyccnt / 100) && 
+      ((current_cyccnt - last_clock_pulse_cyccnt) > 185 * avg_cyccnt / 100))
+  { // if the last midi clock timing was between 195% to 205% it means that we probably missed a midi clock
+    // digitalWriteFast(PIN_EXT_TX, HIGH);
+    midiControl.midiClockPulseHandler(); // so trigger another midi clock pulse
+    // digitalWriteFast(PIN_EXT_TX, LOW);
+    // Serial.printf("avg: %u\tcurrent: %u -- DOUBLE CLOCK\r\n", avg_cyccnt, current_cyccnt - last_clock_pulse_cyccnt );
+  // } else {
+    // Serial.printf("avg: %u\tcurrent: %u \r\n", avg_cyccnt, current_cyccnt - last_clock_pulse_cyccnt );
+  } else {
+    // only take average of cycles which are not outside the norm
+    avg_cyccnt = (avg_cyccnt * 9 + (current_cyccnt - last_clock_pulse_cyccnt)) / 10;
+  }
+  last_clock_pulse_cyccnt = current_cyccnt;
+
+  // digitalWriteFast(PIN_EXT_TX, HIGH);
   midiControl.midiClockPulseHandler();
-  //  timeControl.setDebugPin(3, LOW);
+  // digitalWriteFast(PIN_EXT_TX, LOW);
 }
 
 void midiNoteOnHandlerWrapper(byte channel, byte note, byte velocity)
@@ -336,6 +358,11 @@ void midiStopHandlerWrapper()
   if (globalObj.clockMode != EXTERNAL_MIDI_35_CLOCK)
     return;
   midiControl.midiStopHandler();
+}
+
+void midiControlChangeHandlerWrapper()
+{
+  return;
 }
 
 void midiTimeCodePointerWrapper(uint8_t data)
