@@ -2036,7 +2036,7 @@ bool InputModule::altButtonHandler()
     }
   }
 
-  // non matrix button loop
+    // non matrix button loop
   for (uint8_t i = 16; i < 28; i++)
   {
     if (midplaneGPIO->fell(i))
@@ -2076,7 +2076,7 @@ bool InputModule::altButtonHandler()
     if (midplaneGPIO->rose(i))
     {
       //this section controls the behavior of the channel buttons on press
-      // if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
+      if(globalObj->currentMenu == PATTERN_SELECT || globalObj->currentMenu == SAVE_MENU) break;
       switch (i)
       {
       case SW_PGDN:
