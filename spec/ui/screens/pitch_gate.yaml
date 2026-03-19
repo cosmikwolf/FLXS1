@@ -1,0 +1,122 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp stateDisplay_pitch() ~line 895
+
+screen: pitch_gate
+menu_id: PITCH_GATE_MENU
+title: "stepdata"
+title_alt: "songmode"                  # when chainModeActive
+title_multiselect: "Multiselect"
+display_handler: stateDisplay_pitch
+notes: "Primary step editing screen. Shows pitch, gate length, gate type, and glide for the selected step."
+
+layout:
+  # Title bar
+  - element: 0
+    type: text
+    content: title
+    position: [0, 0]
+    size: [86, 16]
+    text_size: STYLE1X
+    color: "conditional — contrastColor when multiselect, else background/contrastColor"
+
+  # Channel + pattern info (top right)
+  - element: 2
+    type: text
+    content: "ch{n} pt{nn}"
+    position: [86, 0]
+    size: [42, 8]
+    text_size: REGULAR1X
+    color: [background, contrastColor]
+    binding: "globalObj->selectedChannel, sequenceArray[ch].pattern"
+
+  - element: 3
+    type: text
+    content: "stp:{nn}-{nn}"
+    position: [86, 8]
+    size: [42, 8]
+    text_size: REGULAR1X
+    color: "conditional — contrastColor or foreground based on chain mode"
+    binding: "notePage"
+
+  # Pitch value (large center)
+  - element: 1
+    type: text
+    content: "pitch note"
+    position: [0, 17]
+    size: [127, 27]
+    text_size: BOLD4X
+    color: [background, foreground]
+    highlight: STATE_PITCH0
+    binding: "stepData[selectedStep].pitch[0]"
+    format: "note display (midiNotes[] or octave-semitone or colundi)"
+
+  # Transpose indicator (when non-zero)
+  - element: 10
+    type: text
+    content: "+/-{n}"
+    position: [110, 25]
+    size: [17, 8]
+    text_size: REGULAR1X
+    color: [foreground, background]
+    binding: "sequenceArray[ch].transpose"
+    visible: "transpose != 0"
+
+  # Gate length
+  - element: 4
+    type: text
+    content: "gate{n}"
+    position: [0, 47]
+    size: [63, 16]
+    text_size: STYLE1X
+    color: [background, foreground]
+
+  - element: 5
+    type: text
+    content: "gate length value"
+    position: [63, 47]
+    size: [64, 16]
+    text_size: STYLE1X
+    color: [background, foreground]
+    highlight: STATE_GATELENGTH
+    binding: "stepData[selectedStep].gateLength"
+    format: "{whole}.{frac} beats"
+
+  # Gate type
+  - element: 8
+    type: text
+    content: "type:"
+    position: [0, 63]
+    size: [63, 16]
+    text_size: STYLE1X
+    color: [background, foreground]
+
+  - element: 7
+    type: text
+    content: "gate type name"
+    position: [63, 63]
+    size: [64, 16]
+    text_size: STYLE1X
+    color: [background, foreground]
+    highlight: STATE_GATETYPE
+    binding: "stepData[selectedStep].gateType"
+    format: "[off, on, tie, 1hit, hold, half, rand33%, rand50%, rand66%]"
+
+  # Glide
+  - element: 6
+    type: text
+    content: "glide"
+    position: [0, 79]
+    size: [63, 16]
+    text_size: STYLE1X
+    color: [background, foreground]
+
+  - element: 9
+    type: text
+    content: "glide value"
+    position: [63, 79]
+    size: [64, 16]
+    text_size: STYLE1X
+    color: [background, foreground]
+    highlight: STATE_GLIDE
+    binding: "stepData[selectedStep].glide"
+    format: "off or numeric"

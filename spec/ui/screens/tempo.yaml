@@ -1,0 +1,53 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp tempoMenuDisplay() ~line 1650
+
+screen: tempo
+menu_id: TEMPO_MENU
+title: "TEMPO"
+display_handler: tempoMenuDisplay
+
+layout:
+  - element: 0
+    type: text
+    content: "TEMPO"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "tempo BPM"
+    position: [0, 16]
+    size: [127, 29]
+    text_size: BOLD4X
+    highlight: STATE_TEMPO
+    binding: "globalObj->tempoX100"
+    format: "BPM with decimal (tempoX100/100)"
+    notes: "Large centered tempo display"
+
+  - element: 3
+    type: text
+    content: "clock source"
+    position: [0, 45]
+    size: [127, 17]
+    text_size: STYLE1X
+    highlight: STATE_EXTCLOCK
+    binding: "globalObj->clockMode"
+    format: "[INTERNAL CLOCK, MIDI SYNC 3.5mm, MIDI SYNC USB, GATE 0-3, BIDIRECTIONAL]"
+
+  - element: 4
+    type: text
+    content: "RESET:"
+    position: [0, 62]
+    size: [73, 17]
+    text_size: STYLE1X
+
+  - element: 5
+    type: text
+    content: "reset source"
+    position: [74, 62]
+    size: [53, 17]
+    text_size: STYLE1X
+    highlight: STATE_RESETINPUT
+    binding: "sequenceArray[ch].gpio_reset"

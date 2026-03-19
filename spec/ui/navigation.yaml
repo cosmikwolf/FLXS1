@@ -1,0 +1,459 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source files: src/inputModule.cpp, src/displayModule.cpp, src/TimeController.cpp
+
+initial_screen: PITCH_GATE_MENU
+initial_state: STATE_PITCH0
+
+screen_saver:
+  timeout_ms: 10000
+  trigger: "globalObj->screenSaverTimeout >= 10000"
+  animation: polygon_random
+  notes: "Draws random polygons. Any input resets timeout."
+
+modal_overlay:
+  enabled: true
+  timer_based: true
+  handler: modalDisplay
+  notes: "Modal popups appear over current screen for configurable duration (modalMaxTime). 30+ modal types defined."
+
+# State-to-Menu mapping
+# changeState() maps each STATE_ to a currentMenu value
+state_menu_map:
+  PITCH_GATE_MENU:
+    states: [STATE_PITCH0, STATE_GATELENGTH, STATE_GATETYPE, STATE_GLIDE]
+    encoder_cycle_range: [STATE_PITCH0, STATE_GLIDE]
+
+  ARPEGGIO_MENU:
+    states: [STATE_ARPTYPE, STATE_ARPSPEEDNUM, STATE_ARPSPEEDDEN, STATE_ARPOCTAVE, STATE_CHORD]
+    encoder_cycle_range: [STATE_ARPTYPE, STATE_CHORD]
+
+  VELOCITY_MENU:
+    states: [STATE_CV2_TYPE, STATE_CV2_LEVEL, STATE_CV2_SPEED, STATE_CV2_OFFSET]
+    encoder_cycle_range: [STATE_CV2_TYPE, STATE_CV2_OFFSET]
+
+  SEQUENCE_MENU:
+    states: [STATE_FIRSTSTEP, STATE_STEPCOUNT, STATE_BEATCOUNT, STATE_PLAYMODE, STATE_SWING]
+    encoder_cycle_range: [STATE_FIRSTSTEP, STATE_ARPINTMOD]
+    notes: "Encoder cycles through SEQUENCE_MENU + QUANTIZE_MENU + MOD_MENU_1 + MOD_MENU_2 states"
+
+  QUANTIZE_MENU:
+    states: [STATE_QUANTIZESCALE, STATE_QUANTIZEKEY, STATE_QUANTIZEMODE]
+
+  MOD_MENU_1:
+    states: [STATE_SKIPSTEPCOUNT, STATE_SKIPSTEP, STATE_GATEMOD, STATE_RANDOMPITCH,
+             STATE_RANDOMHIGH, STATE_RANDOMLOW, STATE_PITCHMOD, STATE_GLIDEMOD]
+
+  MOD_MENU_2:
+    states: [STATE_ARPTYPEMOD, STATE_ARPSPDMOD, STATE_ARPOCTMOD, STATE_ARPINTMOD]
+
+  TEMPO_MENU:
+    states: [STATE_TEMPO, STATE_EXTCLOCK, STATE_RESETINPUT]
+    encoder_cycle_range: [STATE_TEMPO, STATE_RESETINPUT]
+
+  PATTERN_SELECT:
+    states: [STATE_PATTERNSELECT]
+
+  SAVE_MENU:
+    states: [STATE_SAVE]
+
+  GLOBAL_MENU_1:
+    states: [STATE_PG_BTN_SWITCH, STATE_DATA_KNOB_SWITCH]
+    encoder_cycle_range: [STATE_PG_BTN_SWITCH, STATE_SYSEX_IMPORT]
+    notes: "Encoder in parameterSelect mode cycles through all GLOBAL + SYSEX states"
+
+  GLOBAL_MENU_2:
+    states: [STATE_CH1_VOLT_RANGE, STATE_CH2_VOLT_RANGE, STATE_CH3_VOLT_RANGE, STATE_CH4_VOLT_RANGE]
+
+  GLOBAL_MENU_3:
+    states: [STATE_MIDI_CHANNEL_1, STATE_MIDI_CHANNEL_2, STATE_MIDI_CHANNEL_3, STATE_MIDI_CHANNEL_4]
+
+  SYSEX_MENU:
+    states: [STATE_SYSEX_EXPORT, STATE_SYSEX_IMPORT]
+
+  SYSEX_IMPORT_INPROGRESS:
+    states: [STATE_SYSEX_IMPORTINPROGRESS]
+
+  CALIBRATION_MENU:
+    states: [STATE_CALIBRATION, STATE_CALIB_INPUT0_OFFSET, STATE_CALIB_INPUT0_LOW,
+             STATE_CALIB_INPUT0_HIGH, STATE_CALIB_INPUT1_OFFSET, STATE_CALIB_INPUT1_LOW,
+             STATE_CALIB_INPUT1_HIGH, STATE_CALIB_INPUT2_OFFSET, STATE_CALIB_INPUT2_LOW,
+             STATE_CALIB_INPUT2_HIGH, STATE_CALIB_INPUT3_OFFSET, STATE_CALIB_INPUT3_LOW,
+             STATE_CALIB_INPUT3_HIGH, STATE_CALIB_OUTPUT0_LOW, STATE_CALIB_OUTPUT0_HIGH,
+             STATE_CALIB_OUTPUT1_LOW, STATE_CALIB_OUTPUT1_HIGH, STATE_CALIB_OUTPUT2_LOW,
+             STATE_CALIB_OUTPUT2_HIGH, STATE_CALIB_OUTPUT3_LOW, STATE_CALIB_OUTPUT3_HIGH,
+             STATE_CALIB_OUTPUT4_LOW, STATE_CALIB_OUTPUT4_HIGH, STATE_CALIB_OUTPUT5_LOW,
+             STATE_CALIB_OUTPUT5_HIGH, STATE_CALIB_OUTPUT6_LOW, STATE_CALIB_OUTPUT6_HIGH,
+             STATE_CALIB_OUTPUT7_LOW, STATE_CALIB_OUTPUT7_HIGH,
+             STATE_TEST_MIDI, STATE_TEST_GATES, STATE_TEST_RHEOSTAT,
+             STATE_CALIBRATION_SAVE_MODAL]
+
+  INPUT_DEBUG_MENU:
+    states: [STATE_INPUTDEBUG]
+
+  MENU_RANDOM:
+    states: [STATE_SHORTCUT_RANDOM_PARAM, STATE_SHORTCUT_RANDOM_VAR1,
+             STATE_SHORTCUT_RANDOM_VAR2, STATE_SHORTCUT_RANDOM_VAR3]
+
+  MENU_TRANSPOSE:
+    states: [STATE_SHORTCUT_TRANSPOSE]
+
+  MENU_FILL:
+    states: [STATE_SHORTCUT_FILL]
+
+  MENU_SKIP:
+    states: [STATE_SHORTCUT_SKIP, STATE_SHORTCUT_SKIP_TRIGGER]
+
+  MENU_CLKDIV:
+    states: [STATE_SHORTCUT_CLKDIV]
+
+  MENU_TUNER:
+    states: [STATE_SHORTCUT_TUNER]
+
+  MENU_PAGE:
+    states: [STATE_SHORTCUT_PAGE]
+
+  MENU_FN1:
+    states: [STATE_SHORTCUT_FN1]
+  MENU_FN2:
+    states: [STATE_SHORTCUT_FN2]
+  MENU_FN3:
+    states: [STATE_SHORTCUT_FN3]
+  MENU_FN4:
+    states: [STATE_SHORTCUT_FN4]
+
+  MENU_PATTERN_CHAIN:
+    states: [STATE_PATTERN_CHAIN]
+
+  # DEAD CODE — these menus exist in changeState() but have no active entry point
+  # MENU_CHAIN_HELP: entry commented out in inputModule.cpp ~line 1188
+  # NOTE_DISPLAY: STATE_NOTEDISPLAY has no caller
+  # MENU_MULTISELECT: STATE_MULTISELECT has currentMenu assignment commented out
+
+# Navigation transitions
+transitions:
+  # PATTERN button transitions
+  - from: any
+    trigger: pattern_press
+    condition: "!shift_held"
+    to: PATTERN_SELECT
+
+  - from: PATTERN_SELECT
+    trigger: pattern_press
+    to: PITCH_GATE_MENU
+
+  - from: any
+    trigger: pattern_press
+    condition: "shift_held"
+    to: SAVE_MENU
+
+  - from: SAVE_MENU
+    trigger: pattern_press
+    condition: "shift_held"
+    action: "execute save"
+    to: PITCH_GATE_MENU
+
+  - from: SAVE_MENU
+    trigger: pattern_press
+    condition: "!shift_held"
+    action: "display MODAL_DIDDNTSAVE"
+    to: PITCH_GATE_MENU
+
+  - from: SAVE_MENU
+    trigger: shift_press
+    to: PITCH_GATE_MENU
+
+  # MENU/TEMPO button transitions
+  - from: any
+    trigger: menu_press
+    condition: "!shift_held && currentMenu != TEMPO_MENU"
+    to: TEMPO_MENU
+
+  - from: TEMPO_MENU
+    trigger: menu_press
+    condition: "!shift_held"
+    action: "cycle STATE_TEMPO → STATE_RESETINPUT → STATE_TEMPO"
+    to: TEMPO_MENU
+
+  - from: any
+    trigger: menu_press
+    condition: "shift_held && currentMenu not in [GLOBAL_MENU_1, GLOBAL_MENU_2]"
+    to: GLOBAL_MENU_1
+
+  - from: GLOBAL_MENU_1
+    trigger: menu_press
+    condition: "shift_held"
+    to: GLOBAL_MENU_2
+
+  - from: GLOBAL_MENU_2
+    trigger: menu_press
+    condition: "shift_held"
+    to: PITCH_GATE_MENU
+
+  # Encoder cycling through global/sysex states
+  # globalMenuHandler() uses min_max_cycle(stepMode + knobChange, STATE_PG_BTN_SWITCH, STATE_SYSEX_IMPORT)
+  # when parameterSelect is active, cycling through all GLOBAL + SYSEX states
+  - from: GLOBAL_MENU_1
+    trigger: encoder_rotate
+    condition: "parameterSelect && stepMode cycles past STATE_DATA_KNOB_SWITCH"
+    to: GLOBAL_MENU_2
+    notes: "Encoder param-select cycling: GLOBAL_1 → GLOBAL_2 → GLOBAL_3 → SYSEX"
+
+  - from: GLOBAL_MENU_2
+    trigger: encoder_rotate
+    condition: "parameterSelect && stepMode cycles past STATE_CH4_VOLT_RANGE"
+    to: GLOBAL_MENU_3
+
+  - from: GLOBAL_MENU_3
+    trigger: encoder_rotate
+    condition: "parameterSelect && stepMode cycles past STATE_MIDI_CHANNEL_4"
+    to: SYSEX_MENU
+
+  - from: SYSEX_MENU
+    trigger: encoder_rotate
+    condition: "parameterSelect && stepMode cycles past STATE_SYSEX_IMPORT"
+    to: GLOBAL_MENU_1
+    notes: "Wraps around via min_max_cycle"
+
+  # PAGE UP/DOWN transitions
+  - from: any
+    trigger: pgup_release
+    condition: "shift_held && currentMenu not in [PATTERN_SELECT, SAVE_MENU]"
+    to: MENU_PATTERN_CHAIN
+
+  - from: any
+    trigger: pgdn_release
+    condition: "shift_held && currentMenu not in [PATTERN_SELECT, SAVE_MENU]"
+    action: "toggle multiSelectSwitch"
+    to: PITCH_GATE_MENU
+
+  - from: PATTERN_SELECT
+    trigger: pgup_release
+    action: "increment pattern_page (0-7)"
+    to: PATTERN_SELECT
+
+  - from: PATTERN_SELECT
+    trigger: pgdn_release
+    action: "decrement pattern_page (0-7)"
+    to: PATTERN_SELECT
+
+  - from: SAVE_MENU
+    trigger: pgup_release
+    action: "increment pattern_page (0-7)"
+    to: SAVE_MENU
+
+  - from: SAVE_MENU
+    trigger: pgdn_release
+    action: "decrement pattern_page (0-7)"
+    to: SAVE_MENU
+
+  # Channel button menu cycling
+  - from: PITCH_GATE_MENU
+    trigger: channel_press
+    condition: "same channel selected"
+    to: SEQUENCE_MENU
+
+  - from: SEQUENCE_MENU
+    trigger: channel_press
+    condition: "same channel selected"
+    to: QUANTIZE_MENU
+
+  - from: QUANTIZE_MENU
+    trigger: channel_press
+    condition: "same channel selected"
+    to: MOD_MENU_1
+
+  - from: MOD_MENU_1
+    trigger: channel_press
+    condition: "same channel selected"
+    to: MOD_MENU_2
+
+  - from: MOD_MENU_2
+    trigger: channel_press
+    condition: "same channel selected"
+    to: PITCH_GATE_MENU
+    notes: "Pressing same channel cycles: PITCH → SEQUENCE → QUANTIZE → MOD1 → MOD2 → PITCH"
+
+  - from: any
+    trigger: channel_press
+    condition: "different channel selected"
+    action: "change selectedChannel"
+    to: current_menu
+    notes: "Stay on same menu but switch channel"
+
+  # Channel button shortcuts (channel_hold + matrix)
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_00"
+    action: "toggle mute gate"
+    to: current_menu
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_01"
+    action: "toggle mute CV A"
+    to: current_menu
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_02"
+    action: "toggle mute CV B"
+    to: current_menu
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_03"
+    to: MENU_FILL
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_04"
+    to: MENU_CLKDIV
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_05"
+    action: "clockReset(true)"
+    to: current_menu
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_06"
+    action: "toggle reverse/pendulum"
+    to: current_menu
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_07"
+    to: MENU_SKIP
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_08"
+    to: MENU_RANDOM
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_09"
+    to: MENU_TRANSPOSE
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_10"
+    to: MENU_TUNER
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_11"
+    to: MENU_PAGE
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_12"
+    to: MENU_FN1
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_13"
+    to: MENU_FN2
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_14"
+    to: MENU_FN3
+
+  - from: any
+    trigger: channel_hold_matrix
+    condition: "matrix SW_15"
+    to: MENU_FN4
+
+  # Emergency / debug transitions
+  - from: any
+    trigger: shift_play_menu
+    to: CALIBRATION_MENU
+    notes: "SHIFT+PLAY+MENU simultaneously enters calibration"
+
+  - from: any
+    trigger: shift_rec
+    to: INPUT_DEBUG_MENU
+
+  # Matrix button returns to pitch menu (from most menus)
+  - from: [SEQUENCE_MENU, QUANTIZE_MENU, MOD_MENU_1, MOD_MENU_2, TEMPO_MENU,
+           GLOBAL_MENU_1, GLOBAL_MENU_2, GLOBAL_MENU_3, SYSEX_MENU,
+           MENU_RANDOM, MENU_TRANSPOSE, MENU_FILL, MENU_SKIP, MENU_CLKDIV,
+           MENU_TUNER, MENU_PAGE, MENU_FN1, MENU_FN2, MENU_FN3, MENU_FN4]
+    trigger: matrix_press
+    to: PITCH_GATE_MENU
+    notes: "Pressing a matrix step button exits menu/shortcut screens back to pitch view"
+
+  # MENU button exits shortcut menus to TEMPO
+  - from: [MENU_RANDOM, MENU_TRANSPOSE, MENU_FILL, MENU_SKIP, MENU_CLKDIV,
+           MENU_TUNER, MENU_PAGE, MENU_FN1, MENU_FN2, MENU_FN3, MENU_FN4]
+    trigger: menu_press
+    condition: "!shift_held"
+    to: TEMPO_MENU
+    notes: "MENU button always goes to TEMPO from shortcut screens"
+
+  # NOTE: MENU_RESET and MENU_REVERSE are NOT screens — they fire modal popups
+  # (MODAL_SHORTCUT_RESET / MODAL_SHORTCUT_REVERSE) without changing currentMenu.
+  # They are handled inline in channelButtonShortcutHandler() at SW_05/SW_06.
+
+# Per-screen encoder actions
+per_screen_actions:
+  PITCH_GATE_MENU:
+    encoder_param_select: "Cycle STATE_PITCH0 → STATE_GLIDE"
+    encoder_value: "Adjust pitch/gateLength/gateType/glide per stepMode"
+
+  ARPEGGIO_MENU:
+    encoder_param_select: "Cycle STATE_ARPTYPE → STATE_CHORD"
+    encoder_value: "Adjust arpType/arpSpdNum/arpSpdDen/arpOctave/chord per stepMode"
+
+  VELOCITY_MENU:
+    encoder_param_select: "Cycle STATE_CV2_TYPE → STATE_CV2_OFFSET"
+    encoder_value: "Adjust cv2Type/cv2Level/cv2Speed/cv2Offset per stepMode"
+
+  SEQUENCE_MENU:
+    encoder_param_select: "Cycle STATE_FIRSTSTEP → STATE_ARPINTMOD (across SEQ+QUANT+MOD1+MOD2)"
+    encoder_value: "Adjust firstStep/stepCount/beatCount/playMode/swing"
+
+  QUANTIZE_MENU:
+    encoder_param_select: "Same range as SEQUENCE_MENU"
+    encoder_value: "Adjust quantizeScale/quantizeKey/quantizeMode"
+
+  MOD_MENU_1:
+    encoder_param_select: "Same range as SEQUENCE_MENU"
+    encoder_value: "Adjust skipStepCount/skipStep/gateMod/randomPitch/pitchMod/glideMod"
+
+  MOD_MENU_2:
+    encoder_param_select: "Same range as SEQUENCE_MENU"
+    encoder_value: "Adjust arpTypeMod/arpSpdMod/arpOctMod/arpIntMod"
+
+  TEMPO_MENU:
+    encoder_param_select: "Cycle STATE_TEMPO → STATE_RESETINPUT"
+    encoder_value: "Adjust tempo/clockMode/resetInput"
+
+  GLOBAL_MENU_1:
+    encoder_param_select: "Cycle STATE_PG_BTN_SWITCH → STATE_SYSEX_IMPORT"
+    encoder_value: "Adjust pageButtonStyle/dataInputStyle"
+
+  GLOBAL_MENU_2:
+    encoder_value: "Adjust voltage ranges ch1-4"
+
+  GLOBAL_MENU_3:
+    encoder_value: "Adjust MIDI channels 1-4"
+
+  PATTERN_SELECT:
+    encoder_value: "Adjust patternChangeTrigger (0=immediate, 1-4=channel trigger)"
+
+  MENU_RANDOM:
+    encoder_param_select: "Cycle random sub-states"
+    encoder_value: "Adjust randomization parameters"
+
+  MENU_TRANSPOSE:
+    encoder_value: "Adjust transpose (-64 to +64)"
+
+  MENU_PATTERN_CHAIN:
+    encoder_value: "Adjust chain repeat count, navigate chain entries"
+
+  MULTISELECT:
+    encoder_param_select: "Cycle STATE_PITCH0 → STATE_CV2_OFFSET"
+    encoder_value: "Adjust selected parameter for all selected steps"

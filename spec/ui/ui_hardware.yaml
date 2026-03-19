@@ -1,0 +1,115 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source files: src/displayModule.h, src/LEDArray.h, src/inputModule.h, lib/GlobalVariable/src/global.h
+
+displays:
+  - id: main_display
+    type: oled
+    driver: SSD1351
+    resolution: [128, 96]
+    color_depth: 16                     # RGB565
+    interface: spi
+    spi_pins:
+      cs: 6                             # LCD_CS
+      dc: 10                            # LCD_DC
+      rst: 9                            # LCD_RST
+      mosi: 11                          # kMosiPin
+      sck: 13                           # kSpiClockPin
+    orientation: landscape
+    brightness: 16                      # initial value set in initialize()
+    refresh_mode: polling
+    refresh_interval_us: 40000          # DISPLAY_INTERVAL — 25Hz
+    module: display_module
+    library: SSD_13XX
+    notes: "128x96 variant (SSD_1351_128x96.h). Screen saver activates after 10s inactivity."
+
+input_devices:
+  - id: step_matrix
+    type: button_matrix
+    count: 16
+    interface: spi_gpio_expander
+    driver: MAX7301
+    cs_pin: 0                           # MIDPLANE_MAX7301_CS_PIN
+    active_level: low
+    pull: up                            # INPUT_PULLUP
+    switch_ids: [SW_00, SW_01, SW_02, SW_03, SW_04, SW_05, SW_06, SW_07,
+                 SW_08, SW_09, SW_10, SW_11, SW_12, SW_13, SW_14, SW_15]
+    switch_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    module: input_module
+
+  - id: transport_buttons
+    type: button_group
+    count: 3
+    interface: spi_gpio_expander
+    driver: MAX7301
+    cs_pin: 0
+    active_level: low
+    pull: up
+    buttons:
+      - { id: play, switch_id: SW_PLAY, index: 17 }     # was 16 in initPort but SW_PLAY=17
+      - { id: rec, switch_id: SW_REC, index: 18 }
+      - { id: stop, switch_id: SW_STOP, index: 16 }     # SW_STOP=16
+    module: input_module
+
+  - id: channel_buttons
+    type: button_group
+    count: 4
+    interface: spi_gpio_expander
+    driver: MAX7301
+    cs_pin: 0
+    active_level: low
+    pull: up
+    buttons:
+      - { id: ch0, switch_id: SW_CH0, index: 19 }
+      - { id: ch1, switch_id: SW_CH1, index: 20 }
+      - { id: ch2, switch_id: SW_CH2, index: 21 }
+      - { id: ch3, switch_id: SW_CH3, index: 22 }
+    module: input_module
+
+  - id: navigation_buttons
+    type: button_group
+    count: 5
+    interface: spi_gpio_expander
+    driver: MAX7301
+    cs_pin: 0
+    active_level: low
+    pull: up
+    buttons:
+      - { id: pgdn, switch_id: SW_PGDN, index: 23 }
+      - { id: pgup, switch_id: SW_PGUP, index: 24 }
+      - { id: pattern, switch_id: SW_PATTERN, index: 25 }
+      - { id: menu, switch_id: SW_MENU, index: 26 }
+      - { id: shift, switch_id: SW_SHIFT, index: 27 }
+    module: input_module
+
+  - id: rotary_encoder
+    type: rotary_encoder
+    interface: gpio_interrupt
+    pins:
+      a: 16                            # ENCODER1LEFTPIN
+      b: 25                            # ENCODER1RIGHTPIN
+    encoder_button:
+      interface: spi_gpio_expander
+      driver: MAX7301
+      cs_pin: 33                       # BACKPLANE_MAX7301_CS_PIN (encoder button on backplane)
+      switch_id: SW_ENCODER_BACKPLANE
+      index: 22
+    library: Encoder
+    module: input_module
+
+led_arrays:
+  - id: led_array
+    type: addressable_rgbw
+    driver: WS2812B
+    library: Adafruit_NeoPixel
+    count: 23                          # NUM_LEDS
+    data_pin: 5                        # DATA_PIN / LED_PIN
+    color_order: GRBW                  # NEO_GRBW
+    frequency_khz: 800                 # NEO_KHZ800
+    brightness: 200
+    refresh_interval_us: 50000         # kLedClockInterval
+    mapping:
+      physical_to_logical: [1,2,3,4,6,7,8,9,11,12,13,14,16,17,18,19,0,5,10,15]
+      main_matrix: [2,3,4,5,7,8,9,10,12,13,14,15,17,18,19,20]   # 16 step LEDs
+      channel_buttons: [1,6,11,16]                                 # 4 channel LEDs
+      aux_buttons: [0,21,22]                                       # play, page_select, mode
+    module: led_array

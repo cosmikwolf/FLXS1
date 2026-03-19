@@ -1,0 +1,161 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp globalMenuDisplay/2/3() ~line 2518/2578/2613
+
+# --- GLOBAL MENU PAGE 1 ---
+screen: global_settings_1
+menu_id: GLOBAL_MENU_1
+title: "GLOBAL settings"
+display_handler: globalMenuDisplay
+
+layout:
+  - element: 0
+    type: text
+    content: "GLOBAL settings"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "pg up/dn:"
+    position: [0, 15]
+    size: [95, 16]
+    text_size: STYLE1X
+
+  - element: 2
+    type: text
+    content: "forward/reverse"
+    position: [70, 15]
+    size: [57, 16]
+    text_size: STYLE1X
+    highlight: STATE_PG_BTN_SWITCH
+    binding: "globalObj->pageButtonStyle"
+
+  - element: 3
+    type: text
+    content: "data knb:"
+    position: [0, 31]
+    size: [95, 16]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "toggle/moment"
+    position: [70, 31]
+    size: [57, 16]
+    text_size: STYLE1X
+    highlight: STATE_DATA_KNOB_SWITCH
+    binding: "globalObj->dataInputStyle"
+
+---
+# --- GLOBAL MENU PAGE 2 ---
+screen: global_settings_2
+menu_id: GLOBAL_MENU_2
+title: "GLOBAL settings"
+display_handler: globalMenuDisplay2
+
+layout:
+  - element: 0
+    type: text
+    content: "GLOBAL settings"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 5
+    type: text
+    content: "pitch CV range"
+    position: [0, 15]
+    size: [90, 17]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: "6,7"
+    type: text
+    content: "cv1a: {range}"
+    position: "[0, 31] / [48, 31]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_CH1_VOLT_RANGE
+    binding: "globalObj->outputNegOffset[0]"
+
+  - element: "8,9"
+    type: text
+    content: "cv2a: {range}"
+    position: "[0, 47] / [48, 47]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_CH2_VOLT_RANGE
+    binding: "globalObj->outputNegOffset[1]"
+
+  - element: "10,11"
+    type: text
+    content: "cv3a: {range}"
+    position: "[0, 63] / [48, 63]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_CH3_VOLT_RANGE
+    binding: "globalObj->outputNegOffset[2]"
+
+  - element: "12,13"
+    type: text
+    content: "cv4a: {range}"
+    position: "[0, 79] / [48, 79]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_CH4_VOLT_RANGE
+    binding: "globalObj->outputNegOffset[3]"
+
+---
+# --- GLOBAL MENU PAGE 3 ---
+screen: global_settings_3
+menu_id: GLOBAL_MENU_3
+title: "global settings"
+display_handler: globalMenuDisplay3
+
+layout:
+  - element: 0
+    type: text
+    content: "global settings"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 5
+    type: text
+    content: "MIDI output channels"
+    position: [0, 15]
+    size: [90, 17]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: "6,7"
+    type: text
+    content: "ch1: {midi_ch}"
+    position: "[0, 31] / [48, 31]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_MIDI_CHANNEL_1
+    binding: "globalObj->midiChannel[0]"
+
+  - element: "8,9"
+    type: text
+    content: "ch2: {midi_ch}"
+    position: "[0, 47] / [48, 47]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_MIDI_CHANNEL_2
+    binding: "globalObj->midiChannel[1]"
+
+  - element: "10,11"
+    type: text
+    content: "ch3: {midi_ch}"
+    position: "[0, 63] / [48, 63]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_MIDI_CHANNEL_3
+    binding: "globalObj->midiChannel[2]"
+
+  - element: "12,13"
+    type: text
+    content: "ch4: {midi_ch}"
+    position: "[0, 79] / [48, 79]"
+    size: "[32, 16] / [79, 16]"
+    highlight: STATE_MIDI_CHANNEL_4
+    binding: "globalObj->midiChannel[3]"

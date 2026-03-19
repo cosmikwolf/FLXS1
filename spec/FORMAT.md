@@ -1,0 +1,270 @@
+# Spec Format Reference
+
+This file is the single source of truth for all YAML spec formats used in this project. Commands that read or write specs should consult this file for the canonical templates.
+
+---
+
+## Module Spec Format
+
+Each file in `spec/modules/` must follow this structure:
+
+```yaml
+module: module_name
+layer: application | middleware | driver | hal | pac
+language: c | cpp | rust
+
+owns: []               # Resources this module exclusively controls
+borrows: []            # Resources used but not owned (must be passed in)
+depends_on: []         # Other modules this one imports/calls
+external_deps: []      # External packages (must be declared in architecture.yaml)
+  # - name: esp_idf    # Must match external_packages[].name
+  #   used_headers:     # C: specific headers this module needs
+  #     - "driver/gpio.h"
+  #   used_modules: []  # Rust: specific modules/traits used
+
+interface:
+  - name: function_name
+    inputs: []
+    outputs: []        # C: int return code, C++: return type or error_code, Rust: Result<T,E>
+    blocking: true | false
+    isr_safe: false
+
+error_handling:        # C: return_code | output_pointer | callback | errno_style
+                       # C++: return_code | exception | result | error_code
+                       # Rust: result | panic_never
+memory:
+  allocation: static | stack | none
+  max_instances: 1
+  buffer_owner: caller | module
+
+concurrency:
+  thread_safe: false
+  isr_shared: false    # If true, list shared vars below
+  isr_shared_vars: []
+  protection: disable_irq | mutex | none
+
+constraints:
+  - "No dynamic allocation"
+  - "Must not block for more than Xms"
+  - (any additional rules)
+
+notes: ""              # Optional human-readable clarification
+```
+
+---
+
+## Architecture Spec Format
+
+`spec/architecture.yaml` must follow this structure:
+
+```yaml
+project: project_name
+target:
+  mcu: ""              # e.g. STM32F411, RP2040
+  arch: ""             # e.g. cortex-m4, xtensa
+  toolchain: ""        # e.g. arm-none-eabi-gcc, xtensa-esp32-elf-gcc
+
+language: c            # c, cpp, or rust
+standard: c11          # C: c99/c11/c17/c23, C++: c++11/c++14/c++17/c++20/c++23, Rust: 2021/2024
+
+rtos: none             # none | freertos | zephyr | rtic | embassy
+
+global_constraints:
+  - "No dynamic allocation (no malloc/free)"
+  - "All ISRs defined in a single isr.c file"
+  - "Error handling: return int, 0=success, negative=error enum"
+  - "All ISR-shared data must be volatile"
+  - "No module may access another module's internal struct fields"
+
+layers:
+  - name: application
+    may_depend_on: [middleware, driver]
+  - name: middleware
+    may_depend_on: [driver, hal]
+  - name: driver
+    may_depend_on: [hal]
+  - name: hal
+    may_depend_on: [pac]
+  - name: pac
+    may_depend_on: []
+
+build_system: cmake    # cmake | make | cargo | meson
+
+external_packages: []              # Optional — external library declarations
+  # - name: esp_idf                # Unique identifier referenced by module specs
+  #   version: "5.2"               # Version constraint
+  #   source: sdk                  # sdk | system | git | crate | component
+  #   description: "Espressif IoT Development Framework"
+  #   license: "Apache-2.0"       # SPDX identifier (optional)
+  #   provides_includes:           # C: header paths this package makes available
+  #     - "esp_system.h"
+  #     - "driver/gpio.h"
+  #   provides_modules: []         # Rust: module paths (e.g. ["esp_idf_hal"])
+  #   build_integration:           # How the build system finds/links this package
+  #     cmake: "find_package(esp_idf REQUIRED)"
+  #     make: "-I$(IDF_PATH)/components"
+  #     cargo: 'esp-idf-hal = "0.44"'
+  #     meson: "dependency('esp-idf')"
+```
+
+**Source types:**
+- `sdk` — vendor SDK (ESP-IDF, STM32 HAL). Pre-installed or set up by toolchain.
+- `system` — system library found via pkg-config.
+- `git` — fetched from a git URL (optional `url` + `ref` fields).
+- `crate` — Rust crate from crates.io (cargo projects only).
+- `component` — framework-specific package manager (e.g. ESP-IDF component registry).
+
+---
+
+## Interface Spec Format
+
+Each file in `spec/interfaces/` defines a shared contract (HAL trait, vtable, etc.):
+
+```yaml
+interface: interface_name
+description: ""
+language: c | cpp | rust
+
+functions:
+  - name: function_name
+    inputs: []
+    outputs: []
+    blocking: true | false
+    isr_safe: false
+    description: ""
+
+# C: maps to function pointer typedefs or vtable struct
+# C++: maps to an abstract base class (pure virtual)
+# Rust: maps to a trait definition
+
+notes: ""
+```
+
+---
+
+## State Machine Spec Format
+
+Each file in `spec/state_machines/` defines an FSM:
+
+```yaml
+name: fsm_name
+owner_module: module_name
+states: [list of state names]
+initial_state: state_name
+events: [list of event names]
+transitions:
+  - from: state_name
+    event: event_name
+    to: state_name
+    action: function_name or "none"
+error_state: state_name
+```
+
+---
+
+## Datasheet Summary Schema
+
+Generated by `/fw-fetch-datasheet` into `docs/datasheets/<part_name>/<doc_type>/summary.yaml`:
+
+```yaml
+part: ""
+manufacturer: ""
+document_type: datasheet | technical_reference | errata | programming_guide
+source_url: ""
+source_file: ""
+
+overview:
+  description: ""
+  core: ""
+  max_clock_mhz: null
+  flash: ""
+  sram: ""
+
+peripherals:
+  - name: ""
+    count: null
+    notes: ""
+
+pins:
+  total_gpio: null
+  adc_pins: []
+  dac_pins: []
+  touch_pins: []
+  strapping_pins: []
+  notes: []
+
+electrical:
+  vdd_range: ""
+  io_voltage: ""
+  max_gpio_current_ma: null
+  deep_sleep_current_ua: null
+
+timing:
+  startup_time_ms: null
+  clock_sources: []
+
+register_maps:
+  - peripheral: ""
+    chapter_file: ""
+    base_address: ""
+
+interfaces:
+  - name: ""
+    max_clock_mhz: null
+    modes: []
+
+power_modes:
+  - name: ""
+    typical_current_ma: null
+
+notes: []
+```
+
+**Rules:** Only populate fields clearly stated in the datasheet. Use `null` or empty values for missing data. Never invent or guess values.
+
+---
+
+## Language-Specific Code Rules
+
+### C Projects
+- Public structs must be opaque (forward-declared in `.h`, defined in `.c`) unless spec states otherwise
+- All ISR-shared variables must be declared `volatile`
+- IRQ protection must wrap every access to ISR-shared data
+- Error codes must be defined in a module-level enum in the `.h`
+
+### C++ Projects
+- Public API exposed via `.hpp` header, implementation in `.cpp`
+- Use RAII for resource management (no manual `new`/`delete` unless `memory.allocation: heap`)
+- Prefer `std::expected` or error codes over exceptions in ISR-adjacent code
+- If `error_handling: exception`, exceptions may be used but must not cross module boundaries unless spec allows it
+- Interfaces from `spec/interfaces/` map to abstract base classes with pure virtual methods
+- If `memory.allocation: static`, avoid heap allocation (`new`, `std::make_unique`, etc.)
+- ISR-shared variables must be `volatile` or use `std::atomic`
+
+### Rust Projects
+- All fallible functions return `Result<T, ModuleError>`
+- `#![no_std]` unless spec explicitly allows std
+- Ownership and borrowing must reflect the `owns`/`borrows` fields in spec exactly
+- Traits defined in `spec/interfaces/` map to Rust `trait` definitions
+
+---
+
+## Generation Report Template
+
+After any generation step, always output a brief report:
+
+```
+## Generation Report: <module_name>
+
+Files generated:
+  - C:    src/include/<module>.h + src/<module>/<module>.c + tests/<module>_test.c
+  - C++:  src/include/<module>.hpp + src/<module>/<module>.cpp + tests/<module>_test.cpp
+  - Rust: src/<module>/mod.rs + src/<module>/tests.rs
+
+Spec coverage: COMPLETE | PARTIAL
+Ambiguities found: (list any, or "none")
+Assumptions made: (list any, or "none")
+Constraints verified: (list which global constraints were applied)
+```
+
+If any ambiguities were found, **stop and request clarification before generating**.

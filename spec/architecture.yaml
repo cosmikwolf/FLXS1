@@ -1,0 +1,149 @@
+project: flxs1
+target:
+  mcu: "MK20DX256"
+  arch: "cortex-m4"
+  toolchain: "arm-none-eabi-gcc"
+
+language: cpp
+standard: c++11
+
+rtos: none
+
+global_constraints:
+  - "No dynamic allocation (no malloc/free)"
+  - "All ISRs defined in a single isr.c file"
+  - "Error handling: return int, 0=success, negative=error enum"
+  - "All ISR-shared data must be volatile"
+  - "No module may access another module's internal struct fields"
+
+layers:
+  - name: application
+    may_depend_on: [middleware, driver]
+  - name: middleware
+    may_depend_on: [driver, hal]
+  - name: driver
+    may_depend_on: [hal]
+  - name: hal
+    may_depend_on: [pac]
+  - name: pac
+    may_depend_on: []
+
+build_system: platformio
+
+external_packages:
+  - name: i2c_t3
+    version: ""
+    source: lib
+    description: "Teensy-native I2C library with timeout and multi-bus support"
+    provides_includes:
+      - "i2c_t3.h"
+    build_integration:
+      platformio: "lib_deps = i2c_t3"
+
+  - name: midi
+    version: ""
+    source: lib
+    description: "Arduino MIDI Library for hardware serial MIDI I/O"
+    provides_includes:
+      - "MIDI.h"
+    build_integration:
+      platformio: "lib_deps = MIDI Library"
+
+  - name: ssd_13xx
+    version: ""
+    source: lib
+    description: "SSD1351 128x128 OLED display driver (SPI)"
+    provides_includes:
+      - "SSD_13XX.h"
+    build_integration:
+      platformio: "lib_deps = SSD_13XX"
+
+  - name: encoder
+    version: ""
+    source: lib
+    description: "Rotary encoder input library with interrupt support"
+    provides_includes:
+      - "Encoder.h"
+    build_integration:
+      platformio: "lib_deps = Encoder"
+
+  - name: serial_flash
+    version: ""
+    source: lib
+    description: "Serial flash memory read/write for pattern storage"
+    provides_includes:
+      - "SerialFlash.h"
+    build_integration:
+      platformio: "lib_deps = SerialFlash"
+
+  - name: adafruit_mcp23017
+    version: ""
+    source: lib
+    description: "I2C GPIO expander driver for button matrix"
+    provides_includes:
+      - "Adafruit_MCP23017.h"
+    build_integration:
+      platformio: "lib_deps = Adafruit-MCP23017-Arduino-Library"
+
+  - name: adafruit_neopixel
+    version: ""
+    source: lib
+    description: "Addressable RGB LED control (WS2812/NeoPixel)"
+    provides_includes:
+      - "Adafruit_NeoPixel.h"
+    build_integration:
+      platformio: "lib_deps = Adafruit NeoPixel"
+
+  - name: fastled
+    version: ""
+    source: lib
+    description: "LED animation framework for addressable LEDs"
+    provides_includes:
+      - "FastLED.h"
+    build_integration:
+      platformio: "lib_deps = FastLED"
+
+  - name: arduino_json
+    version: ""
+    source: lib
+    description: "JSON parsing and serialization"
+    provides_includes:
+      - "ArduinoJson.h"
+    build_integration:
+      platformio: "lib_deps = ArduinoJson"
+
+  - name: audio
+    version: ""
+    source: lib
+    description: "Teensy Audio library for audio synthesis/processing"
+    provides_includes:
+      - "Audio.h"
+    build_integration:
+      platformio: "lib_deps = Audio"
+
+  - name: zetaohm_ad5676
+    version: ""
+    source: local
+    description: "Custom driver for AD5676 8-channel DAC (CV outputs)"
+    provides_includes:
+      - "Zetaohm_AD5676.h"
+    build_integration:
+      platformio: "src_dir local"
+
+  - name: zetaohm_max7301
+    version: ""
+    source: local
+    description: "Custom driver for MAX7301 GPIO expander (I/O muxing)"
+    provides_includes:
+      - "Zetaohm_MAX7301.h"
+    build_integration:
+      platformio: "src_dir local"
+
+  - name: zetaohm_mcp4352
+    version: ""
+    source: local
+    description: "Custom driver for MCP4352 digital potentiometer"
+    provides_includes:
+      - "Zetaohm_MCP4352.h"
+    build_integration:
+      platformio: "src_dir local"

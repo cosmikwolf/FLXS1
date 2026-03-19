@@ -1,0 +1,221 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp
+
+# --- SYSEX MENU ---
+screen: sysex
+menu_id: SYSEX_MENU
+title: "sysex"
+display_handler: sysexMenuHandler
+notes: "SysEx import/export menu. SHIFT+PATTERN triggers export or import."
+
+layout:
+  - element: 0
+    type: text
+    content: "sysex"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "export/import"
+    position: [0, 20]
+    size: [127, 17]
+    text_size: STYLE1X
+    highlight: STATE_SYSEX_EXPORT
+    binding: "globalObj->importExportDisplaySwitch"
+
+---
+# --- SYSEX IMPORT IN PROGRESS ---
+screen: sysex_import
+menu_id: SYSEX_IMPORT_INPROGRESS
+title: "sysex import"
+display_handler: sysexImportHandler
+notes: "Shows import progress. Updates per-channel/pattern as SysEx data arrives."
+
+layout:
+  - element: 0
+    type: text
+    content: "sysex import"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+
+  - element: 1
+    type: text
+    content: "channel: {n}"
+    position: [0, 20]
+    size: [127, 17]
+    text_size: STYLE1X
+    binding: "globalObj->sysex_channel"
+
+  - element: 2
+    type: text
+    content: "pattern: {n}"
+    position: [0, 37]
+    size: [127, 17]
+    text_size: STYLE1X
+    binding: "globalObj->sysex_pattern"
+
+  - element: 3
+    type: text
+    content: "status"
+    position: [0, 54]
+    size: [127, 17]
+    text_size: STYLE1X
+    binding: "globalObj->sysex_status"
+    format: "[idle, preparing, readyfordata, importing, processing, importcomplete, error]"
+
+---
+# --- INPUT MENU ---
+screen: input_menu
+menu_id: INPUT_MENU
+title: "CH{n} INPUT MAP"
+display_handler: inputMenuDisplay
+notes: "Input mapping configuration. Partially implemented."
+
+layout:
+  - element: 0
+    type: text
+    content: "CH{n} INPUT MAP"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "label"
+    position: [0, 16]
+    size: [64, 16]
+    text_size: STYLE1X
+
+---
+# --- INPUT DEBUG MENU ---
+screen: input_debug
+menu_id: INPUT_DEBUG_MENU
+title: "input debug"
+display_handler: inputDebugMenuDisplay
+notes: "Debug screen showing raw input values. Accessed via SHIFT+REC."
+
+layout:
+  - element: 0
+    type: text
+    content: "input debug"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    notes: "Shows raw ADC values, gate inputs, and other diagnostic info"
+
+---
+# DEAD CODE as standalone screens: NOTE_DISPLAY, MENU_CHAIN_HELP
+# These exist in changeState() and displayLoop() but have no active entry point.
+#
+# MENU_MULTISELECT: The standalone screen is dead code (currentMenu assignment
+# commented out at inputModule.cpp:714), BUT multiselect is very much alive as
+# an OVERLAY MODE via globalObj->multiSelectSwitch. When active, it modifies
+# pitch_gate, arpeggio, velocity, and shortcut screens — showing alternate
+# titles, running multiSelectInputHandler(), and using multiSelectLEDHandler().
+# Toggled via SHIFT+PGDN. See screen specs for title_multiselect fields.
+
+---
+# --- MODAL POPUP ---
+screen: modal
+menu_id: MENU_MODAL
+display_handler: modalPopup
+notes: "Generic modal popup. Content varies by modalSelect value."
+
+layout:
+  - element: 5
+    type: rect
+    content: "background box"
+    position: [10, 18]
+    size: [107, 51]
+    text_size: MODALBOLD
+    color: [BLACK, WHITE]
+    notes: "White background box with border"
+
+  - element: 0
+    type: text
+    content: "modal line 1"
+    position: [12, 24]
+    size: [103, 20]
+    text_size: MODALBOLD
+    color: [BLACK, WHITE]
+
+  - element: 1
+    type: text
+    content: "modal line 2"
+    position: [12, 48]
+    size: [103, 20]
+    text_size: MODALBOLD
+    color: [BLACK, WHITE]
+    notes: "Only shown when two lines of text"
+
+modal_types:
+  - MODAL_SELECT_CH1-CH4: "CHANNEL {n}"
+  - MODAL_MUTE_GATE: "MUTE GATE / ch: {list}"
+  - MODAL_MUTE_CVA: "MUTE CV A / ch: {list}"
+  - MODAL_MUTE_CVB: "MUTE CV B / ch: {list}"
+  - MODAL_UNMUTE_GATE: "UNMUTE GATE / ch: {list}"
+  - MODAL_UNMUTE_CVA: "UNMUTE CV A / ch: {list}"
+  - MODAL_UNMUTE_CVB: "UNMUTE CV B / ch: {list}"
+  - MODAL_SAVE: "SAVED"
+  - MODAL_DIDDNTSAVE: "NOT SAVED / HOLD SHIFT"
+  - MODAL_COPY_STEP: "STEP {n} COPY"
+  - MODAL_PASTE_STEP: "STEP PASTE"
+  - MODAL_CLEAR_STEP: "STEP {n} CLEAR"
+  - MODAL_COPY_PATTERN: "PATTERN {n} / COPY"
+  - MODAL_PASTE_PATTERN_CONFIRMED: "PATTERN {n} / PASTED TO {m}"
+  - MODAL_PASTE_PATTERN_ARMED: "PRESS AGAIN / TO PASTE"
+  - MODAL_CLEAR_PATTERN_CONFIRMED: "PATTERN / ERASED"
+  - MODAL_CLEAR_PATTERN_ARMED: "PRESS AGAIN / TO ERASE"
+  - MODAL_COPY_PAGE: "CH{n} PG{m} / COPY"
+  - MODAL_PASTE_PAGE: "CH{n} PG{m} / PASTE"
+  - MODAL_CLEAR_PAGE: "CH{n} PG{m} / CLEAR"
+  - MODAL_COPY_CHANNEL: "CHANNEL {n} / COPY"
+  - MODAL_PASTE_CHANNEL: "CHANNEL PASTE"
+  - MODAL_CLEAR_CHANNEL: "CHANNEL {n} / CHANNEL CLEAR"
+  - MODAL_ERASEARMED: "press again / to clear"
+  - MODAL_ERASED: "Channel {n} / CLEARED"
+  - MODAL_RANDOM_PITCH_GATE: "CHANNEL {n} / RNDM PTCH&GT"
+  - MODAL_RANDOM_PITCH_GATE_WARNING: "Confirm randomize / CHANNEL {n}"
+  - MODAL_SHORTCUT_REVERSE: "forward/reverse/Pendulum"
+  - MODAL_SHORTCUT_RESET: "Reset / CHANNEL {n}"
+  - MODAL_TOBEIMPLEMENTED: "shortcut / coming soon"
+  - MODAL_EXPORTING: "SYSEX EXPORT / exporting..."
+  - MODAL_EXPORTCOMPLETE: "SYSEX EXPORT / complete..."
+  - MODAL_PREPARING_SYSEX: "PREPARING / TO IMPORT"
+  - MODAL_IMPORTCOMPLETE: "SYSEX IMPORT / complete..."
+
+---
+# --- CALIBRATION MENU ---
+screen: calibration
+menu_id: CALIBRATION_MENU
+display_handler: "inputCalibrationMenuDisplay / outputCalibrationMenuDisplay / midiTestDisplay / gateTestDisplay / rheostatTestDisplay"
+notes: "Calibration menu with sub-screens based on stepMode. Entered via SHIFT+PLAY+MENU or SHIFT+CHANNEL+MENU."
+
+sub_screens:
+  - condition: "stepMode < STATE_CALIB_OUTPUT0_LOW"
+    handler: inputCalibrationMenuDisplay
+    notes: "ADC input calibration (4 inputs x offset/low/high)"
+
+  - condition: "stepMode == STATE_TEST_MIDI"
+    handler: midiTestDisplay
+    notes: "MIDI loopback test"
+
+  - condition: "stepMode == STATE_TEST_GATES"
+    handler: gateTestDisplay
+    notes: "Gate output test"
+
+  - condition: "stepMode == STATE_TEST_RHEOSTAT"
+    handler: rheostatTestDisplay
+    notes: "Digital potentiometer test"
+
+  - condition: "stepMode >= STATE_CALIB_OUTPUT0_LOW"
+    handler: outputCalibrationMenuDisplay
+    notes: "DAC output calibration (8 outputs x low/high)"
+
+
+# DEAD CODE: chain_help — entry point commented out in inputModule.cpp

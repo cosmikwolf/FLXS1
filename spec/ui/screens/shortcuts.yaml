@@ -1,0 +1,276 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp ~lines 2876-3192
+
+# --- RANDOM SHORTCUT ---
+screen: shortcut_random
+menu_id: MENU_RANDOM
+title: "Random"
+display_handler: shortcutRandomMenu
+notes: "Randomization parameter editor. Channel+Random button executes."
+
+layout:
+  - element: 0
+    type: text
+    content: "Random"
+    position: [0, 0]
+    size: [86, 15]
+    text_size: STYLE1X
+
+  - element: 11
+    type: text
+    content: "press ch+rndm"
+    position: [64, 0]
+    size: [63, 8]
+    text_size: REGULAR1X
+    color: [background, contrastColor]
+
+  - element: 12
+    type: text
+    content: "to execute"
+    position: [64, 8]
+    size: [63, 8]
+    text_size: REGULAR1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "param:"
+    position: [0, 20]
+    size: [46, 17]
+    text_size: STYLE1X
+
+  - element: 5
+    type: text
+    content: "param name"
+    position: [47, 20]
+    size: [80, 17]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_RANDOM_PARAM
+    binding: "globalObj->randomizeParamSelect"
+    format: "[pitch+gate, pitch, gate, cv2_type, cv2_speed, cv2_amplitude, cv2_offset]"
+
+  - element: "2,6"
+    type: text
+    content: "var1 label/value"
+    position: "[0, 37] / [47, 37]"
+    size: "[46, 17] / [80, 17]"
+    highlight: STATE_SHORTCUT_RANDOM_VAR1
+    binding: "varies by randomizeParamSelect"
+
+  - element: "3,7"
+    type: text
+    content: "var2 label/value"
+    position: "[0, 54] / [47, 54]"
+    size: "[46, 17] / [80, 17]"
+    highlight: STATE_SHORTCUT_RANDOM_VAR2
+
+  - element: "4,8"
+    type: text
+    content: "var3 label/value"
+    position: "[0, 71] / [47, 71]"
+    size: "[46, 17] / [80, 17]"
+    highlight: STATE_SHORTCUT_RANDOM_VAR3
+
+---
+# --- TRANSPOSE SHORTCUT ---
+screen: shortcut_transpose
+menu_id: MENU_TRANSPOSE
+title: "Transpose"
+display_handler: shortcutTransposeMenu
+
+layout:
+  - element: 0
+    type: text
+    content: "Transpose"
+    position: [0, 0]
+    size: [86, 15]
+    text_size: STYLE1X
+
+  - element: 1
+    type: text
+    content: "scale degrees:"
+    position: [0, 20]
+    size: [128, 17]
+    text_size: STYLE1X
+
+  - element: 5
+    type: text
+    content: "transpose value"
+    position: [0, 37]
+    size: [127, 27]
+    text_size: BOLD4X
+    highlight: STATE_SHORTCUT_TRANSPOSE
+    binding: "sequenceArray[ch].transpose"
+    format: "signed integer"
+
+---
+# --- SKIP SHORTCUT ---
+screen: shortcut_skip
+menu_id: MENU_SKIP
+title: "shortcut skip"
+display_handler: shortcutSkipMenu
+
+layout:
+  - element: 0
+    type: text
+    content: "shortcut skip"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+
+  - element: 1
+    type: text
+    content: "skip count:"
+    position: [0, 20]
+    size: [82, 16]
+    text_size: STYLE1X
+
+  - element: 2
+    type: text
+    content: "skip count value"
+    position: [83, 20]
+    size: [40, 16]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_SKIP
+    binding: "sequenceArray[ch].skipStepCount"
+
+  - element: 3
+    type: text
+    content: "trigger:"
+    position: [0, 36]
+    size: [82, 16]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "trigger mapping"
+    position: [83, 36]
+    size: [40, 16]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_SKIP_TRIGGER
+    binding: "sequenceArray[ch].gpio_skipstep"
+
+---
+# --- FILL SHORTCUT ---
+screen: shortcut_fill
+menu_id: MENU_FILL
+title: "shortcut fill"
+display_handler: shortcutFillMenu
+
+layout:
+  - element: 0
+    type: text
+    content: "shortcut fill"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_FILL
+
+---
+# --- CLOCK DIVIDER SHORTCUT ---
+screen: shortcut_clkdiv
+menu_id: MENU_CLKDIV
+title: "clock divider"
+display_handler: shortcutClkdivMenu
+
+layout:
+  - element: 0
+    type: text
+    content: "clock divider"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_CLKDIV
+
+---
+# --- TUNER SHORTCUT ---
+screen: shortcut_tuner
+menu_id: MENU_TUNER
+title: "shortcut tuner"
+display_handler: shortcutTunerMenu
+
+layout:
+  - element: 0
+    type: text
+    content: "shortcut tuner"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_TUNER
+
+---
+# --- PAGE SHORTCUT ---
+screen: shortcut_page
+menu_id: MENU_PAGE
+title: "shortcut page"
+display_handler: shortcutPageMenu
+
+layout:
+  - element: 0
+    type: text
+    content: "shortcut page"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    highlight: STATE_SHORTCUT_PAGE
+
+---
+# NOTE: MENU_RESET and MENU_REVERSE are NOT screens.
+# SW_05 (reset) and SW_06 (reverse) in channelButtonShortcutHandler() fire
+# modal popups (MODAL_SHORTCUT_RESET / MODAL_SHORTCUT_REVERSE) directly
+# without changing currentMenu. The displayModule functions shortcutResetMenu()
+# and shortcutReverseMenu() exist but are never reached via the display loop
+# switch because currentMenu is never set to MENU_RESET or MENU_REVERSE.
+
+---
+# --- FN1-FN4 SHORTCUTS ---
+screen: shortcut_fn1
+menu_id: MENU_FN1
+title: "shortcut fn1"
+display_handler: shortcutFn1Menu
+layout:
+  - element: 0
+    type: text
+    content: "shortcut fn1"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+
+---
+screen: shortcut_fn2
+menu_id: MENU_FN2
+title: "shortcut fn2"
+display_handler: shortcutFn2Menu
+layout:
+  - element: 0
+    type: text
+    content: "shortcut fn2"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+
+---
+screen: shortcut_fn3
+menu_id: MENU_FN3
+title: "shortcut fn3"
+display_handler: shortcutFn3Menu
+layout:
+  - element: 0
+    type: text
+    content: "shortcut fn3"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+
+---
+screen: shortcut_fn4
+menu_id: MENU_FN4
+title: "shortcut fn4"
+display_handler: shortcutFn4Menu
+layout:
+  - element: 0
+    type: text
+    content: "shortcut fn4"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X

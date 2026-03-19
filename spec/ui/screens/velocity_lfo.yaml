@@ -1,0 +1,95 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp stateDisplay_velocity() ~line 1203
+
+screen: velocity_lfo
+menu_id: VELOCITY_MENU
+title: "LFO & ENV"
+title_multiselect: "lfoenvmult"
+display_handler: stateDisplay_velocity
+
+layout:
+  - element: 0
+    type: text
+    content: title
+    position: [0, 0]
+    size: [86, 16]
+    text_size: STYLE1X
+
+  - element: 7
+    type: text
+    content: "ch{n} pt{nn}"
+    position: [86, 0]
+    size: [42, 8]
+    text_size: REGULAR1X
+
+  - element: 8
+    type: text
+    content: "stp:{nn}-{nn}"
+    position: [86, 8]
+    size: [42, 8]
+    text_size: REGULAR1X
+
+  - element: 3
+    type: text
+    content: "type:"
+    position: [0, 20]
+    size: [57, 17]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "lfo type"
+    position: [58, 20]
+    size: [69, 17]
+    text_size: STYLE1X
+    highlight: STATE_CV2_TYPE
+    binding: "stepData[selectedStep].velocityType"
+    format: "[off, trigger, quantized, voltage, env_decay, env_attack, env_ar, env_asr, sine, triangle, square, rndsquare, sawup, sawdn, samplehold]"
+
+  - element: 1
+    type: text
+    content: "ampl:"
+    position: [0, 37]
+    size: [57, 17]
+    text_size: STYLE1X
+
+  - element: 2
+    type: text
+    content: "amplitude"
+    position: [58, 37]
+    size: [69, 17]
+    text_size: STYLE1X
+    highlight: STATE_CV2_LEVEL
+    binding: "stepData[selectedStep].velocity"
+
+  - element: 5
+    type: text
+    content: "Speed:"
+    position: [0, 54]
+    size: [57, 17]
+    text_size: STYLE1X
+
+  - element: 6
+    type: text
+    content: "speed value"
+    position: [58, 54]
+    size: [69, 17]
+    text_size: STYLE1X
+    highlight: STATE_CV2_SPEED
+    binding: "stepData[selectedStep].cv2speed"
+
+  - element: 10
+    type: text
+    content: "offset:"
+    position: [0, 71]
+    size: [57, 17]
+    text_size: STYLE1X
+
+  - element: 11
+    type: text
+    content: "offset value"
+    position: [58, 71]
+    size: [69, 17]
+    text_size: STYLE1X
+    highlight: STATE_CV2_OFFSET
+    binding: "stepData[selectedStep].cv2offset"

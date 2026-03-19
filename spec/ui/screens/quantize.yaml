@@ -1,0 +1,68 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp scaleMenuDisplay() ~line 1515
+
+screen: quantize
+menu_id: QUANTIZE_MENU
+title: "ch{n} quantizer"
+display_handler: scaleMenuDisplay
+
+layout:
+  - element: 0
+    type: text
+    content: "ch{n} quantizer"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 3
+    type: text
+    content: "scale:"
+    position: [0, 15]
+    size: [48, 16]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "scale value"
+    position: [48, 15]
+    size: [79, 16]
+    text_size: STYLE1X
+    highlight: STATE_QUANTIZESCALE
+    binding: "sequenceArray[ch].quantizeScale"
+    format: "12 semitone, pythagorean, colundi, 17-TET"
+
+  - element: 5
+    type: text
+    content: "key:"
+    position: [0, 31]
+    size: [48, 16]
+    text_size: STYLE1X
+
+  - element: 6
+    type: text
+    content: "key value"
+    position: [48, 31]
+    size: [79, 16]
+    text_size: STYLE1X
+    highlight: STATE_QUANTIZEKEY
+    binding: "sequenceArray[ch].quantizeKey"
+    format: "[c, c#, d, d#, e, f, f#, g, g#, a, a#, b]"
+
+  - element: 7
+    type: text
+    content: "mode:"
+    position: [0, 47]
+    size: [48, 16]
+    text_size: STYLE1X
+
+  - element: 8
+    type: text
+    content: "mode value"
+    position: [48, 47]
+    size: [79, 16]
+    text_size: STYLE1X
+    highlight: STATE_QUANTIZEMODE
+    binding: "sequenceArray[ch].quantizeMode"
+    format: "[chromatic, ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian, blues_major, blues_minor, pent_major, pent_minor, folk, japanese, gamelan, gypsy, arabian, flamenco, wholetone]"
+    notes: "In STATE_QUANTIZEMODE, matrix LEDs show scale degrees as toggle grid"

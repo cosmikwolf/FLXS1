@@ -1,0 +1,43 @@
+# Module Spec — Example Module
+# Replace "example_module" with your actual module name.
+# See spec/FORMAT.md for the full Module Spec Format reference.
+
+module: example_module          # Unique module name (snake_case)
+layer: driver                   # One of: application | middleware | driver | hal | pac
+language: cpp                   # Must match architecture.yaml language (c | cpp | rust)
+
+owns: []                        # Resources this module exclusively controls (e.g. ["SPI0", "TIM2"])
+borrows: []                     # Resources used but not owned — must be passed in by caller
+depends_on: []                  # Other modules this one imports/calls (must exist in spec/modules/ or spec/interfaces/)
+external_deps: []               # External packages from architecture.yaml (see spec/FORMAT.md)
+  # - name: i2c_t3              # Must match external_packages[].name in architecture.yaml
+  #   used_headers:             # Specific headers this module needs from the package
+  #     - "i2c_t3.h"
+  #   used_modules: []          # Rust only: specific modules/traits used
+
+interface:                      # Public API — one entry per function
+  - name: example_init          # Function name (snake_case)
+    inputs: []                  # List of parameter types/names, e.g. ["uint8_t channel", "uint32_t timeout_ms"]
+    outputs: ["int"]            # Return type. C/C++: int return code. Rust: Result<T, E>
+    blocking: false             # true if this function may block
+    isr_safe: false             # true if safe to call from an ISR context
+
+error_handling: return_code     # C: return_code | output_pointer | callback | errno_style
+                                # C++: return_code | exception | result | error_code
+                                # Rust: result | panic_never
+
+memory:
+  allocation: static            # static | stack | none (never heap unless explicitly authorised)
+  max_instances: 1              # Maximum concurrent instances of this module
+  buffer_owner: caller          # caller | module — who owns data buffers
+
+concurrency:
+  thread_safe: false            # true if API must be safe to call from multiple threads/tasks
+  isr_shared: false             # true if any variables are shared between ISR and main context
+  isr_shared_vars: []           # List of shared variable names (required if isr_shared is true)
+  protection: none              # disable_irq | mutex | none (must not be "none" if isr_shared is true)
+
+constraints:                    # Module-specific constraints (in addition to global_constraints)
+  - "No dynamic allocation"
+
+notes: ""                       # Optional human-readable notes or clarifications

@@ -1,0 +1,54 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp patternChainMenuHandler() ~line 2769
+
+screen: pattern_chain
+menu_id: MENU_PATTERN_CHAIN
+title: "SONG EDIT"
+display_handler: patternChainMenuHandler
+notes: "Song mode pattern chain editor. Chain up to 16 patterns with per-channel selection and repeat counts."
+
+layout:
+  - element: 0
+    type: text
+    content: "SONG EDIT"
+    position: [0, 0]
+    size: [86, 16]
+    text_size: STYLE1X
+    color: "conditional — background/contrastColor or RED/BLACK based on chain active"
+
+  - element: 7
+    type: text
+    content: "pattern info"
+    position: [86, 0]
+    size: [42, 8]
+    text_size: REGULAR1X
+    notes: "Shows current pattern/push play hint"
+
+  - element: 8
+    type: text
+    content: "repeat info"
+    position: [86, 8]
+    size: [42, 8]
+    text_size: REGULAR1X
+    notes: "Shows repeat count or 'to start'"
+
+  - element: 5
+    type: text
+    content: "event pattern count channels"
+    position: [0, 20]
+    size: [128, 15]
+    text_size: REGULAR1X
+    color: [background, contrastColor]
+    notes: "Column header"
+
+  # Chain entries (4 visible at a time, scrollable)
+  - element: "1-4"
+    type: text
+    content: "chain entry"
+    position: "[0, 30/46/62/78]"
+    size: [127, 16]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+    binding: "chainPatternSelect[], chainPatternRepeatCount[], chainModeMasterChannel[], chainChannelSelect[][], chainChannelMute[][]"
+    format: "{index} pt:{pattern} x{repeat} {ch1}{ch2}{ch3}{ch4}"
+    notes: "Each entry shows event index, pattern number, repeat count, and per-channel enable/mute status"

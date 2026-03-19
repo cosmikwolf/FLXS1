@@ -1,0 +1,199 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp modMenu1_DisplayHandler() ~line 1720, modMenu2_DisplayHandler() ~line 1789
+
+# --- MODULATION MENU 1 ---
+screen: modulation_1
+menu_id: MOD_MENU_1
+title: "ch{n} modulation 1"
+display_handler: modMenu1_DisplayHandler
+notes: "CV input modulation mappings for skip, gate, random, pitch, glide"
+
+layout:
+  - element: 0
+    type: text
+    content: "ch{n} modulation 1"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "skip rndm:"
+    position: [0, 15]
+    size: [82, 16]
+    text_size: STYLE1X
+    highlight: STATE_SKIPSTEPCOUNT
+    binding: "sequenceArray[ch].skipStepCount"
+
+  - element: 2
+    type: text
+    content: "skip trigger"
+    position: [83, 15]
+    size: [40, 16]
+    text_size: STYLE1X
+    highlight: STATE_SKIPSTEP
+    binding: "sequenceArray[ch].gpio_skipstep"
+
+  - element: 3
+    type: text
+    content: "gate lngth:"
+    position: [0, 31]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "gate mod mapping"
+    position: [83, 31]
+    size: [40, 16]
+    text_size: STYLE1X
+    highlight: STATE_GATEMOD
+    binding: "sequenceArray[ch].cv_gatemod"
+
+  - element: 5
+    type: text
+    content: "rndm pch"
+    position: [0, 47]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 11
+    type: text
+    content: "add:{n}"
+    position: [67, 47]
+    size: [29, 8]
+    text_size: REGULAR1X
+    highlight: STATE_RANDOMHIGH
+    binding: "sequenceArray[ch].randomHigh"
+
+  - element: 12
+    type: text
+    content: "sub:{n}"
+    position: [67, 55]
+    size: [29, 8]
+    text_size: REGULAR1X
+    highlight: STATE_RANDOMLOW
+    binding: "sequenceArray[ch].randomLow"
+
+  - element: 6
+    type: text
+    content: "random trigger"
+    position: [96, 47]
+    size: [31, 16]
+    text_size: STYLE1X
+    highlight: STATE_RANDOMPITCH
+    binding: "sequenceArray[ch].gpio_randompitch"
+
+  - element: 7
+    type: text
+    content: "transpose:"
+    position: [0, 63]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 8
+    type: text
+    content: "pitch mod mapping"
+    position: [83, 63]
+    size: [40, 16]
+    text_size: STYLE1X
+    highlight: STATE_PITCHMOD
+    binding: "sequenceArray[ch].cv_pitchmod"
+
+  - element: 9
+    type: text
+    content: "glide time:"
+    position: [0, 79]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 10
+    type: text
+    content: "glide mod mapping"
+    position: [83, 79]
+    size: [40, 16]
+    text_size: STYLE1X
+    highlight: STATE_GLIDEMOD
+    binding: "sequenceArray[ch].cv_glidemod"
+
+---
+# --- MODULATION MENU 2 ---
+screen: modulation_2
+menu_id: MOD_MENU_2
+title: "ch{n} modulation 2"
+display_handler: modMenu2_DisplayHandler
+notes: "CV input modulation mappings for arpeggio parameters"
+
+layout:
+  - element: 0
+    type: text
+    content: "ch{n} modulation 2"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 1
+    type: text
+    content: "arp type:"
+    position: [0, 15]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 2
+    type: text
+    content: "arp type mod"
+    position: [80, 15]
+    size: [47, 16]
+    text_size: STYLE1X
+    highlight: STATE_ARPTYPEMOD
+    binding: "sequenceArray[ch].cv_arptypemod"
+
+  - element: 3
+    type: text
+    content: "arp speed:"
+    position: [0, 31]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "arp speed mod"
+    position: [80, 31]
+    size: [47, 16]
+    text_size: STYLE1X
+    highlight: STATE_ARPSPDMOD
+    binding: "sequenceArray[ch].cv_arpspdmod"
+
+  - element: 5
+    type: text
+    content: "arp octve:"
+    position: [0, 47]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 6
+    type: text
+    content: "arp octave mod"
+    position: [80, 47]
+    size: [47, 16]
+    text_size: STYLE1X
+    highlight: STATE_ARPOCTMOD
+    binding: "sequenceArray[ch].cv_arpoctmod"
+
+  - element: 7
+    type: text
+    content: "arp intvl:"
+    position: [0, 63]
+    size: [64, 16]
+    text_size: STYLE1X
+
+  - element: 8
+    type: text
+    content: "arp interval mod"
+    position: [80, 63]
+    size: [47, 16]
+    text_size: STYLE1X
+    highlight: STATE_ARPINTMOD
+    binding: "sequenceArray[ch].cv_arpintmod"

@@ -1,0 +1,106 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp stateDisplay_arp() ~line 1078
+
+screen: arpeggio
+menu_id: ARPEGGIO_MENU
+title: "arpeggio"
+title_multiselect: "arpmulti"
+display_handler: stateDisplay_arp
+
+layout:
+  - element: 0
+    type: text
+    content: title
+    position: [0, 0]
+    size: [86, 16]
+    text_size: STYLE1X
+
+  - element: 7
+    type: text
+    content: "ch{n} pt{nn}"
+    position: [86, 0]
+    size: [42, 8]
+    text_size: REGULAR1X
+    binding: "globalObj->selectedChannel, sequenceArray[ch].pattern"
+
+  - element: 12
+    type: text
+    content: "stp:{nn}-{nn}"
+    position: [86, 8]
+    size: [42, 8]
+    text_size: REGULAR1X
+    binding: "notePage"
+
+  - element: 1
+    type: text
+    content: "algo"
+    position: [0, 20]
+    size: [63, 17]
+    text_size: STYLE1X
+
+  - element: 2
+    type: text
+    content: "arp type"
+    position: [63, 20]
+    size: [64, 17]
+    text_size: STYLE1X
+    highlight: STATE_ARPTYPE
+    binding: "stepData[selectedStep].arpType"
+    format: "[off, up, dn, updn1, updn2, rand]"
+
+  - element: 4
+    type: text
+    content: "speed"
+    position: [0, 37]
+    size: [63, 17]
+    text_size: STYLE1X
+
+  - element: 5
+    type: text
+    content: "numerator"
+    position: [63, 37]
+    size: [32, 17]
+    text_size: STYLE1X
+    highlight: STATE_ARPSPEEDNUM
+    binding: "stepData[selectedStep].arpSpdNum"
+
+  - element: 6
+    type: text
+    content: "denominator"
+    position: [95, 37]
+    size: [32, 17]
+    text_size: STYLE1X
+    highlight: STATE_ARPSPEEDDEN
+    binding: "stepData[selectedStep].arpSpdDen"
+
+  - element: 8
+    type: text
+    content: "octve"
+    position: [0, 54]
+    size: [63, 17]
+    text_size: STYLE1X
+
+  - element: 9
+    type: text
+    content: "octave value"
+    position: [63, 54]
+    size: [64, 17]
+    text_size: STYLE1X
+    highlight: STATE_ARPOCTAVE
+    binding: "stepData[selectedStep].arpOctave"
+
+  - element: 10
+    type: text
+    content: "intvl"
+    position: [0, 71]
+    size: [63, 17]
+    text_size: STYLE1X
+
+  - element: 11
+    type: text
+    content: "chord/interval"
+    position: [63, 71]
+    size: [64, 17]
+    text_size: STYLE1X
+    highlight: STATE_CHORD
+    binding: "stepData[selectedStep].chord"

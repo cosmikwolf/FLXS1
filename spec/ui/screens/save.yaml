@@ -1,0 +1,77 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp saveMenuDisplayHandler() ~line 2071
+
+screen: save
+menu_id: SAVE_MENU
+title: "Save Slots page {n}"
+display_handler: saveMenuDisplayHandler
+
+layout:
+  - element: 16
+    type: text
+    content: "Save Slots page {n}"
+    position: [0, 0]
+    size: [128, 16]
+    text_size: STYLE1X
+    color: [RED, BLACK]
+    binding: "globalObj->pattern_page"
+
+  - element: 17
+    type: text
+    content: "CHANNEL"
+    position: [0, 16]
+    size: [128, 8]
+    text_size: REGULAR1X
+    color: [BLACK, YELLOW]
+
+  # Channel selector row (ch1-ch4)
+  - element: "0-3"
+    type: text
+    content: "ch{n}"
+    position: "[0/32/64/96, 24]"
+    size: [32, 16]
+    text_size: STYLE1X
+    color: "conditional — highlighted if patternChannelSelector bit set"
+    binding: "globalObj->patternChannelSelector"
+
+  - element: 18
+    type: text
+    content: "SAVE DESTINATION INDEX"
+    position: [0, 40]
+    size: [128, 8]
+    text_size: REGULAR1X
+    color: [BLACK, YELLOW]
+
+  # Save destination row
+  - element: "4-7"
+    type: text
+    content: "destination index"
+    position: "[0/32/64/96, 48]"
+    size: [32, 16]
+    text_size: STYLE1X
+    binding: "globalObj->saveDestination[0-3]"
+
+  # Data status row
+  - element: "21-24"
+    type: text
+    content: "DATA or EMPTY"
+    position: "[0/32/64/96, 64]"
+    size: [32, 8]
+    text_size: REGULAR1X
+    binding: "globalObj->savedSequences[ch][destination]"
+
+  - element: 19
+    type: text
+    content: "press shift+pattern to save"
+    position: [0, 80]
+    size: [128, 8]
+    text_size: REGULAR1X
+    color: [BLACK, YELLOW]
+
+  - element: 20
+    type: text
+    content: "shift - help"
+    position: [0, 88]
+    size: [128, 8]
+    text_size: REGULAR1X
+    color: [RED, BLACK]

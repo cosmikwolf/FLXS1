@@ -1,0 +1,166 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source files: src/LEDArray.h, src/LEDArray.cpp
+
+led_groups:
+  - id: main_matrix_leds
+    count: 16
+    led_indices: [2,3,4,5,7,8,9,10,12,13,14,15,17,18,19,20]
+    notes: "16 step LEDs mapped via ledMainMatrix[16]"
+
+  - id: channel_button_leds
+    count: 4
+    led_indices: [1,6,11,16]
+    notes: "4 channel indicator LEDs mapped via ledChannelButtons[4]"
+
+  - id: aux_button_leds
+    count: 3
+    led_indices: [0,21,22]
+    notes: "Play/pause LED (0), page select LED (21), mode LED (22)"
+
+# LED handlers per menu state
+led_handlers:
+  - id: pitch_mode
+    handler: channelPitchModeLEDHandler
+    active_menus: [PITCH_GATE_MENU, MENU_RANDOM, ARPEGGIO_MENU]
+    condition: "!globalObj->multiSelectSwitch"
+    main_matrix:
+      - condition: "step == activeStep"
+        color: { r: 127, g: 127, b: 127, w: 255 }
+      - condition: "gateType == 0 (rest)"
+        color: { r: 1, g: 1, b: 1, w: 1 }
+      - condition: "gateType != 0"
+        color: "wheel(pitch)"
+      - condition: "step == selectedStep && blinkTimer < half_beat"
+        color: { r: 255, g: 255, b: 255, w: 0 }
+    aux_leds:
+      led_21: "wheel() based on notePage (255/191/127 positions)"
+      led_22: "wheel() based on notePage (127/127/191/255 positions)"
+    channel_leds: "channelLEDHandler()"
+    play_led: "playPauseHandler()"
+
+  - id: multiselect_mode
+    handler: multiSelectLEDHandler
+    active_menus: [PITCH_GATE_MENU, MENU_RANDOM, ARPEGGIO_MENU, VELOCITY_MENU]
+    condition: "globalObj->multiSelectSwitch"
+    main_matrix:
+      - condition: "step selected && blink half"
+        color: { r: 0, g: 0, b: 0, w: 255 }
+      - condition: "gateType != 0"
+        color: "wheel(pitch)"
+      - condition: "gateType == 0"
+        color: { r: 16, g: 0, b: 16, w: 0 }
+
+  - id: sequence_mode
+    handler: channelSequenceModeLEDHandler
+    active_menus: [SEQUENCE_MENU, QUANTIZE_MENU, MOD_MENU_1, MOD_MENU_2,
+                   TEMPO_MENU, GLOBAL_MENU_1, GLOBAL_MENU_2, SYSEX_MENU]
+    condition: "stepMode != STATE_QUANTIZEMODE"
+    main_matrix:
+      - condition: "step == activeStep"
+        color: { r: 255, g: 255, b: 255, w: 255 }
+      - condition: "gateType == 0 (rest)"
+        color: { r: 1, g: 1, b: 1, w: 1 }
+      - condition: "gateType != 0"
+        color: "wheel(pitch)"
+
+  - id: quantize_mode
+    handler: quantizeModeLEDHandler
+    active_menus: [SEQUENCE_MENU, QUANTIZE_MENU, MOD_MENU_1, MOD_MENU_2,
+                   TEMPO_MENU, GLOBAL_MENU_1, GLOBAL_MENU_2, SYSEX_MENU]
+    condition: "stepMode == STATE_QUANTIZEMODE"
+    main_matrix:
+      - condition: "quantizeMode bit set"
+        color: { r: 0, g: 255, b: 0, w: 255 }
+      - condition: "quantizeMode bit clear"
+        color: { r: 255, g: 0, b: 255, w: 0 }
+
+  - id: gate_mode
+    handler: channelGateModeLEDHandler
+    active_menus: [VELOCITY_MENU]
+    condition: "!globalObj->multiSelectSwitch"
+    main_matrix:
+      - condition: "step == activeStep && gateType == 1"
+        color: { r: 0, g: 0, b: 255, w: 128 }
+      - condition: "step == activeStep && gateType == 2"
+        color: { r: 255, g: 0, b: 0, w: 128 }
+      - condition: "step == activeStep && gateType == 3"
+        color: { r: 0, g: 255, b: 0, w: 128 }
+      - condition: "step == activeStep && gateType == other"
+        color: { r: 255, g: 255, b: 255, w: 255 }
+      - condition: "step == selectedStep"
+        color: "wheel(millis/5)"
+      - condition: "gateType == 0"
+        color: { r: 0, g: 0, b: 0, w: 0 }
+      - condition: "gateType == 1 (step)"
+        color: { r: 0, g: 0, b: 255, w: 0 }
+      - condition: "gateType == 2 (tie)"
+        color: { r: 255, g: 0, b: 0, w: 0 }
+      - condition: "gateType == 3 (1hit)"
+        color: { r: 0, g: 255, b: 0, w: 0 }
+
+  - id: pattern_select_save
+    handler: patternSelectSaveHandler
+    active_menus: [INPUT_DEBUG_MENU, PATTERN_SELECT, SAVE_MENU]
+    main_matrix:
+      - condition: "pattern has saved data"
+        color: "wheel(millis/5 + 18*n)"
+      - condition: "pattern is empty"
+        color: { r: 0, g: 0, b: 0, w: 10 }
+      - condition: "SAVE_MENU && is save destination && blink"
+        color: { r: 100, g: 100, b: 100, w: 10 }
+    channel_leds:
+      - condition: "patternChannelSelector bit set"
+        color: "wheel(millis/10 + 18*i, 200)"
+      - condition: "patternChannelSelector bit clear"
+        color: { r: 16, g: 16, b: 16, w: 0 }
+
+  - id: pattern_chain
+    handler: patternChainLEDHandler
+    active_menus: [MENU_PATTERN_CHAIN]
+    main_matrix:
+      - condition: "is selected chain pattern"
+        color: "wheel(millis/5 + 18*n, 255)"
+      - condition: "has saved data"
+        color: "dim(wheel(millis/5 + 18*n), 64)"
+      - condition: "empty"
+        color: { r: 0, g: 0, b: 0, w: 10 }
+    channel_leds:
+      - condition: "is master channel for chain"
+        color: "wheel(millis/10, 255)"
+      - condition: "channel selected for chain"
+        color: { r: 0, g: 0, b: 0, w: 200 }
+      - condition: "channel not selected"
+        color: { r: 0, g: 0, b: 0, w: 10 }
+
+# Common LED sub-handlers
+common_handlers:
+  - id: play_pause
+    handler: playPauseHandler
+    led_index: 0
+    states:
+      - condition: "playing && chainModeActive"
+        color: "wheel(192)"
+      - condition: "playing && !chainModeActive"
+        color: "wheel(64)"
+      - condition: "!playing && chainModeActive"
+        color: "wheel(255, 32)"
+      - condition: "!playing && !chainModeActive"
+        color: "wheel(255)"
+
+  - id: channel_indicator
+    handler: channelLEDHandler
+    led_group: channel_button_leds
+    states:
+      - condition: "selected && muted"
+        color: { r: 127, g: 0, b: 0, w: 32 }
+      - condition: "selected && !muted"
+        color: { r: 0, g: 0, b: 127, w: 64 }
+      - condition: "!selected && muted"
+        color: { r: 127, g: 0, b: 0, w: 0 }
+      - condition: "!selected && !muted"
+        color: { r: 0, g: 127, b: 0, w: 0 }
+
+blink_sync:
+  tempo_sync: true
+  formula: "blinkTimer > 6000000 / tempoX100"
+  notes: "Blink timer resets every half beat, synchronized to master tempo"

@@ -1,0 +1,204 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source files: src/inputModule.h, src/inputModule.cpp, lib/GlobalVariable/src/global.h
+
+timing:
+  input_poll_interval_us: 10000        # INPUT_INTERVAL
+  double_click_ms: 250                 # DOUBLECLICKMS
+  hold_ms: 1000                        # HOLDMS
+  debounce: hardware                   # MAX7301 handles debounce via fell()/rose()
+
+gestures:
+  # Matrix button gestures
+  - id: matrix_press
+    trigger: press
+    device: step_matrix
+    detection: fell
+    notes: "Detected via midplaneGPIO->fell(i)"
+
+  - id: matrix_release
+    trigger: release
+    device: step_matrix
+    detection: rose
+    notes: "Detected via midplaneGPIO->rose(i)"
+
+  # Transport button gestures
+  - id: play_press
+    trigger: press
+    device: transport_buttons.play
+    detection: fell
+
+  - id: rec_press
+    trigger: press
+    device: transport_buttons.rec
+    detection: fell
+
+  - id: stop_press
+    trigger: press
+    device: transport_buttons.stop
+    detection: fell
+
+  # Channel button gestures
+  - id: channel_press
+    trigger: press
+    device: channel_buttons
+    detection: fell
+    notes: "Channel 0-3 detected by switch index"
+
+  - id: channel_release
+    trigger: release
+    device: channel_buttons
+    detection: rose
+
+  - id: channel_hold
+    trigger: hold
+    device: channel_buttons
+    hold_time_ms: 1000
+    notes: "Detected via buttonHoldTimer and heldButton. Enables shortcut mode."
+
+  # Navigation button gestures
+  - id: pgup_release
+    trigger: release
+    device: navigation_buttons.pgup
+    detection: rose
+    notes: "PgUp uses rose (release) not fell (press)"
+
+  - id: pgdn_release
+    trigger: release
+    device: navigation_buttons.pgdn
+    detection: rose
+    notes: "PgDn uses rose (release) not fell (press)"
+
+  - id: pattern_press
+    trigger: press
+    device: navigation_buttons.pattern
+    detection: fell
+
+  - id: menu_press
+    trigger: press
+    device: navigation_buttons.menu
+    detection: fell
+
+  - id: shift_press
+    trigger: press
+    device: navigation_buttons.shift
+    detection: fell
+
+  - id: shift_held
+    trigger: hold
+    device: navigation_buttons.shift
+    notes: "Detected via midplaneGPIO->pressed(SW_SHIFT). Modifier key."
+
+  # Encoder gestures
+  - id: encoder_rotate
+    trigger: rotate
+    device: rotary_encoder
+    notes: "Accumulated as knobChange = knobRead - knobPrevious"
+
+  - id: encoder_button_press
+    trigger: press
+    device: rotary_encoder.encoder_button
+    notes: "Toggles globalObj->parameterSelect — switches encoder between value edit and parameter select"
+
+button_modes:
+  - id: BUTTON_MODE_WAIT
+    value: 0
+    description: "Default mode, waiting for input"
+
+  - id: BUTTON_MODE_XOX
+    value: 1
+    description: "Step sequencer XOX toggle mode"
+
+  - id: BUTTON_MODE_PLAYRANGE
+    value: 2
+    description: "Set play range while playing"
+
+  - id: BUTTON_MODE_MULTISELECT
+    value: 3
+    description: "Multi-step selection mode"
+
+combinations:
+  - id: shift_pattern
+    buttons: [shift, pattern]
+    action: "Enter save mode (STATE_SAVE)"
+    notes: "In save menu, executes save. Outside, enters save mode."
+
+  - id: shift_menu
+    buttons: [shift, menu]
+    action: "Enter global settings (STATE_PG_BTN_SWITCH)"
+    notes: "Cycles through GLOBAL_MENU_1 → GLOBAL_MENU_2 → PITCH_GATE_MENU"
+
+  - id: shift_pgup
+    buttons: [shift, pgup]
+    action: "Enter pattern chain mode (STATE_PATTERN_CHAIN)"
+
+  - id: shift_pgdn
+    buttons: [shift, pgdn]
+    action: "Toggle multiSelectSwitch, return to PITCH_GATE_MENU"
+
+  - id: shift_channel_menu
+    buttons: [shift, channel, menu]
+    action: "Enter calibration menu (STATE_CALIB_INPUT0_OFFSET)"
+
+  - id: shift_channel
+    buttons: [shift, channel]
+    action: "Enter tuner (STATE_TUNER)"
+
+  - id: channel_hold_matrix
+    buttons: [channel_hold, step_matrix]
+    action: "Activate shortcut per matrix button position"
+    shortcut_map:
+      SW_00: "Toggle mute gate"
+      SW_01: "Toggle mute CV A"
+      SW_02: "Toggle mute CV B"
+      SW_03: "Fill shortcut"
+      SW_04: "Clock divider shortcut"
+      SW_05: "Reset sequence"
+      SW_06: "Toggle reverse/pendulum"
+      SW_07: "Skip shortcut"
+      SW_08: "Random shortcut"
+      SW_09: "Transpose shortcut"
+      SW_10: "Tuner shortcut"
+      SW_11: "Page shortcut"
+      SW_12: "Function 1"
+      SW_13: "Function 2"
+      SW_14: "Function 3"
+      SW_15: "Function 4"
+
+  - id: play_matrix
+    buttons: [play, step_matrix]
+    action: "Copy step (or copy pattern in SAVE_MENU)"
+
+  - id: rec_matrix
+    buttons: [rec, step_matrix]
+    action: "Paste step (or paste pattern in SAVE_MENU)"
+
+  - id: stop_matrix
+    buttons: [stop, step_matrix]
+    action: "Clear step (or clear pattern in SAVE_MENU)"
+
+  - id: play_channel
+    buttons: [play, channel]
+    action: "Copy channel"
+
+  - id: rec_channel
+    buttons: [rec, channel]
+    action: "Paste channel"
+
+  - id: play_pgup
+    buttons: [play, pgup]
+    action: "Copy page"
+
+  - id: rec_pgup
+    buttons: [rec, pgup]
+    action: "Paste page"
+
+  - id: shift_play_menu
+    buttons: [shift, play, menu]
+    action: "Enter calibration menu"
+    notes: "Emergency calibration entry"
+
+  - id: shift_rec
+    buttons: [shift, rec]
+    action: "Enter input debug menu (STATE_INPUTDEBUG)"
+
+sequences: []

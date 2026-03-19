@@ -1,0 +1,110 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source files: src/displayModule.h, lib/SSD_13XX/_fonts/
+
+fonts:
+  - id: a04b03
+    file: "_fonts/a04b03.c"
+    usage: primary_text
+    text_sizes: [REGULAR1X, REGULAR2X, BOLD1X, BOLD2X, BOLD4X, REGULARSPECIAL]
+    notes: "Default font for most UI elements. Used at scales 1x-4x."
+
+  - id: flxs1_menu
+    file: "_fonts/flxs1_menu.c"
+    usage: menu_labels
+    text_sizes: [STYLE1X, MODALBOLD]
+    notes: "Custom menu font. Used for screen titles, labels, and modal popups."
+
+  - id: unborn_small
+    file: "_fonts/unborn_small.c"
+    usage: decorative
+    notes: "Small decorative font. Included but primary usage not identified."
+
+  - id: visitor_18
+    file: "_fonts/Visitor_18.c"
+    usage: decorative
+    notes: "18pt pixel font. Available but not used in primary render calls."
+
+  - id: f_zero_18
+    file: "_fonts/F_Zero_18.c"
+    usage: decorative
+    notes: "18pt pixel font. Available but not used in primary render calls."
+
+  - id: lady_radical_16
+    file: "_fonts/LadyRadical_16.c"
+    usage: splash_screen
+    notes: "Used for 'Zetaohm' text on boot splash at 2x scale."
+
+  - id: orbit_b_12
+    file: "_fonts/OrbitB_12.c"
+    usage: decorative
+    notes: "12pt orbital font. Available but not used in primary render calls."
+
+  - id: orbit_bold_14
+    file: "_fonts/OrbitBold_14.c"
+    usage: initialization
+    notes: "Set as initial font during display initialization."
+
+  - id: pixel_square_10
+    file: "_fonts/PixelSquare_10.c"
+    usage: decorative
+    notes: "10pt pixel font. Available for use."
+
+  - id: pixel_square_bold_10
+    file: "_fonts/PixelSquareBold_10.c"
+    usage: decorative
+    notes: "10pt bold pixel font. Available for use."
+
+  - id: neue_haas_xblack_28
+    file: "_fonts/NeueHaasXBlack_28.c"
+    usage: splash_screen
+    notes: "Used for 'FLXS1' text on boot splash at 1x scale."
+
+text_size_definitions:
+  REGULAR1X: { id: 0, font: a04b03, scale: 1 }
+  BOLD1X: { id: 1, font: a04b03, scale: 1 }
+  REGULAR2X: { id: 2, font: a04b03, scale: 2 }
+  BOLD2X: { id: 3, font: a04b03, scale: 2, cursor: "CENTER, y+1" }
+  REGULAR3X: { id: 4, font: a04b03, scale: 3 }
+  BOLD3X: { id: 5, font: a04b03, scale: 3 }
+  REGULAR4X: { id: 6, font: a04b03, scale: 4 }
+  BOLD4X: { id: 7, font: a04b03, scale: 4, cursor: "CENTER, y" }
+  STYLE1X: { id: 8, font: flxs1_menu, scale: 1, cursor: "x+2, y+2" }
+  MODALBOLD: { id: 9, font: flxs1_menu, scale: 1, cursor: "CENTER, y", wrap: false }
+  REGULARSPECIAL: { id: 10, font: a04b03, scale: 1, cursor: "x+w/2, y+h/2, REL_XY" }
+
+color_palette:
+  # Standard colors (from SSD_13XX library)
+  BLACK: 0x0000
+  BLUE: 0x001F
+  RED: 0xF800
+  GREEN: 0x07E0
+  CYAN: 0x07FF
+  MAGENTA: 0xF81F
+  YELLOW: 0xFFE0
+  WHITE: 0xFFFF
+  # Custom colors (from displayModule.h)
+  NAVY: 0x000F
+  LIGHTBLUE: 0x421F
+  DARKGREEN: 0x67E0
+  DARKCYAN: 0x03EF
+  MAROON: 0x7800
+  PURPLE: 0x780F
+  OLIVE: 0x7BE0
+  LIGHTGREY: 0xC618
+  DARKGREY: 0x7BEF
+  ORANGE: 0xFD20
+  LIGHTORANGE: 0xFEAF
+  LIGHTGREEN: 0xAFEF
+  GREENYELLOW: 0xAFE5
+  PINK: 0xF81F
+  LIGHTPINK: 0xFCFF
+  DARKPURPLE: 0x48B3
+
+channel_color_scheme:
+  - { channel: 0, foreground: ORANGE, contrast: LIGHTORANGE, background: BLACK }
+  - { channel: 1, foreground: DARKGREEN, contrast: LIGHTGREEN, background: BLACK }
+  - { channel: 2, foreground: PINK, contrast: LIGHTPINK, background: BLACK }
+  - { channel: 3, foreground: RED, contrast: LIGHTGREY, background: BLACK }
+
+icons: []
+bitmaps: []

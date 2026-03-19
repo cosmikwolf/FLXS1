@@ -1,0 +1,81 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp patternSelectDisplay() ~line 1853
+
+screen: pattern_select
+menu_id: PATTERN_SELECT
+title: "PATTERN PAGE {n}"
+title_alt: "CHAIN MODE"
+display_handler: patternSelectDisplay
+
+layout:
+  - element: 16
+    type: text
+    content: "PATTERN PAGE {n}"
+    position: [0, 0]
+    size: [128, 16]
+    text_size: STYLE1X
+    color: "conditional — RED on BLACK when chain mode"
+
+  # Channel pattern assignments row
+  - element: 17
+    type: text
+    content: "ch1 pattern"
+    position: [0, 16]
+    size: [32, 12]
+    text_size: REGULAR1X
+    binding: "sequenceArray[0].pattern"
+
+  - element: 18
+    type: text
+    content: "ch2 pattern"
+    position: [32, 16]
+    size: [32, 12]
+    text_size: REGULAR1X
+    binding: "sequenceArray[1].pattern"
+
+  - element: 19
+    type: text
+    content: "ch3 pattern"
+    position: [64, 16]
+    size: [32, 12]
+    text_size: REGULAR1X
+    binding: "sequenceArray[2].pattern"
+
+  - element: 20
+    type: text
+    content: "ch4 pattern"
+    position: [96, 16]
+    size: [32, 12]
+    text_size: REGULAR1X
+    binding: "sequenceArray[3].pattern"
+
+  # Pattern change trigger
+  - element: 21
+    type: text
+    content: "trigger:"
+    position: [0, 28]
+    size: [53, 16]
+    text_size: STYLE1X
+    color: [BLACK, LIGHTGREY]
+
+  - element: 22
+    type: text
+    content: "trigger mode"
+    position: [54, 28]
+    size: [74, 16]
+    text_size: STYLE1X
+    binding: "globalObj->patternChangeTrigger"
+    format: "[immediate, ch1, ch2, ch3, ch4]"
+
+  # 4x4 pattern grid
+  pattern_grid:
+    origin: [3, 46]
+    cell_size: [31, 13]
+    x_offset: 30
+    y_offset: 12
+    count: 16
+    text_size: REGULARSPECIAL
+    binding: "globalObj->savedSequences[0-3][pattern+page*16]"
+    format: "channel indicator (1/2/3/4/12/etc.) or empty"
+    color: "ORANGE if has data, dimmer for empty"
+    notes: "Elements 0-15 in a 4x4 grid. Page selectable via pgup/pgdn (0-7 pages = 128 patterns)"

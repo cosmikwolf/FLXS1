@@ -1,0 +1,98 @@
+# REVERSE-ENGINEERED UI SPEC — Review before using
+# Source: src/displayModule.cpp sequenceMenuDisplay() ~line 1330
+
+screen: sequence
+menu_id: SEQUENCE_MENU
+title: "ch{n} transport"
+display_handler: sequenceMenuDisplay
+
+layout:
+  - element: 0
+    type: text
+    content: "ch{n} transport"
+    position: [0, 0]
+    size: [128, 15]
+    text_size: STYLE1X
+    color: [background, contrastColor]
+
+  - element: 9
+    type: text
+    content: "first step:"
+    position: [0, 15]
+    size: [89, 16]
+    text_size: STYLE1X
+
+  - element: 10
+    type: text
+    content: "first step value"
+    position: [90, 15]
+    size: [37, 16]
+    text_size: STYLE1X
+    highlight: STATE_FIRSTSTEP
+    binding: "sequenceArray[ch].firstStep"
+
+  - element: 1
+    type: text
+    content: "step count:"
+    position: [0, 31]
+    size: [89, 16]
+    text_size: STYLE1X
+
+  - element: 2
+    type: text
+    content: "step count value"
+    position: [90, 31]
+    size: [37, 16]
+    text_size: STYLE1X
+    highlight: STATE_STEPCOUNT
+    binding: "sequenceArray[ch].stepCount"
+
+  - element: 3
+    type: text
+    content: "clock div:"
+    position: [0, 47]
+    size: [89, 16]
+    text_size: STYLE1X
+
+  - element: 4
+    type: text
+    content: "clock division"
+    position: [90, 47]
+    size: [37, 16]
+    text_size: STYLE1X
+    highlight: STATE_BEATCOUNT
+    binding: "sequenceArray[ch].clockDivision"
+
+  - element: 5
+    type: text
+    content: "direction:"
+    position: [0, 63]
+    size: [89, 16]
+    text_size: STYLE1X
+
+  - element: 6
+    type: text
+    content: "play mode"
+    position: [90, 63]
+    size: [37, 16]
+    text_size: STYLE1X
+    highlight: STATE_PLAYMODE
+    binding: "sequenceArray[ch].playMode"
+    format: "[FWD, REV, RNDM, PEND]"
+
+  - element: 7
+    type: text
+    content: "swing:"
+    position: [0, 79]
+    size: [50, 16]
+    text_size: STYLE1X
+
+  - element: 8
+    type: text
+    content: "swing percent"
+    position: [90, 79]
+    size: [37, 16]
+    text_size: STYLE1X
+    highlight: STATE_SWING
+    binding: "sequenceArray[ch].swingX100"
+    format: "percentage"
